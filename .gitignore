@@ -10,6 +10,23 @@
 *.dll
 *.dylib
 
+# additional
+*.db
+*.xml
+*.exe
+*.dll
+*~
+*.log
+*.ini
+*.zip
+*.rar
+*.7z
+*.pdb
+*.cppcheck
+*.csv
+*.xls
+*.xlsx
+
 # Qt-es
 object_script.*.Release
 object_script.*.Debug
@@ -29,6 +46,7 @@ ui_*.h
 *.jsc
 Makefile*
 *build-*
+build-*
 *.qm
 *.prl
 
@@ -52,3 +70,13 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+/*/debug
+/*/release
+/*/GeneratedFiles
+/*/moc
+/*/obj
+/*/release
+/build-*
+/test_source
+/MMSTools-cppcheck*
