@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/settings-96x96.png</file>
+        <file>img/data-transformation.png</file>
+        <file>i18n/EventLogConverter_ru_RU.qm</file>
+        <file>i18n/EventLogConverter_uk_UA.qm</file>
+    </qresource>
+</RCC>
