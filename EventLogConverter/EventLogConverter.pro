@@ -27,7 +27,7 @@ INCLUDEPATH += . src
 PRECOMPILED_HEADER  = src/stdafx.h
 
 HEADERS += \
-#    src/stdafx.h \
+    src/stdafx.h \
     ../Common/Settings/QPayKioskSettings.h \
     src/mainwindow.h \
     src/ELCSettings.h \
