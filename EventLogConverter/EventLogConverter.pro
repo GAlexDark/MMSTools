@@ -3,6 +3,7 @@ QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
+CONFIG += cmdline precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
 #CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -pg -no-pie #-g3 -pg
@@ -18,20 +19,24 @@ QXLSX_HEADERPATH=../Common/3dparty/QXlsx/header/  # current QXlsx header path is
 QXLSX_SOURCEPATH=../Common/3dparty/QXlsx/source/  # current QXlsx source path is ./source/
 include(../Common/3dparty/QXlsx/QXlsx.pri)
 
-#INCLUDEPATH += ../Common/
+
 INCLUDEPATH += ../Common/Settings
 INCLUDEPATH += . src
+
+# Use Precompiled headers (PCH)
+PRECOMPILED_HEADER  = src/stdafx.h
+
+HEADERS += \
+#    src/stdafx.h \
+    ../Common/Settings/QPayKioskSettings.h \
+    src/mainwindow.h \
+    src/ELCSettings.h \
 
 SOURCES += \
     ../Common/Settings/QPayKioskSettings.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/ELCSettings.cpp
-
-HEADERS += \
-    ../Common/Settings/QPayKioskSettings.h \
-    src/mainwindow.h \
-    src/ELCSettings.h
 
 FORMS += \
     src/mainwindow.ui

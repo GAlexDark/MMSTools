@@ -12,13 +12,7 @@
 
 #include "ELCSettings.h"
 
-#include "xlsxdocument.h"
-//#include "xlsxchartsheet.h"
-//#include "xlsxcellrange.h"
-//#include "xlsxchart.h"
-//#include "xlsxrichstring.h"
-//#include "xlsxworkbook.h"
-#include "xlsxformat.h"
+/* The QXlsx headers moved in the stdafx.h file */
 using namespace QXlsx;
 
 const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (id INTEGER PRIMARY KEY ASC, username TEXT, timestampISO8601 TEXT, requestid TEXT, \
