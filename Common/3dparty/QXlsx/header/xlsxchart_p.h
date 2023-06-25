@@ -35,7 +35,9 @@ public:
     enum Type { T_None = (-1), T_Cat, T_Val, T_Date, T_Ser };
     enum AxisPos { None = (-1), Left, Right, Top, Bottom };
 public:
-    XlsxAxis(){}
+    XlsxAxis()
+        :type(Type::T_None), axisPos(AxisPos::None), axisId(0), crossAx(0)
+    {}
 
     XlsxAxis( Type t,
               XlsxAxis::AxisPos p,

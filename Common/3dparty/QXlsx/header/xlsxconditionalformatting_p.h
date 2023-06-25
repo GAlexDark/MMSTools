@@ -18,7 +18,7 @@ class XlsxCfVoData
 {
 public:
     XlsxCfVoData()
-        :gte(true)
+        :type(ConditionalFormatting::ValueObjectType()), gte(true)
     {
     }
 

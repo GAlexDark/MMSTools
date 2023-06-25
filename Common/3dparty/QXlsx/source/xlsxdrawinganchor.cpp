@@ -683,7 +683,7 @@ void DrawingAnchor::saveXmlObjectConnectionShape(QXmlStreamWriter &writer) const
 
 
          writer.writeStartElement(QStringLiteral("a:ln"));
-            if(!xIn_w.isEmpty()&&!xIn_cap.isEmpty()){
+            if(!xIn_w.isEmpty()||!xIn_cap.isEmpty()||!xIn_cmpd.isEmpty()||!xIn_algn.isEmpty()){
                 if(!xIn_w.isEmpty()){
                     writer.writeAttribute(QStringLiteral("w"), xIn_w);
                 }
@@ -898,7 +898,7 @@ void DrawingAnchor::saveXmlObjectShape(QXmlStreamWriter &writer) const
          writer.writeEndElement();//a:blipFill
       }
     writer.writeStartElement(QStringLiteral("a:ln"));
-       if(!xIn_w.isEmpty()&&!xIn_cap.isEmpty()){
+       if(!xIn_w.isEmpty()||!xIn_cap.isEmpty()||!xIn_cmpd.isEmpty()||!xIn_algn.isEmpty()){
            if(!xIn_w.isEmpty()){
                writer.writeAttribute(QStringLiteral("w"), xIn_w);
            }

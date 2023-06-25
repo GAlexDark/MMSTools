@@ -741,8 +741,10 @@ bool Document::setColumnFormat(const CellRange &range, const Format &format)
  */
 bool Document::setColumnHidden(const CellRange &range, bool hidden)
 {
-	if (Worksheet *sheet = currentWorksheet())
-		return sheet->setColumnWidth(range, hidden);
+    if (Worksheet *sheet = currentWorksheet()) {
+        if (hidden)
+            return sheet->setColumnWidth(range, 0);
+    }
 	return false;
 }
 

@@ -1175,7 +1175,7 @@ uint Worksheet::getImageCount()
 
     if ( d->drawing == nullptr )
     {
-        return false;
+        return 0;
     }
 
     int size = d->drawing->anchors.size();
