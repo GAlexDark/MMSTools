@@ -582,6 +582,8 @@ MainWindow::doGenerateReport(const QString &fileName)
     dateFormat.setHorizontalAlignment(Format::AlignRight);
     dateFormat.setNumberFormat("dd.mm.yyyy hh:mm:ss");
 
+    qDebug() << xlsxW.setColumnHidden(colTimestampISO8601, true);
+
     if (!_exec(getAllRecords)) {
         setInfoText(getDBErrorText());
         return false;
