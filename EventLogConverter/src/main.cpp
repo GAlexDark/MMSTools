@@ -19,8 +19,9 @@ int main(int argc, char *argv[])
 
     QTranslator translator;
     if (translator.load(QLocale(), appName, QLatin1String("_"), QLatin1String(":/i18n"))) {
-        QCoreApplication::installTranslator(&translator);
-        qDebug() << "Translator files loaded";
+        if (QCoreApplication::installTranslator(&translator)) {
+            qDebug() << "Translator files loaded";
+        }
     }
 
     MainWindow w;
