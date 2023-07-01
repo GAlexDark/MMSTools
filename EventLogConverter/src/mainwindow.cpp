@@ -514,17 +514,18 @@ MainWindow::doParseEventLogFile()
             m_dbreq.bindValue(":type", headerItems.at(3));
             m_dbreq.bindValue(":details", details);
 
-            m_dbreq.bindValue(":username1", QString());
-            m_dbreq.bindValue(":authtype", QString());
-            m_dbreq.bindValue(":externalip", QString());
-            m_dbreq.bindValue(":internalip", QString());
-
             if ((details.indexOf("ip address:") > 0) && parseUserLogonDetails(details, username, authType, externalip, internalip)) {
                 m_dbreq.bindValue(":username1", username);
                 m_dbreq.bindValue(":authtype", authType);
                 m_dbreq.bindValue(":externalip", externalip);
                 m_dbreq.bindValue(":internalip", internalip);
+            } else {
+                m_dbreq.bindValue(":username1", QString());
+                m_dbreq.bindValue(":authtype", QString());
+                m_dbreq.bindValue(":externalip", QString());
+                m_dbreq.bindValue(":internalip", QString());
             }
+
             if (!_exec()) {
                 m_isHasError = true;
                 setInfoText(getDBErrorText());
