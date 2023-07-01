@@ -66,13 +66,19 @@ MainWindow::MainWindow(QWidget *parent)
     m_state->setMinimumWidth(250);
     ui->statusbar->addWidget(m_state);
 
-    connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
-    connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(onAboutQt()));
+    bool retVal =connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
+    Q_ASSERT_X(retVal, "connect", "actionAbout_program connection is not established");
+    retVal = connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(onAboutQt()));
+    Q_ASSERT_X(retVal, "connect", "actionAbout_Qt connection is not established");
 
-    connect(ui->pbOpenFile, SIGNAL(clicked(bool)), this, SLOT(openFileClick()));
-    connect(ui->pbConvert, SIGNAL(clicked(bool)), this, SLOT(convertEventLogClick()));
-    connect(ui->pbClearDB, SIGNAL(clicked(bool)), this, SLOT(clearDBclick()));
-    connect(ui->pbGenerateReport, SIGNAL(clicked(bool)), this, SLOT(generateReportClick()));
+    retVal = connect(ui->pbOpenFile, SIGNAL(clicked(bool)), this, SLOT(openFileClick()));
+    Q_ASSERT_X(retVal, "connect", "pbOpenFile connection is not established");
+    retVal = connect(ui->pbConvert, SIGNAL(clicked(bool)), this, SLOT(convertEventLogClick()));
+    Q_ASSERT_X(retVal, "connect", "pbConvert connection is not established");
+    retVal = connect(ui->pbClearDB, SIGNAL(clicked(bool)), this, SLOT(clearDBclick()));
+    Q_ASSERT_X(retVal, "connect", "pbClearDB connection is not established");
+    retVal = connect(ui->pbGenerateReport, SIGNAL(clicked(bool)), this, SLOT(generateReportClick()));
+    Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
 
     setStateText(tr("Ready"));
 
