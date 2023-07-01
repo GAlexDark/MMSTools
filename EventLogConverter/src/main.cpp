@@ -15,7 +15,9 @@ int main(int argc, char *argv[])
     QCoreApplication::addLibraryPath(QStringLiteral("%1/plugins").arg(appPath));
 
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
-    ELCSettings::instance().init(appPath, iniFile);
+    if (!ELCSettings::instance().init(appPath, iniFile)) {
+        return 1;
+    }
 
     QTranslator translator;
     if (translator.load(QLocale(), appName, QLatin1String("_"), QLatin1String(":/i18n"))) {
