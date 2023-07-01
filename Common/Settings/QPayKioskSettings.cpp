@@ -24,8 +24,9 @@ QPayKioskSettings::QPayKioskSettings() :
 
 QPayKioskSettings::~QPayKioskSettings()
 {
-    if (m_settings)
+    if (m_settings) {
         delete m_settings;
+    }
 }
 
 bool
@@ -34,11 +35,13 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
     QString iniFileName = QDir(appPath).filePath(fileName);
 
     QFileInfo fileInfo(iniFileName);
-    if (!fileInfo.exists() || !fileInfo.isFile())
+    if (!fileInfo.exists() || !fileInfo.isFile()) {
         createDefault(iniFileName);
+    }
 
-    if (m_settings)
+    if (m_settings) {
         delete m_settings;
+    }
     m_settings = new QSettings(iniFileName, QSettings::IniFormat);
 
     return true;
@@ -47,8 +50,9 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
 QVariant
 QPayKioskSettings::getMain(const QString& keyName) const
 {
-    if (!m_settings)
+    if (!m_settings) {
         return QVariant();
+    }
     return m_settings->value(keyName);
 }
 

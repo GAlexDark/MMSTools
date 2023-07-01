@@ -231,8 +231,9 @@ MainWindow::commitTransaction()
 
 void
 removeQuote(QString &data, QChar quoteChar) {
-    if (data.isNull() || data.isEmpty())
+    if (data.isNull() || data.isEmpty()) {
         return;
+    }
 
     if (data.at(0) == quoteChar) {
         data.remove(0, 1);
@@ -461,7 +462,7 @@ MainWindow::doParseEventLogFile()
         format20 = "yyyy-MM-ddTHH:mm:ssZ"; //lenght 20
     QDateTime timestamp, timestamptz;
 
-    QString username,  authType, ipaddresses, externalip, internalip;
+    QString username,  authType, externalip, internalip;
 
     if (!beginTransaction()) {
         setInfoText(getDBErrorText());
@@ -713,8 +714,9 @@ MainWindow::convertEventLogClick()
     setStateText(tr("File %1 parsing start").arg(QFileInfo(m_filename).fileName()));
     QApplication::processEvents();
 
-    if (doParseEventLogFile() && m_mode == simpleReport)
+    if (doParseEventLogFile() && m_mode == simpleReport) {
         doGenerateReport();
+    }
     doParseDone();
 }
 
