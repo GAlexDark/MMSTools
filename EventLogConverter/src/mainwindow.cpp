@@ -397,8 +397,7 @@ void
 MainWindow::openFileClick()
 {
     QString selected_filter;
-    //QString dir = QApplication::applicationDirPath();
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open MMS EventLog"), QDir::currentPath(), tr("MMS Eventlog (*.csv);; MMS Eventlog (*.xls)"), &selected_filter);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open MMS EventLog"), "", tr("MMS Eventlog (*.csv);; MMS Eventlog (*.xls)"), &selected_filter);
     // The inferior stopped because it triggered an eaxception.
     // ref: https://forum.qt.io/topic/142647/the-inferior-stopped-because-it-triggered-an-eaxception/2
     if (fileName.isEmpty() || fileName.isNull()) {
@@ -743,8 +742,8 @@ void
 MainWindow::generateReportClick()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save MMS EventLog report"),
-                                                      QDir::currentPath(),
-                                                      tr("Excel (*.xlsx)"));
+                                                    "",
+                                                    tr("Excel (*.xlsx)"));
     if (fileName.isEmpty() || fileName.isNull()) {
         return;
     }
