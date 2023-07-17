@@ -15,8 +15,10 @@
 /* The QXlsx headers moved in the stdafx.h file */
 using namespace QXlsx;
 
-const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (id INTEGER PRIMARY KEY ASC, username TEXT, timestampISO8601 TEXT, requestid TEXT, \
-                                                   type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME);");
+const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
+                                                    timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
+                                                   type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME, \
+                                                   PRIMARY KEY (timestampISO8601, requestid));");
 
 void
 MainWindow::setStateText(const QString &state)
@@ -111,33 +113,46 @@ MainWindow::MainWindow(QWidget *parent)
     if (mode.indexOf("auto_report") != -1) {
         m_mode = autoReport;
     }
+
+    m_dbreq = QSqlQuery(m_db);
+
     switch (m_mode) {
     case multiReport:
     case autoReport:
         ui->pbGenerateReport->setVisible(true);
         ui->pbClearDB->setVisible(true);
+
+        if (!_exec(createEventLogTable)) {
+            setInfoText(getDBErrorText());
+        }
+
         break;
     default:
         ui->pbGenerateReport->setVisible(false);
         ui->pbClearDB->setVisible(false);
+
+        doClearDB();
+
         break;
     }
 
-    m_dbreq = QSqlQuery(m_db);
-    if (!_exec(createEventLogTable)) {
-        setInfoText(getDBErrorText());
-    }
+
+
     _exec("PRAGMA journal_mode = MEMORY;");
     _exec("PRAGMA page_size = 32768;");
     _exec("PRAGMA synchronous = OFF;");
     _exec("PRAGMA cache_size = 100000;"); // from test
     _exec("PRAGMA temp_store = MEMORY;"); // from test
     m_isHasError = false;
+
+    m_path = "";
 }
 
 MainWindow::~MainWindow()
 {
-    doClearDB();
+    if (m_mode == simpleReport) {
+        doClearDB();
+    }
     closeDB();
     QString qs;
     qs.append(QSqlDatabase::database().connectionName());
@@ -397,13 +412,14 @@ void
 MainWindow::openFileClick()
 {
     QString selected_filter;
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open MMS EventLog"), "", tr("MMS Eventlog (*.csv);; MMS Eventlog (*.xls)"), &selected_filter);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open MMS EventLog"), m_path, tr("MMS Eventlog (*.csv);; MMS Eventlog (*.xls)"), &selected_filter);
     // The inferior stopped because it triggered an eaxception.
     // ref: https://forum.qt.io/topic/142647/the-inferior-stopped-because-it-triggered-an-eaxception/2
     if (fileName.isEmpty() || fileName.isNull()) {
         return;
     }
     m_filename = fileName;
+    m_path = QFileInfo(m_filename).absoluteDir().absolutePath();
 
     qDebug() << selected_filter;
     qDebug() << m_filename;
@@ -452,7 +468,7 @@ MainWindow::doParseEventLogFile()
     setInfoText(headerItems.join(" , ") + " -- Details");
     QApplication::processEvents();
 
-    const QString insertOriginalData = QStringLiteral("INSERT INTO [eventlog] (username, timestampISO8601, requestid, type, details, timestamp, username1, authtype, externalip, internalip) \
+    const QString insertOriginalData = QStringLiteral("INSERT OR IGNORE INTO [eventlog] (username, timestampISO8601, requestid, type, details, timestamp, username1, authtype, externalip, internalip) \
                                         VALUES (:username, :timestampISO8601, :requestid, :type, :details, :timestamp, :username1, :authtype, :externalip, :internalip)");
     if (!prepareRequest(insertOriginalData)) {
         setInfoText(getDBErrorText());
@@ -508,6 +524,7 @@ MainWindow::doParseEventLogFile()
             timestamp = QDateTime::fromString(timestampISO8601, format);
             timestamp.setTimeSpec(Qt::UTC);
             timestamptz = timestamp.toLocalTime();
+
             m_dbreq.bindValue(":timestamp", timestamptz);
             m_dbreq.bindValue(":requestid", headerItems.at(2));
             m_dbreq.bindValue(":type", headerItems.at(3));
@@ -742,7 +759,7 @@ void
 MainWindow::generateReportClick()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save MMS EventLog report"),
-                                                    "",
+                                                    m_path,
                                                     tr("Excel (*.xlsx)"));
     if (fileName.isEmpty() || fileName.isNull()) {
         return;

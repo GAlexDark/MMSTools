@@ -38,6 +38,7 @@ private:
     QString         m_filename,
                     m_fileErrorText;
     QFile           m_file;
+    QString         m_path;
 
     QString         m_buffer;
     QStringList     m_stringList;
