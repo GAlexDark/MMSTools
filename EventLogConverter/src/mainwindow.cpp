@@ -491,6 +491,7 @@ MainWindow::doParseEventLogFile()
         return false;
     }
 
+    QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
     m_isHasError = false;
     for (int i = 1; i < m_stringList.size(); ++i) {
         details = m_stringList.at(i);
@@ -536,10 +537,10 @@ MainWindow::doParseEventLogFile()
                 m_dbreq.bindValue(":externalip", externalip);
                 m_dbreq.bindValue(":internalip", internalip);
             } else {
-                m_dbreq.bindValue(":username1", QString());
-                m_dbreq.bindValue(":authtype", QString());
-                m_dbreq.bindValue(":externalip", QString());
-                m_dbreq.bindValue(":internalip", QString());
+                m_dbreq.bindValue(":username1", nullStringValue); //Qt 6 only
+                m_dbreq.bindValue(":authtype", nullStringValue);
+                m_dbreq.bindValue(":externalip", nullStringValue);
+                m_dbreq.bindValue(":internalip", nullStringValue);
             }
 
             if (!_exec()) {
