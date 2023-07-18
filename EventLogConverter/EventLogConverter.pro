@@ -3,7 +3,7 @@ QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
-CONFIG += cmdline precompile_header
+CONFIG += precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
 #CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -pg -no-pie #-g3 -pg
