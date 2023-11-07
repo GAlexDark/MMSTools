@@ -20,12 +20,11 @@
 #include <QFileInfo>
 
 QPayKioskSettings::QPayKioskSettings() :
-    m_settings(NULL) {}
+    m_settings(nullptr) {}
 
 QPayKioskSettings::~QPayKioskSettings()
 {
-    if (m_settings)
-        delete m_settings;
+    delete m_settings;
 }
 
 bool
@@ -34,22 +33,24 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
     QString iniFileName = QDir(appPath).filePath(fileName);
 
     QFileInfo fileInfo(iniFileName);
-    if (!fileInfo.exists() || !fileInfo.isFile())
+    if (!fileInfo.exists() || !fileInfo.isFile()) {
         createDefault(iniFileName);
+    }
 
-    if (m_settings)
-        delete m_settings;
-    m_settings = new QSettings(iniFileName, QSettings::IniFormat);
+    delete m_settings;
 
+    try {
+        m_settings = new QSettings(iniFileName, QSettings::IniFormat);
+    } catch (std::bad_alloc& ex) {
+        return false;
+    }
     return true;
 }
 
 QVariant
 QPayKioskSettings::getMain(const QString& keyName) const
 {
-    if (!m_settings)
-        return QVariant();
-    return m_settings->value(keyName);
+    return (m_settings) ? m_settings->value(keyName) : QVariant();
 }
 
 QString

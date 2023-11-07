@@ -83,6 +83,7 @@ CellReference::CellReference(int row, int column)
     Constructs the Reference form the given \a cell string.
 */
 CellReference::CellReference(const QString &cell)
+    :_row(0), _column(0)
 {
     init(cell);
 }
@@ -92,6 +93,7 @@ CellReference::CellReference(const QString &cell)
     Constructs the Reference form the given \a cell string.
 */
 CellReference::CellReference(const char *cell)
+    :_row(0), _column(0)
 {
     init(QString::fromLatin1(cell));
 }

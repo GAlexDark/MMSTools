@@ -21,7 +21,9 @@ QT_BEGIN_NAMESPACE_XLSX
 CellPrivate::CellPrivate(Cell *p) :
 	q_ptr(p)
 {
-
+    parent = nullptr;
+    cellType = Cell::CellType();
+    styleNumber = 0;
 }
 
 CellPrivate::CellPrivate(const CellPrivate * const cp)
@@ -33,7 +35,7 @@ CellPrivate::CellPrivate(const CellPrivate * const cp)
     , richString(cp->richString)
     , styleNumber(cp->styleNumber)
 {
-
+    q_ptr = nullptr;
 }
 
 /*!

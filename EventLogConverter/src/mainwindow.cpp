@@ -66,13 +66,19 @@ MainWindow::MainWindow(QWidget *parent)
     m_state->setMinimumWidth(250);
     ui->statusbar->addWidget(m_state);
 
-    connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
-    connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(onAboutQt()));
+    bool retVal =connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
+    Q_ASSERT_X(retVal, "connect", "actionAbout_program connection is not established");
+    retVal = connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(onAboutQt()));
+    Q_ASSERT_X(retVal, "connect", "actionAbout_Qt connection is not established");
 
-    connect(ui->pbOpenFile, SIGNAL(clicked(bool)), this, SLOT(openFileClick()));
-    connect(ui->pbConvert, SIGNAL(clicked(bool)), this, SLOT(convertEventLogClick()));
-    connect(ui->pbClearDB, SIGNAL(clicked(bool)), this, SLOT(clearDBclick()));
-    connect(ui->pbGenerateReport, SIGNAL(clicked(bool)), this, SLOT(generateReportClick()));
+    retVal = connect(ui->pbOpenFile, SIGNAL(clicked(bool)), this, SLOT(openFileClick()));
+    Q_ASSERT_X(retVal, "connect", "pbOpenFile connection is not established");
+    retVal = connect(ui->pbConvert, SIGNAL(clicked(bool)), this, SLOT(convertEventLogClick()));
+    Q_ASSERT_X(retVal, "connect", "pbConvert connection is not established");
+    retVal = connect(ui->pbClearDB, SIGNAL(clicked(bool)), this, SLOT(clearDBclick()));
+    Q_ASSERT_X(retVal, "connect", "pbClearDB connection is not established");
+    retVal = connect(ui->pbGenerateReport, SIGNAL(clicked(bool)), this, SLOT(generateReportClick()));
+    Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
 
     setStateText(tr("Ready"));
 
@@ -231,8 +237,9 @@ MainWindow::commitTransaction()
 
 void
 removeQuote(QString &data, QChar quoteChar) {
-    if (data.isNull() || data.isEmpty())
+    if (data.isNull() || data.isEmpty()) {
         return;
+    }
 
     if (data.at(0) == quoteChar) {
         data.remove(0, 1);
@@ -461,7 +468,7 @@ MainWindow::doParseEventLogFile()
         format20 = "yyyy-MM-ddTHH:mm:ssZ"; //lenght 20
     QDateTime timestamp, timestamptz;
 
-    QString username,  authType, ipaddresses, externalip, internalip;
+    QString username,  authType, externalip, internalip;
 
     if (!beginTransaction()) {
         setInfoText(getDBErrorText());
@@ -507,17 +514,18 @@ MainWindow::doParseEventLogFile()
             m_dbreq.bindValue(":type", headerItems.at(3));
             m_dbreq.bindValue(":details", details);
 
-            m_dbreq.bindValue(":username1", QString());
-            m_dbreq.bindValue(":authtype", QString());
-            m_dbreq.bindValue(":externalip", QString());
-            m_dbreq.bindValue(":internalip", QString());
-
             if ((details.indexOf("ip address:") > 0) && parseUserLogonDetails(details, username, authType, externalip, internalip)) {
                 m_dbreq.bindValue(":username1", username);
                 m_dbreq.bindValue(":authtype", authType);
                 m_dbreq.bindValue(":externalip", externalip);
                 m_dbreq.bindValue(":internalip", internalip);
+            } else {
+                m_dbreq.bindValue(":username1", QString());
+                m_dbreq.bindValue(":authtype", QString());
+                m_dbreq.bindValue(":externalip", QString());
+                m_dbreq.bindValue(":internalip", QString());
             }
+
             if (!_exec()) {
                 m_isHasError = true;
                 setInfoText(getDBErrorText());
@@ -581,6 +589,8 @@ MainWindow::doGenerateReport(const QString &fileName)
     Format dateFormat;
     dateFormat.setHorizontalAlignment(Format::AlignRight);
     dateFormat.setNumberFormat("dd.mm.yyyy hh:mm:ss");
+
+    qDebug() << xlsxW.setColumnHidden(colTimestampISO8601, true);
 
     if (!_exec(getAllRecords)) {
         setInfoText(getDBErrorText());
@@ -711,8 +721,9 @@ MainWindow::convertEventLogClick()
     setStateText(tr("File %1 parsing start").arg(QFileInfo(m_filename).fileName()));
     QApplication::processEvents();
 
-    if (doParseEventLogFile() && m_mode == simpleReport)
+    if (doParseEventLogFile() && m_mode == simpleReport) {
         doGenerateReport();
+    }
     doParseDone();
 }
 

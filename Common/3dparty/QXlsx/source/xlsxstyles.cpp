@@ -637,10 +637,9 @@ void Styles::writeCellXfs(QXmlStreamWriter &writer) const
             writer.writeAttribute(QStringLiteral("applyFill"), QStringLiteral("1"));
         if (format.hasBorderData())
             writer.writeAttribute(QStringLiteral("applyBorder"), QStringLiteral("1"));
-        if (format.hasAlignmentData())
-            writer.writeAttribute(QStringLiteral("applyAlignment"), QStringLiteral("1"));
 
         if (format.hasAlignmentData()) {
+            writer.writeAttribute(QStringLiteral("applyAlignment"), QStringLiteral("1"));
             writer.writeEmptyElement(QStringLiteral("alignment"));
             if (format.hasProperty(FormatPrivate::P_Alignment_AlignH)) {
                 switch (format.horizontalAlignment()) {

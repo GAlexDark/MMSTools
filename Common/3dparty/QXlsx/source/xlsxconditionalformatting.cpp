@@ -163,7 +163,7 @@ bool ConditionalFormatting::addHighlightCellsRule(HighlightRuleType type, const 
     bool skipFormula = false;
 
     auto cfRule = std::make_shared<XlsxCfRuleData>();
-    if (type >= Highlight_LessThan && type <= Highlight_NotBetween) {
+    if (type <= Highlight_NotBetween) { // 0 <= type <= 7
         cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("cellIs");
         QString op;
         switch (type) {
@@ -178,71 +178,91 @@ bool ConditionalFormatting::addHighlightCellsRule(HighlightRuleType type, const 
         default: break;
         }
         cfRule->attrs[XlsxCfRuleData::A_operator] = op;
-    } else if (type >= Highlight_ContainsText && type <= Highlight_EndsWith) {
-        if (type == Highlight_ContainsText) {
+    } else if (type <= Highlight_EndsWith) { // 8 <= type <= 11
+        switch (type) {
+        case Highlight_ContainsText: // = 8
             cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("containsText");
             cfRule->attrs[XlsxCfRuleData::A_operator] = QStringLiteral("containsText");
             cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("NOT(ISERROR(SEARCH(\"%1\",%2)))").arg(formula1);
-        } else if (type == Highlight_NotContainsText) {
+            break;
+        case Highlight_NotContainsText: // = 9
             cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("notContainsText");
             cfRule->attrs[XlsxCfRuleData::A_operator] = QStringLiteral("notContains");
             cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("ISERROR(SEARCH(\"%2\",%1))").arg(formula1);
-        } else if (type == Highlight_BeginsWith) {
+            break;
+        case Highlight_BeginsWith: // = 10
             cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("beginsWith");
             cfRule->attrs[XlsxCfRuleData::A_operator] = QStringLiteral("beginsWith");
             cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("LEFT(%2,LEN(\"%1\"))=\"%1\"").arg(formula1);
-        } else {
+            break;
+        case Highlight_EndsWith: // = 11
             cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("endsWith");
             cfRule->attrs[XlsxCfRuleData::A_operator] = QStringLiteral("endsWith");
             cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("RIGHT(%2,LEN(\"%1\"))=\"%1\"").arg(formula1);
-        }
+            break;
+        default: break;
+        } // switch
+
         cfRule->attrs[XlsxCfRuleData::A_text] = formula1;
         skipFormula = true;
-    } else if (type == Highlight_TimePeriod) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("timePeriod");
-        //:Todo
-        return false;
-    } else if (type == Highlight_Duplicate) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("duplicateValues");
-    } else if (type == Highlight_Unique) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("uniqueValues");
-    } else if (type == Highlight_Errors) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("containsErrors");
-        cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("ISERROR(%1)");
-        skipFormula = true;
-    } else if (type == Highlight_NoErrors) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("notContainsErrors");
-        cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("NOT(ISERROR(%1))");
-        skipFormula = true;
-    } else if (type == Highlight_Blanks) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("containsBlanks");
-        cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("LEN(TRIM(%1))=0");
-        skipFormula = true;
-    } else if (type == Highlight_NoBlanks) {
-        cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("notContainsBlanks");
-        cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("LEN(TRIM(%1))>0");
-        skipFormula = true;
-    } else if (type >= Highlight_Top && type <= Highlight_BottomPercent) {
+    } else if (type <= Highlight_NoErrors) { // 12 <= type <= 18
+        switch (type) {
+        case Highlight_TimePeriod: // = 12
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("timePeriod");
+            //:Todo
+            return false;
+        case Highlight_Duplicate: // = 13
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("duplicateValues");
+            break;
+        case Highlight_Unique: // = 14
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("uniqueValues");
+            break;
+        case Highlight_Blanks: // = 15
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("containsBlanks");
+            cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("LEN(TRIM(%1))=0");
+            skipFormula = true;
+            break;
+        case Highlight_NoBlanks: // = 16
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("notContainsBlanks");
+            cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("LEN(TRIM(%1))>0");
+            skipFormula = true;
+            break;
+        case Highlight_Errors: // = 17
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("containsErrors");
+            cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("ISERROR(%1)");
+            skipFormula = true;
+            break;
+        case Highlight_NoErrors: // = 18
+            cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("notContainsErrors");
+            cfRule->attrs[XlsxCfRuleData::A_formula1_temp] = QStringLiteral("NOT(ISERROR(%1))");
+            skipFormula = true;
+            break;
+        default: break;
+        } // switch
+    } else if (type <= Highlight_BottomPercent) { // 19 <= type <= 22
         cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("top10");
-        if (type == Highlight_Bottom || type == Highlight_BottomPercent)
+        // action for Highlight_Top(?)
+        if (type == Highlight_Bottom || type == Highlight_BottomPercent) // type = 21 || 22
             cfRule->attrs[XlsxCfRuleData::A_bottom] = QStringLiteral("1");
-        if (type == Highlight_TopPercent || type == Highlight_BottomPercent)
+        if (type == Highlight_TopPercent || type == Highlight_BottomPercent) // type = 20 || 22
             cfRule->attrs[XlsxCfRuleData::A_percent] = QStringLiteral("1");
+
         cfRule->attrs[XlsxCfRuleData::A_rank] = !formula1.isEmpty() ? formula1 : QStringLiteral("10");
         skipFormula = true;
-    } else if (type >= Highlight_AboveAverage && type <= Highlight_BelowStdDev3) {
+    } else if (type <= Highlight_BelowStdDev3) { // 23 <= type <= 32
         cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("aboveAverage");
-        if (type >= Highlight_BelowAverage && type <= Highlight_BelowStdDev3)
+        // action for Highlight_AboveAverage(?)
+        if (type >= Highlight_BelowAverage) // 28 <= type <= 32
             cfRule->attrs[XlsxCfRuleData::A_aboveAverage] = QStringLiteral("0");
-        if (type == Highlight_AboveOrEqualAverage || type == Highlight_BelowOrEqualAverage)
+        if (type == Highlight_AboveOrEqualAverage || type == Highlight_BelowOrEqualAverage) // type = 24 || 29
             cfRule->attrs[XlsxCfRuleData::A_equalAverage] = QStringLiteral("1");
-        if (type == Highlight_AboveStdDev1 || type == Highlight_BelowStdDev1)
+        if (type == Highlight_AboveStdDev1 || type == Highlight_BelowStdDev1) // type = 25 || 30
             cfRule->attrs[XlsxCfRuleData::A_stdDev] = QStringLiteral("1");
-        else if (type == Highlight_AboveStdDev2 || type == Highlight_BelowStdDev2)
+        else if (type == Highlight_AboveStdDev2 || type == Highlight_BelowStdDev2) // type = 26 || 31
             cfRule->attrs[XlsxCfRuleData::A_stdDev] = QStringLiteral("2");
-        else if (type == Highlight_AboveStdDev3 || type == Highlight_BelowStdDev3)
+        else if (type == Highlight_AboveStdDev3 || type == Highlight_BelowStdDev3) // type = 27 || 32
             cfRule->attrs[XlsxCfRuleData::A_stdDev] = QStringLiteral("3");
-    } else if (type == Highlight_Expression){
+    } else if (type == Highlight_Expression){ // = 33
         cfRule->attrs[XlsxCfRuleData::A_type] = QStringLiteral("expression");
     } else {
         return false;
