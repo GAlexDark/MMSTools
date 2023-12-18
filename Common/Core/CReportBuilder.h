@@ -7,7 +7,7 @@
 class CReportBuilder
 {
 public:
-    bool init(const QString &dbFileName, const QString reportName);
+    bool init(const QString &dbFileName, const QString &reportName);
     QString errorString() const { return m_errorString; }
     bool generateReport();
 

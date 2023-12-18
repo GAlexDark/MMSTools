@@ -6,7 +6,7 @@ const QString getAllRecords = QStringLiteral("select timestampISO8601, timestamp
 
 
 bool
-CReportBuilder::init(const QString &dbFileName, const QString reportName)
+CReportBuilder::init(const QString &dbFileName, const QString &reportName)
 {
 
     __DEBUG( Q_FUNC_INFO )
@@ -32,7 +32,7 @@ CReportBuilder::generateReport()
     __DEBUG( Q_FUNC_INFO )
 
     // [1]  Writing excel file(*.xlsx)
-    int rowHeader = 1, row = 2;
+    int rowHeader = 1;
     int colTimestampISO8601 = 1, colTimestamp = 2, colExternalIP = 3, colUsername = 4, colType = 5, colDetails = 6,
             colAuthType = 7, colInternalIP = 8, colRequestid = 9;
     QString buf;
@@ -67,6 +67,7 @@ CReportBuilder::generateReport()
 
     bool retVal = m_db.exec(getAllRecords);
     if (retVal) {
+        int row = 2;
         while (m_db.isNext()) {
             writeValue = m_db.geValue(0).toString();
             xlsxReport.write(row, colTimestampISO8601, writeValue);
@@ -99,14 +100,13 @@ CReportBuilder::generateReport()
 
             ++row;
         } // while
-    }
 
-    if (retVal) {
         retVal = xlsxReport.saveAs(m_reportFileName);
         if (!retVal) {
             m_errorString = "Error save report file";
             __DEBUG( m_errorString )
         }
+
     } else {
         m_errorString = m_db.errorString();
         __DEBUG( m_errorString )
