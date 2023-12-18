@@ -57,7 +57,7 @@ ELCSettingsTest::test_getDBName()
 {
     ELCSettings &settings = ELCSettings::instance();
     QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
-    QCOMPARE(retVal, QString("E:\\PROJECTS\\Qt\\MMSTools\\test_source\\EventLogConverter.db"));
+    QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 
 void

@@ -20,4 +20,5 @@ SOURCES += \
     tst_elcsettings.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
+DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
 OTHER_FILES += data/*

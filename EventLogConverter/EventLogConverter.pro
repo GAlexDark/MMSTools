@@ -51,4 +51,4 @@ RESOURCES += $${TARGET}.qrc
 RC_FILE = $${TARGET}.rc
 
 include(../MMSTools.pri)
-DEFINES += SRCDIR=\\\"$${TEST_SRCDIR}\\\"
+DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"

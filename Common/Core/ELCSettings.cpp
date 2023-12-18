@@ -36,7 +36,7 @@ ELCSettings::createDefault(const QString& iniPath)
 
     settings.beginGroup(QStringLiteral("SETTINGS"));
 #ifdef QT_DEBUG
-    settings.setValue(QStringLiteral("db_file_name"), SRCDIR"EventLogConverter.db");
+    settings.setValue(QStringLiteral("db_file_name"), TEST_SRCDIR"EventLogConverter.db");
 #else
     settings.setValue(QStringLiteral("db_file_name"), "EventLogConverter.db");
 #endif
