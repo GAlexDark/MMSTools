@@ -25,7 +25,7 @@ public:
     ELCSettings();
     static ELCSettings& instance();
 private:
-    void createDefault(const QString& iniPath);
+    void createDefault(const QString& iniPath) override;
 };
 
 #endif // ELCSETTINGS_H
