@@ -9,6 +9,7 @@
 #include <QRegularExpression>
 #include <QChar>
 #include <QUuid>
+#include <QDebug>
 
 #include "ELCSettings.h"
 
@@ -490,8 +491,9 @@ MainWindow::doParseEventLogFile()
         setStateText(tr("DB Error!"));
         return false;
     }
-
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
+#endif
     m_isHasError = false;
     for (int i = 1; i < m_stringList.size(); ++i) {
         details = m_stringList.at(i);
@@ -537,10 +539,17 @@ MainWindow::doParseEventLogFile()
                 m_dbreq.bindValue(":externalip", externalip);
                 m_dbreq.bindValue(":internalip", internalip);
             } else {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
                 m_dbreq.bindValue(":username1", nullStringValue); //Qt 6 only
                 m_dbreq.bindValue(":authtype", nullStringValue);
                 m_dbreq.bindValue(":externalip", nullStringValue);
                 m_dbreq.bindValue(":internalip", nullStringValue);
+#else
+                m_dbreq.bindValue(":username1", ""); //Qt 6 only
+                m_dbreq.bindValue(":authtype", "");
+                m_dbreq.bindValue(":externalip", "");
+                m_dbreq.bindValue(":internalip", "");
+#endif
             }
 
             if (!_exec()) {

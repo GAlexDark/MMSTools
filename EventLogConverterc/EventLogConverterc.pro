@@ -1,13 +1,18 @@
 TEMPLATE = app
 
-QT += core gui sql
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT = core sql
 
 QT_CVERSION = c++11
-CONFIG += QT_CVERSION precompile_header
+CONFIG += QT_CVERSION cmdline precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
+
+lessThan(QT_MAJOR_VERSION, 6) {
+    CONFIG(debug, debug|release): message("gprof mode")
+    CONFIG(debug, debug|release): QMAKE_CFLAGS_DEBUG += -g -pg  #-no-pie
+    CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -g -pg  #-no-pie
+    CONFIG(debug, debug|release): QMAKE_LFLAGS_DEBUG += -g -pg -lgmon #-no-pie
+}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -26,29 +31,18 @@ INCLUDEPATH += . src
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
-    ../Common/Core/QPayKioskSettings.h \
-    ../Common/Core/ELCSettings.h \
+    ../Common/Core/CBasicDBClass.h \
+    ../Common/Core/Debug.h \
     ../Common/Core/stdafx.h \
-    src/mainwindow.h
+    ../Common/Core/CReportBuilder.h \
+    ../Common/Core/CSVLoader.h \
+    ../Common/Core/CSVParser.h
 
 SOURCES += \
-    ../Common/Core/QPayKioskSettings.cpp \
-    ../Common/Core/ELCSettings.cpp \
-    src/main.cpp \
-    src/mainwindow.cpp
-
-FORMS += \
-    src/mainwindow.ui
-
-LANGUAGES = ru en uk
-TRANSLATIONS += \
-    i18n/$${TARGET}_ru_RU.ts \
-    i18n/$${TARGET}_uk_UA.ts
+    ../Common/Core/CBasicDBClass.cpp \
+    ../Common/Core/CReportBuilder.cpp \
+    ../Common/Core/CSVLoader.cpp \
+    ../Common/Core/CSVParser.cpp \
+    src/main.cpp
 
 include(../deployment.pri)
-
-RESOURCES += $${TARGET}.qrc
-RC_FILE = $${TARGET}.rc
-
-include(../MMSTools.pri)
-DEFINES += SRCDIR=\\\"$${TEST_SRCDIR}\\\"

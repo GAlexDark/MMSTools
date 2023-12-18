@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QTranslator>
+#include <QDebug>
 
 #include "ELCSettings.h"
 

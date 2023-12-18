@@ -36,13 +36,11 @@ ELCSettings::createDefault(const QString& iniPath)
 
     settings.beginGroup(QStringLiteral("SETTINGS"));
 #ifdef QT_DEBUG
-    settings.setValue(QStringLiteral("db_file_name"), "E:\\PROJECTS\\Qt\\MMSTools\\test_source\\EventLogConverter.db");
+    settings.setValue(QStringLiteral("db_file_name"), SRCDIR"EventLogConverter.db");
 #else
     settings.setValue(QStringLiteral("db_file_name"), "EventLogConverter.db");
 #endif
     settings.setValue(QStringLiteral("mode"), "simple_report"); //multi_report | auto_report
 
-    //settings.setValue(QStringLiteral("logfile_name"), "cmdb.log");
-    //settings.setValue(QStringLiteral("log_level"), "info");
     settings.endGroup();
 }

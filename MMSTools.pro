@@ -1,7 +1,10 @@
 TEMPLATE = subdirs
+include(MMSTools.pri)
 
 SUBDIRS += \
-    EventLogConverter
+    EventLogConverter \
+    EventLogConverterc \
+    tests
 
 MOC_DIR = moc
 OBJECTS_DIR = obj
