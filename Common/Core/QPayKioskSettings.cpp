@@ -41,7 +41,7 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
 
     try {
         m_settings = new QSettings(iniFileName, QSettings::IniFormat);
-    } catch (std::bad_alloc& ex) {
+    } catch (const std::bad_alloc& ex) {
         return false;
     }
     return true;
