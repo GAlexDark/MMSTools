@@ -1,5 +1,4 @@
 #include "CReportBuilder.h"
-#include <QEventLoop>
 #include "Debug.h"
 
 const QString getAllRecords = QStringLiteral("select timestampISO8601, timestamp, externalip, username, type, details, \
