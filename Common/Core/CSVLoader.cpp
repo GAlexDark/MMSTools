@@ -90,7 +90,7 @@ CSVLoader::readSmallFile()
         QTextStream textStream(&m_file);
         try {
             buffer = textStream.readAll();
-            if (buffer.isEmpty() || buffer.isNull()) {
+            if (buffer.isEmpty()) {
                 retVal = false;
             }
         } catch (...) {
