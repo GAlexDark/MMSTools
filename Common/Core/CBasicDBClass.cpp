@@ -39,7 +39,7 @@ CBasicDBClass::_Deinit()
 bool
 CBasicDBClass::_exec(const QString &query)
 {
-    __DEBUG( Q_FUNC_INFO )
+    //__DEBUG( Q_FUNC_INFO )
 
     m_SQLRes.clear();
     m_SQLRes.setForwardOnly(true); // ускорение для ::next()
@@ -55,7 +55,7 @@ CBasicDBClass::_exec(const QString &query)
 bool
 CBasicDBClass::_exec()
 {
-    __DEBUG( Q_FUNC_INFO )
+    //__DEBUG( Q_FUNC_INFO )
 
     bool retVal = m_SQLRes.exec();
     if (!retVal) {

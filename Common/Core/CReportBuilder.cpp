@@ -63,8 +63,6 @@ CReportBuilder::generateReport()
     dateFormat.setHorizontalAlignment(QXlsx::Format::AlignRight);
     dateFormat.setNumberFormat("dd.mm.yyyy hh:mm:ss");
 
-    __DEBUG( xlsxReport.setColumnHidden(colTimestampISO8601, true) )
-
     bool retVal = m_db.exec(getAllRecords);
     if (retVal) {
         int row = 2;
