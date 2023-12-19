@@ -22,7 +22,7 @@ private:
 class CSVThreadReportBuilder: public QThread
 {
 public:
-    bool init(const QString &dbFileName, const QString reportName);
+    bool init(const QString &dbFileName, const QString &reportName);
     void run();
     QString errorString() const { return m_errorString; }
 

@@ -118,7 +118,7 @@ CReportBuilder::generateReport()
 
 //----------------------------------------------------------
 
-bool CSVThreadReportBuilder::init(const QString &dbFileName, const QString reportName)
+bool CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName)
 {
     __DEBUG( Q_FUNC_INFO )
 
