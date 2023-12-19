@@ -46,10 +46,8 @@ int main(int argc, char *argv[])
 
     OutToConsole("EventLog Converter console start");
 
-    bool retVal = true;
-
     CSVThreadLoader loader;
-    retVal = loader.init(dbName, true, "\r\n");
+    bool retVal = loader.init(dbName, true, "\r\n");
     if (retVal) {
         loader.setFileName(files);
         loader.start();
