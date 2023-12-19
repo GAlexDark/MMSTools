@@ -84,7 +84,7 @@ void CBasicDBClassTest::test_connectionName()
 
 void CBasicDBClassTest::test_getDBinstance()
 {
-    QVERIFY(m_fakeDB.getDBinstance() != nullptr);
+    QVERIFY(m_fakeDB.getDBinstance());
 }
 
 void CBasicDBClassTest::test_initDB()
