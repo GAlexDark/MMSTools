@@ -66,12 +66,12 @@ void CSVParserTest::testSuccessAuth_wALL_ips() {
 
     initTestCase();
 
-    QCOMPARE(m_username, QString("galex"));
+    QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_timestampISO8601, QString("2023-05-09T11:19:57.36Z"));
     QCOMPARE(m_requestID, QString("edbfa4ea24038861"));
     QCOMPARE(m_type, QString("Вхід користувача - успішно"));
-    QCOMPARE(m_details, QString("username: galex,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
-    QCOMPARE(m_username1, QString("galex"));
+    QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
+    QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString("192.0.2.211"));
     QCOMPARE(m_internalIP, QString("10.10.10.10"));
@@ -122,12 +122,12 @@ void CSVParserTest::testSuccessAuth_wINTERNAL_ips() {
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
-    QCOMPARE(m_username, QString("galex"));
+    QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:40:06.777Z"));
     QCOMPARE(m_requestID, QString("10ff82c8e706c291"));
     QCOMPARE(m_type, QString("Вхід користувача - успішно"));
-    QCOMPARE(m_details, QString("username: galex,@N@  type: PASSWORD,@N@  ip address: 10.10.1.13, 10.10.10.10"));
-    QCOMPARE(m_username1, QString("galex"));
+    QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 10.10.1.13, 10.10.10.10"));
+    QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString("10.10.1.13, 10.10.10.10"));
@@ -151,7 +151,7 @@ void CSVParserTest::testOtherData1()
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
-    QCOMPARE(m_username, QString("galex"));
+    QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:40:16.293Z"));
     QCOMPARE(m_requestID, QString("d88e4c72cf7f34ad"));
     QCOMPARE(m_type, QString("Зміна меню"));
@@ -180,7 +180,7 @@ void CSVParserTest::testOtherdata2()
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
-    QCOMPARE(m_username, QString("galex"));
+    QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_timestampISO8601, QString("2023-05-31T10:19:09.84Z"));
     QCOMPARE(m_requestID, QString("9afa5af2e524f0ed"));
     QCOMPARE(m_type, QString("Financial Guarantee"));
@@ -209,7 +209,7 @@ void CSVParserTest::testOtherdata3_exception()
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
-    QCOMPARE(m_username, QString("galex"));
+    QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_timestampISO8601, QString("2023-05-31T09:56:50.55Z"));
     QCOMPARE(m_requestID, QString("a6145c4eb3322357"));
     QCOMPARE(m_type, QString("System error"));

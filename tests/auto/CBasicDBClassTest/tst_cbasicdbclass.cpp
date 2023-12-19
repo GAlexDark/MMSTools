@@ -157,12 +157,12 @@ void CBasicDBClassTest::test_getValues()
     QVERIFY(retVal);
 
     while (m_fakeDB.isNext()) {
-        QCOMPARE(m_fakeDB.geValue(0).toString(), QString("galex"));
+        QCOMPARE(m_fakeDB.geValue(0).toString(), QString("mr_data"));
         QCOMPARE(m_fakeDB.geValue(1).toString(), QString("2023-05-09T11:19:57.36Z"));
         QCOMPARE(m_fakeDB.geValue(2).toString(), QString("edbfa4ea24038861"));
 
-        QCOMPARE(m_fakeDB.geValue(4).toString(), QString("username: galex,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
-        QCOMPARE(m_fakeDB.geValue(5).toString(), QString("galex"));
+        QCOMPARE(m_fakeDB.geValue(4).toString(), QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
+        QCOMPARE(m_fakeDB.geValue(5).toString(), QString("mr_data"));
         QCOMPARE(m_fakeDB.geValue(6).toString(), QString("PASSWORD"));
         QCOMPARE(m_fakeDB.geValue(7).toString(), QString("192.0.2.211"));
         QCOMPARE(m_fakeDB.geValue(8).toString(), QString("10.10.10.10"));
@@ -196,13 +196,13 @@ void CBasicDBClassTest::test_InsertBindedValues()
     QVERIFY(retVal);
 
     TDataItem data;
-    data[QStringLiteral(":username")] = "galex";
+    data[QStringLiteral(":username")] = "mr_data";
     data[QStringLiteral(":timestampISO8601")] = "2023-05-09T11:19:57.36Z";
     data[QStringLiteral(":timestamp")] = "2023-05-09T14:19:57.360";
     data[QStringLiteral(":requestid")] = "edbfa4ea24038861";
     data[QStringLiteral(":type")] = "Вхід користувача - успішно";
-    data[QStringLiteral(":details")] = "username: galex,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10";
-    data[QStringLiteral(":username1")] = "galex";
+    data[QStringLiteral(":details")] = "username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10";
+    data[QStringLiteral(":username1")] = "mr_data";
     data[QStringLiteral(":authtype")] = "PASSWORD";
     data[QStringLiteral(":externalip")] = "192.0.2.211";
     data[QStringLiteral(":internalip")] = "10.10.10.10";
