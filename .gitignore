@@ -23,7 +23,6 @@
 *.7z
 *.pdb
 *.cppcheck
-*.csv
 *.xls
 *.xlsx
 
