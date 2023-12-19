@@ -240,10 +240,10 @@ void CSVParserTest::testDateTimeFormats()
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:40:16.293Z"));
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:16.293"));
 
-    qDebug() << "Testcase: Check parsing datetime (format20 yyyy-MM-ddTHH:mm:ss.zzZ)";
+    qDebug() << "Testcase: Check parsing datetime (format23 yyyy-MM-ddTHH:mm:ss.zzZ)";
 
     buf.clear();
-    file.setFileName(SRCDIR"data/testcase_datetimeFormat20.csv");
+    file.setFileName(SRCDIR"data/testcase_datetimeFormat23.csv");
     retVal = file.open(QIODeviceBase::ReadOnly);
     QVERIFY(retVal);
     buf = file.readAll();
