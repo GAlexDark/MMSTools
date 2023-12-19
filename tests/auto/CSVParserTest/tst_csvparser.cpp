@@ -75,7 +75,7 @@ void CSVParserTest::testSuccessAuth_wALL_ips() {
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString("192.0.2.211"));
     QCOMPARE(m_internalIP, QString("10.10.10.10"));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-09T14:19:57.360"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
 }
 
 void CSVParserTest::testFailedAuth() {
@@ -103,7 +103,7 @@ void CSVParserTest::testFailedAuth() {
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString("10.10.10.10"));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-23T13:25:46.717"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
 }
 
 void CSVParserTest::testSuccessAuth_wINTERNAL_ips() {
@@ -131,7 +131,7 @@ void CSVParserTest::testSuccessAuth_wINTERNAL_ips() {
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString("10.10.1.13, 10.10.10.10"));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-23T13:40:06.777"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:06.777"));
 }
 
 void CSVParserTest::testOtherData1()
@@ -160,7 +160,7 @@ void CSVParserTest::testOtherData1()
     QCOMPARE(m_authType, QString(""));
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString(""));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-23T13:40:16.293"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:16.293"));
 }
 
 void CSVParserTest::testOtherdata2()
@@ -189,7 +189,7 @@ void CSVParserTest::testOtherdata2()
     QCOMPARE(m_authType, QString(""));
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString(""));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-31T13:19:09.840"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), "2023-05-31T13:19:09.840");
 }
 
 void CSVParserTest::testOtherdata3_exception()
@@ -218,7 +218,7 @@ void CSVParserTest::testOtherdata3_exception()
     QCOMPARE(m_authType, QString(""));
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString(""));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-31T12:56:50.550"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-31T12:56:50.550"));
 }
 
 void CSVParserTest::testDateTimeFormats()
@@ -238,7 +238,7 @@ void CSVParserTest::testDateTimeFormats()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:40:16.293Z"));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-23T13:40:16.293"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:16.293"));
 
     qDebug() << "Testcase: Check parsing datetime (format20 yyyy-MM-ddTHH:mm:ss.zzZ)";
 
@@ -255,7 +255,7 @@ void CSVParserTest::testDateTimeFormats()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:40:13.21Z"));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-23T13:40:13.210"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:13.210"));
 
     qDebug() << "Testcase: Check parsing datetime (format22 yyyy-MM-ddTHH:mm:ss.zZ)";
 
@@ -272,7 +272,7 @@ void CSVParserTest::testDateTimeFormats()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:39:33.2Z"));
-    QCOMPARE(m_timestampTZ.toString("yyyy-MM-ddTHH:mm:ss.zzz"), QString("2023-05-23T13:39:33.200"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:39:33.200"));
 }
 
 QTEST_APPLESS_MAIN(CSVParserTest)

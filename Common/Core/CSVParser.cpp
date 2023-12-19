@@ -3,11 +3,6 @@
 
 #include "Debug.h"
 
-
-const QString format24 = "yyyy-MM-ddTHH:mm:ss.zzzZ"; // lenght 24
-const QString format22 = "yyyy-MM-ddTHH:mm:ss.zZ"; // lenght 22
-const QString format20 = "yyyy-MM-ddTHH:mm:ssZ"; //lenght 20
-
 QRegularExpression reHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"); //get header
 QRegularExpression reSuccessLogon("^(.*?)@N@(.*?)@N@(.*?)$");
 QRegularExpression reFailedLogon("^(.*?)@N@(.*?)$");
@@ -157,7 +152,7 @@ CSVParser::CSVParser()
 void
 CSVParser::parse(const QString &line)
 {
-    __DEBUG( Q_FUNC_INFO )
+    //__DEBUG( Q_FUNC_INFO )
 
     m_details = line;
     m_details.replace("\n", "@N@", Qt::CaseInsensitive);
@@ -171,19 +166,7 @@ CSVParser::parse(const QString &line)
         m_details.remove(0, 1); // remove first ',' char before quote char in details field
         removeQuote(m_details, '"');
 
-        switch (m_timestampISO8601.length()) {
-        case 20:
-            m_format = format20;
-            break;
-        case 22:
-        case 23:
-            m_format = format22;
-            break;
-        default:
-            m_format = format24;
-            break;
-        }
-        m_timestamp = QDateTime::fromString(m_timestampISO8601, m_format);
+        m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
         m_timestamp.setTimeSpec(Qt::UTC);
         m_timestamptz = m_timestamp.toLocalTime();
 
