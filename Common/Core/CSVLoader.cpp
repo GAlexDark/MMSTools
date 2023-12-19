@@ -76,54 +76,70 @@ CSVLoader::prepareRequest(const QString &query)
     return m_db.prepareRequest(query);
 }
 
-CSVLoader::CSVLoader()
-{
-    __DEBUG( Q_FUNC_INFO )
-
-    m_errorString.clear();
-    m_fileName.clear();
-    m_eolChars.clear();
-    m_buffer = nullptr;
-    m_bufferSize = defBufferSize;
-    m_fileNames.clear();
-    m_isHeaders = false;
-}
-
-CSVLoader::~CSVLoader()
-{
-    __DEBUG( Q_FUNC_INFO )
-
-    m_buffer->clear();
-    delete m_buffer;
-
-    if (m_file.isOpen()) {
-        m_file.close();
-    }
-    closeDB();
-}
+//-----------------------------------------------------------
 
 bool
-CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QByteArray &eolChars, qint64 bufferSize)
+CSVLoader::readSmallFile()
 {
     __DEBUG( Q_FUNC_INFO )
 
-    m_eolChars = eolChars;
-    m_isHeaders = dataHasHeaders;
-    m_bufferSize = bufferSize;
-
-    bool retVal = initDB(dbFileName);
+    QString buffer;
+    m_file.setFileName(m_fileName);
+    bool retVal = m_file.open(QIODevice::ReadOnly);
     if (retVal) {
-        retVal = initBuffer();
+        QTextStream textStream(&m_file);
+        try {
+            buffer = textStream.readAll();
+            if (buffer.isEmpty() || buffer.isNull()) {
+                retVal = false;
+            }
+        } catch (...) {
+            retVal = false;
+        }
     }
-    if (!retVal) {
-        closeDB();
+    m_file.close();
+
+    if (retVal) {
+        buffer.replace("\r\n", "@RN@", Qt::CaseInsensitive );
+        buffer.replace("\n", "@N@", Qt::CaseInsensitive);
+        buffer.replace("@RN@", "\r\n", Qt::CaseInsensitive );
+
+        QStringList list;
+        list.append(buffer.split(m_eolChars));
+
+        QString line;
+        int firstDataColumn = (m_isHeaders)? 1 : 0;
+        int columnCount = list.size();
+        for (int i = firstDataColumn; i < columnCount; ++i) {
+            line = list.at(i);
+            m_parser.parse(line);
+            m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
+                                   m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
+
+            m_data[QStringLiteral(":username")] = m_username;
+            m_data[QStringLiteral(":timestampISO8601")] = m_timestampISO8601;
+            m_data[QStringLiteral(":timestamp")] = m_timestampTZ;
+            m_data[QStringLiteral(":requestid")] = m_requestID;
+            m_data[QStringLiteral(":type")] = m_type;
+            m_data[QStringLiteral(":details")] = m_details;
+            m_data[QStringLiteral(":username1")] = m_username1;
+            m_data[QStringLiteral(":authtype")] = m_authType;
+            m_data[QStringLiteral(":externalip")] = m_externalIP;
+            m_data[QStringLiteral(":internalip")] = m_internalIP;
+            retVal = m_db.execRequest(m_data);
+            if (!retVal) {
+                m_errorString = m_db.errorString();
+                break;
+            }
+            line.clear();
+        }
     }
 
     return retVal;
 }
 
 bool
-CSVLoader::read()
+CSVLoader::readLargeFile()
 {
     __DEBUG( Q_FUNC_INFO )
 
@@ -141,7 +157,7 @@ CSVLoader::read()
         m_file.seek(bufferPosition);
         bytesRead = m_file.read(m_buffer->data(), m_bufferSize);
         if (bytesRead > 0) {
-        //If data has header
+            //If data has header
             if (m_isHeaders) {
                 nextPosition = m_buffer->indexOf(m_eolChars, prevPosition);
                 if (nextPosition != -1) {
@@ -211,6 +227,68 @@ CSVLoader::read()
     return retVal;
 }
 
+//-----------------------------------------------------------
+
+CSVLoader::CSVLoader()
+{
+    __DEBUG( Q_FUNC_INFO )
+
+    m_errorString.clear();
+    m_fileName.clear();
+    m_eolChars.clear();
+    m_buffer = nullptr;
+    m_bufferSize = defBufferSize;
+    m_fileNames.clear();
+    m_isHeaders = false;
+}
+
+CSVLoader::~CSVLoader()
+{
+    __DEBUG( Q_FUNC_INFO )
+
+    m_buffer->clear();
+    delete m_buffer;
+
+    if (m_file.isOpen()) {
+        m_file.close();
+    }
+    closeDB();
+}
+
+bool
+CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QByteArray &eolChars, qint64 bufferSize)
+{
+    __DEBUG( Q_FUNC_INFO )
+
+    m_eolChars = eolChars;
+    m_isHeaders = dataHasHeaders;
+    m_bufferSize = bufferSize;
+
+    bool retVal = initDB(dbFileName);
+    if (retVal) {
+        retVal = initBuffer();
+    }
+    if (!retVal) {
+        closeDB();
+    }
+
+    return retVal;
+}
+
+bool
+CSVLoader::read()
+{
+    __DEBUG( Q_FUNC_INFO )
+
+    m_file.setFileName(m_fileName);
+    qint64 size = m_file.size();
+
+    return (size < defMaxFileSize)? readSmallFile() : readLargeFile();
+}
+
+
+
+//--------------------------------------------------------------------------
 
 void
 CSVThreadLoader::run()

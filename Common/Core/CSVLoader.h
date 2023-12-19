@@ -8,6 +8,7 @@
 #include "CBasicDBClass.h"
 
 const qint64 defBufferSize = 128 * 1024; // 128KB
+const qint64 defMaxFileSize = 1024 * 1024; // 1M
 
 class CSVLoader
 {
@@ -33,6 +34,9 @@ private:
 
     bool initDB(const QString &dbFileName);
     bool initBuffer();
+
+    bool readLargeFile();
+    bool readSmallFile();
 
     QString     m_username,
                 m_timestampISO8601,
