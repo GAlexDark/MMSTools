@@ -25,10 +25,12 @@ public:
     bool init(const QString &dbFileName, const QString &reportName);
     void run();
     QString errorString() const { return m_errorString; }
+    bool getStatus() const { return m_retVal; }
 
 private:
     CReportBuilder  m_builser;
     QString         m_errorString;
+    bool            m_retVal;
 };
 
 

@@ -282,7 +282,11 @@ CSVLoader::read()
 
     m_file.setFileName(m_fileName);
     qint64 size = m_file.size();
-
+#ifdef QT_DEBUG
+  #ifdef TEST_LARGE
+    size = defMaxFileSize + 1;
+  #endif
+#endif
     return (size < defMaxFileSize)? readSmallFile() : readLargeFile();
 }
 
@@ -290,25 +294,28 @@ CSVLoader::read()
 
 //--------------------------------------------------------------------------
 
+CSVThreadLoader::CSVThreadLoader(): m_retVal(false)
+{}
+
 void
 CSVThreadLoader::run()
 {
     __DEBUG( Q_FUNC_INFO )
 
-    bool retVal = true;
+    m_errorString.clear();
     //-----------------------------------------------------
     if (m_fileNames.size() > 0 ) {
-        retVal = beginTrancaction();
-        if (retVal) {
-            retVal = prepareRequest(insertOriginalData);
-            if (retVal) {
+        m_retVal = beginTrancaction();
+        if (m_retVal) {
+            m_retVal = prepareRequest(insertOriginalData);
+            if (m_retVal) {
                 qsizetype filesCount = m_fileNames.size();
                 for (qsizetype i = 0; i < filesCount; ++i) {
                     setFileName(m_fileNames.at(i));
-                    retVal = read();
-                    if (retVal) {
-                        retVal = commit();
-                        if (!retVal) {
+                    m_retVal = read();
+                    if (m_retVal) {
+                        m_retVal = commit();
+                        if (!m_retVal) {
                             break;
                         }
                     }
@@ -318,7 +325,7 @@ CSVThreadLoader::run()
         closeDB();
     } // m_fileNames.size()
     //-----------------------------------------------------
-    if (!retVal) {
+    if (!m_retVal) {
         m_errorString = errorString();
         __DEBUG( m_errorString )
     }

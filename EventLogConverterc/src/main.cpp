@@ -52,7 +52,12 @@ int main(int argc, char *argv[])
         loader.setFileName(files);
         loader.start();
 
+        OutToConsole("wait...");
         loader.wait();
+        retVal = loader.getStatus();
+    }
+
+    if (retVal) {
         OutToConsole("File reading finished");
     } else {
         OutToConsole("Error reading file");
@@ -65,7 +70,12 @@ int main(int argc, char *argv[])
         if (report.init(dbName, reportName)) {
             report.start();
 
+            OutToConsole("wait...");
             report.wait();
+            retVal = report.getStatus();
+        }
+
+        if (retVal) {
             OutToConsole("Report generating finished");
         } else {
             OutToConsole("Error generate report");

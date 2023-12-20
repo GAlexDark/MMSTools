@@ -67,10 +67,13 @@ protected:
 class CSVThreadLoader: public QThread, public CSVLoader
 {
 public:
+    explicit CSVThreadLoader();
     void run();
+    bool getStatus() const { return m_retVal; }
 
 private:
     QString m_errorString;
+    bool m_retVal;
 };
 
 #endif // CSVLOADER_H

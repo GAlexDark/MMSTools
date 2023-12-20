@@ -130,8 +130,9 @@ CSVThreadReportBuilder::run()
 {
     __DEBUG( Q_FUNC_INFO )
 
-    bool retVal = m_builser.generateReport();
-    if (!retVal) {
+    m_errorString.clear();
+    m_retVal = m_builser.generateReport();
+    if (!m_retVal) {
         m_errorString = m_builser.errorString();
     }
 }
