@@ -36,13 +36,21 @@ HEADERS += \
     ../Common/Core/stdafx.h \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSVLoader.h \
-    ../Common/Core/CSVParser.h
+    ../Common/Core/CSVParser.h \
+    ../Common/Core/CSingleApplication.h \
+    ../Common/Core/QPayKioskSettings.h \
+    ../Common/Core/ELCSettings.h
 
 SOURCES += \
     ../Common/Core/CBasicDBClass.cpp \
     ../Common/Core/CReportBuilder.cpp \
     ../Common/Core/CSVLoader.cpp \
     ../Common/Core/CSVParser.cpp \
+    ../Common/Core/CSingleApplication.cpp \
+    ../Common/Core/ELCSettings.cpp \
+    ../Common/Core/QPayKioskSettings.cpp \
     src/main.cpp
 
 include(../deployment.pri)
+include(../MMSTools.pri)
+DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
