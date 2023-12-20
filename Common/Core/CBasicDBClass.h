@@ -18,7 +18,7 @@ public:
     CBasicDBClass *getDBinstance() { return this; }
     QString errorString() const { return m_errorString; }
 
-    bool init(const QString &dbName, const QString &connectionString);
+    bool init(const QString &dbDriverName, const QString &connectionString);
     bool open();
     void close();
     void deinit();

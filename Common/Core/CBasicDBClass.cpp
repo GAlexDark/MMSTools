@@ -90,22 +90,22 @@ CBasicDBClass::~CBasicDBClass()
 }
 
 /********************************************************
- * dbName - имя драйвера БД
+ * dbDriverName - имя драйвера БД
  * connectionString - для SQLite это путь к файлу БД
 ********************************************************/
 bool
-CBasicDBClass::init(const QString &dbName, const QString &connectionString)
+CBasicDBClass::init(const QString &dbDriverName, const QString &connectionString)
 {
     __DEBUG( Q_FUNC_INFO )
 
     if (!m_isInited) {
-        if (connectionString.isEmpty() || dbName.isEmpty()) {
+        if (connectionString.isEmpty() || dbDriverName.isEmpty()) {
             m_isInited = false;
             m_errorString = "Empty connection string";
             __DEBUG( m_errorString )
         } else {
             // соединяемся с базой данных
-            m_db = QSqlDatabase::addDatabase(dbName, m_connectionName);
+            m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
             m_isInited = m_db.isValid();
             if (m_isInited) {
                 m_db.setDatabaseName(connectionString);
