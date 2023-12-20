@@ -18,6 +18,7 @@
 #include "QPayKioskSettings.h"
 #include <QDir>
 #include <QFileInfo>
+#include "Debug.h"
 
 QPayKioskSettings::QPayKioskSettings() :
     m_settings(nullptr) {}
@@ -42,6 +43,7 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
     try {
         m_settings = new QSettings(iniFileName, QSettings::IniFormat);
     } catch (const std::bad_alloc& ex) {
+        __DEBUG( ex.what() )
         return false;
     }
     return true;
