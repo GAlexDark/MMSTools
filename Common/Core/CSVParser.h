@@ -8,6 +8,7 @@ class CSVParser
 {
 public:
     CSVParser();
+    void init(const QString &internalipFirstOctet);
     void parse(const QString& line);
     QString errorString() const { return m_errorString; }
 
@@ -37,11 +38,12 @@ private:
                 m_requestID,
                 m_type;
     QString     m_errorString;
+    QString     m_internalipFirstOctet;
 
     void removeQuote(QString &data, QChar quoteChar);
     void parseHeaderString(QChar quoteChar);
 
-    void analizeIPAdresses(const QString &ipaddresses, QString &externalIP, QString &internalIP);
+    void analizeIPAdresses(const QString &ipaddresses);
     bool parseUserSuccessLogonDetails();
     bool parseUserFailedLogonDetails();
     bool parseUserLogonDetails();

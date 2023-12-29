@@ -40,13 +40,14 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
 
     delete m_settings;
 
+    bool retVal = true;
     try {
         m_settings = new QSettings(iniFileName, QSettings::IniFormat);
     } catch (const std::bad_alloc& ex) {
         __DEBUG( ex.what() )
-        return false;
+        retVal = false;
     }
-    return true;
+    return retVal;
 }
 
 QVariant

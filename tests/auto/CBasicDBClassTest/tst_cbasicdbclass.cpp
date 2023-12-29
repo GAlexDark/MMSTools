@@ -29,9 +29,8 @@ public:
 private:
     CBasicDBClass m_fakeDB;
 
-    void initTestCase();
-
 private slots:
+    void initTestCase();
     void test_connectionName();
     void test_getDBinstance();
 
@@ -60,10 +59,7 @@ void CBasicDBClassTest::initTestCase()
 }
 
 
-CBasicDBClassTest::CBasicDBClassTest()
-{
-    initTestCase();
-}
+CBasicDBClassTest::CBasicDBClassTest() {}
 
 CBasicDBClassTest::~CBasicDBClassTest()
 {

@@ -11,9 +11,11 @@ CONFIG -= app_bundle
 INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/QPayKioskSettings.h \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/ELCSettings.h
 
 SOURCES += \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/QPayKioskSettings.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/ELCSettings.cpp \
     tst_elcsettings.cpp
 

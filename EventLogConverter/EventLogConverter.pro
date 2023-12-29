@@ -51,4 +51,26 @@ RESOURCES += $${TARGET}.qrc
 RC_FILE = $${TARGET}.rc
 
 include(../MMSTools.pri)
+
+
+MAJOR_VER = 2
+MINOR_VER = 0
+PATCH_VER = 0
+BUILD_VER = 0
+BUILD_DATE = $$_DATE_
+
+VER_PE = $${MAJOR_VER}.$${MINOR_VER}
+win32:VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER}.$${BUILD_VER} # major.minor.patch.build
+else: VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
+
+VERSION_PE_HEADER = $${VER_PE}
+VERSION = $${VERSTR}
+QMAKE_TARGET_DESCRIPTION = MMS Event Log Conversion GUI Utility
+QMAKE_TARGET_COPYRIGHT = (C) 2023 Oleksii Gaienko
+QMAKE_TARGET_PRODUCT = MMS Event Log Conversion Utility
+QMAKE_TARGET_INTERNALNAME = $${TARGET}
+
 DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
+DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"
+DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
+DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""

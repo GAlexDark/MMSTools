@@ -1,14 +1,14 @@
 #include "CSingleApplication.h"
 #include <QCoreApplication>
-#include <QFileInfo>
-#include <QFile>
-#include <QDir>
-#include <QByteArray>
+
+#ifdef __MSG_EXCHANGE
+ #include <QByteArray>
+#endif
 
 #include "Debug.h"
 
-const QString sharedMemory_prefix = "_m";
-const QString semaphore_prefix = "_s";
+const QString sharedMemory_prefix = QStringLiteral("_m");
+const QString semaphore_prefix = QStringLiteral("_s");
 const QString ELC_PID_FILENAME = QStringLiteral("PID");
 
 /*
@@ -53,17 +53,16 @@ CSingleApplication::~CSingleApplication()
 bool
 CSingleApplication::isRunning()
 {
-    // true - the slave process
-    // false - the master process
+    // true - slave process
+    // false - master process
 
-    bool retVal = true;
     if (!m_semaphore->acquire()) {
-        __DEBUG ( QString("CSingleApplication: Acquisition error, %1").arg(m_semaphore->errorString()));
-        return retVal;
+        __DEBUG( QStringLiteral("QPaySingleApplication: Acquisition error, %1").arg(m_semaphore->errorString()) )
+        return true;
     }
-
+    bool isRun = false;
 #ifndef Q_OS_WIN32
-    // in linux / unix shared memory is not freed when the application terminates abnormally,
+    // In the linux / unix shared memory is not freed when the application terminates abnormally,
     // so you need to get rid of the garbage
     {
         QSharedMemory nix_fix_shared_memory(m_id + sharedMemory_prefix);
@@ -73,35 +72,37 @@ CSingleApplication::isRunning()
     }
 #endif
 
-    if (m_sharedMemory == nullptr) {
+    if (m_sharedMemory == NULL) {
         m_sharedMemory = new QSharedMemory(m_id + sharedMemory_prefix);
         Q_CHECK_PTR(m_semaphore);
     }
 
-    if (m_sharedMemory->attach()) {
-        retVal = true;
+    if(m_sharedMemory->attach()) {
+        isRun = true;
     } else {
+        isRun = false;
+
 #ifdef QT_DEBUG
         // Analyze error
         if (m_sharedMemory->error() != QSharedMemory::NotFound) {
-            __DEBUG( QString("CSingleApplication: Attach error, %1").arg(m_sharedMemory->errorString()) )
+            __DEBUG( QStringLiteral("CSingleApplication: Attach error, %1").arg(m_sharedMemory->errorString()) )
         } else {
-            __DEBUG( QString("CSingleApplication: Create shared memory segment") )
+            __DEBUG( QStringLiteral("CSingleApplication: Create shared memory segment") )
         }
 #endif
-        // Create shared memory segment
+    // Create shared memory segment
         if (!m_sharedMemory->create(segSize)) {
-            __DEBUG( QString("CSingleApplication: create error, %1").arg(m_sharedMemory->errorString()) )
-            retVal = true;
+            __DEBUG( QStringLiteral("CSingleApplication: create error, %1").arg(m_sharedMemory->errorString()) )
+            isRun = true;
         }
     } // m_sharedMemory->attach()
 
     if (!m_semaphore->release()) {
-        qDebug() << "QPaySingleApplicatio∟n: release error, " << m_semaphore->errorString();
-        retVal = true;
+        __DEBUG( QStringLiteral("QPaySingleApplicatio∟n: release error, %1").arg(m_semaphore->errorString()) )
+        return true;
     }
 
-    return retVal;
+    return isRun;
 }
 
 #ifdef __MSG_EXCHANGE

@@ -7,7 +7,6 @@
   #include <QTimer>
 #endif
 #include <QString>
-
 #include <QObject>
 
 const int segSize = 128;
@@ -16,26 +15,22 @@ class CSingleApplication : public QObject
 {
     Q_OBJECT
 public:
-    CSingleApplication(const QString &id);
+    explicit CSingleApplication(const QString &id);
     ~CSingleApplication();
 
     bool isRunning();
 
 #ifdef __MSG_EXCHANGE
-/****************************************************************************
- *
- * startCheckingMessage() - Включение обмена данными через QSharedMemory
- *
- ***************************************************************************/
+/**
+ * @brief Инициализация обмена данными через QSharedMemory
+ */
     void startCheckingMessage();
 
-/****************************************************************************
- *
- * bool sendMessage(const QString &message) - отправка сообщения через QSharedMemory
- * успешная отправка - true.
- * если размер данных в байтах больше segSize, то возвращается ошибка.
- *
- ***************************************************************************/
+/**
+ * @brief Отправка сообщения через QSharedMemory
+ * @param message
+ * @return true если отправка успешная, false если размер данных в байтах больше segSize
+ */
     bool sendMessage(const QString &message);
 #endif
 
@@ -46,12 +41,10 @@ private slots:
         void checkForMessage();
 
 signals:
-/***************************************************************************
- *
- * void messageAvailable(const QStringList& messages) - cигнал, который вырабатывается при
- * получении данных через QSharedMemory
- *
- **************************************************************************/
+/**
+ * @brief cигнал, который вырабатывается при получении данных через QSharedMemory
+ * @param message
+ */
     void messageAvailable(const QStringList& messages);
 #endif
 

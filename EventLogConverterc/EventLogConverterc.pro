@@ -33,13 +33,17 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 HEADERS += \
     ../Common/Core/CBasicDBClass.h \
     ../Common/Core/Debug.h \
+    ../Common/Core/QStorageInfoHelper.h \
     ../Common/Core/stdafx.h \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSVLoader.h \
     ../Common/Core/CSVParser.h \
     ../Common/Core/CSingleApplication.h \
     ../Common/Core/QPayKioskSettings.h \
-    ../Common/Core/ELCSettings.h
+    ../Common/Core/ELCSettings.h \
+    src/CConsoleOutput.h \
+    src/CDataSourceList.h \
+    src/QCommandLineParserHelper.h
 
 SOURCES += \
     ../Common/Core/CBasicDBClass.cpp \
@@ -47,10 +51,36 @@ SOURCES += \
     ../Common/Core/CSVLoader.cpp \
     ../Common/Core/CSVParser.cpp \
     ../Common/Core/CSingleApplication.cpp \
-    ../Common/Core/ELCSettings.cpp \
     ../Common/Core/QPayKioskSettings.cpp \
+    ../Common/Core/ELCSettings.cpp \
+    src/CDataSourceList.cpp \
+    src/QCommandLineParserHelper.cpp \
     src/main.cpp
 
 include(../deployment.pri)
 include(../MMSTools.pri)
+
+RC_ICONS = img/elcc.ico
+
+MAJOR_VER = 1
+MINOR_VER = 0
+PATCH_VER = 0
+BUILD_VER = 0
+BUILD_DATE = $$_DATE_
+
+VER_PE = $${MAJOR_VER}.$${MINOR_VER}
+win32:VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER}.$${BUILD_VER} # major.minor.patch.build
+else: VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
+
+VERSION_PE_HEADER = $${VER_PE}
+VERSION = $${VERSTR}
+QMAKE_TARGET_DESCRIPTION = MMS Event Log Conversion Console Utility
+QMAKE_TARGET_COPYRIGHT = (C) 2023 Oleksii Gaienko
+QMAKE_TARGET_PRODUCT = MMS Event Log Conversion Utility
+QMAKE_TARGET_INTERNALNAME = $${TARGET}
+
 DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
+DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"
+DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
+DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""
+DEFINES += QT_VER=\\\"$${QT_VERSION}\\\"

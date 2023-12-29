@@ -28,7 +28,7 @@ CBasicDBClass::_Deinit()
     if (m_isInited) {
         QString qs;
         qs.append(QSqlDatabase::database().connectionName());
-        __DEBUG( QString("connectionName: %1").arg(qs) )
+        __DEBUG( QStringLiteral("connectionName: %1").arg(qs) )
         QSqlDatabase::removeDatabase(qs);
         __DEBUG( "Database removed" )
         //конец кода
@@ -46,7 +46,7 @@ CBasicDBClass::_exec(const QString &query)
     bool retVal = m_SQLRes.exec(query);
     if (!retVal) {
         QSqlError error = m_SQLRes.lastError();
-        m_errorString = QString("SQL execution error: %1").arg(error.text());
+        m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
         __DEBUG(m_errorString)
     }
     return retVal;
@@ -60,7 +60,7 @@ CBasicDBClass::_exec()
     bool retVal = m_SQLRes.exec();
     if (!retVal) {
         QSqlError error = m_SQLRes.lastError();
-        m_errorString = QString("SQL execution error: %1").arg(error.text());
+        m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
         __DEBUG(m_errorString)
     }
     return retVal;
@@ -89,10 +89,11 @@ CBasicDBClass::~CBasicDBClass()
     _Deinit();
 }
 
-/********************************************************
- * dbDriverName - имя драйвера БД
- * connectionString - для SQLite это путь к файлу БД
-********************************************************/
+/**
+ * @brief init
+ * @param dbDriverName - имя драйвера БД
+ * @param connectionString - для SQLite это путь к файлу БД
+ */
 bool
 CBasicDBClass::init(const QString &dbDriverName, const QString &connectionString)
 {
@@ -101,7 +102,7 @@ CBasicDBClass::init(const QString &dbDriverName, const QString &connectionString
     if (!m_isInited) {
         if (connectionString.isEmpty() || dbDriverName.isEmpty()) {
             m_isInited = false;
-            m_errorString = "Empty connection string";
+            m_errorString = QStringLiteral("Empty connection string");
             __DEBUG( m_errorString )
         } else {
             // соединяемся с базой данных
@@ -111,7 +112,7 @@ CBasicDBClass::init(const QString &dbDriverName, const QString &connectionString
                 m_db.setDatabaseName(connectionString);
             } else {
                 QSqlError error = m_db.lastError();
-                m_errorString = QString("Error loading DB driver: %1").arg(error.text());
+                m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
                 __DEBUG( m_errorString );
             }
         }
@@ -136,7 +137,7 @@ CBasicDBClass::open()
             m_SQLRes = QSqlQuery(m_db); // <-- единое связывание всех запросов
         } else {
             QSqlError error = m_db.lastError();
-            m_errorString = QString("Error open DB file: %1").arg(error.text());
+            m_errorString = QStringLiteral("Error open DB file: %1").arg(error.text());
             __DEBUG( m_errorString )
         }
     }
@@ -178,7 +179,7 @@ CBasicDBClass::beginTransaction()
     m_isBeginTransaction = m_db.transaction();
     if (!m_isBeginTransaction) {
         QSqlError error = m_db.lastError();
-        m_errorString = QString("Transaction Error: %1").arg(error.text());
+        m_errorString = QStringLiteral("Transaction Error: %1").arg(error.text());
         __DEBUG( m_errorString )
     }
     return m_isBeginTransaction;
@@ -202,7 +203,7 @@ CBasicDBClass::commitTransaction()
             m_isBeginTransaction = false;
         } else {
             QSqlError error = m_db.lastError();
-            m_errorString = QString("Transaction Error. Commit status: %1").arg(error.text());
+            m_errorString = QStringLiteral("Transaction Error. Commit status: %1").arg(error.text());
             __DEBUG(m_errorString)
         }
     }
@@ -225,7 +226,7 @@ CBasicDBClass::rollbackTransaction()
         if (retVal) {
         } else {
             QSqlError error = m_db.lastError();
-            m_errorString = QString("Transaction Error. Rollback status: %1").arg(error.text());
+            m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(error.text());
             __DEBUG(m_errorString)
         }
         m_isBeginTransaction = false;
@@ -264,7 +265,7 @@ CBasicDBClass::prepareRequest(const QString &query)
     bool retVal = m_SQLRes.prepare(query);
     if (!retVal) {
 		QSqlError error = m_SQLRes.lastError();
-        m_errorString = QString("SQL prepare error: %1").arg(error.text());
+        m_errorString = QStringLiteral("SQL prepare error: %1").arg(error.text());
         __DEBUG(m_errorString)
     }
     return retVal;

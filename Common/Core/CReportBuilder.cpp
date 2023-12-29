@@ -1,20 +1,39 @@
 #include "CReportBuilder.h"
 #include "Debug.h"
+#include "QStorageInfoHelper.h"
 
-const QString getAllRecords = QStringLiteral("select timestampISO8601, timestamp, externalip, username, type, details, \
-                                    authtype, internalip, requestid from eventlog order by timestamp DESC;");
+const QString getAllRecords = QStringLiteral("SELECT e.timestampISO8601, e.timestamp, e.externalip, e.username, e.type, e.details, \
+e.authtype, e.internalip, e.requestid FROM eventlog e %1 ORDER BY e.timestamp DESC;");
+const QString pragmaUTF8 = QStringLiteral("PRAGMA encoding = \"UTF-8\";");
+const QString pragmaPageSize = QStringLiteral("PRAGMA page_size = %1;");
 
+CReportBuilder::CReportBuilder(): m_errorString(""), m_reportFileName("")
+{}
 
 bool
-CReportBuilder::init(const QString &dbFileName, const QString &reportName)
+CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList)
 {
 
     __DEBUG( Q_FUNC_INFO )
 
     m_reportFileName = reportName;
+    m_excludedUsernamesList = excludedUsernamesList;
     bool retVal = m_db.init("QSQLITE", dbFileName);
     if (retVal) {
         retVal = m_db.open();
+        if (retVal) {
+            int blockSize = QStorageInfoHelper::getStorageBlockSize(dbFileName);
+            QStringList pragmaItems;
+            pragmaItems.append(pragmaUTF8);
+            pragmaItems.append(pragmaPageSize.arg(blockSize));
+
+            for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
+                retVal = m_db.exec(pragmaItems.at(i));
+                if (!retVal) {
+                    break;
+                }
+            }
+        }
     }
 
     if (!retVal) {
@@ -31,7 +50,6 @@ CReportBuilder::generateReport()
 {
     __DEBUG( Q_FUNC_INFO )
 
-    // [1]  Writing excel file(*.xlsx)
     int rowHeader = 1;
     int colTimestampISO8601 = 1, colTimestamp = 2, colExternalIP = 3, colUsername = 4, colType = 5, colDetails = 6,
             colAuthType = 7, colInternalIP = 8, colRequestid = 9;
@@ -39,23 +57,23 @@ CReportBuilder::generateReport()
 
     QXlsx::Document xlsxReport;
     // Add header
-    QVariant writeValue = QString("Відмітка часу (часовий пояс - UTC)");
+    QVariant writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
     xlsxReport.write(rowHeader, colTimestampISO8601, writeValue);
-    writeValue = QString("Відмітка часу (за Київським часом)");
+    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
     xlsxReport.write(rowHeader, colTimestamp, writeValue);
-    writeValue = QString("Зовнішній IP");
+    writeValue = QStringLiteral("Зовнішній IP");
     xlsxReport.write(rowHeader, colExternalIP, writeValue);
-    writeValue = QString("Ім'я користувача");
+    writeValue = QStringLiteral("Ім'я користувача");
     xlsxReport.write(rowHeader, colUsername, writeValue);
-    writeValue = QString("Тип");
+    writeValue = QStringLiteral("Тип");
     xlsxReport.write(rowHeader, colType, writeValue);
-    writeValue = QString("Деталі");
+    writeValue = QStringLiteral("Деталі");
     xlsxReport.write(rowHeader, colDetails, writeValue);
-    writeValue = QString("Тип авторизації");
+    writeValue = QStringLiteral("Тип авторизації");
     xlsxReport.write(rowHeader, colAuthType, writeValue);
-    writeValue = QString("Внутрішній IP");
+    writeValue = QStringLiteral("Внутрішній IP");
     xlsxReport.write(rowHeader, colInternalIP, writeValue);
-    writeValue = QString("ID запиту");
+    writeValue = QStringLiteral("ID запиту");
     xlsxReport.write(rowHeader, colRequestid, writeValue);
 
     // Set datetime format
@@ -63,7 +81,22 @@ CReportBuilder::generateReport()
     dateFormat.setHorizontalAlignment(QXlsx::Format::AlignRight);
     dateFormat.setNumberFormat("dd.mm.yyyy hh:mm:ss");
 
-    bool retVal = m_db.exec(getAllRecords);
+    QString args;
+    args.clear();
+    if (!m_excludedUsernamesList.isEmpty()) {
+        args.append(QStringLiteral("WHERE "));
+        qsizetype size = m_excludedUsernamesList.size();
+        for (qsizetype i = 0; i < size; ++i) {
+            if (i+1 == size) {
+                args.append(QStringLiteral("e.username<>%1").arg(m_excludedUsernamesList.at(i)));
+            } else {
+                args.append(QStringLiteral("e.username<>%1 AND ").arg(m_excludedUsernamesList.at(i)));
+            }
+        }
+    }
+    __DEBUG( getAllRecords.arg(args) )
+
+    bool retVal = m_db.exec(getAllRecords.arg(args));
     if (retVal) {
         int row = 2;
         while (m_db.isNext()) {
@@ -101,7 +134,7 @@ CReportBuilder::generateReport()
 
         retVal = xlsxReport.saveAs(m_reportFileName);
         if (!retVal) {
-            m_errorString = "Error save report file";
+            m_errorString = QStringLiteral("Error save report file");
             __DEBUG( m_errorString )
         }
 
@@ -118,11 +151,15 @@ CReportBuilder::generateReport()
 
 //----------------------------------------------------------
 
-bool CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName)
+CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(false)
+{}
+
+bool
+CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList)
 {
     __DEBUG( Q_FUNC_INFO )
 
-    return m_builser.init(dbFileName, reportName);;
+    return m_builser.init(dbFileName, reportName, excludedUsernamesList);
 }
 
 void

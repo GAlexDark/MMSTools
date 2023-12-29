@@ -22,7 +22,6 @@
 class ELCSettings : public QPayKioskSettings
 {
 public:
-    ELCSettings();
     static ELCSettings& instance();
 private:
     void createDefault(const QString& iniPath) override;

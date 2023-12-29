@@ -29,13 +29,12 @@ private:
             m_internalIP;
     QDateTime m_timestampTZ;
 
-    void initTestCase();
-
 private slots:
-//    void cleanupTestCase();
+    void initTestCase();
     void testSuccessAuth_wALL_ips();
     void testFailedAuth();
     void testSuccessAuth_wINTERNAL_ips();
+    void testSuccessAuth_wEXTERNAL_ips();
     void testOtherData1();
     void testOtherdata2();
     void testOtherdata3_exception();
@@ -56,6 +55,7 @@ void CSVParserTest::initTestCase()
     QVERIFY(!buf.isEmpty());
     file.close();
 
+    m_parser.init("10.");
     m_parser.parse(buf);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
@@ -132,6 +132,34 @@ void CSVParserTest::testSuccessAuth_wINTERNAL_ips() {
     QCOMPARE(m_externalIP, QString(""));
     QCOMPARE(m_internalIP, QString("10.10.1.13, 10.10.10.10"));
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:06.777"));
+}
+
+void CSVParserTest::testSuccessAuth_wEXTERNAL_ips() {
+    qDebug() << "Testcase: Success auth with external IPs only";
+
+    initTestCase(); // for checking empty fields
+
+    QFile file(SRCDIR"data/testcase_success_wExt_ips.csv");
+    bool retVal = file.open(QIODeviceBase::ReadOnly);
+    QVERIFY(retVal);
+    QByteArray buf = file.readAll();
+    QVERIFY(!buf.isEmpty());
+    file.close();
+
+    m_parser.parse(buf);
+    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
+                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
+
+    QCOMPARE(m_username, QString("mr_data"));
+    QCOMPARE(m_timestampISO8601, QString("2022-10-17T06:46:45.443Z"));
+    QCOMPARE(m_requestID, QString("7eab70f76c744995"));
+    QCOMPARE(m_type, QString("Вхід користувача - успішно"));
+    QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.118"));
+    QCOMPARE(m_username1, QString("mr_data"));
+    QCOMPARE(m_authType, QString("PASSWORD"));
+    QCOMPARE(m_externalIP, QString("192.0.2.118"));
+    QCOMPARE(m_internalIP, QString(""));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2022-10-17T09:46:45.443"));
 }
 
 void CSVParserTest::testOtherData1()

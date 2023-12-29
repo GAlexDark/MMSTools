@@ -1,5 +1,6 @@
 #include "CSVLoader.h"
 
+#include "QStorageInfoHelper.h"
 #include "Debug.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -16,32 +17,46 @@ const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [
                                     type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME, \
                                     PRIMARY KEY (timestampISO8601, requestid));");
 
+const QString pragmaUTF8 = QStringLiteral("PRAGMA encoding = \"UTF-8\";");
+const QString pragmaJournalMode = QStringLiteral("PRAGMA journal_mode = %1;");
+const QString pragmaPageSize = QStringLiteral("PRAGMA page_size = %1;");
+const QString pragmaSynchronous = QStringLiteral("PRAGMA synchronous = NORMAL;");
+const QString pragmaTempStore = QStringLiteral("PRAGMA temp_store = %1;");
+
+
 bool
-CSVLoader::initDB(const QString &dbFileName)
-{
+CSVLoader::initDB(const QString &dbFileName, const QString &tempStore, const QString &journalMode)
+{    
     bool retVal = m_db.init("QSQLITE", dbFileName);
     if (retVal) {
         retVal = m_db.open();
         if (retVal) {
-            retVal = m_db.exec("PRAGMA journal_mode = MEMORY;");
-            if (retVal) {
-                retVal = m_db.exec("PRAGMA page_size = 32768;");
-                if (retVal) {
-                    retVal = m_db.exec("PRAGMA synchronous = OFF;");
-                    if (retVal) {
-                        retVal = m_db.exec("PRAGMA cache_size = 100000;"); // from test
-                        if (retVal) {
-                            retVal = m_db.exec("PRAGMA temp_store = MEMORY;"); // from test
-                            if (retVal) {
-                                retVal = m_db.exec(createEventLogTable);
-                            }
-                        }
-                    }
+            int blockSize = QStorageInfoHelper::getStorageBlockSize(dbFileName);
+            QStringList pragmaItems;
+            pragmaItems.append(pragmaUTF8);
+            if (QString::compare(journalMode, "memory", Qt::CaseInsensitive) == 0) {
+                pragmaItems.append(pragmaJournalMode.arg("MEMORY"));
+            } else {
+                pragmaItems.append(pragmaJournalMode.arg("DELETE"));
+            }
+            pragmaItems.append(pragmaPageSize.arg(blockSize));
+            pragmaItems.append(pragmaSynchronous);
+            if (QString::compare(tempStore, "memory", Qt::CaseInsensitive) == 0) {
+                pragmaItems.append(pragmaTempStore.arg("MEMORY"));
+            } else {
+                pragmaItems.append(pragmaTempStore.arg("DEFAULT"));
+            }
+            for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
+                retVal = m_db.exec(pragmaItems.at(i));
+                if (!retVal) {
+                    break;
                 }
+            }
+            if (retVal) {
+                retVal = m_db.exec(createEventLogTable);
             }
         }
     }
-
     if (!retVal) {
         m_errorString = m_db.errorString();
         m_db.close();
@@ -55,13 +70,11 @@ CSVLoader::initBuffer()
     bool retVal = true;
     try {
         if (m_bufferSize > 0) {
-            m_buffer = new QByteArray;
+            m_buffer = new QByteArray(m_bufferSize, 0);
             Q_ASSERT(m_buffer);
-            m_buffer->resize(m_bufferSize);
-            memset(m_buffer->data(), 0, m_buffer->size());
         } else {
             retVal = false;
-            m_errorString = "Invalid buffer size";
+            m_errorString = QStringLiteral("Invalid buffer size");
         }
     } catch (std::bad_alloc &e) {
         m_errorString = e.what();
@@ -108,9 +121,9 @@ CSVLoader::readSmallFile()
         list.append(buffer.split(m_eolChars));
 
         QString line;
-        int firstDataColumn = (m_isHeaders)? 1 : 0;
-        int columnCount = list.size();
-        for (int i = firstDataColumn; i < columnCount; ++i) {
+        qsizetype firstDataColumn = (m_isHeaders)? 1 : 0;
+        qsizetype columnCount = list.size();
+        for (qsizetype i = firstDataColumn; i < columnCount; ++i) {
             line = list.at(i);
             m_parser.parse(line);
             m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
@@ -163,7 +176,6 @@ CSVLoader::readLargeFile()
                 if (nextPosition != -1) {
                     line.clear();
                     line.append(m_buffer->mid(prevPosition, nextPosition));
-                    //m_callbackFunction(line);
 
                     prevPosition = nextPosition + eolCharsLen;
                 }
@@ -227,19 +239,15 @@ CSVLoader::readLargeFile()
     return retVal;
 }
 
+
 //-----------------------------------------------------------
 
-CSVLoader::CSVLoader()
+CSVLoader::CSVLoader(): m_errorString(""), m_buffer(nullptr), m_bufferSize(defBufferSize), m_fileName(""), m_isHeaders(false)
 {
     __DEBUG( Q_FUNC_INFO )
 
-    m_errorString.clear();
-    m_fileName.clear();
     m_eolChars.clear();
-    m_buffer = nullptr;
-    m_bufferSize = defBufferSize;
     m_fileNames.clear();
-    m_isHeaders = false;
 }
 
 CSVLoader::~CSVLoader()
@@ -256,7 +264,8 @@ CSVLoader::~CSVLoader()
 }
 
 bool
-CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QByteArray &eolChars, qint64 bufferSize)
+CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const QString &tempStore, const QString &journalMode,
+                     const QByteArray &eolChars, qint64 bufferSize)
 {
     __DEBUG( Q_FUNC_INFO )
 
@@ -264,7 +273,9 @@ CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QByteArray
     m_isHeaders = dataHasHeaders;
     m_bufferSize = bufferSize;
 
-    bool retVal = initDB(dbFileName);
+    m_parser.init(internalipFirstOctet);
+
+    bool retVal = initDB(dbFileName, tempStore, journalMode);
     if (retVal) {
         retVal = initBuffer();
     }
@@ -290,11 +301,9 @@ CSVLoader::read()
     return (size < defMaxFileSize)? readSmallFile() : readLargeFile();
 }
 
-
-
 //--------------------------------------------------------------------------
 
-CSVThreadLoader::CSVThreadLoader(): m_retVal(false)
+CSVThreadLoader::CSVThreadLoader(): m_errorString(""), m_retVal(false)
 {}
 
 void
@@ -305,13 +314,17 @@ CSVThreadLoader::run()
     m_errorString.clear();
     //-----------------------------------------------------
     if (m_fileNames.size() > 0 ) {
+        emit sendMessage( tr("Preparing to read file(s).") );
         m_retVal = beginTrancaction();
         if (m_retVal) {
             m_retVal = prepareRequest(insertOriginalData);
             if (m_retVal) {
                 qsizetype filesCount = m_fileNames.size();
+                QString fileName;
                 for (qsizetype i = 0; i < filesCount; ++i) {
-                    setFileName(m_fileNames.at(i));
+                    fileName = m_fileNames.at(i);
+                    emit sendMessage( tr("Reading of file %1 has started.").arg(fileName) );
+                    setFileName(fileName);
                     m_retVal = read();
                     if (m_retVal) {
                         m_retVal = commit();
@@ -319,6 +332,7 @@ CSVThreadLoader::run()
                             break;
                         }
                     }
+                    emit sendMessage( tr("File %1 has been read").arg(fileName) );
                 } //for
             }
         }

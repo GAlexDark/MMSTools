@@ -24,11 +24,6 @@ ELCSettings& ELCSettings::instance()
     return g_elcSettings;
 }
 
-ELCSettings::ELCSettings()
-{
-
-}
-
 void
 ELCSettings::createDefault(const QString& iniPath)
 {
@@ -36,11 +31,16 @@ ELCSettings::createDefault(const QString& iniPath)
 
     settings.beginGroup(QStringLiteral("SETTINGS"));
 #ifdef QT_DEBUG
-    settings.setValue(QStringLiteral("db_file_name"), TEST_SRCDIR"EventLogConverter.db");
+    settings.setValue(QStringLiteral("db_file_name"), QStringLiteral(TEST_SRCDIR"EventLogConverter.db"));
 #else
-    settings.setValue(QStringLiteral("db_file_name"), "EventLogConverter.db");
+    settings.setValue(QStringLiteral("db_file_name"), QStringLiteral("EventLogConverter.db"));
 #endif
-    settings.setValue(QStringLiteral("mode"), "simple_report"); //multi_report | auto_report
+    settings.setValue(QStringLiteral("clear_on_startup"), QStringLiteral("yes")); // yes | no
+    settings.setValue(QStringLiteral("internal_ip_start_octet"), QStringLiteral("10."));
+    settings.endGroup();
 
+    settings.beginGroup(QStringLiteral("DATABASE"));
+    settings.setValue(QStringLiteral("temp_store"), QStringLiteral("MEMORY"));
+    settings.setValue(QStringLiteral("journal_mode"), QStringLiteral("MEMORY"));
     settings.endGroup();
 }

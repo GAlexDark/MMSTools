@@ -13,11 +13,12 @@ const qint64 defMaxFileSize = 1024 * 1024; // 1M
 class CSVLoader
 {
 public:
-    CSVLoader();
+    explicit CSVLoader();
     ~CSVLoader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    bool init(const QString &dbFileName, bool dataHasHeaders, const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
+    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const QString &tempStore, const QString &journalMode,
+              const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
     bool read();
     QString errorString() const { return m_errorString; }
 
@@ -32,7 +33,7 @@ private:
     CBasicDBClass  m_db;
     TDataItem   m_data;
 
-    bool initDB(const QString &dbFileName);
+    bool initDB(const QString &dbFileName, const QString &tempStore, const QString &journalMode);
     bool initBuffer();
 
     bool readLargeFile();
@@ -66,14 +67,19 @@ protected:
 
 class CSVThreadLoader: public QThread, public CSVLoader
 {
+    Q_OBJECT
 public:
     explicit CSVThreadLoader();
     void run();
     bool getStatus() const { return m_retVal; }
 
+signals:
+    void sendMessage(const QString &msg);
+
 private:
     QString m_errorString;
     bool m_retVal;
+
 };
 
 #endif // CSVLOADER_H

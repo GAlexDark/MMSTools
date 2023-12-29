@@ -14,13 +14,20 @@ public:
     ~ELCSettingsTest();
 
 private slots:
+    void initTestCase();
+    void cleanupTestCase();
     void test_init();
     void test_fileExists();
     void test_getDBName();
-    void test_getMode();
+    //void test_getMode();
 };
 
-ELCSettingsTest::ELCSettingsTest()
+ELCSettingsTest::ELCSettingsTest() {}
+
+ELCSettingsTest::~ELCSettingsTest() {}
+
+void
+removeIniFile()
 {
     QFile file(SRCDIR"data/EventLogConverter.ini");
     if (file.exists()) {
@@ -28,12 +35,16 @@ ELCSettingsTest::ELCSettingsTest()
     }
 }
 
-ELCSettingsTest::~ELCSettingsTest()
+void
+ELCSettingsTest::initTestCase()
 {
-    QFile file(SRCDIR"data/EventLogConverter.ini");
-    if (file.exists()) {
-        file.remove();
-    }
+    removeIniFile();
+}
+
+void
+ELCSettingsTest::cleanupTestCase()
+{
+    removeIniFile();
 }
 
 void
@@ -59,7 +70,7 @@ ELCSettingsTest::test_getDBName()
     QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
-
+/*
 void
 ELCSettingsTest::test_getMode()
 {
@@ -67,7 +78,7 @@ ELCSettingsTest::test_getMode()
     QString retVal = settings.getMain("SETTINGS/mode").toString().trimmed();
     QCOMPARE(retVal, QString("simple_report"));
 }
-
+*/
 QTEST_APPLESS_MAIN(ELCSettingsTest)
 
 #include "tst_elcsettings.moc"

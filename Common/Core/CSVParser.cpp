@@ -13,16 +13,20 @@ const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [
                                     internalip TEXT, timestamp DATETIME, \
                                     PRIMARY KEY (timestampISO8601, requestid));");
 
+const qsizetype userNameLen = QString("username: ").length();
+const qsizetype typeLen = QString("type: ").length();
+const qsizetype ipaddressLen = QString("ip address: ").length();
+
 void
 CSVParser::removeQuote(QString &data, QChar quoteChar)
 {    
     if (!data.isEmpty()) {
-        if (data.at(0) == quoteChar) {
-            data.remove(0, 1);
+        if (data.startsWith(quoteChar)) {
+            data = data.mid(1);
         }
-        int lastChar = data.length() - 1;
-        if (data.at(lastChar) == quoteChar) {
-            data.resize(lastChar);
+        qsizetype lastChar = data.length() - 1;
+        if (data.endsWith(quoteChar)) {
+            data = data.left(lastChar);
         }
     }
 }
@@ -30,8 +34,8 @@ CSVParser::removeQuote(QString &data, QChar quoteChar)
 void
 CSVParser::parseHeaderString(QChar quoteChar)
 {
-    int from = 0;
-    int next = 0;
+    qsizetype from = 0;
+    qsizetype next = 0;
 
     next = m_header.indexOf(',', from);
     m_username = m_header.mid(from, next);
@@ -55,37 +59,37 @@ CSVParser::parseHeaderString(QChar quoteChar)
 
 //=================================================================================
 void
-CSVParser::analizeIPAdresses(const QString &ipaddresses, QString &externalIP, QString &internalIP)
+CSVParser::analizeIPAdresses(const QString &ipaddresses)
 {
-    int pos = ipaddresses.indexOf(',');
+    qsizetype pos = ipaddresses.indexOf(',');
     if (pos != -1) {
         QString firstip = ipaddresses.mid(0, pos).trimmed();
         QString secondip = ipaddresses.mid(pos + 1).trimmed();
-        bool isPrivateFirstIP = (firstip.indexOf("10.") == 0)? true : false;
-        bool isPrivateSecondIP = (secondip.indexOf("10.") == 0)? true : false;
+        bool isPrivateFirstIP = (firstip.indexOf(m_internalipFirstOctet) == 0)? true : false;
+        bool isPrivateSecondIP = (secondip.indexOf(m_internalipFirstOctet) == 0)? true : false;
 
         if (isPrivateFirstIP && isPrivateSecondIP) {
-            externalIP.clear();
-            internalIP = ipaddresses;
+            m_externalip.clear();
+            m_internalip = ipaddresses;
             return;
         }
 
         if (isPrivateFirstIP) {
-            externalIP = secondip;
-            internalIP = firstip;
+            m_externalip = secondip;
+            m_internalip = firstip;
         } else {
-            externalIP = firstip;
-            internalIP = secondip;
+            m_externalip = firstip;
+            m_internalip = secondip;
         }
         return;
     } // pos()
 
-    if (ipaddresses.indexOf("10.") == 0) {
-        externalIP.clear();
-        internalIP = ipaddresses;
+    if (ipaddresses.indexOf(m_internalipFirstOctet) == 0) {
+        m_externalip.clear();
+        m_internalip = ipaddresses;
     } else {
-        externalIP = ipaddresses;
-        internalIP.clear();
+        m_externalip = ipaddresses;
+        m_internalip.clear();
     }
 }
 
@@ -97,16 +101,14 @@ CSVParser::parseUserSuccessLogonDetails()
     QRegularExpressionMatch match = reSuccessLogon.match(m_details);
     if (match.hasMatch()) {
         m_username1 = match.captured(1).trimmed();
-        m_username1.remove("username: ");
-        m_username1.resize(m_username1.length() - 1);
+        m_username1 = m_username1.mid(userNameLen, m_username1.indexOf(',') - userNameLen);
 
         m_authType = match.captured(2).trimmed();
-        m_authType.remove("type: ");
-        m_authType.resize(m_authType.length() - 1);
+        m_authType = m_authType.mid(typeLen, m_authType.indexOf(',') - typeLen);
 
         QString ipaddresses = match.captured(3).trimmed();
-        ipaddresses.remove("ip address: ");
-        analizeIPAdresses(ipaddresses, m_externalip, m_internalip);
+        ipaddresses = ipaddresses.mid(ipaddressLen);
+        analizeIPAdresses(ipaddresses);
 
         retVal = true;
     }
@@ -122,11 +124,11 @@ CSVParser::parseUserFailedLogonDetails()
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
     if (match.hasMatch()) {
         m_authType = match.captured(1).trimmed();
-        m_authType.remove("type: ");
+        m_authType = m_authType.mid(typeLen, m_authType.indexOf(',') - typeLen);
 
         QString ipaddresses = match.captured(2).trimmed();
-        ipaddresses.remove("ip address: ");
-        analizeIPAdresses(ipaddresses, m_externalip, m_internalip);
+        ipaddresses = ipaddresses.mid(ipaddressLen);
+        analizeIPAdresses(ipaddresses);
 
         retVal = true;
     }
@@ -150,10 +152,14 @@ CSVParser::CSVParser()
 }
 
 void
+CSVParser::init(const QString &internalipFirstOctet)
+{
+    m_internalipFirstOctet = internalipFirstOctet;
+}
+
+void
 CSVParser::parse(const QString &line)
 {
-    //__DEBUG( Q_FUNC_INFO )
-
     m_details = line;
     m_details.replace("\n", "@N@", Qt::CaseInsensitive);
 
@@ -162,8 +168,7 @@ CSVParser::parse(const QString &line)
         m_header = match.captured(0);
         parseHeaderString('"');
 
-        m_details.remove(m_header, Qt::CaseInsensitive);
-        m_details.remove(0, 1); // remove first ',' char before quote char in details field
+        m_details = m_details.mid(m_header.length() + 1);
         removeQuote(m_details, '"');
 
         m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
