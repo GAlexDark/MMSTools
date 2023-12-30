@@ -3,20 +3,20 @@
 
 #include "Debug.h"
 
-QRegularExpression reHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"); //get header
-QRegularExpression reSuccessLogon("^(.*?)@N@(.*?)@N@(.*?)$");
-QRegularExpression reFailedLogon("^(.*?)@N@(.*?)$");
+QRegularExpression reHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
+QRegularExpression reSuccessLogon("^username:\\s(.*?),@N@\\s\\stype:\\s(.*?),@N@\\s\\sip\\saddress:\\s(.*?)$");
+QRegularExpression reFailedLogon("^type:\\s(.*?)@N@\\s\\sip\\saddress:\\s(.*?)$");
 
 const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
                                     timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
                                     type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, \
                                     internalip TEXT, timestamp DATETIME, \
                                     PRIMARY KEY (timestampISO8601, requestid));");
-
+/*
 const qsizetype userNameLen = QString("username: ").length();
 const qsizetype typeLen = QString("type: ").length();
 const qsizetype ipaddressLen = QString("ip address: ").length();
-
+*/
 void
 CSVParser::removeQuote(QString &data, QChar quoteChar)
 {    
@@ -101,13 +101,10 @@ CSVParser::parseUserSuccessLogonDetails()
     QRegularExpressionMatch match = reSuccessLogon.match(m_details);
     if (match.hasMatch()) {
         m_username1 = match.captured(1).trimmed();
-        m_username1 = m_username1.mid(userNameLen, m_username1.indexOf(',') - userNameLen);
 
         m_authType = match.captured(2).trimmed();
-        m_authType = m_authType.mid(typeLen, m_authType.indexOf(',') - typeLen);
 
         QString ipaddresses = match.captured(3).trimmed();
-        ipaddresses = ipaddresses.mid(ipaddressLen);
         analizeIPAdresses(ipaddresses);
 
         retVal = true;
@@ -125,10 +122,8 @@ CSVParser::parseUserFailedLogonDetails()
         m_username1.clear();
 
         m_authType = match.captured(1).trimmed();
-        m_authType = m_authType.mid(typeLen, m_authType.indexOf(',') - typeLen);
 
         QString ipaddresses = match.captured(2).trimmed();
-        ipaddresses = ipaddresses.mid(ipaddressLen);
         analizeIPAdresses(ipaddresses);
 
         retVal = true;
