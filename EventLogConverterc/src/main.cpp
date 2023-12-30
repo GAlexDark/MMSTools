@@ -16,9 +16,8 @@ trunvateDB(const QString &connectionString, QString &errorString)
 {
     __DEBUG( Q_FUNC_INFO )
 
-    bool retVal = true;
     CBasicDBClass db;
-    retVal = db.init("QSQLITE", connectionString);
+    bool retVal = db.init("QSQLITE", connectionString);
     if (retVal) {
         retVal = db.open();
         if (retVal) {
