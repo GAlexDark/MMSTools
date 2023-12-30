@@ -51,6 +51,8 @@ CSVParser::parseHeaderString(QChar quoteChar)
     m_requestID = m_header.mid(from, next - from);
     removeQuote(m_requestID, quoteChar);
     from = next +1;
+    bool ok = true;
+    __DEBUG( m_requestID.toLongLong(&ok, 16) )
 
     next = m_header.indexOf(',', from);
     m_type = m_header.mid(from, next - from);
@@ -71,26 +73,24 @@ CSVParser::analizeIPAdresses(const QString &ipaddresses)
         if (isPrivateFirstIP && isPrivateSecondIP) {
             m_externalip.clear();
             m_internalip = ipaddresses;
-            return;
-        }
-
-        if (isPrivateFirstIP) {
-            m_externalip = secondip;
-            m_internalip = firstip;
         } else {
-            m_externalip = firstip;
-            m_internalip = secondip;
-        }
-        return;
-    } // pos()
-
-    if (ipaddresses.indexOf(m_internalipFirstOctet) == 0) {
-        m_externalip.clear();
-        m_internalip = ipaddresses;
+            if (isPrivateFirstIP) {
+                m_externalip = secondip;
+                m_internalip = firstip;
+            } else {
+                m_externalip = firstip;
+                m_internalip = secondip;
+            }
+        } // if &&
     } else {
-        m_externalip = ipaddresses;
-        m_internalip.clear();
-    }
+        if (ipaddresses.indexOf(m_internalipFirstOctet) == 0) {
+            m_externalip.clear();
+            m_internalip = ipaddresses;
+        } else {
+            m_externalip = ipaddresses;
+            m_internalip.clear();
+        }
+    } // (pos != -1)
 }
 
 bool
@@ -119,10 +119,11 @@ bool
 CSVParser::parseUserFailedLogonDetails()
 {
     bool retVal = false;
-    m_username1.clear();
 
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
     if (match.hasMatch()) {
+        m_username1.clear();
+
         m_authType = match.captured(1).trimmed();
         m_authType = m_authType.mid(typeLen, m_authType.indexOf(',') - typeLen);
 
@@ -138,7 +139,7 @@ CSVParser::parseUserFailedLogonDetails()
 bool
 CSVParser::parseUserLogonDetails()
 {
-    bool retVal = parseUserSuccessLogonDetails();;
+    bool retVal = parseUserSuccessLogonDetails();
     if (!retVal) {
         retVal = parseUserFailedLogonDetails();
     }
