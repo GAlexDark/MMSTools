@@ -64,14 +64,7 @@ QCommandLineParserHelper::excludedUsernames()
         if (buf.indexOf(';') != -1) {
             res.append(buf.split(';'));
         }
-        qsizetype i = 0;
-        while (i < res.size()) {
-            buf = res.at(i).trimmed();
-            res[i] = buf;
-            if (buf.isEmpty() )
-                res.removeAt(i);
-            else i++;
-        }
+        res.removeAll(QString(""));
         retVal.clear();
         retVal.append(res);
     }
