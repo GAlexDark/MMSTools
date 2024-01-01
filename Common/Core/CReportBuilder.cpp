@@ -11,13 +11,15 @@ CReportBuilder::CReportBuilder(): m_errorString(""), m_reportFileName("")
 {}
 
 bool
-CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList)
+CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList)
 {
 
     __DEBUG( Q_FUNC_INFO )
 
     m_reportFileName = reportName;
     m_excludedUsernamesList = excludedUsernamesList;
+    m_includedUsernamesList = includedUsernamesList;
+
     bool retVal = m_db.init("QSQLITE", dbFileName);
     if (retVal) {
         retVal = m_db.open();
@@ -83,16 +85,22 @@ CReportBuilder::generateReport()
 
     QString args;
     args.clear();
-    if (!m_excludedUsernamesList.isEmpty()) {
-        args.append(QStringLiteral("WHERE "));
-        qsizetype size = m_excludedUsernamesList.size();
-        for (qsizetype i = 0; i < size; ++i) {
-            if (i+1 == size) {
-                args.append(QStringLiteral("e.username<>%1").arg(m_excludedUsernamesList.at(i)));
-            } else {
+    if (m_includedUsernamesList.isEmpty()) {
+        if (!m_excludedUsernamesList.isEmpty()) {
+            args.append(QStringLiteral("WHERE "));
+            qsizetype size = m_excludedUsernamesList.size() - 1;
+            for (qsizetype i = 0; i < size; ++i) {
                 args.append(QStringLiteral("e.username<>%1 AND ").arg(m_excludedUsernamesList.at(i)));
-            }
+            } //for
+            args.append(QStringLiteral("e.username<>%1").arg(m_excludedUsernamesList.at(size)));
         }
+    } else {
+        args.append(QStringLiteral("WHERE "));
+        qsizetype size = m_includedUsernamesList.size() - 1;
+        for (qsizetype i = 0; i < size; ++i) {
+            args.append(QStringLiteral("e.username=%1 OR ").arg(m_includedUsernamesList.at(i)));
+        } //for
+        args.append(QStringLiteral("e.username=%1").arg(m_includedUsernamesList.at(size)));
     }
     __DEBUG( getAllRecords.arg(args) )
 
@@ -155,11 +163,11 @@ CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(fa
 {}
 
 bool
-CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList)
+CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList)
 {
     __DEBUG( Q_FUNC_INFO )
 
-    return m_builser.init(dbFileName, reportName, excludedUsernamesList);
+    return m_builser.init(dbFileName, reportName, excludedUsernamesList, includedUsernamesList);
 }
 
 void
