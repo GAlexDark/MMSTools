@@ -119,11 +119,6 @@ CBasicDBClass::init(const QString &dbDriverName, const QString &connectionString
     }
     return m_isInited;
 }
-/*
-    закончить транзакции (commit)
-    закрыть подключение к базе
-    деинициализация подключения
-*/
 
 bool
 CBasicDBClass::open()
