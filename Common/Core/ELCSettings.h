@@ -3,8 +3,8 @@
 *  Copyright (c) Oleksii Gaienko, 2023
 *  Contact: galexsoftware@gmail.com
 *
-*  
-*  
+*  Event Log Conversion Utility
+*  Event Log Conversion Utility
 *
 *  Module name: ELCSettings.h
 *  Author(s): Oleksii Gaienko
@@ -23,7 +23,9 @@ class ELCSettings : public QPayKioskSettings
 {
 public:
     static ELCSettings& instance();
-private:
+
+//private:
+protected:
     void createDefault(const QString& iniPath) override;
 };
 

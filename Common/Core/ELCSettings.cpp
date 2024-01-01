@@ -3,8 +3,8 @@
 *  Copyright (c) Oleksii Gaienko, 2023
 *  Contact: galexsoftware@gmail.com
 *
-*  cmdbsmallparser
-*  cmdbsmallparser
+*  Event Log Conversion Utility
+*  Event Log Conversion Utility
 *
 *  Module name: ELCSettings.cpp
 *  Author(s): Oleksii Gaienko
