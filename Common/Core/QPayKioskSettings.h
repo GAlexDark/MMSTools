@@ -16,6 +16,7 @@ public:
 public:
     bool init(const QString& appPath, const QString &fileName);
     QVariant getMain(const QString& keyName) const;
+    void setMain(const QString& group, const QString& keyName, QVariant value);
 
     QString defaultClientLang();
 
