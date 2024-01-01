@@ -35,9 +35,7 @@ void
 CSVParser::parseHeaderString(QChar quoteChar)
 {
     qsizetype from = 0;
-    qsizetype next = 0;
-
-    next = m_header.indexOf(',', from);
+    qsizetype next = m_header.indexOf(',', from);
     m_username = m_header.mid(from, next);
     removeQuote(m_username, quoteChar);
     from = next +1;
@@ -51,8 +49,6 @@ CSVParser::parseHeaderString(QChar quoteChar)
     m_requestID = m_header.mid(from, next - from);
     removeQuote(m_requestID, quoteChar);
     from = next +1;
-    bool ok = true;
-    __DEBUG( m_requestID.toLongLong(&ok, 16) )
 
     next = m_header.indexOf(',', from);
     m_type = m_header.mid(from, next - from);
@@ -96,18 +92,15 @@ CSVParser::analizeIPAdresses(const QString &ipaddresses)
 bool
 CSVParser::parseUserSuccessLogonDetails()
 {
-    bool retVal = false;
-
     QRegularExpressionMatch match = reSuccessLogon.match(m_details);
-    if (match.hasMatch()) {
+    bool retVal = match.hasMatch();
+    if (retVal) {
         m_username1 = match.captured(1).trimmed();
 
         m_authType = match.captured(2).trimmed();
 
         QString ipaddresses = match.captured(3).trimmed();
         analizeIPAdresses(ipaddresses);
-
-        retVal = true;
     }
     return retVal;
 }
@@ -115,18 +108,15 @@ CSVParser::parseUserSuccessLogonDetails()
 bool
 CSVParser::parseUserFailedLogonDetails()
 {
-    bool retVal = false;
-
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
-    if (match.hasMatch()) {
+    bool retVal = match.hasMatch();
+    if (retVal) {
         m_username1.clear();
 
         m_authType = match.captured(1).trimmed();
 
         QString ipaddresses = match.captured(2).trimmed();
         analizeIPAdresses(ipaddresses);
-
-        retVal = true;
     }
     return retVal;
 }
