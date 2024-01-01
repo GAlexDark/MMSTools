@@ -35,6 +35,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="172"/>
+        <location filename="../src/mainwindow.cpp" line="146"/>
         <source>About MMS EventLog Converter</source>
         <translation>Про Конвертер журналів подій MMS</translation>
     </message>
@@ -44,29 +45,23 @@
         <translation>Про версію Qt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="73"/>
-        <location filename="../src/mainwindow.cpp" line="136"/>
+        <location filename="../src/mainwindow.cpp" line="83"/>
+        <location filename="../src/mainwindow.cpp" line="727"/>
         <source>Ready</source>
         <translation>Готовий</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="107"/>
-        <source>Open MMS Event Log file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cpp" line="107"/>
-        <source>MMS Eventlog (*.csv)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cpp" line="146"/>
-        <source>Save MMS Event Log report</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+        <location filename="../src/mainwindow.cpp" line="93"/>
+        <location filename="../src/mainwindow.cpp" line="101"/>
+        <location filename="../src/mainwindow.cpp" line="452"/>
+        <location filename="../src/mainwindow.cpp" line="467"/>
+        <location filename="../src/mainwindow.cpp" line="523"/>
+        <location filename="../src/mainwindow.cpp" line="536"/>
+        <location filename="../src/mainwindow.cpp" line="652"/>
+        <location filename="../src/mainwindow.cpp" line="657"/>
+        <location filename="../src/mainwindow.cpp" line="662"/>
         <source>DB Error!</source>
-        <translation type="vanished">Помилка БД!</translation>
+        <translation>Помилка БД!</translation>
     </message>
     <message>
         <source>MMS EventLog Converter and Parser
@@ -77,72 +72,56 @@ Version 1.0
 (с) Олексій Гаєнко</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <source>MMS EventLog Converter
 Version 1.0
 (c) Oleksii Gaienko</source>
-        <translation type="vanished">Конвертер журналів подій MMS
+        <translation>Конвертер журналів подій MMS
 Версія 1.0
 (с) Олексій Гаєнко</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="91"/>
-        <source>About MMS Event Log Conversion Utility</source>
-        <translation>Про утиліту перетворення журналу подій MMS</translation>
-    </message>
-    <message>
-        <source>MMS Event Log Conversion Utility
-Version %1
-Copyright (C) 2023 Oleksii Gaienko</source>
-        <translation type="vanished">Утиліта перетворення журналу подій MMS
-Версія %1
-Copyright (C) 2023 Олексій Гаєнко</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cpp" line="92"/>
-        <source>MMS Event Log Conversion Utility
-Version %1
-Copyright (C) 2023 Oleksii Gaienko
- This program uses QXlsx library: https://github.com/QtExcel/QXlsx.</source>
-        <translation>Утиліта перетворення журналу подій MMS
-Версія %1
-Copyright (C) 2023 Олексій Гаєнко
-Ця програма використовує бібліотеку Xlsx: https://github.com/QtExcel/QXlsx.</translation>
-    </message>
-    <message>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>Open MMS EventLog</source>
-        <translation type="vanished">Відкрити журнал подій MMS</translation>
+        <translation>Відкрити журнал подій MMS</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>MMS Eventlog (*.csv);; MMS Eventlog (*.xls)</source>
-        <translation type="vanished">Журнал подій MMS (*.csv);; Журнал подій MMS (*.xls)</translation>
+        <translation>Журнал подій MMS (*.csv);; Журнал подій MMS (*.xls)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="115"/>
+        <location filename="../src/mainwindow.cpp" line="416"/>
         <source>File %1 was selected</source>
         <translation>Вибрано файл %1</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="678"/>
         <source>Opening file %1</source>
-        <translation type="vanished">Відкриття файлу %1</translation>
+        <translation>Відкриття файлу %1</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="688"/>
         <source>Reading file %1</source>
-        <translation type="vanished">Читання файлу %1</translation>
+        <translation>Читання файлу %1</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="683"/>
         <source>File %1 opening error</source>
-        <translation type="vanished">Помилка відкриття файлу %1</translation>
+        <translation>Помилка відкриття файлу %1</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="694"/>
         <source>File %1 read error</source>
-        <translation type="vanished">Помилка читання файлу %1</translation>
+        <translation>Помилка читання файлу %1</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="733"/>
         <source>Save MMS EventLog report</source>
-        <translation type="vanished">Зберегти звіт MMS EventLog</translation>
+        <translation>Зберегти звіт MMS EventLog</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="148"/>
+        <location filename="../src/mainwindow.cpp" line="735"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
@@ -151,55 +130,64 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 прочитано</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="526"/>
         <source>Added: %1 -- %2</source>
-        <translation type="vanished">Додано: %1 -- %2</translation>
+        <translation>Додано: %1 -- %2</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="634"/>
         <source>Report file %1 was saved</source>
-        <translation type="vanished">Файл звіту %1 збережено</translation>
+        <translation>Файл звіту %1 збережено</translation>
     </message>
     <message>
         <source>File opening error %1: </source>
         <translation type="vanished">Помилка відкриття файлу %1:</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="695"/>
+        <location filename="../src/mainwindow.cpp" line="706"/>
         <source>Error. File %1 too large</source>
-        <translation type="vanished">Помилка. Файл %1 занадто великий</translation>
+        <translation>Помилка. Файл %1 занадто великий</translation>
     </message>
     <message>
         <source>File %1 was loaded</source>
         <translation type="vanished">Файл %1 було вибрано</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="700"/>
         <source>Preparation for file %1 parsing</source>
-        <translation type="vanished">Підготовка до парсингу файлу %1</translation>
+        <translation>Підготовка до парсингу файлу %1</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="710"/>
         <source>File %1 parsing start</source>
-        <translation type="vanished">Початок парсингу файлу %1</translation>
+        <translation>Початок парсингу файлу %1</translation>
     </message>
     <message>
         <source>Added: </source>
         <translation type="vanished">Додано: </translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="540"/>
         <source>File %1 was parsed</source>
-        <translation type="vanished">Файл %1 розпарений</translation>
+        <translation>Файл %1 розпарений</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="548"/>
         <source>Generating report</source>
-        <translation type="vanished">Створення звіту</translation>
+        <translation>Створення звіту</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="631"/>
         <source>Error save xlsx report!</source>
-        <translation type="vanished">Помилка збереження звіту в xlsx</translation>
+        <translation>Помилка збереження звіту в xlsx</translation>
     </message>
     <message>
         <source>File %1 was saved</source>
         <translation type="vanished">Файл %1 збережено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="135"/>
+        <location filename="../src/mainwindow.cpp" line="726"/>
         <source>Database was cleared</source>
         <translation>БД очищена</translation>
     </message>
