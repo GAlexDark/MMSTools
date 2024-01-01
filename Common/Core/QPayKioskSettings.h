@@ -1,20 +1,3 @@
-/****************************************************************************
-*
-*  Copyright (c) Oleksii Gaienko, 2017
-*  Contact: galexsoftware@gmail.com
-*
-*  Common module
-*  Common module
-*
-*  Module name: QPayKioskSettings.h
-*  Author(s):
-*  Reviewer(s):
-*
-*  Abstract:
-*     Basic class for reading ini-settings
-*
-****************************************************************************/
-
 #ifndef KIOSKSETTINGS_H
 #define KIOSKSETTINGS_H
 
