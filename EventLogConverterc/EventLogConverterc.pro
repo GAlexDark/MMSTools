@@ -7,6 +7,8 @@ CONFIG += QT_CVERSION cmdline precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
 
+DEFINES += QT_USE_QSTRINGBUILDER
+
 lessThan(QT_MAJOR_VERSION, 6) {
     CONFIG(debug, debug|release): message("gprof mode")
     CONFIG(debug, debug|release): QMAKE_CFLAGS_DEBUG += -g -pg  #-no-pie
