@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     QString searchFolder;
     QString reportName;
     QStringList files;
-    QStringList excludedUsers;
+    QStringList excludedUsers, includedUsers;
 
     QCommandLineParserHelper cmd;
     if (!cmd.parseCmdArgs(a)) {
@@ -85,30 +85,34 @@ int main(int argc, char *argv[])
 
         if (searchFolder.isEmpty() && files.isEmpty()) {
             consoleOut.outToConsole(QStringLiteral("The <path> and <files> arguments are missing."));
-            return 0;
+            return 1;
         }
 
         if (!files.isEmpty()) {
-            QString buf;
+            QFileInfo fi;
             for (qsizetype i = 0; i < files.size(); ++i) {
-                buf = QDir::fromNativeSeparators(files.at(i)).replace("//", "/");
-                QFileInfo file(buf);
-                if (file.exists() && file.isFile()) {
-                    files[i] = buf;
+                fi.setFile(files.at(i));
+                if (fi.exists() && fi.isFile()) {
+                    files[i] = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
                 } else {
-                    consoleOut.outToConsole(QStringLiteral("The file %1 is corrupted or missing.").arg(buf));
+                    consoleOut.outToConsole(QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName()));
                     return 1;
                 }
             }
         }
 
         if (!searchFolder.isEmpty()) {
-            searchFolder = QDir::fromNativeSeparators(searchFolder);
-            searchFolder.replace("//", "/");
-            if (QDir(searchFolder).exists()) {
-                files.append( CDataSourceList::getDataSourceList(searchFolder, QStringList() << "*.csv") );
+            QFileInfo sf(searchFolder);
+            QDir dir = sf.absoluteDir();
+            QString mask = sf.fileName().trimmed();
+            if (mask.isEmpty()) {
+                mask = "*.csv"; // default mask
+            }
+            if (dir.exists()) {
+                searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
+                files.append( CDataSourceList::getDataSourceList(searchFolder, QStringList() << mask) );
             } else {
-                consoleOut.outToConsole(QStringLiteral("Cannot find the directory."));
+                consoleOut.outToConsole(QStringLiteral("Cannot find the directory %1.").arg(searchFolder));
                 return 1;
             }
         }
@@ -118,19 +122,15 @@ int main(int argc, char *argv[])
         if (reportName.isEmpty()) {
             QDateTime now = QDateTime::currentDateTime();
             reportName = QString("%1_report.xlsx").arg(now.toString("ddMMyyyy-hhmmsszzz"));
-            __DEBUG( reportName )
-        } else {
-            if (reportName.indexOf(".xlsx") == -1) {
-                reportName = reportName + ".xlsx";
-            }
-            reportName = QDir::fromNativeSeparators(reportName);
-            __DEBUG( reportName )
         }
-        if (reportName.indexOf('/') == -1) {
+        if ((reportName.indexOf('/') == -1) || (reportName.indexOf('\\') == -1)) {
             QString filePath = QFileInfo(files.at(0)).absolutePath();
             reportName = QDir(filePath).filePath(reportName);
-            __DEBUG( reportName )
         }
+        if (QString::compare(reportName, ".xlsx", Qt::CaseInsensitive) != 0) {
+            reportName = reportName + ".xlsx";
+        }
+        reportName = QDir::fromNativeSeparators(reportName);
         reportName.replace("//", "/");
 
         excludedUsers = cmd.excludedUsernames();
@@ -142,7 +142,15 @@ int main(int argc, char *argv[])
                 return 1;
             }
         }
-        __DEBUG( excludedUsers )
+        buf.clear();
+        includedUsers = cmd.includedUsernames();
+        for (qsizetype i = 0; i < includedUsers.size(); ++i) {
+            buf = includedUsers.at(i);
+            if (!sanitizeValue(buf)) {
+                consoleOut.outToConsole(QStringLiteral("Invalid character in the value %1").arg(buf));
+                return 1;
+            }
+        }
     } //if (argc == 1)
 
     consoleOut.outToConsole(QStringLiteral("MMS Event Log Conversion Utility starting..."));
@@ -195,7 +203,7 @@ int main(int argc, char *argv[])
 
     consoleOut.outToConsole(QStringLiteral("Generate report"));
     CSVThreadReportBuilder report;
-    if (report.init(dbName, reportName, excludedUsers)) {
+    if (report.init(dbName, reportName, excludedUsers, includedUsers)) {
         report.start();
 
         consoleOut.outToConsole(QStringLiteral("wait..."));

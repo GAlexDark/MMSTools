@@ -14,6 +14,7 @@ public:
     QStringList files();
     QString reportName();
     QStringList excludedUsernames();
+    QStringList includedUsernames();
     void showHelpAndExit();
 
 private:
@@ -22,10 +23,12 @@ private:
     bool                m_isPath,
                         m_isFiles,
                         m_isReportName,
-                        m_isExcluded;
+                        m_isExcluded,
+                        m_isIncluded;
 
     QStringList         m_filesList;
 
+    void parseValuesList(QStringList &data);
 };
 
 #endif // QCOMMANDLINEPARSERHELPER_H
