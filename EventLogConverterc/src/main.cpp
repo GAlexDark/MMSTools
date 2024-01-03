@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     CSingleApplication sa("elc_instance");
     if (sa.isRunning()) {
-        consoleOut.outToConsole(QStringLiteral("The another copy of the Utility still running."));
+        consoleOut.outToConsole(QStringLiteral("The another copy of the Utility is still running."));
         return 1;
     }
 
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
     if (!ELCSettings::instance().init(appPath, iniFile)) {
-        consoleOut.outToConsole(QStringLiteral("Cannot init settings class."));
+        consoleOut.outToConsole(QStringLiteral("The settings class cannot be initialized."));
         return 1;
     }
 
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     QString dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
     __DEBUG( dbName )
     if (dbName.isEmpty()) {
-        consoleOut.outToConsole(QStringLiteral("Cannot get database file name."));
+        consoleOut.outToConsole(QStringLiteral("Unable to get database file name."));
         return 1;
     }
     QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
