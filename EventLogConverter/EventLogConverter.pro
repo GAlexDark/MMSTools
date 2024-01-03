@@ -26,24 +26,32 @@ INCLUDEPATH += . src
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
+    ../Common/Core/CBasicDBClass.h \
+    ../Common/Core/CSingleApplication.h \
+    ../Common/Core/Debug.h \
     ../Common/Core/QPayKioskSettings.h \
     ../Common/Core/ELCSettings.h \
     ../Common/Core/stdafx.h \
+    src/ELCWSettings.h \
     src/mainwindow.h
 
 SOURCES += \
+    ../Common/Core/CBasicDBClass.cpp \
+    ../Common/Core/CSingleApplication.cpp \
     ../Common/Core/QPayKioskSettings.cpp \
     ../Common/Core/ELCSettings.cpp \
+    src/ELCWSettings.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
 FORMS += \
     src/mainwindow.ui
 
-LANGUAGES = ru en uk
 TRANSLATIONS += \
     i18n/$${TARGET}_ru_RU.ts \
     i18n/$${TARGET}_uk_UA.ts
+
+CONFIG += lrelease
 
 include(../deployment.pri)
 
