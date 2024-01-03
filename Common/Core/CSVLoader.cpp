@@ -332,7 +332,7 @@ CSVThreadLoader::run()
                             break;
                         }
                     }
-                    emit sendMessage( tr("File %1 has been read").arg(fileName) );
+                    emit sendMessage( tr("The file %1 was read").arg(fileName) );
                 } //for
             }
         }
