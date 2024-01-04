@@ -19,7 +19,7 @@ QCommandLineParserHelper::parseValuesList(QStringList &data)
     data.removeDuplicates();
 }
 
-QCommandLineParserHelper::QCommandLineParserHelper(): m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false)
+QCommandLineParserHelper::QCommandLineParserHelper(): m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false), m_isIncluded(false)
 {}
 
 bool
