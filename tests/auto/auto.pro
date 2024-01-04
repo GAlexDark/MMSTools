@@ -5,6 +5,7 @@ SUBDIRS += \
     CSVLoaderTest \
     CSVParserTest \
     CSingleApplicationTest \
-    ELCSettingsTest \
-    CBasicDBClassTest
+    CELCCSettingsTest \
+    CBasicDatabaseTest \
+    CELCWSettingsTest
 

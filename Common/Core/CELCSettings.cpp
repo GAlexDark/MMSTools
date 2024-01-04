@@ -4,28 +4,21 @@
 *  Contact: galexsoftware@gmail.com
 *
 *  Event Log Conversion Utility
-*  Event Log Conversion Utility
+*  Common module
 *
-*  Module name: ELCSettings.cpp
+*  Module name: CELCSettings.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
 *  Abstract:
-*     Basic slass for read-write ini-settings
+*     The base class for creating default settings in the ini file.
 *
 ****************************************************************************/
 
-#include "ELCSettings.h"
-
-static ELCSettings g_elcSettings;
-
-ELCSettings& ELCSettings::instance()
-{
-    return g_elcSettings;
-}
+#include "CELCSettings.h"
 
 void
-ELCSettings::createDefault(const QString& iniPath)
+CELCSettings::createDefault(const QString& iniPath)
 {
     QSettings settings(iniPath, QSettings::IniFormat);
 

@@ -2,16 +2,16 @@
 #include <QFile>
 #include <QDebug>
 
-#include "ELCSettings.h"
+#include "CELCCSettings.h"
 
 // add necessary includes here
 
-class ELCSettingsTest : public QObject
+class CELCCSettingsTest : public QObject
 {
     Q_OBJECT
 public:
-    ELCSettingsTest();
-    ~ELCSettingsTest();
+    CELCCSettingsTest();
+    ~CELCCSettingsTest();
 
 private slots:
     void initTestCase();
@@ -22,9 +22,9 @@ private slots:
     //void test_getMode();
 };
 
-ELCSettingsTest::ELCSettingsTest() {}
+CELCCSettingsTest::CELCCSettingsTest() {}
 
-ELCSettingsTest::~ELCSettingsTest() {}
+CELCCSettingsTest::~CELCCSettingsTest() {}
 
 void
 removeIniFile()
@@ -36,49 +36,41 @@ removeIniFile()
 }
 
 void
-ELCSettingsTest::initTestCase()
+CELCCSettingsTest::initTestCase()
 {
     removeIniFile();
 }
 
 void
-ELCSettingsTest::cleanupTestCase()
+CELCCSettingsTest::cleanupTestCase()
 {
     removeIniFile();
 }
 
 void
-ELCSettingsTest::test_init()
+CELCCSettingsTest::test_init()
 {
     QString iniFile = QStringLiteral("EventLogConverter.ini");
     QString appPath = SRCDIR"data";
-    bool retVal = ELCSettings::instance().init(appPath, iniFile);
+    bool retVal = CELCCSettings::instance().init(appPath, iniFile);
     QVERIFY(retVal);
 }
 
 void
-ELCSettingsTest::test_fileExists()
+CELCCSettingsTest::test_fileExists()
 {
     QFile file(SRCDIR"data/EventLogConverter.ini");
     QVERIFY(file.exists());
 }
 
 void
-ELCSettingsTest::test_getDBName()
+CELCCSettingsTest::test_getDBName()
 {
-    ELCSettings &settings = ELCSettings::instance();
+    CELCCSettings &settings = CELCCSettings::instance();
     QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
-/*
-void
-ELCSettingsTest::test_getMode()
-{
-    ELCSettings &settings = ELCSettings::instance();
-    QString retVal = settings.getMain("SETTINGS/mode").toString().trimmed();
-    QCOMPARE(retVal, QString("simple_report"));
-}
-*/
-QTEST_APPLESS_MAIN(ELCSettingsTest)
 
-#include "tst_elcsettings.moc"
+QTEST_APPLESS_MAIN(CELCCSettingsTest)
+
+#include "tst_celccsettings.moc"

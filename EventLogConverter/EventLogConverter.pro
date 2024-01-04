@@ -26,21 +26,21 @@ INCLUDEPATH += . src
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
-    ../Common/Core/CBasicDBClass.h \
+    ../Common/Core/CBasicDatabase.h \
+    ../Common/Core/CBasicSettings.h \
+    ../Common/Core/CELCSettings.h \
     ../Common/Core/CSingleApplication.h \
     ../Common/Core/Debug.h \
-    ../Common/Core/QPayKioskSettings.h \
-    ../Common/Core/ELCSettings.h \
     ../Common/Core/stdafx.h \
-    src/ELCWSettings.h \
+    src/CELCWSettings.h \
     src/mainwindow.h
 
 SOURCES += \
-    ../Common/Core/CBasicDBClass.cpp \
+    ../Common/Core/CBasicDatabase.cpp \
+    ../Common/Core/CBasicSettings.cpp \
+    ../Common/Core/CELCSettings.cpp \
     ../Common/Core/CSingleApplication.cpp \
-    ../Common/Core/QPayKioskSettings.cpp \
-    ../Common/Core/ELCSettings.cpp \
-    src/ELCWSettings.cpp \
+    src/CELCWSettings.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 

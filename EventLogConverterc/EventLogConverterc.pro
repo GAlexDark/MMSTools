@@ -33,28 +33,30 @@ INCLUDEPATH += . src
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
-    ../Common/Core/CBasicDBClass.h \
-    ../Common/Core/Debug.h \
-    ../Common/Core/QStorageInfoHelper.h \
-    ../Common/Core/stdafx.h \
+    ../Common/Core/CBasicDatabase.h \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSVLoader.h \
     ../Common/Core/CSVParser.h \
     ../Common/Core/CSingleApplication.h \
-    ../Common/Core/QPayKioskSettings.h \
-    ../Common/Core/ELCSettings.h \
+    ../Common/Core/CBasicSettings.h \
+    ../Common/Core/CELCSettings.h \
+    ../Common/Core/Debug.h \
+    ../Common/Core/QStorageInfoHelper.h \
+    ../Common/Core/stdafx.h \
     src/CConsoleOutput.h \
+    src/CELCCSettings.h \
     src/CDataSourceList.h \
     src/QCommandLineParserHelper.h
 
 SOURCES += \
-    ../Common/Core/CBasicDBClass.cpp \
+    ../Common/Core/CBasicDatabase.cpp \
     ../Common/Core/CReportBuilder.cpp \
     ../Common/Core/CSVLoader.cpp \
     ../Common/Core/CSVParser.cpp \
     ../Common/Core/CSingleApplication.cpp \
-    ../Common/Core/QPayKioskSettings.cpp \
-    ../Common/Core/ELCSettings.cpp \
+    ../Common/Core/CBasicSettings.cpp \
+    ../Common/Core/CELCSettings.cpp \
+    src/CELCCSettings.cpp \
     src/CDataSourceList.cpp \
     src/QCommandLineParserHelper.cpp \
     src/main.cpp
