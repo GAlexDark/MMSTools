@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2017-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Common module
+*  Common module
+*
+*  Module name: CBasicDatabase.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The base class for work with a database.
+*
+****************************************************************************/
+
 #ifndef CBASICDATABASE_H
 #define CBASICDATABASE_H
 
@@ -41,7 +58,6 @@ public:
     bool isNext() { return m_SQLRes.next(); }
 
 private:
-    //работа с БД
     QSqlDatabase    m_db;
     QSqlQuery       m_SQLRes;
 
@@ -52,7 +68,6 @@ private:
 
     bool            m_isBeginTransaction;
 
-    void _Close();
     void _Deinit();
     bool _exec(const QString &query);
     bool _exec();

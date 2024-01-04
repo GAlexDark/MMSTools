@@ -1,22 +1,25 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2017-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Common module
+*  Common module
+*
+*  Module name: CBasicDatabase.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The base class for work with a database.
+*
+****************************************************************************/
+
 #include "CBasicDatabase.h"
 #include <QUuid>
 #include <QSqlError>
 #include <QSqlRecord>
 #include "Debug.h"
-
-void
-CBasicDatabase::_Close()
-{
-    __DEBUG( Q_FUNC_INFO )
-
-    if (m_db.isOpen()) {
-        __DEBUG( "DB is open" )
-        if (m_SQLRes.isActive()) {
-            m_SQLRes.finish();
-        }
-        m_db.close();
-    }
-}
 
 void
 CBasicDatabase::_Deinit()
@@ -39,8 +42,6 @@ CBasicDatabase::_Deinit()
 bool
 CBasicDatabase::_exec(const QString &query)
 {
-    //__DEBUG( Q_FUNC_INFO )
-
     m_SQLRes.clear();
     m_SQLRes.setForwardOnly(true); // ускорение для ::next()
     bool retVal = m_SQLRes.exec(query);
@@ -55,8 +56,6 @@ CBasicDatabase::_exec(const QString &query)
 bool
 CBasicDatabase::_exec()
 {
-    //__DEBUG( Q_FUNC_INFO )
-
     bool retVal = m_SQLRes.exec();
     if (!retVal) {
         QSqlError error = m_SQLRes.lastError();
@@ -86,6 +85,7 @@ CBasicDatabase::CBasicDatabase(const QString &connectionName): m_isInited(false)
 CBasicDatabase::~CBasicDatabase()
 {
     __DEBUG( Q_FUNC_INFO )
+    close();
     _Deinit();
 }
 
@@ -162,7 +162,7 @@ CBasicDatabase::deinit()
 {
     __DEBUG( Q_FUNC_INFO )
 
-    _Close();
+    close();
     _Deinit();
 }
 
@@ -253,7 +253,7 @@ CBasicDatabase::prepareRequest(const QString &query)
 	m_SQLRes.clear();
     bool retVal = m_SQLRes.prepare(query);
     if (!retVal) {
-		QSqlError error = m_SQLRes.lastError();
+        QSqlError error = m_SQLRes.lastError();
         m_errorString = QStringLiteral("SQL prepare error: %1").arg(error.text());
         __DEBUG(m_errorString)
     }
