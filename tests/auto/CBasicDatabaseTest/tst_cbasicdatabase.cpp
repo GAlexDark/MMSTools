@@ -2,14 +2,14 @@
 #include <QFile>
 #include <QByteArray>
 
-#include "CBasicDBClass.h"
+#include "CBasicDatabase.h"
 
 // add necessary includes here
 
 const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
                                     timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
                                     type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME, \
-                                    PRIMARY KEY (timestampISO8601, requestid));");
+                                    PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);");
 
 const QString insertOriginalData = QStringLiteral("INSERT OR IGNORE INTO [eventlog] (username, timestampISO8601, \
                                    requestid, type, details, timestamp, username1, authtype, externalip, \
@@ -18,16 +18,16 @@ const QString insertOriginalData = QStringLiteral("INSERT OR IGNORE INTO [eventl
 
 const int recordCount = 51;
 
-class CBasicDBClassTest : public QObject
+class CBasicDatabaseTest : public QObject
 {
     Q_OBJECT
 
 public:
-    CBasicDBClassTest();
-    ~CBasicDBClassTest();
+    CBasicDatabaseTest();
+    ~CBasicDatabaseTest();
 
 private:
-    CBasicDBClass m_fakeDB;
+    CBasicDatabase m_fakeDB;
 
 private slots:
     void initTestCase();
@@ -47,7 +47,7 @@ private slots:
 
 };
 
-void CBasicDBClassTest::initTestCase()
+void CBasicDatabaseTest::initTestCase()
 {
     bool retVal = true;
     QFileInfo file(SRCDIR"data/fakedb.db");
@@ -59,9 +59,9 @@ void CBasicDBClassTest::initTestCase()
 }
 
 
-CBasicDBClassTest::CBasicDBClassTest() {}
+CBasicDatabaseTest::CBasicDatabaseTest() {}
 
-CBasicDBClassTest::~CBasicDBClassTest()
+CBasicDatabaseTest::~CBasicDatabaseTest()
 {
     m_fakeDB.close();
 }
@@ -72,36 +72,36 @@ CBasicDBClassTest::~CBasicDBClassTest()
  *
  ****************************************************/
 
-void CBasicDBClassTest::test_connectionName()
+void CBasicDatabaseTest::test_connectionName()
 {
     QVERIFY(!m_fakeDB.getConnectionName().isEmpty());
     QVERIFY(!m_fakeDB.getConnectionName().isNull());
 }
 
-void CBasicDBClassTest::test_getDBinstance()
+void CBasicDatabaseTest::test_getDBinstance()
 {
     QVERIFY(m_fakeDB.getDBinstance());
 }
 
-void CBasicDBClassTest::test_initDB()
+void CBasicDatabaseTest::test_initDB()
 {
     bool retVal = m_fakeDB.init("QSQLITE", SRCDIR"data/fakedb.db");
     QVERIFY(retVal);
 }
 
-void CBasicDBClassTest::test_openDB()
+void CBasicDatabaseTest::test_openDB()
 {
     bool retVal = m_fakeDB.open();
     QVERIFY(retVal);
 }
 
-void CBasicDBClassTest::test_createTable()
+void CBasicDatabaseTest::test_createTable()
 {
     bool retVal = m_fakeDB.exec(createEventLogTable);
     QVERIFY(retVal);
 }
 
-void CBasicDBClassTest::test_importData()
+void CBasicDatabaseTest::test_importData()
 {
     QFile file(SRCDIR"data/fakedb.sql");
     bool retVal = file.open(QIODeviceBase::ReadOnly);
@@ -111,9 +111,12 @@ void CBasicDBClassTest::test_importData()
     QVERIFY(!buf.isEmpty());
     retVal = m_fakeDB.exec(buf);
     QVERIFY(retVal);
+    qDebug()  << "Ignore dublicates checking";
+    retVal = m_fakeDB.exec(buf);
+    QVERIFY(retVal);
 }
 
-void CBasicDBClassTest::test_findInDBvar1()
+void CBasicDatabaseTest::test_findInDBvar1()
 {
     TDataList res = m_fakeDB.findInDB("select count() from eventlog;", false);
     int columnCount = res.at(0).at(0).toInt();
@@ -126,7 +129,7 @@ void CBasicDBClassTest::test_findInDBvar1()
     QCOMPARE(columnCount, recordCount);
 }
 
-void CBasicDBClassTest::test_findInDBvar2()
+void CBasicDatabaseTest::test_findInDBvar2()
 {
     TDataList retVal = m_fakeDB.findInDB("select * from eventlog;", false);
     QCOMPARE(retVal.count(), recordCount);
@@ -135,7 +138,7 @@ void CBasicDBClassTest::test_findInDBvar2()
     QCOMPARE(retVal1.count(), recordCount + 1);
 }
 
-void CBasicDBClassTest::test_findInDBvar3()
+void CBasicDatabaseTest::test_findInDBvar3()
 {
     int count = 0;
     bool retVal = m_fakeDB.exec("select * from eventlog;");
@@ -146,7 +149,7 @@ void CBasicDBClassTest::test_findInDBvar3()
     QCOMPARE(count, recordCount);
 }
 
-void CBasicDBClassTest::test_getValues()
+void CBasicDatabaseTest::test_getValues()
 {
     int count = 0;
     bool retVal = m_fakeDB.exec("select * from eventlog where rowid=1;");
@@ -168,7 +171,7 @@ void CBasicDBClassTest::test_getValues()
     QCOMPARE(count, 1);
 }
 
-void CBasicDBClassTest::test_truncateTable()
+void CBasicDatabaseTest::test_truncateTable()
 {
     QFile file(SRCDIR"data/fakedb.db");
     qint64 oldSize = file.size();
@@ -185,7 +188,7 @@ void CBasicDBClassTest::test_truncateTable()
     QVERIFY(oldSize != newSize);
 }
 
-void CBasicDBClassTest::test_InsertBindedValues()
+void CBasicDatabaseTest::test_InsertBindedValues()
 {
     test_createTable();
     bool retVal = m_fakeDB.prepareRequest(insertOriginalData);
@@ -214,6 +217,6 @@ void CBasicDBClassTest::test_InsertBindedValues()
     QCOMPARE(count, 1);
 }
 
-QTEST_APPLESS_MAIN(CBasicDBClassTest)
+QTEST_APPLESS_MAIN(CBasicDatabaseTest)
 
-#include "tst_cbasicdbclass.moc"
+#include "tst_cbasicdatabase.moc"

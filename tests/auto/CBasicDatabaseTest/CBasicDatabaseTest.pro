@@ -11,11 +11,11 @@ CONFIG -= app_bundle
 INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDBClass.h
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.h
 
 SOURCES +=  \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDBClass.cpp \
-    tst_cbasicdbclass.cpp
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.cpp \
+    tst_cbasicdatabase.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 OTHER_FILES += data/*
