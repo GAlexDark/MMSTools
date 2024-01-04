@@ -2,7 +2,7 @@
 #define CREPORTBUILDER_H
 
 #include <QThread>
-#include "CBasicDBClass.h"
+#include "CBasicDatabase.h"
 
 class CReportBuilder
 {
@@ -13,7 +13,7 @@ public:
     bool generateReport();
 
 private:
-    CBasicDBClass   m_db;
+    CBasicDatabase   m_db;
     QString         m_errorString;
     QString         m_reportFileName;
     QStringList     m_excludedUsernamesList,

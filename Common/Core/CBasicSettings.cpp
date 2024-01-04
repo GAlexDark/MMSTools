@@ -1,18 +1,35 @@
-#include "QPayKioskSettings.h"
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2017-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Common module
+*  Common module
+*
+*  Module name: CBasicSettings.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The base class for the read and write settings from the ini-file.
+*
+****************************************************************************/
+
+#include "CBasicSettings.h"
 #include <QDir>
 #include <QFileInfo>
 #include "Debug.h"
 
-QPayKioskSettings::QPayKioskSettings() :
+CBasicSettings::CBasicSettings() :
     m_settings(nullptr) {}
 
-QPayKioskSettings::~QPayKioskSettings()
+CBasicSettings::~CBasicSettings()
 {
     delete m_settings;
 }
 
 bool
-QPayKioskSettings::init(const QString& appPath, const QString &fileName)
+CBasicSettings::init(const QString& appPath, const QString &fileName)
 {
     QString iniFileName = QDir(appPath).filePath(fileName);
 
@@ -34,21 +51,17 @@ QPayKioskSettings::init(const QString& appPath, const QString &fileName)
 }
 
 QVariant
-QPayKioskSettings::getMain(const QString& keyName) const
+CBasicSettings::getMain(const QString& keyName) const
 {
     return (m_settings) ? m_settings->value(keyName) : QVariant();
 }
 
 void
-QPayKioskSettings::setMain(const QString& group, const QString& keyName, QVariant value)
+CBasicSettings::setMain(const QString& group, const QString& keyName, const QVariant& value)
 {
-    m_settings->beginGroup(group);
-    m_settings->setValue(keyName, value);
-    m_settings->endGroup();
+    if (m_settings) {
+        m_settings->beginGroup(group);
+        m_settings->setValue(keyName, value);
+        m_settings->endGroup();
+    }
 }
-
-QString
-QPayKioskSettings::defaultClientLang(){
-    return getMain("user/default_lang").toString();
-}
-

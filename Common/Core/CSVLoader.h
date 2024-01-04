@@ -5,7 +5,7 @@
 #include <QThread>
 
 #include "CSVParser.h"
-#include "CBasicDBClass.h"
+#include "CBasicDatabase.h"
 
 const qint64 defBufferSize = 128 * 1024; // 128KB
 const qint64 defMaxFileSize = 1024 * 1024; // 1M
@@ -30,7 +30,7 @@ private:
     qint64      m_bufferSize;
     QString     m_fileName;
     bool        m_isHeaders;
-    CBasicDBClass  m_db;
+    CBasicDatabase  m_db;
     TDataItem   m_data;
 
     bool initDB(const QString &dbFileName, const QString &tempStore, const QString &journalMode);

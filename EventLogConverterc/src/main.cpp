@@ -4,8 +4,8 @@
 #include "Debug.h"
 #include "CSVLoader.h"
 #include "CReportBuilder.h"
-#include "ELCSettings.h"
-#include "CBasicDBClass.h"
+#include "CELCCSettings.h"
+#include "CBasicDatabase.h"
 #include "CSingleApplication.h"
 #include "CDataSourceList.h"
 #include "QCommandLineParserHelper.h"
@@ -15,8 +15,8 @@ bool
 trunvateDB(const QString &connectionString, QString &errorString)
 {
     __DEBUG( Q_FUNC_INFO )
-
-    CBasicDBClass db;
+    
+    CBasicDatabase db;
     bool retVal = db.init("QSQLITE", connectionString);
     if (retVal) {
         retVal = db.open();
@@ -156,13 +156,13 @@ int main(int argc, char *argv[])
     consoleOut.outToConsole(QStringLiteral("MMS Event Log Conversion Utility starting..."));
 
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
-    if (!ELCSettings::instance().init(appPath, iniFile)) {
+    if (!CELCCSettings::instance().init(appPath, iniFile)) {
         consoleOut.outToConsole(QStringLiteral("The settings class cannot be initialized."));
         return 1;
     }
 
     //get path to the DB
-    ELCSettings &settings = ELCSettings::instance();
+    CELCCSettings &settings = CELCCSettings::instance();
     QString dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
     __DEBUG( dbName )
     if (dbName.isEmpty()) {
@@ -171,11 +171,13 @@ int main(int argc, char *argv[])
     }
     QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
     if (cleardb.isEmpty() || (QString::compare(cleardb, "yes", Qt::CaseInsensitive) == 0)) {
+        consoleOut.outToConsole(QStringLiteral("Starting cleaning database..."));
         QString errorString;
         if (!trunvateDB(dbName, errorString)) {
-            consoleOut.outToConsole(QStringLiteral("Cannot open database: %1").arg(errorString));
+            consoleOut.outToConsole(QStringLiteral("Cannot clean database: %1").arg(errorString));
             return 1;
         }
+        consoleOut.outToConsole(QStringLiteral("The database was clean."));
     }
 
     CSVThreadLoader loader;
