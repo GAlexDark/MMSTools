@@ -254,8 +254,8 @@ CSVLoader::~CSVLoader()
 {
     __DEBUG( Q_FUNC_INFO )
 
-    m_buffer->clear();
     delete m_buffer;
+    m_buffer = nullptr;
 
     if (m_file.isOpen()) {
         m_file.close();
