@@ -42,7 +42,7 @@ Usage:\n-e <user1> -e <user2> ... -e <userN> or\n -e <user1,user2,..,userN> or\n
                 if (retVal) {
                     QCommandLineOption include_option(QStringList() << "i" << "include", "The list of usernames separated by ',' or ';' only included from the report. \
 When using this option, the exclude option is ignored. \
-Usage:\n-i <user1> -i <user2> ... -i <userN> or\n -i <user1,user2,..,userN> or\n-i <user1;user2;..;userN>", "usernames");
+Usage:\n-i <user1> -i <user2> ... -i <userN> or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN", "usernames");
                     retVal = m_parser.addOption(include_option);
                     if (retVal) {
                         m_parser.process(app);
