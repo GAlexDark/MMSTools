@@ -31,6 +31,8 @@ QStringList
 elcUtils::parseValuesList(QString data)
 {
     QStringList retVal;
+    data = data.trimmed();
+    data.replace(" ", "");
     if ((data.indexOf(',') != -1) || (data.indexOf(';') != -1)) {
         if (data.indexOf(',') != -1) {
             data.replace(';', ',');
