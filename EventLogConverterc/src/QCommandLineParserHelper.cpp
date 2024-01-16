@@ -2,7 +2,8 @@
 
 #include "elcUtils.h"
 
-QCommandLineParserHelper::QCommandLineParserHelper(): m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false), m_isIncluded(false)
+QCommandLineParserHelper::QCommandLineParserHelper()
+    : m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false), m_isIncluded(false)
 {}
 
 bool
@@ -13,19 +14,19 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
     QCommandLineOption path_option(QStringList() << "p" << "path", "Path to the directory with the MMS Event Log files for the report.", "path");
     bool retVal = m_parser.addOption(path_option);
     if (retVal) {
-        QCommandLineOption files_option(QStringList() << "f" << "files", "MMS Event Log data file(s) for the report. Usage:\n-f <file1> -f <file2> ... -f <fileN>", "files");
+        QCommandLineOption files_option(QStringList() << "f" << "files", "MMS Event Log data file(s) for the report. Usage:\n-f file1 -f file2 ... -f fileN", "files");
         retVal = m_parser.addOption(files_option);
         if (retVal) {
             QCommandLineOption reportname_option(QStringList() << "r" << "report", "Path to the directory and name of the report file.", "report");
             retVal = m_parser.addOption(reportname_option);
             if (retVal) {
                 QCommandLineOption exclude_option(QStringList() << "e" << "exclude", "The list of usernames separated by ',' or ';' excluded from the report. \
-Usage:\n-e <user1> -e <user2> ... -e <userN> or\n -e <user1,user2,..,userN> or\n-e <user1;user2;..;userN>", "usernames");
+Usage:\n-e user1 -e user2 ... -e userN or\n -e user1,user2,..,userN or\n-e user1;user2;..;userN", "usernames");
                 retVal = m_parser.addOption(exclude_option);
                 if (retVal) {
                     QCommandLineOption include_option(QStringList() << "i" << "include", "The list of usernames separated by ',' or ';' only included from the report. \
 When using this option, the exclude option is ignored. \
-Usage:\n-i <user1> -i <user2> ... -i <userN> or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN", "usernames");
+Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN", "usernames");
                     retVal = m_parser.addOption(include_option);
                     if (retVal) {
                         m_parser.process(app);
