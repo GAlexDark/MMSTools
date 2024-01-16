@@ -11,6 +11,7 @@ namespace elcUtils
     void parseValuesList(QStringList &data);
     bool trunvateDB(const QString &connectionString, QString &errorString);
     int getStorageBlockSize(const QString &file);
+    QString getFormattedDateTime(const QString &dateTime);
 
 //    void expand_environment_variables(QString &path);
 }

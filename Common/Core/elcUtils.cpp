@@ -97,6 +97,13 @@ elcUtils::getStorageBlockSize(const QString &file)
     return (blockSize != -1)? blockSize : defaultStorageBlockSize;
 }
 
+QString
+elcUtils::getFormattedDateTime(const QString &dateTime)
+{
+    QDateTime buildDate = QDateTime::fromString(dateTime);
+    return buildDate.toString("yyyyMMddhhmm");
+}
+
 #ifdef Q_OS_WIN
 void
 ExpandEnvStrings(QString &path)

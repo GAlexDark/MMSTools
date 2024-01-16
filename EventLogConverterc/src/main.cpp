@@ -14,7 +14,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, BUILD_DATE));
+    QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
     QString appName = QCoreApplication::applicationName();
     QString appPath = a.applicationDirPath();
 
