@@ -15,14 +15,14 @@ CSVLoader::initDB(const QString &dbFileName, const QString &tempStore, const QSt
             int blockSize = elcUtils::getStorageBlockSize(dbFileName);
             QStringList pragmaItems;
             pragmaItems.append(pragmaUTF8);
-            if (QString::compare(journalMode, "memory", Qt::CaseInsensitive) == 0) {
+            if (!journalMode.isEmpty() && QString::compare(journalMode, "memory", Qt::CaseInsensitive) == 0) {
                 pragmaItems.append(pragmaJournalMode.arg("MEMORY"));
             } else {
                 pragmaItems.append(pragmaJournalMode.arg("DELETE"));
             }
             pragmaItems.append(pragmaPageSize.arg(blockSize));
             pragmaItems.append(pragmaSynchronous);
-            if (QString::compare(tempStore, "memory", Qt::CaseInsensitive) == 0) {
+            if (!tempStore.isEmpty() && QString::compare(tempStore, "memory", Qt::CaseInsensitive) == 0) {
                 pragmaItems.append(pragmaTempStore.arg("MEMORY"));
             } else {
                 pragmaItems.append(pragmaTempStore.arg("DEFAULT"));
@@ -288,7 +288,7 @@ CSVThreadLoader::run()
                 QString fileName;
                 for (qsizetype i = 0; i < filesCount; ++i) {
                     fileName = m_fileNames.at(i);
-                    emit sendMessage( tr("Reading of file %1 has started.").arg(fileName) );
+                    emit sendMessage( tr("Reading of the file %1 has started.").arg(fileName) );
                     setFileName(fileName);
                     m_retVal = read();
                     if (m_retVal) {
