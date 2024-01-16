@@ -139,10 +139,7 @@ MainWindow::onContact()
                     tr("<p>The MMS Event Log Conversion Utility developers can be reached at the mail:</p>"
                            "%1"
                            "<p>Please use %2 for bigger chunks of text.</p>")
-                        .arg("<p>&nbsp;&nbsp;&nbsp;&nbsp;"
-                             "<a href=\"mailto:support@galexsoftware.info\">"
-                             "mailto:support@galexsoftware.info"
-                             "</a></p>")
+                        .arg(QStringLiteral("<p>&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"mailto:%1\">%1</a></p>").arg(CONTACT))
                         .arg("<a href=\"https://pastebin.com\">"
                              "https://pastebin.com"
                              "</a>"),

@@ -71,7 +71,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 0
-BUILD_VER = 16
+BUILD_VER = 17
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}
@@ -91,3 +91,4 @@ DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"
 DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
 DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""
 DEFINES += QT_VER=\\\"$${QT_VERSION}\\\"
+DEFINES += CONTACT=\\\"support@galexsoftware.info\\\"
