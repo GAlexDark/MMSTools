@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="77"/>
         <source>Read Event Log file(s)</source>
-        <translation>Xbnfnm файл(ы) журнала(-ов) событий</translation>
+        <translation>Читать файл(ы) журнала(-ов) событий</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="96"/>

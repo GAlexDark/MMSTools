@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="77"/>
         <source>Read Event Log file(s)</source>
-        <translation>Читати файл(и) журналу(-ів) подій</translation>
+        <translation>Читання файл(и) журналу(-ів) подій</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="96"/>
