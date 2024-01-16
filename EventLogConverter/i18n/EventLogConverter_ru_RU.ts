@@ -36,9 +36,13 @@
         <translation>Утилита преобразования журналов событий MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="58"/>
         <source>Select EventLog file</source>
-        <translation>Выбрать файл журнала событий</translation>
+        <translation type="vanished">Выбрать файл журнала событий</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="58"/>
+        <source>Select EventLog file(s)</source>
+        <translation>Выбрать файл(ы) журнала(-ов) событий</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="77"/>
@@ -46,22 +50,22 @@
         <translation>Конвертировать журнал событий</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="90"/>
+        <location filename="../src/mainwindow.ui" line="96"/>
         <source>Generate Report</source>
         <translation>Создать отчет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="109"/>
+        <location filename="../src/mainwindow.ui" line="115"/>
         <source>Clear DB</source>
         <translation>Очистить БД</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="162"/>
+        <location filename="../src/mainwindow.ui" line="168"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="183"/>
+        <location filename="../src/mainwindow.ui" line="189"/>
         <source>Contacts...</source>
         <translation>Контакты...</translation>
     </message>
@@ -70,7 +74,7 @@
         <translation type="vanished">О Конвертере журналов событий MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="178"/>
+        <location filename="../src/mainwindow.ui" line="184"/>
         <source>About Qt version</source>
         <translation>О версии Qt</translation>
     </message>
@@ -285,7 +289,7 @@ Version 1.0
 (с) Алексей Гаенко</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="173"/>
+        <location filename="../src/mainwindow.ui" line="179"/>
         <location filename="../src/mainwindow.cpp" line="124"/>
         <source>About MMS Event Log Conversion Utility</source>
         <translation>Об утилите преобразования журнала событий MMS</translation>

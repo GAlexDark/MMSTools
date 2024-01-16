@@ -43,33 +43,33 @@
         <item>
          <widget class="QPushButton" name="pbOpenFile">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>120</width>
+            <width>125</width>
             <height>48</height>
            </size>
           </property>
           <property name="text">
-           <string>Select EventLog file</string>
+           <string>Select EventLog file(s)</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pbConvert">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>120</width>
+            <width>125</width>
             <height>48</height>
            </size>
           </property>
@@ -80,9 +80,15 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbGenerateReport">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>120</width>
+            <width>125</width>
             <height>48</height>
            </size>
           </property>
@@ -94,14 +100,14 @@
         <item>
          <widget class="QPushButton" name="pbClearDB">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>120</width>
+            <width>125</width>
             <height>48</height>
            </size>
           </property>
