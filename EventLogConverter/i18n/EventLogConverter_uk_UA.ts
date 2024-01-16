@@ -40,14 +40,22 @@
         <translation type="vanished">Вибрати файл журналу подій</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="58"/>
         <source>Select EventLog file(s)</source>
+        <translation type="vanished">Вибрати файл(и) журналу(-ів) подій</translation>
+    </message>
+    <message>
+        <source>Convert EventLog</source>
+        <translation type="vanished">Конвертувати журнал подій</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="58"/>
+        <source>Select Event Log file(s)</source>
         <translation>Вибрати файл(и) журналу(-ів) подій</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="77"/>
-        <source>Convert EventLog</source>
-        <translation>Конвертувати журнал подій</translation>
+        <source>Read Event Log file(s)</source>
+        <translation>Читати файл(и) журналу(-ів) подій</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="96"/>
@@ -422,8 +430,12 @@ Copyright (C) 2023 Олексій Гаєнко
     </message>
     <message>
         <location filename="../src/OptionsDialog.ui" line="113"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be included from the report.. When this option is used, the exclusion option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список імен користувачів, розділених «,» або «;», які будуть включені до звіту. Якщо використовується цей параметр, параметр виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List of usernames separated by &apos;,&apos; or &apos;;&apos; and only those included in the report. When this option is used, the exclude option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos; і лише ті, що включені до звіту. У разі використання цієї опції опція виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos; і лише ті, що включені до звіту. У разі використання цієї опції опція виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/OptionsDialog.ui" line="130"/>

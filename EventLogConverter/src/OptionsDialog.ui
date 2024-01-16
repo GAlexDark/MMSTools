@@ -110,7 +110,7 @@
     <item>
      <widget class="QLineEdit" name="edIncludedUsers">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List of usernames separated by ',' or ';' and only those included in the report. When this option is used, the exclude option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by ',' or ';', to be included from the report.. When this option is used, the exclusion option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
