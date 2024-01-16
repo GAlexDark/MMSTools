@@ -7,7 +7,6 @@
 class CSVParser
 {
 public:
-    CSVParser();
     void init(const QString &internalipFirstOctet);
     void parse(const QString& line);
     QString errorString() const { return m_errorString; }

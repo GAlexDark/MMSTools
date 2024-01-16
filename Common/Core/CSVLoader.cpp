@@ -1,37 +1,18 @@
 #include "CSVLoader.h"
+#include <QTextStream>
 
-#include "QStorageInfoHelper.h"
-#include "Debug.h"
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
-#endif
-
-const QString insertOriginalData = QStringLiteral("INSERT OR IGNORE INTO [eventlog] (username, timestampISO8601, \
-                                    requestid, type, details, timestamp, username1, authtype, externalip, \
-                                    internalip) VALUES (:username, :timestampISO8601, :requestid, :type, \
-                                    :details, :timestamp, :username1, :authtype, :externalip, :internalip)");
-
-const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
-                                    timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
-                                    type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME, \
-                                    PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);");
-
-const QString pragmaUTF8 = QStringLiteral("PRAGMA encoding = \"UTF-8\";");
-const QString pragmaJournalMode = QStringLiteral("PRAGMA journal_mode = %1;");
-const QString pragmaPageSize = QStringLiteral("PRAGMA page_size = %1;");
-const QString pragmaSynchronous = QStringLiteral("PRAGMA synchronous = NORMAL;");
-const QString pragmaTempStore = QStringLiteral("PRAGMA temp_store = %1;");
-
+//#include "Debug.h"
+#include "DBStrings.h"
+#include "elcUtils.h"
 
 bool
 CSVLoader::initDB(const QString &dbFileName, const QString &tempStore, const QString &journalMode)
-{    
+{
     bool retVal = m_db.init("QSQLITE", dbFileName);
     if (retVal) {
         retVal = m_db.open();
         if (retVal) {
-            int blockSize = QStorageInfoHelper::getStorageBlockSize(dbFileName);
+            int blockSize = elcUtils::getStorageBlockSize(dbFileName);
             QStringList pragmaItems;
             pragmaItems.append(pragmaUTF8);
             if (QString::compare(journalMode, "memory", Qt::CaseInsensitive) == 0) {
@@ -71,12 +52,12 @@ CSVLoader::initBuffer()
     try {
         if (m_bufferSize > 0) {
             m_buffer = new QByteArray(m_bufferSize, 0);
-            Q_ASSERT(m_buffer);
+
         } else {
             retVal = false;
             m_errorString = QStringLiteral("Invalid buffer size");
         }
-    } catch (std::bad_alloc &e) {
+    } catch (const std::bad_alloc &e) {
         m_errorString = e.what();
         retVal = false;
     }
@@ -94,10 +75,7 @@ CSVLoader::prepareRequest(const QString &query)
 bool
 CSVLoader::readSmallFile()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     QString buffer;
-    m_file.setFileName(m_fileName);
     bool retVal = m_file.open(QIODevice::ReadOnly);
     if (retVal) {
         QTextStream textStream(&m_file);
@@ -108,6 +86,7 @@ CSVLoader::readSmallFile()
             }
         } catch (...) {
             retVal = false;
+            m_errorString = QStringLiteral("Error reading file");
         }
     }
     m_file.close();
@@ -154,9 +133,6 @@ CSVLoader::readSmallFile()
 bool
 CSVLoader::readLargeFile()
 {
-    __DEBUG( Q_FUNC_INFO )
-
-    m_file.setFileName(m_fileName);
     bool retVal = m_file.open(QIODevice::ReadOnly);
     if (retVal) {
         QString line;
@@ -239,21 +215,15 @@ CSVLoader::readLargeFile()
     return retVal;
 }
 
-
-//-----------------------------------------------------------
-
-CSVLoader::CSVLoader(): m_errorString(""), m_buffer(nullptr), m_bufferSize(defBufferSize), m_fileName(""), m_isHeaders(false)
+CSVLoader::CSVLoader()
+    : m_errorString(""), m_buffer(nullptr), m_bufferSize(defBufferSize), m_fileName(""), m_isHeaders(false)
 {
-    __DEBUG( Q_FUNC_INFO )
-
     m_eolChars.clear();
     m_fileNames.clear();
 }
 
 CSVLoader::~CSVLoader()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     delete m_buffer;
     m_buffer = nullptr;
 
@@ -267,8 +237,6 @@ bool
 CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const QString &tempStore, const QString &journalMode,
                      const QByteArray &eolChars, qint64 bufferSize)
 {
-    __DEBUG( Q_FUNC_INFO )
-
     m_eolChars = eolChars;
     m_isHeaders = dataHasHeaders;
     m_bufferSize = bufferSize;
@@ -289,8 +257,6 @@ CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &i
 bool
 CSVLoader::read()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     m_file.setFileName(m_fileName);
     qint64 size = m_file.size();
 #ifdef QT_DEBUG
@@ -303,18 +269,17 @@ CSVLoader::read()
 
 //--------------------------------------------------------------------------
 
-CSVThreadLoader::CSVThreadLoader(): m_errorString(""), m_retVal(false)
+CSVThreadLoader::CSVThreadLoader()
+    : m_errorString(""), m_retVal(false)
 {}
 
 void
 CSVThreadLoader::run()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     m_errorString.clear();
     //-----------------------------------------------------
     if (m_fileNames.size() > 0 ) {
-        emit sendMessage( tr("Preparing to read file(s).") );
+        emit sendMessage( tr("Preparing to read the file(s).") );
         m_retVal = beginTrancaction();
         if (m_retVal) {
             m_retVal = prepareRequest(insertOriginalData);
@@ -341,6 +306,5 @@ CSVThreadLoader::run()
     //-----------------------------------------------------
     if (!m_retVal) {
         m_errorString = errorString();
-        __DEBUG( m_errorString )
     }
 }

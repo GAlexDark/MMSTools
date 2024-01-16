@@ -18,16 +18,14 @@
 #ifndef CBASICSETTINGS_H
 #define CBASICSETTINGS_H
 
+#include <QSettings>
 #include <QString>
 #include <QVariant>
-#include <QSettings>
 
-class CBasicSettings : public QObject
+class CBasicSettings
 {
-    Q_OBJECT
-
 public:
-    CBasicSettings();
+    explicit CBasicSettings();
     ~CBasicSettings();
 
 public:
@@ -39,8 +37,7 @@ protected:
     virtual void createDefault(const QString& iniPath) =0;
 
 private:
-    QSettings* m_settings;
-    QString    m_fileName;
+    QSettings*  m_settings;
 };
 
 #endif // CBASICSETTINGS_H

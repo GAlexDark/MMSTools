@@ -6,6 +6,7 @@ QT_CVERSION = c++11
 CONFIG += QT_CVERSION cmdline precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
+CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -O0 -fno-omit-frame-pointer -gdwarf-3
 
 DEFINES += QT_USE_QSTRINGBUILDER
 
@@ -34,15 +35,15 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
     ../Common/Core/CBasicDatabase.h \
+    ../Common/Core/DBStrings.h \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSVLoader.h \
     ../Common/Core/CSVParser.h \
     ../Common/Core/CSingleApplication.h \
     ../Common/Core/CBasicSettings.h \
     ../Common/Core/CELCSettings.h \
-    ../Common/Core/Debug.h \
-    ../Common/Core/QStorageInfoHelper.h \
     ../Common/Core/stdafx.h \
+    ../Common/Core/elcUtils.h \
     src/CConsoleOutput.h \
     src/CELCCSettings.h \
     src/CDataSourceList.h \
@@ -56,6 +57,7 @@ SOURCES += \
     ../Common/Core/CSingleApplication.cpp \
     ../Common/Core/CBasicSettings.cpp \
     ../Common/Core/CELCSettings.cpp \
+    ../Common/Core/elcUtils.cpp \
     src/CELCCSettings.cpp \
     src/CDataSourceList.cpp \
     src/QCommandLineParserHelper.cpp \
@@ -82,6 +84,7 @@ QMAKE_TARGET_DESCRIPTION = MMS Event Log Conversion Console Utility
 QMAKE_TARGET_COPYRIGHT = (C) 2023 Oleksii Gaienko
 QMAKE_TARGET_PRODUCT = MMS Event Log Conversion Utility
 QMAKE_TARGET_INTERNALNAME = $${TARGET}
+QMAKE_TARGET_COMMENTS = support@galexsoftware.info
 
 DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
 DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"

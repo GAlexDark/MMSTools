@@ -7,9 +7,9 @@
 
 #include "Debug.h"
 
-const QString sharedMemory_prefix = QStringLiteral("_m");
-const QString semaphore_prefix = QStringLiteral("_s");
-const QString ELC_PID_FILENAME = QStringLiteral("PID");
+inline const QString sharedMemory_prefix = QStringLiteral("_m");
+inline const QString semaphore_prefix = QStringLiteral("_s");
+inline const QString ELC_PID_FILENAME = QStringLiteral("PID");
 
 /*
 https://stackoverflow.com/questions/17431205/qsharedmemory-signals-and-qbuffer
@@ -72,7 +72,7 @@ CSingleApplication::isRunning()
     }
 #endif
 
-    if (m_sharedMemory == NULL) {
+    if (m_sharedMemory == nullptr) {
         m_sharedMemory = new QSharedMemory(m_id + sharedMemory_prefix);
         Q_CHECK_PTR(m_semaphore);
     }
@@ -92,10 +92,9 @@ CSingleApplication::isRunning()
 #endif
     // Create shared memory segment
         if (!m_sharedMemory->create(segSize)) {
-            __DEBUG( QStringLiteral("CSingleApplication: create error, %1").arg(m_sharedMemory->errorString()) )
             isRun = true;
         }
-    } // m_sharedMemory->attach()
+    }
 
     if (!m_semaphore->release()) {
         __DEBUG( QStringLiteral("QPaySingleApplicatio∟n: release error, %1").arg(m_semaphore->errorString()) )

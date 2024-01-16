@@ -1,23 +1,6 @@
 #include "QCommandLineParserHelper.h"
 
-void
-QCommandLineParserHelper::parseValuesList(QStringList &data)
-{
-    if (data.size() == 1) {
-        QStringList res;
-        QString buf = data.at(0).trimmed();
-        if (buf.indexOf(',') != -1) {
-            res.append(buf.split(','));
-        }
-        if (buf.indexOf(';') != -1) {
-            res.append(buf.split(';'));
-        }
-        res.removeAll(QString(""));
-        data.clear();
-        data.append(res);
-    }
-    data.removeDuplicates();
-}
+#include "elcUtils.h"
 
 QCommandLineParserHelper::QCommandLineParserHelper(): m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false), m_isIncluded(false)
 {}
@@ -30,10 +13,10 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
     QCommandLineOption path_option(QStringList() << "p" << "path", "Path to the directory with the MMS Event Log files for the report.", "path");
     bool retVal = m_parser.addOption(path_option);
     if (retVal) {
-        QCommandLineOption files_option(QStringList() << "f" << "files", "MMS Event Log data file(s) for the report. Usage:\n-f <file1> -f <file2> ... -f <fileN>" , "file");
+        QCommandLineOption files_option(QStringList() << "f" << "files", "MMS Event Log data file(s) for the report. Usage:\n-f <file1> -f <file2> ... -f <fileN>", "files");
         retVal = m_parser.addOption(files_option);
         if (retVal) {
-            QCommandLineOption reportname_option(QStringList() << "r" << "report", "Path to the directory and name of the report file.", "file");
+            QCommandLineOption reportname_option(QStringList() << "r" << "report", "Path to the directory and name of the report file.", "report");
             retVal = m_parser.addOption(reportname_option);
             if (retVal) {
                 QCommandLineOption exclude_option(QStringList() << "e" << "exclude", "The list of usernames separated by ',' or ';' excluded from the report. \
@@ -81,14 +64,14 @@ QStringList
 QCommandLineParserHelper::excludedUsernames()
 {
     QStringList retVal = (m_isExcluded)? m_parser.values("exclude") : QStringList();
-    parseValuesList(retVal);
+    elcUtils::parseValuesList(retVal);
     return retVal;
 }
 
 QStringList QCommandLineParserHelper::includedUsernames()
 {
     QStringList retVal = (m_isIncluded)? m_parser.values("include") : QStringList();
-    parseValuesList(retVal);
+    elcUtils::parseValuesList(retVal);
     return retVal;
 }
 

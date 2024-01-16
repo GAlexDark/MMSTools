@@ -16,7 +16,7 @@
 ****************************************************************************/
 
 #include "CELCSettings.h"
-
+#include <QCoreApplication>
 void
 CELCSettings::createDefault(const QString& iniPath)
 {
@@ -26,7 +26,8 @@ CELCSettings::createDefault(const QString& iniPath)
 #ifdef QT_DEBUG
     settings.setValue(QStringLiteral("db_file_name"), QStringLiteral(TEST_SRCDIR"EventLogConverter.db"));
 #else
-    settings.setValue(QStringLiteral("db_file_name"), QStringLiteral("EventLogConverter.db"));
+    QString dbName = QStringLiteral("%1.db").arg(QCoreApplication::applicationName());
+    settings.setValue(QStringLiteral("db_file_name"), dbName);
 #endif
     settings.setValue(QStringLiteral("clear_on_startup"), QStringLiteral("yes")); // yes | no
     settings.setValue(QStringLiteral("internal_ip_start_octet"), QStringLiteral("10."));
@@ -36,4 +37,5 @@ CELCSettings::createDefault(const QString& iniPath)
     settings.setValue(QStringLiteral("temp_store"), QStringLiteral("MEMORY"));
     settings.setValue(QStringLiteral("journal_mode"), QStringLiteral("MEMORY"));
     settings.endGroup();
+
 }

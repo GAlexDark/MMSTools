@@ -2,18 +2,25 @@
 #define CREPORTBUILDER_H
 
 #include <QThread>
+#include <QString>
+#include <QStringList>
+
 #include "CBasicDatabase.h"
 
 class CReportBuilder
 {
 public:
     explicit CReportBuilder();
+    virtual ~CReportBuilder();
     bool init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList);
     QString errorString() const { return m_errorString; }
     bool generateReport();
 
 private:
-    CBasicDatabase   m_db;
+    CReportBuilder(const CReportBuilder&) = delete;
+    CReportBuilder& operator=(CReportBuilder&) = delete;
+
+    CBasicDatabase   *m_db;
     QString         m_errorString;
     QString         m_reportFileName;
     QStringList     m_excludedUsernamesList,

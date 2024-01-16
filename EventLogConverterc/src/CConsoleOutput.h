@@ -2,6 +2,7 @@
 #define CCONSOLEOUTPUT_H
 
 #include <QTextStream>
+#include <QObject>
 
 #ifdef Q_OS_WIN32
   #include <windows.h>

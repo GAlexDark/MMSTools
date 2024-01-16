@@ -1,7 +1,6 @@
 #include "CDataSourceList.h"
 
 #include <QDirIterator>
-#include <QDebug>
 
 QStringList CDataSourceList::getDataSourceList(const QString &path, const QStringList &mask)
 {

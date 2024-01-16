@@ -25,6 +25,8 @@ class CELCCSettings : public CELCSettings
 public:
     static CELCCSettings& instance();
 
+private:
+    void createDefault(const QString& iniPath) override;
 };
 
 #endif // CELCCSETTINGS_H

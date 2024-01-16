@@ -14,7 +14,7 @@ class CSVLoader
 {
 public:
     explicit CSVLoader();
-    ~CSVLoader();
+    virtual ~CSVLoader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
     bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const QString &tempStore, const QString &journalMode,

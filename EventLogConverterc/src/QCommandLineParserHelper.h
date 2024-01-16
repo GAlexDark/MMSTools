@@ -28,7 +28,6 @@ private:
 
     QStringList         m_filesList;
 
-    void parseValuesList(QStringList &data);
 };
 
 #endif // QCOMMANDLINEPARSERHELPER_H

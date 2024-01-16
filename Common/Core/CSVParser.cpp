@@ -1,22 +1,12 @@
 #include "CSVParser.h"
 #include <QRegularExpression>
 
-#include "Debug.h"
+//#include "Debug.h"
 
 QRegularExpression reHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
 QRegularExpression reSuccessLogon("^username:\\s(.*?),@N@\\s\\stype:\\s(.*?),@N@\\s\\sip\\saddress:\\s(.*?)$");
 QRegularExpression reFailedLogon("^type:\\s(.*?)@N@\\s\\sip\\saddress:\\s(.*?)$");
 
-const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
-                                    timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
-                                    type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, \
-                                    internalip TEXT, timestamp DATETIME, \
-                                    PRIMARY KEY (timestampISO8601, requestid));");
-/*
-const qsizetype userNameLen = QString("username: ").length();
-const qsizetype typeLen = QString("type: ").length();
-const qsizetype ipaddressLen = QString("ip address: ").length();
-*/
 void
 CSVParser::removeQuote(QString &data, QChar quoteChar)
 {    
@@ -131,11 +121,11 @@ CSVParser::parseUserLogonDetails()
     return retVal;
 }
 
-//=================================================================================
-CSVParser::CSVParser()
-{
-    __DEBUG( Q_FUNC_INFO )
-}
+/*
+CSVParser::CSVParser(const QString &internalipFirstOctet)
+    : m_internalipFirstOctet(internalipFirstOctet)
+{}
+*/
 
 void
 CSVParser::init(const QString &internalipFirstOctet)

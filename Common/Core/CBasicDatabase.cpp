@@ -17,24 +17,21 @@
 
 #include "CBasicDatabase.h"
 #include <QUuid>
-#include <QSqlError>
-#include <QSqlRecord>
-#include "Debug.h"
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlRecord>
 
 void
 CBasicDatabase::_Deinit()
 {
-    __DEBUG( Q_FUNC_INFO )
-
-    // код избавления от бага:
-    // QSqlDatabasePrivate::removeDatabase connection is still in use, all queries will cease to work.
     if (m_isInited) {
-        QString qs;
-        qs.append(QSqlDatabase::database().connectionName());
-        __DEBUG( QStringLiteral("connectionName: %1").arg(qs) )
-        QSqlDatabase::removeDatabase(qs);
-        __DEBUG( "Database removed" )
-        //конец кода
+/***************************
+ * This sourse code fixed a standard QSqlDatabase bug:
+ *   QSqlDatabasePrivate::removeDatabase connection is still in use, all queries will cease to work.
+ **************************/
+        const QString connectionName = m_db.connectionName();
+        m_db = QSqlDatabase();
+        QSqlDatabase::removeDatabase(connectionName);
+
         m_isInited = false;
     }
 }
@@ -42,13 +39,12 @@ CBasicDatabase::_Deinit()
 bool
 CBasicDatabase::_exec(const QString &query)
 {
-    m_SQLRes.clear();
-    m_SQLRes.setForwardOnly(true); // ускорение для ::next()
-    bool retVal = m_SQLRes.exec(query);
+    m_SQLRes->clear();
+    m_SQLRes->setForwardOnly(true); // ускорение для ::next()
+    bool retVal = m_SQLRes->exec(query);
     if (!retVal) {
-        QSqlError error = m_SQLRes.lastError();
+        QSqlError error = m_SQLRes->lastError();
         m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
-        __DEBUG(m_errorString)
     }
     return retVal;
 }
@@ -56,11 +52,10 @@ CBasicDatabase::_exec(const QString &query)
 bool
 CBasicDatabase::_exec()
 {
-    bool retVal = m_SQLRes.exec();
+    bool retVal = m_SQLRes->exec();
     if (!retVal) {
-        QSqlError error = m_SQLRes.lastError();
+        QSqlError error = m_SQLRes->lastError();
         m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
-        __DEBUG(m_errorString)
     }
     return retVal;
 }
@@ -71,39 +66,40 @@ CBasicDatabase::_exec()
  *
  ********************************************************************/
 
-CBasicDatabase::CBasicDatabase(const QString &connectionName): m_isInited(false), m_connectionName(connectionName),
-    m_ErrorCode(0), m_isBeginTransaction(false)
+CBasicDatabase::CBasicDatabase(const QString &connectionName)
+    : m_SQLRes(nullptr), m_isInited(false), m_connectionName(connectionName), m_ErrorCode(0), m_isBeginTransaction(false)
 {
-    __DEBUG( Q_FUNC_INFO )
-
     if (m_connectionName.isEmpty()) {
         QUuid guid = QUuid::createUuid();
         m_connectionName = guid.toString();
     }
 }
 
+CBasicDatabase::CBasicDatabase()
+    : m_SQLRes(nullptr), m_isInited(false), m_connectionName(""), m_ErrorCode(0), m_isBeginTransaction(false)
+{
+    QUuid guid = QUuid::createUuid();
+    m_connectionName = guid.toString();
+}
+
 CBasicDatabase::~CBasicDatabase()
 {
-    __DEBUG( Q_FUNC_INFO )
     close();
     _Deinit();
 }
 
 /**
- * @brief init
- * @param dbDriverName - имя драйвера БД
- * @param connectionString - для SQLite это путь к файлу БД
+ * @brief init member
+ * @param dbDriverName - the DB driver name
+ * @param connectionString - for the SQLite DB this is the path to the DB file
  */
 bool
 CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
 {
-    __DEBUG( Q_FUNC_INFO )
-
     if (!m_isInited) {
         if (connectionString.isEmpty() || dbDriverName.isEmpty()) {
             m_isInited = false;
             m_errorString = QStringLiteral("Empty connection string");
-            __DEBUG( m_errorString )
         } else {
             // соединяемся с базой данных
             m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
@@ -113,7 +109,6 @@ CBasicDatabase::init(const QString &dbDriverName, const QString &connectionStrin
             } else {
                 QSqlError error = m_db.lastError();
                 m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
-                __DEBUG( m_errorString );
             }
         }
     }
@@ -123,17 +118,20 @@ CBasicDatabase::init(const QString &dbDriverName, const QString &connectionStrin
 bool
 CBasicDatabase::open()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     bool retVal = true;
-    if(!m_db.isOpen()) {
+    if (!m_db.isOpen()) {
         retVal = m_db.open();
         if (retVal) {
-            m_SQLRes = QSqlQuery(m_db); // <-- единое связывание всех запросов
+            try {
+                m_SQLRes = new QSqlQuery(m_db); // <-- единое связывание всех запросов
+
+            } catch (const std::bad_alloc &e) {
+                m_errorString = QStringLiteral("Fatal SQL Query Error: %1").arg(e.what());
+                retVal = false;
+            }
         } else {
             QSqlError error = m_db.lastError();
             m_errorString = QStringLiteral("Error open DB file: %1").arg(error.text());
-            __DEBUG( m_errorString )
         }
     }
     return retVal;
@@ -142,26 +140,20 @@ CBasicDatabase::open()
 void
 CBasicDatabase::close()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     if (m_db.isValid() && m_db.isOpen()) {
-        if (m_SQLRes.isActive()) {
-            __DEBUG( "m_SQLRes is active" );
-            m_SQLRes.finish();
+        if (m_SQLRes && m_SQLRes->isActive()) {
+            m_SQLRes->finish();
+            delete m_SQLRes;
+            m_SQLRes = nullptr;
         }
-        __DEBUG( "DB is open" )
         commitTransaction();
-        __DEBUG( "Closing DB" )
         m_db.close();
-        __DEBUG( "DB was closed" )
     }
 }
 
 void
 CBasicDatabase::deinit()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     close();
     _Deinit();
 }
@@ -169,13 +161,10 @@ CBasicDatabase::deinit()
 bool
 CBasicDatabase::beginTransaction()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     m_isBeginTransaction = m_db.transaction();
     if (!m_isBeginTransaction) {
         QSqlError error = m_db.lastError();
         m_errorString = QStringLiteral("Transaction Error: %1").arg(error.text());
-        __DEBUG( m_errorString )
     }
     return m_isBeginTransaction;
 }
@@ -183,13 +172,10 @@ CBasicDatabase::beginTransaction()
 bool
 CBasicDatabase::commitTransaction()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     bool retVal = true;
     if (m_isBeginTransaction) {
-        if (m_SQLRes.isActive()) {
-            __DEBUG( "m_SQLRes is active" );
-            m_SQLRes.finish();
+        if (m_SQLRes && m_SQLRes->isActive()) {
+            m_SQLRes->finish();
         }
 
         retVal = m_db.commit();
@@ -198,7 +184,6 @@ CBasicDatabase::commitTransaction()
         } else {
             QSqlError error = m_db.lastError();
             m_errorString = QStringLiteral("Transaction Error. Commit status: %1").arg(error.text());
-            __DEBUG(m_errorString)
         }
     }
     return retVal;
@@ -207,8 +192,6 @@ CBasicDatabase::commitTransaction()
 bool
 CBasicDatabase::rollbackTransaction()
 {     
-    __DEBUG( Q_FUNC_INFO )
-
     bool retVal = true;
     if (m_isBeginTransaction) {
         retVal = m_db.rollback();
@@ -216,7 +199,6 @@ CBasicDatabase::rollbackTransaction()
         } else {
             QSqlError error = m_db.lastError();
             m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(error.text());
-            __DEBUG(m_errorString)
         }
         m_isBeginTransaction = false;
     }
@@ -226,8 +208,8 @@ CBasicDatabase::rollbackTransaction()
 bool
 CBasicDatabase::optimizeDatabaseSize()
 {
-    if (m_SQLRes.isActive()) {
-        m_SQLRes.finish();
+    if (m_SQLRes->isActive()) {
+        m_SQLRes->finish();
     }
     return _exec(QStringLiteral("VACUUM;"));
 }
@@ -235,8 +217,8 @@ CBasicDatabase::optimizeDatabaseSize()
 bool
 CBasicDatabase::truncateTable(const QString &tableName)
 {
-    if (m_SQLRes.isActive()) {
-        m_SQLRes.finish();
+    if (m_SQLRes->isActive()) {
+        m_SQLRes->finish();
     }
     bool retVal = _exec(QStringLiteral("drop table if exists [%1];").arg(tableName));
     if (retVal) {
@@ -248,14 +230,11 @@ CBasicDatabase::truncateTable(const QString &tableName)
 bool
 CBasicDatabase::prepareRequest(const QString &query)
 {
-    __DEBUG( Q_FUNC_INFO )
-
-	m_SQLRes.clear();
-    bool retVal = m_SQLRes.prepare(query);
+    m_SQLRes->clear();
+    bool retVal = m_SQLRes->prepare(query);
     if (!retVal) {
-        QSqlError error = m_SQLRes.lastError();
+        QSqlError error = m_SQLRes->lastError();
         m_errorString = QStringLiteral("SQL prepare error: %1").arg(error.text());
-        __DEBUG(m_errorString)
     }
     return retVal;
 }
@@ -267,12 +246,11 @@ CBasicDatabase::execRequest(TDataItem data)
     TDataItem::iterator itEnd = data.end();
 
     while (itStart != itEnd) {
-        m_SQLRes.bindValue (itStart.key(), itStart.value());
+        m_SQLRes->bindValue (itStart.key(), itStart.value());
         ++itStart;
     }
 
     bool retVal = _exec();
-    m_SQLRes.finish();
     return retVal;
 }
 
@@ -285,11 +263,11 @@ CBasicDatabase::insertToDB(const QString &query, TDataItem data)
         TDataItem::iterator itEnd = data.end();
 
         while (itStart != itEnd) {
-            m_SQLRes.bindValue (itStart.key(), itStart.value());
+            m_SQLRes->bindValue (itStart.key(), itStart.value());
             ++itStart;
         }
         retVal = _exec();
-        m_SQLRes.finish();
+        m_SQLRes->finish();
     }
     return retVal;
 }
@@ -302,27 +280,24 @@ CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
     if (exec(query)) {
         QStringList item;
 
-        QSqlRecord rec = m_SQLRes.record();
+        QSqlRecord rec = m_SQLRes->record();
         int columnCount = rec.count();
-        __DEBUG( "Column count: " + QString::number(columnCount) )
-
         if (addColumnHeaders) {
-            __DEBUG( "Headers enabled" )
             for (int i = 0; i < columnCount; i++) {
                 item.append(rec.fieldName(i));
             }
             retVal.append(item);
         }
 
-        while(m_SQLRes.next()) {
+        while(m_SQLRes->next()) {
             hasResult = true;
             item.clear();
             for (int i = 0; i < columnCount; i++) {
-                item.append(m_SQLRes.value(i).toString().trimmed());
+                item.append(m_SQLRes->value(i).toString().trimmed());
             }
             retVal.append(item);
         }
-        m_SQLRes.finish();
+        m_SQLRes->finish();
     }
     return (hasResult)? retVal : TDataList();
 }

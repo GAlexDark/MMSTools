@@ -31,14 +31,14 @@ private:
 
 private slots:
     void initTestCase();
-    void testSuccessAuth_wALL_ips();
-    void testFailedAuth();
-    void testSuccessAuth_wINTERNAL_ips();
-    void testSuccessAuth_wEXTERNAL_ips();
-    void testOtherData1();
-    void testOtherdata2();
-    void testOtherdata3_exception();
-    void testDateTimeFormats();
+    void test_successAuth_wALL_ips();
+    void test_failedAuth();
+    void test_successAuth_wINTERNAL_ips();
+    void test_successAuth_wEXTERNAL_ips();
+    void test_otherData1();
+    void test_otherData2();
+    void test_otherData3_exception();
+    void test_DateTimeFormats();
 };
 
 CSVParserTest::CSVParserTest() {}
@@ -49,7 +49,11 @@ void CSVParserTest::initTestCase()
 {
     // All fields are not empty
     QFile file(SRCDIR"data/testcase_success_wAll_ips.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -61,7 +65,7 @@ void CSVParserTest::initTestCase()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 }
 
-void CSVParserTest::testSuccessAuth_wALL_ips() {
+void CSVParserTest::test_successAuth_wALL_ips() {
     qDebug() << "Testcase: Success auth with all IPs (internal + external)";
 
     initTestCase();
@@ -78,13 +82,17 @@ void CSVParserTest::testSuccessAuth_wALL_ips() {
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
 }
 
-void CSVParserTest::testFailedAuth() {
+void CSVParserTest::test_failedAuth() {
     qDebug() << "Testcase: Failed auth";
 
     initTestCase(); // for checking empty fields
 
     QFile file(SRCDIR"data/testcase_failed.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -94,25 +102,29 @@ void CSVParserTest::testFailedAuth() {
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
-    QCOMPARE(m_username, QString(""));
+    QCOMPARE(m_username, QString());
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:25:46.717Z"));
     QCOMPARE(m_requestID, QString("693d40a5f9e0e2ec"));
     QCOMPARE(m_type, QString("Вхід користувача - невдало"));
     QCOMPARE(m_details, QString("type: PASSWORD@N@  ip address: 10.10.10.10"));
-    QCOMPARE(m_username1, QString(""));
+    QCOMPARE(m_username1, QString());
     QCOMPARE(m_authType, QString("PASSWORD"));
-    QCOMPARE(m_externalIP, QString(""));
+    QCOMPARE(m_externalIP, QString());
     QCOMPARE(m_internalIP, QString("10.10.10.10"));
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
 }
 
-void CSVParserTest::testSuccessAuth_wINTERNAL_ips() {
+void CSVParserTest::test_successAuth_wINTERNAL_ips() {
     qDebug() << "Testcase: Success auth with internal IPs only";
 
     initTestCase(); // for checking empty fields
 
     QFile file(SRCDIR"data/testcase_success_wInt_ips.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -129,18 +141,22 @@ void CSVParserTest::testSuccessAuth_wINTERNAL_ips() {
     QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 10.10.1.13, 10.10.10.10"));
     QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
-    QCOMPARE(m_externalIP, QString(""));
+    QCOMPARE(m_externalIP, QString());
     QCOMPARE(m_internalIP, QString("10.10.1.13, 10.10.10.10"));
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:06.777"));
 }
 
-void CSVParserTest::testSuccessAuth_wEXTERNAL_ips() {
+void CSVParserTest::test_successAuth_wEXTERNAL_ips() {
     qDebug() << "Testcase: Success auth with external IPs only";
 
     initTestCase(); // for checking empty fields
 
     QFile file(SRCDIR"data/testcase_success_wExt_ips.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -158,18 +174,22 @@ void CSVParserTest::testSuccessAuth_wEXTERNAL_ips() {
     QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString("192.0.2.118"));
-    QCOMPARE(m_internalIP, QString(""));
+    QCOMPARE(m_internalIP, QString());
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2022-10-17T09:46:45.443"));
 }
 
-void CSVParserTest::testOtherData1()
+void CSVParserTest::test_otherData1()
 {
     qDebug() << "Testcase: Other data #1";
 
     initTestCase(); // for checking empty fields
 
     QFile file(SRCDIR"data/testcase_otherdata1.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -184,21 +204,25 @@ void CSVParserTest::testOtherData1()
     QCOMPARE(m_requestID, QString("d88e4c72cf7f34ad"));
     QCOMPARE(m_type, QString("Зміна меню"));
     QCOMPARE(m_details, QString("Журнал подій"));
-    QCOMPARE(m_username1, QString(""));
-    QCOMPARE(m_authType, QString(""));
-    QCOMPARE(m_externalIP, QString(""));
-    QCOMPARE(m_internalIP, QString(""));
+    QCOMPARE(m_username1, QString());
+    QCOMPARE(m_authType, QString());
+    QCOMPARE(m_externalIP, QString());
+    QCOMPARE(m_internalIP, QString());
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:16.293"));
 }
 
-void CSVParserTest::testOtherdata2()
+void CSVParserTest::test_otherData2()
 {
     qDebug() << "Testcase: Other data #2";
 
     initTestCase(); // for checking empty fields
 
     QFile file(SRCDIR"data/testcase_otherdata2.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -213,21 +237,25 @@ void CSVParserTest::testOtherdata2()
     QCOMPARE(m_requestID, QString("9afa5af2e524f0ed"));
     QCOMPARE(m_type, QString("Financial Guarantee"));
     //the datails data is not interesting and very long
-    QCOMPARE(m_username1, QString(""));
-    QCOMPARE(m_authType, QString(""));
-    QCOMPARE(m_externalIP, QString(""));
-    QCOMPARE(m_internalIP, QString(""));
+    QCOMPARE(m_username1, QString());
+    QCOMPARE(m_authType, QString());
+    QCOMPARE(m_externalIP, QString());
+    QCOMPARE(m_internalIP, QString());
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), "2023-05-31T13:19:09.840");
 }
 
-void CSVParserTest::testOtherdata3_exception()
+void CSVParserTest::test_otherData3_exception()
 {
     qDebug() << "Testcase: Other data #3 - exception";
 
     initTestCase(); // for checking empty fields
 
     QFile file(SRCDIR"data/testcase_otherdata3_exception.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -242,20 +270,24 @@ void CSVParserTest::testOtherdata3_exception()
     QCOMPARE(m_requestID, QString("a6145c4eb3322357"));
     QCOMPARE(m_type, QString("System error"));
     //the datails data is not interesting and very long
-    QCOMPARE(m_username1, QString(""));
-    QCOMPARE(m_authType, QString(""));
-    QCOMPARE(m_externalIP, QString(""));
-    QCOMPARE(m_internalIP, QString(""));
+    QCOMPARE(m_username1, QString());
+    QCOMPARE(m_authType, QString());
+    QCOMPARE(m_externalIP, QString());
+    QCOMPARE(m_internalIP, QString());
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-31T12:56:50.550"));
 }
 
-void CSVParserTest::testDateTimeFormats()
+void CSVParserTest::test_DateTimeFormats()
 {
     QFile file;
     qDebug() << "Testcase: Check parsing datetime (format24 yyyy-MM-ddTHH:mm:ss.zzzZ)";
 
     file.setFileName(SRCDIR"data/testcase_datetimeFormat24.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -272,7 +304,11 @@ void CSVParserTest::testDateTimeFormats()
 
     buf.clear();
     file.setFileName(SRCDIR"data/testcase_datetimeFormat23.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     buf = file.readAll();
     QVERIFY(!buf.isEmpty());
@@ -289,7 +325,11 @@ void CSVParserTest::testDateTimeFormats()
 
     buf.clear();
     file.setFileName(SRCDIR"data/testcase_datetimeFormat22.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     buf = file.readAll();
     QVERIFY(!buf.isEmpty());

@@ -3,18 +3,9 @@
 #include <QByteArray>
 
 #include "CBasicDatabase.h"
+#include "DBStrings.h"
 
 // add necessary includes here
-
-const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
-                                    timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
-                                    type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME, \
-                                    PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);");
-
-const QString insertOriginalData = QStringLiteral("INSERT OR IGNORE INTO [eventlog] (username, timestampISO8601, \
-                                   requestid, type, details, timestamp, username1, authtype, externalip, \
-                                   internalip) VALUES (:username, :timestampISO8601, :requestid, :type, \
-                                   :details, :timestamp, :username1, :authtype, :externalip, :internalip)");
 
 const int recordCount = 51;
 
@@ -104,7 +95,11 @@ void CBasicDatabaseTest::test_createTable()
 void CBasicDatabaseTest::test_importData()
 {
     QFile file(SRCDIR"data/fakedb.sql");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
     QVERIFY(retVal);
     QByteArray buf = file.readAll();
     file.close();

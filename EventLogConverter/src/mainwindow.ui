@@ -20,7 +20,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>MMS EventLog Converter</string>
+   <string>MMS Event Log Conversion Utility</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -163,18 +163,24 @@
     </property>
     <addaction name="actionAbout_program"/>
     <addaction name="actionAbout_Qt"/>
+    <addaction name="actionContact"/>
    </widget>
    <addaction name="menu_About"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAbout_program">
    <property name="text">
-    <string>About MMS EventLog Converter</string>
+    <string>About MMS Event Log Conversion Utility</string>
    </property>
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt version</string>
+   </property>
+  </action>
+  <action name="actionContact">
+   <property name="text">
+    <string>Contacts...</string>
    </property>
   </action>
  </widget>

@@ -20,6 +20,12 @@
 
 static ELCWSettings g_elcwSettings;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
+#else
+    QVariant nullStringValue = QVariant(QString());
+#endif
+
 ELCWSettings& ELCWSettings::instance()
 {
     return g_elcwSettings;
@@ -32,6 +38,6 @@ ELCWSettings::createDefault(const QString& iniPath)
 
     QSettings settings(iniPath, QSettings::IniFormat);
     settings.beginGroup(QStringLiteral("HISTORY"));
-    settings.setValue(QStringLiteral("last_dir"), QVariant());
+    settings.setValue(QStringLiteral("last_dir"), nullStringValue);
     settings.endGroup();
 }

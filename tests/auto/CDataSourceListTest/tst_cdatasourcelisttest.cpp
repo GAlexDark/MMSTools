@@ -11,7 +11,12 @@ void
 createTestFile(const QString &fileName)
 {
     QFile f(fileName);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     if (f.open(QIODeviceBase::WriteOnly)) {
+#else
+    if (f.open(QIODevice::WriteOnly)) {
+#endif
         f.write("test");
         f.close();
     }

@@ -9,6 +9,8 @@ CONFIG += QT_CVERSION precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
 
+DEFINES += QT_USE_QSTRINGBUILDER
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -27,24 +29,35 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
     ../Common/Core/CBasicDatabase.h \
+    ../Common/Core/DBStrings.h \
+    ../Common/Core/CReportBuilder.h \
+    ../Common/Core/CSVLoader.h \
+    ../Common/Core/CSVParser.h \
+    ../Common/Core/CSingleApplication.h \
     ../Common/Core/CBasicSettings.h \
     ../Common/Core/CELCSettings.h \
-    ../Common/Core/CSingleApplication.h \
-    ../Common/Core/Debug.h \
+    ../Common/Core/elcUtils.h \
     ../Common/Core/stdafx.h \
     src/CELCWSettings.h \
+    src/OptionsDialog.h \
     src/mainwindow.h
 
 SOURCES += \
     ../Common/Core/CBasicDatabase.cpp \
+    ../Common/Core/CReportBuilder.cpp \
+    ../Common/Core/CSVLoader.cpp \
+    ../Common/Core/CSVParser.cpp \
+    ../Common/Core/CSingleApplication.cpp \
     ../Common/Core/CBasicSettings.cpp \
     ../Common/Core/CELCSettings.cpp \
-    ../Common/Core/CSingleApplication.cpp \
+    ../Common/Core/elcUtils.cpp \
     src/CELCWSettings.cpp \
+    src/OptionsDialog.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
 FORMS += \
+    src/OptionsDialog.ui \
     src/mainwindow.ui
 
 TRANSLATIONS += \
@@ -56,10 +69,10 @@ CONFIG += lrelease
 include(../deployment.pri)
 
 RESOURCES += $${TARGET}.qrc
-RC_FILE = $${TARGET}.rc
 
 include(../MMSTools.pri)
 
+RC_ICONS = img/elc.ico
 
 MAJOR_VER = 2
 MINOR_VER = 0
@@ -77,8 +90,10 @@ QMAKE_TARGET_DESCRIPTION = MMS Event Log Conversion GUI Utility
 QMAKE_TARGET_COPYRIGHT = (C) 2023 Oleksii Gaienko
 QMAKE_TARGET_PRODUCT = MMS Event Log Conversion Utility
 QMAKE_TARGET_INTERNALNAME = $${TARGET}
+QMAKE_TARGET_COMMENTS = support@galexsoftware.info
 
 DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
 DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"
 DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
 DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""
+DEFINES += QT_VER=\\\"$${QT_VERSION}\\\"

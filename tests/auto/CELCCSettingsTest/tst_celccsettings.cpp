@@ -6,6 +6,9 @@
 
 // add necessary includes here
 
+const QString fileName = QStringLiteral("EventLogConverterc.ini");
+const QString filePath = QStringLiteral(SRCDIR"data");
+
 class CELCCSettingsTest : public QObject
 {
     Q_OBJECT
@@ -29,9 +32,11 @@ CELCCSettingsTest::~CELCCSettingsTest() {}
 void
 removeIniFile()
 {
-    QFile file(SRCDIR"data/EventLogConverter.ini");
+    QString fp = QDir(filePath).filePath(fileName);
+    QFile file(fp);
     if (file.exists()) {
         file.remove();
+        qDebug() << "file removed";
     }
 }
 
@@ -50,17 +55,20 @@ CELCCSettingsTest::cleanupTestCase()
 void
 CELCCSettingsTest::test_init()
 {
-    QString iniFile = QStringLiteral("EventLogConverter.ini");
-    QString appPath = SRCDIR"data";
-    bool retVal = CELCCSettings::instance().init(appPath, iniFile);
+    qDebug() << filePath;
+    qDebug() << fileName;
+    bool retVal = CELCCSettings::instance().init(filePath, fileName);
     QVERIFY(retVal);
 }
 
 void
 CELCCSettingsTest::test_fileExists()
 {
-    QFile file(SRCDIR"data/EventLogConverter.ini");
-    QVERIFY(file.exists());
+    QString fp = QDir(filePath).filePath(fileName);
+    qDebug() << fp;
+    QFile file(fp);
+    bool retVal = file.exists();
+    QVERIFY(retVal);
 }
 
 void

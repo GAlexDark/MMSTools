@@ -12,11 +12,9 @@ INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.h \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/DBStrings.h
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.h
 
 SOURCES +=  \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.cpp \
-    tst_cbasicdatabase.cpp
-
-DEFINES += SRCDIR=\\\"$$PWD/\\\"
-OTHER_FILES += data/*
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.cpp \
+    tst_utilstest.cpp

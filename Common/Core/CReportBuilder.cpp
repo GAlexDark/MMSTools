@@ -1,47 +1,54 @@
 #include "CReportBuilder.h"
-#include "Debug.h"
-#include "QStorageInfoHelper.h"
+//#include "Debug.h"
+#include "DBStrings.h"
+#include "elcUtils.h"
 
-const QString getAllRecords = QStringLiteral("SELECT e.timestampISO8601, e.timestamp, e.externalip, e.username, e.type, e.details, \
-e.authtype, e.internalip, e.requestid FROM eventlog e %1 ORDER BY e.timestamp DESC;");
-const QString pragmaUTF8 = QStringLiteral("PRAGMA encoding = \"UTF-8\";");
-const QString pragmaPageSize = QStringLiteral("PRAGMA page_size = %1;");
-
-CReportBuilder::CReportBuilder(): m_errorString(""), m_reportFileName("")
+CReportBuilder::CReportBuilder()
+    : m_db(nullptr), m_errorString(""), m_reportFileName("")
 {}
+
+CReportBuilder::~CReportBuilder()
+{
+    delete m_db;
+    m_db = nullptr;
+}
 
 bool
 CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList)
 {
+    bool retVal = true;
+    try {
+        m_db = new CBasicDatabase();
 
-    __DEBUG( Q_FUNC_INFO )
+        m_reportFileName = reportName;
+        m_excludedUsernamesList = excludedUsernamesList;
+        m_includedUsernamesList = includedUsernamesList;
 
-    m_reportFileName = reportName;
-    m_excludedUsernamesList = excludedUsernamesList;
-    m_includedUsernamesList = includedUsernamesList;
-
-    bool retVal = m_db.init("QSQLITE", dbFileName);
-    if (retVal) {
-        retVal = m_db.open();
+        retVal = m_db->init("QSQLITE", dbFileName);
         if (retVal) {
-            int blockSize = QStorageInfoHelper::getStorageBlockSize(dbFileName);
-            QStringList pragmaItems;
-            pragmaItems.append(pragmaUTF8);
-            pragmaItems.append(pragmaPageSize.arg(blockSize));
+            retVal = m_db->open();
+            if (retVal) {
+                int blockSize = elcUtils::getStorageBlockSize(dbFileName);
+                QStringList pragmaItems;
+                pragmaItems.append(pragmaUTF8);
+                pragmaItems.append(pragmaPageSize.arg(blockSize));
 
-            for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
-                retVal = m_db.exec(pragmaItems.at(i));
-                if (!retVal) {
-                    break;
+                for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
+                    retVal = m_db->exec(pragmaItems.at(i));
+                    if (!retVal) {
+                        break;
+                    }
                 }
             }
         }
+    } catch (const std::bad_alloc &e) {
+        retVal = false;
+        m_errorString = e.what();
     }
 
     if (!retVal) {
-        m_errorString = m_db.errorString();
-        __DEBUG( m_errorString )
-        m_db.close();
+        m_errorString = m_db->errorString();
+        m_db->close();
     }
 
     return retVal;
@@ -50,8 +57,6 @@ CReportBuilder::init(const QString &dbFileName, const QString &reportName, const
 bool
 CReportBuilder::generateReport()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     int rowHeader = 1;
     int colTimestampISO8601 = 1, colTimestamp = 2, colExternalIP = 3, colUsername = 4, colType = 5, colDetails = 6,
             colAuthType = 7, colInternalIP = 8, colRequestid = 9;
@@ -102,39 +107,38 @@ CReportBuilder::generateReport()
         } //for
         args.append(QStringLiteral("e.username=%1").arg(m_includedUsernamesList.at(size)));
     }
-    __DEBUG( getAllRecords.arg(args) )
 
-    bool retVal = m_db.exec(getAllRecords.arg(args));
+    bool retVal = m_db->exec(getAllRecords.arg(args));
     if (retVal) {
         int row = 2;
-        while (m_db.isNext()) {
-            writeValue = m_db.geValue(0).toString();
+        while (m_db->isNext()) {
+            writeValue = m_db->geValue(0).toString();
             xlsxReport.write(row, colTimestampISO8601, writeValue);
 
-            writeValue = m_db.geValue(1).toDateTime();
+            writeValue = m_db->geValue(1).toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 
-            writeValue = m_db.geValue(2).toString();
+            writeValue = m_db->geValue(2).toString();
             xlsxReport.write(row, colExternalIP, writeValue);
 
-            writeValue = m_db.geValue(3).toString();
+            writeValue = m_db->geValue(3).toString();
             xlsxReport.write(row, colUsername, writeValue);
 
-            writeValue = m_db.geValue(4).toString();
+            writeValue = m_db->geValue(4).toString();
             xlsxReport.write(row, colType, writeValue);
 
-            buf = m_db.geValue(5).toString();
+            buf = m_db->geValue(5).toString();
             buf.replace("@N@", "\n", Qt::CaseInsensitive);
             writeValue = buf;
             xlsxReport.write(row, colDetails, writeValue);
 
-            writeValue = m_db.geValue(6).toString();
+            writeValue = m_db->geValue(6).toString();
             xlsxReport.write(row, colAuthType, writeValue);
 
-            writeValue = m_db.geValue(7).toString();
+            writeValue = m_db->geValue(7).toString();
             xlsxReport.write(row, colInternalIP, writeValue);
 
-            writeValue = m_db.geValue(8).toString();
+            writeValue = m_db->geValue(8).toString();
             xlsxReport.write(row, colRequestid, writeValue);
 
             ++row;
@@ -143,17 +147,13 @@ CReportBuilder::generateReport()
         retVal = xlsxReport.saveAs(m_reportFileName);
         if (!retVal) {
             m_errorString = QStringLiteral("Error save report file");
-            __DEBUG( m_errorString )
         }
-
     } else {
-        m_errorString = m_db.errorString();
-        __DEBUG( m_errorString )
+        m_errorString = m_db->errorString();
     }
 
-    m_db.close();
+    m_db->close();
 
-    __DEBUG ( "CReportBuilder::generateReport DONE" )
     return retVal;
 }
 
@@ -165,16 +165,12 @@ CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(fa
 bool
 CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList)
 {
-    __DEBUG( Q_FUNC_INFO )
-
     return m_builser.init(dbFileName, reportName, excludedUsernamesList, includedUsernamesList);
 }
 
 void
 CSVThreadReportBuilder::run()
 {
-    __DEBUG( Q_FUNC_INFO )
-
     m_errorString.clear();
     m_retVal = m_builser.generateReport();
     if (!m_retVal) {

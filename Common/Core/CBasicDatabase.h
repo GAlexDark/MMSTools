@@ -21,6 +21,10 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QVariant>
+#include <QString>
+#include <QMap>
+#include <QList>
+
 
 typedef QMap<QString, QVariant> TDataItem; //список полей для bindValue (в формате ":holder_name", "value")
 typedef QList<QStringList> TDataList;
@@ -28,7 +32,8 @@ typedef QList<QStringList> TDataList;
 class CBasicDatabase
 {
 public:
-    explicit CBasicDatabase(const QString &connectionName = "");
+    explicit CBasicDatabase(const QString &connectionName);
+    CBasicDatabase();
     virtual ~CBasicDatabase();
 
     QString getConnectionName() const { return m_connectionName; }
@@ -54,12 +59,15 @@ public:
 
     bool exec(const QString &query);
 
-    QVariant geValue(int index) const { return m_SQLRes.value(index); }
-    bool isNext() { return m_SQLRes.next(); }
+    QVariant geValue(int index) const { return m_SQLRes->value(index); }
+    bool isNext() { return m_SQLRes->next(); }
 
 private:
+    CBasicDatabase(const CBasicDatabase&) = delete;
+    CBasicDatabase& operator=(CBasicDatabase&) = delete;
+
     QSqlDatabase    m_db;
-    QSqlQuery       m_SQLRes;
+    QSqlQuery       *m_SQLRes;
 
     bool            m_isInited;         //флаг подключения к БД. True - connected, false - not connected
     QString         m_connectionName;   //Уникальное имя соединения

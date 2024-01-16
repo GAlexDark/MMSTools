@@ -7,5 +7,6 @@ SUBDIRS += \
     CSingleApplicationTest \
     CELCCSettingsTest \
     CBasicDatabaseTest \
-    CELCWSettingsTest
+    CELCWSettingsTest \
+    UtilsTest
 

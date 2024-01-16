@@ -18,14 +18,17 @@
 #include "CBasicSettings.h"
 #include <QDir>
 #include <QFileInfo>
-#include "Debug.h"
 
 CBasicSettings::CBasicSettings() :
-    m_settings(nullptr) {}
+    m_settings(nullptr)
+{}
 
 CBasicSettings::~CBasicSettings()
 {
-    delete m_settings;
+    if (m_settings) {
+        delete m_settings;
+        m_settings = nullptr;
+    }
 }
 
 bool
@@ -44,9 +47,9 @@ CBasicSettings::init(const QString& appPath, const QString &fileName)
     try {
         m_settings = new QSettings(iniFileName, QSettings::IniFormat);
     } catch (const std::bad_alloc& ex) {
-        __DEBUG( ex.what() )
         retVal = false;
     }
+
     return retVal;
 }
 
