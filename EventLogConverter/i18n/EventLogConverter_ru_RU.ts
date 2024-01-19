@@ -279,9 +279,19 @@ No - Otherwise.</source>
         <translation>	Список включенных пользователей пуст.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="299"/>
+        <source>	The included users: %1</source>
+        <translation>	Список включенных пользователей: %1</translation>
+    </message>
+    <message>
         <location filename="../src/mainwindow.cpp" line="302"/>
         <source>	The excluded users list is empty.</source>
         <translation>	Список исключенных пользователей пуст.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="304"/>
+        <source>	The excluded users: %1</source>
+        <translation>	Список исключенных пользователей: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="315"/>

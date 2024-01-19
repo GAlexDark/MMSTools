@@ -296,12 +296,12 @@ MainWindow::generateReportClick()
         if (includedUsers.isEmpty()) {
             setInfoText(tr("\tThe included users list is empty."));
         } else {
-            setInfoText("\t" + includedUsers.join(','));
+            setInfoText(tr("\tThe included users: %1").arg(includedUsers.join(',')));
         }
         if (excludedUsers.isEmpty()) {
             setInfoText(tr("\tThe excluded users list is empty."));
         } else {
-            setInfoText("\t" + excludedUsers.join(','));
+            setInfoText(tr("\tThe excluded users: %1").arg(excludedUsers.join(',')));
         }
         QCoreApplication::processEvents();
 

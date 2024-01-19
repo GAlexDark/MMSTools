@@ -276,12 +276,22 @@ No - Otherwise.</source>
     <message>
         <location filename="../src/mainwindow.cpp" line="297"/>
         <source>	The included users list is empty.</source>
-        <translation>	Список увімкнених включених порожній.</translation>
+        <translation>	Перелік включених користувачів порожній.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="299"/>
+        <source>	The included users: %1</source>
+        <translation>	Включені користувачі: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="302"/>
         <source>	The excluded users list is empty.</source>
-        <translation>	Список виключених користувачів порожній.</translation>
+        <translation>	Перелік виключених користувачів порожній.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="304"/>
+        <source>	The excluded users: %1</source>
+        <translation>	Виключені користувачі: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="315"/>
@@ -460,12 +470,12 @@ Copyright (C) 2023 Олексій Гаєнко
     <message>
         <location filename="../src/OptionsDialog.ui" line="103"/>
         <source>Usernames included in the report</source>
-        <translation>Імена користувачів, включені до звіту</translation>
+        <translation>Імена користувачів, включених до звіту</translation>
     </message>
     <message>
         <location filename="../src/OptionsDialog.ui" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be included from the report.. When this option is used, the exclusion option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список імен користувачів, розділених «,» або «;», які будуть включені до звіту. Якщо використовується цей параметр, параметр виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених «,» або «;», які будуть включені до звіту. Якщо використовується цей параметр, параметр виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List of usernames separated by &apos;,&apos; or &apos;;&apos; and only those included in the report. When this option is used, the exclude option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -474,7 +484,7 @@ Copyright (C) 2023 Олексій Гаєнко
     <message>
         <location filename="../src/OptionsDialog.ui" line="130"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be excluded from the report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos;, які потрібно виключити зі звіту.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos;, які потрібно виключити зі звіту.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/OptionsDialog.ui" line="120"/>
