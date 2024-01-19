@@ -1,6 +1,5 @@
 #include <QCoreApplication>
 #include <QDir>
-#include <QRegularExpression>
 //#include "Debug.h"
 #include "CSVLoader.h"
 #include "CReportBuilder.h"
@@ -10,6 +9,8 @@
 #include "QCommandLineParserHelper.h"
 #include "CConsoleOutput.h"
 #include "elcUtils.h"
+
+using pragmaList_t = QMap<QString, QString>;
 
 int main(int argc, char *argv[])
 {
@@ -146,25 +147,46 @@ int main(int argc, char *argv[])
 
     bool retVal;
     {
+        consoleOut.outToConsole("Start reading and converting files...");
+
         CSVThreadLoader loader;
-        retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)), Qt::DirectConnection);
+        retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString))); //, Qt::DirectConnection
         Q_ASSERT_X(retVal, "connect", "connection is not established");
 
-        QString dataHasHeaders = settings.getMain("SETTINGS/data_has_headers").toString().trimmed();
-        bool hasHeaders = (dataHasHeaders.isEmpty() || QString::compare(dataHasHeaders, "yes", Qt::CaseInsensitive) == 0)? true : false;
+        QString value = settings.getMain("SETTINGS/data_has_headers").toString().trimmed();
+        bool hasHeaders = (value.isEmpty() || QString::compare(value, "yes", Qt::CaseInsensitive) == 0)? true : false;
         QString internalipFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
-        QString tempStore = settings.getMain("DATABASE/temp_store").toString().trimmed();
-        QString journalMode = settings.getMain("DATABASE/journal_mode").toString().trimmed();
-        retVal = loader.init(dbName, hasHeaders, internalipFirstOctet, tempStore, journalMode, "\r\n");
+
+        pragmaList_t pragmaList;
+        value = settings.getMain("DATABASE/synchronous").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["synchronous"] = value;
+        }
+        value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["journal_mode"] = value;
+        }
+        value = settings.getMain("DATABASE/temp_store").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["temp_store"] = value;
+        }
+        value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["locking_mode"] = value;
+        }
+
+        retVal = loader.init(dbName, hasHeaders, internalipFirstOctet, pragmaList, "\r\n");
         if (retVal) {
             loader.setFileName(files);
             loader.start();
 
             consoleOut.outToConsole(QStringLiteral("wait..."));
-            loader.wait();
+            elcUtils::waitForEndThread(&loader, 100);
             retVal = loader.getStatus();
         }
+        QCoreApplication::processEvents();
         QObject::disconnect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
+
         if (retVal) {
             consoleOut.outToConsole(QStringLiteral("Reading file(s) completed"));
         } else {
@@ -173,16 +195,16 @@ int main(int argc, char *argv[])
         }
     }
 
-    consoleOut.outToConsole(QStringLiteral("Generating report"));
+    consoleOut.outToConsole(QStringLiteral("Start generating the report..."));
     CSVThreadReportBuilder report;
     if (report.init(dbName, reportName, excludedUsers, includedUsers)) {
         report.start();
 
         consoleOut.outToConsole(QStringLiteral("wait..."));
-        report.wait();
+        elcUtils::waitForEndThread(&report, 100);
         retVal = report.getStatus();
     }
-
+    QCoreApplication::processEvents();
     if (retVal) {
         consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe result in the %1 file.").arg(reportName));
     } else {

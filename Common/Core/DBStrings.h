@@ -18,7 +18,8 @@ type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, interna
 PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);");
 
 inline const QString pragmaJournalMode = QStringLiteral("PRAGMA journal_mode = %1;");
-inline const QString pragmaSynchronous = QStringLiteral("PRAGMA synchronous = NORMAL;");
+inline const QString pragmaSynchronous = QStringLiteral("PRAGMA synchronous = %1;");
 inline const QString pragmaTempStore = QStringLiteral("PRAGMA temp_store = %1;");
+inline const QString pragmaLockingMode = QStringLiteral("PRAGMA locking_mode = %1;");
 
 #endif // DBSTRINGS_H

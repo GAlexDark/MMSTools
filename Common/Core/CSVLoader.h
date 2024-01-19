@@ -10,6 +10,8 @@
 const qint64 defBufferSize = 128 * 1024; // 128KB
 const qint64 defMaxFileSize = 1024 * 1024; // 1M
 
+using pragmaList_t = QMap<QString, QString>;
+
 class CSVLoader
 {
 public:
@@ -17,7 +19,7 @@ public:
     virtual ~CSVLoader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const QString &tempStore, const QString &journalMode,
+    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, pragmaList_t pragmaList,
               const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
     bool read();
     QString errorString() const { return m_errorString; }
@@ -33,7 +35,7 @@ private:
     CBasicDatabase  m_db;
     TDataItem   m_data;
 
-    bool initDB(const QString &dbFileName, const QString &tempStore, const QString &journalMode);
+    bool initDB(const QString &dbFileName, pragmaList_t pragmaList);
     bool initBuffer();
 
     bool readLargeFile();

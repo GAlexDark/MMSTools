@@ -6,35 +6,37 @@
 #include "elcUtils.h"
 
 bool
-CSVLoader::initDB(const QString &dbFileName, const QString &tempStore, const QString &journalMode)
+CSVLoader::initDB(const QString &dbFileName, pragmaList_t pragmaList)
 {
     bool retVal = m_db.init("QSQLITE", dbFileName);
     if (retVal) {
         retVal = m_db.open();
         if (retVal) {
+            QStringList dbCommandItems;
+            dbCommandItems.append(pragmaUTF8);
+
+            QString value = pragmaList.value("synchronous", "NORMAL");
+            dbCommandItems.append(pragmaSynchronous.arg(value));
+
             int blockSize = elcUtils::getStorageBlockSize(dbFileName);
-            QStringList pragmaItems;
-            pragmaItems.append(pragmaUTF8);
-            if (!journalMode.isEmpty() && QString::compare(journalMode, "memory", Qt::CaseInsensitive) == 0) {
-                pragmaItems.append(pragmaJournalMode.arg("MEMORY"));
-            } else {
-                pragmaItems.append(pragmaJournalMode.arg("DELETE"));
-            }
-            pragmaItems.append(pragmaPageSize.arg(blockSize));
-            pragmaItems.append(pragmaSynchronous);
-            if (!tempStore.isEmpty() && QString::compare(tempStore, "memory", Qt::CaseInsensitive) == 0) {
-                pragmaItems.append(pragmaTempStore.arg("MEMORY"));
-            } else {
-                pragmaItems.append(pragmaTempStore.arg("DEFAULT"));
-            }
-            for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
-                retVal = m_db.exec(pragmaItems.at(i));
+            dbCommandItems.append(pragmaPageSize.arg(blockSize));
+
+            value = pragmaList.value("journal_mode", "MEMORY");
+            dbCommandItems.append(pragmaJournalMode.arg(value));
+
+            value = pragmaList.value("temp_store", "MEMORY");
+            dbCommandItems.append(pragmaTempStore.arg(value));
+
+            value = pragmaList.value("locking_mode", "NORMAL");
+            dbCommandItems.append(pragmaLockingMode.arg(value));
+
+            dbCommandItems.append(createEventLogTable);
+
+            for (qsizetype i = 0; i < dbCommandItems.size(); ++i) {
+                retVal = m_db.exec(dbCommandItems.at(i));
                 if (!retVal) {
                     break;
                 }
-            }
-            if (retVal) {
-                retVal = m_db.exec(createEventLogTable);
             }
         }
     }
@@ -143,6 +145,8 @@ CSVLoader::readLargeFile()
         bool isEOF = false;
         qint64 bytesRead;
 
+        memset(m_buffer->data(), 0, m_buffer->size());
+
         m_file.seek(bufferPosition);
         bytesRead = m_file.read(m_buffer->data(), m_bufferSize);
         if (bytesRead > 0) {
@@ -234,7 +238,7 @@ CSVLoader::~CSVLoader()
 }
 
 bool
-CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const QString &tempStore, const QString &journalMode,
+CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, pragmaList_t pragmaList,
                      const QByteArray &eolChars, qint64 bufferSize)
 {
     m_eolChars = eolChars;
@@ -243,7 +247,7 @@ CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &i
 
     m_parser.init(internalipFirstOctet);
 
-    bool retVal = initDB(dbFileName, tempStore, journalMode);
+    bool retVal = initDB(dbFileName, pragmaList);
     if (retVal) {
         retVal = initBuffer();
     }

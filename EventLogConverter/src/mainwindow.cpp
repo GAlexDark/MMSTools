@@ -13,6 +13,8 @@
 #include "CReportBuilder.h"
 #include "elcUtils.h"
 
+using pragmaList_t = QMap<QString, QString>;
+
 void
 MainWindow::setStateText(const QString &state)
 {
@@ -167,7 +169,7 @@ MainWindow::openFileClick()
             setInfoText(m_fileList.at(i));
         }
         setStateText(tr("The file(s) was selected"));
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
 
         // ref: https://github.com/mu-editor/mu/issues/832
         QMessageBox messageBox = QMessageBox(this);
@@ -196,8 +198,6 @@ MainWindow::openFileClick()
     }
 }
 
-
-
 void
 MainWindow::convertEventLogClick()
 {
@@ -205,24 +205,46 @@ MainWindow::convertEventLogClick()
 
     if (!m_fileList.isEmpty()) {
         CSVThreadLoader loader;
-        bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)), Qt::DirectConnection);
+        bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
         Q_ASSERT_X(retVal, "connect", "connection is not established");
 
         const ELCWSettings &settings = ELCWSettings::instance();
         QString internalipFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
-        QString tempStore = settings.getMain("DATABASE/temp_store").toString().trimmed();
-        QString journalMode = settings.getMain("DATABASE/journal_mode").toString().trimmed();
 
-        retVal = loader.init(m_dbName, m_hasHeaders, internalipFirstOctet, tempStore, journalMode, "\r\n");
+        pragmaList_t pragmaList;
+        QString value = settings.getMain("DATABASE/synchronous").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["synchronous"] = value;
+        }
+        value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["journal_mode"] = value;
+        }
+        value = settings.getMain("DATABASE/temp_store").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["temp_store"] = value;
+        }
+        value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
+        if (!value.isEmpty()) {
+            pragmaList["locking_mode"] = value;
+        }
+
+        setInfoText(tr("Start reading and converting file(s)..."));
+        setStateText(tr("Read and converting"));
+        QCoreApplication::processEvents();
+
+        retVal = loader.init(m_dbName, m_hasHeaders, internalipFirstOctet, pragmaList, "\r\n");
         if (retVal) {
             loader.setFileName(m_fileList);
             loader.start();
 
-            //setInfoText(tr("wait..."));
-            loader.wait();
+            setInfoText(tr("wait..."));
+            elcUtils::waitForEndThread(&loader, 100);
             retVal = loader.getStatus();
         }
+        QCoreApplication::processEvents();
         QObject::disconnect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
+
         if (retVal) {
             setInfoText(tr("Reading file(s) completed"));
             setStateText(tr("Reading complete"));
@@ -245,7 +267,7 @@ MainWindow::clearDBclick()
     disableButtons();
 
     setInfoText(tr("Starting cleaning database..."));
-    QApplication::processEvents();
+    QCoreApplication::processEvents();
 
     QString errorString;
     if (elcUtils::trunvateDB(m_dbName, errorString)) {
@@ -264,20 +286,24 @@ MainWindow::generateReportClick()
 {
     disableButtons();
 
+    setInfoText(tr("Start generating the report..."));
+    setStateText(tr("Start generating the report"));
+    QCoreApplication::processEvents();
+
     QStringList includedUsers, excludedUsers;
     if (showOptionsDialog(includedUsers, excludedUsers)) {
         setInfoText(tr("Additional report filtering settings:"));
         if (includedUsers.isEmpty()) {
-            setInfoText(tr("The included users list is empty."));
+            setInfoText(tr("\tThe included users list is empty."));
         } else {
-            setInfoText(includedUsers.join(','));
+            setInfoText("\t" + includedUsers.join(','));
         }
         if (excludedUsers.isEmpty()) {
-            setInfoText(tr("The excluded users list is empty."));
+            setInfoText(tr("\tThe excluded users list is empty."));
         } else {
-            setInfoText(excludedUsers.join(','));
+            setInfoText("\t" + excludedUsers.join(','));
         }
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
 
         QString reportName = QFileDialog::getSaveFileName(this, tr("Save MMS Event Log report"),
                                                         m_lastDir,
@@ -286,16 +312,19 @@ MainWindow::generateReportClick()
             setInfoText(tr("The report will be created here: %1").arg(reportName));
             bool retVal = true;
 
-            setInfoText(tr("Generating report"));
+            setInfoText(tr("Generating report..."));
+            setStateText(tr("Generating report"));
+            QCoreApplication::processEvents();
+
             CSVThreadReportBuilder report;
             if (report.init(m_dbName, reportName, excludedUsers, includedUsers)) {
                 report.start();
 
                 setInfoText(tr("wait..."));
-                report.wait();
+                elcUtils::waitForEndThread(&report, 100);
                 retVal = report.getStatus();
             }
-
+            QCoreApplication::processEvents();
             if (retVal) {
                 setInfoText(tr("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
                 setStateText(tr("Report created"));

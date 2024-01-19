@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QDir>
 
-#include "Debug.h"
+//#include "Debug.h"
 #include "CSingleApplication.h"
 #include "CELCWSettings.h"
 #include "elcUtils.h"
@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
     if (!retVal) {
             QMessageBox::warning(nullptr, "Warning", "Error loading localization resources.");
     }
-    __DEBUG( "Translator files installed" )
 
     CSingleApplication sa("elcw_instance");
     if (sa.isRunning()) {
@@ -47,7 +46,6 @@ int main(int argc, char *argv[])
     //get path to the DB
     const ELCWSettings &settings = ELCWSettings::instance();
     QString dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
-    __DEBUG( dbName )
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1.db").arg(appName);
         QMessageBox::warning(nullptr, QObject::tr("Warning") ,QObject::tr("Unable to get database file name."), QMessageBox::Ok);

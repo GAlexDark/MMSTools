@@ -1,4 +1,5 @@
 #include "elcUtils.h"
+#include "qthread.h"
 
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -6,6 +7,7 @@
 #include <QStorageInfo>
 #include <QDir>
 #include <QDebug>
+#include <QCoreApplication>
 
 #ifdef Q_OS_WIN
     #include "windows.h"
@@ -104,6 +106,14 @@ elcUtils::getFormattedDateTime(const QString &dateTime)
 {
     QDateTime buildDate = QDateTime::fromString(dateTime);
     return buildDate.toString("yyyyMMddhhmm");
+}
+
+void
+elcUtils::waitForEndThread(QThread *obj, unsigned long time)
+{
+    while (!obj->wait(time)) {
+        QCoreApplication::processEvents();
+    }
 }
 
 #ifdef Q_OS_WIN

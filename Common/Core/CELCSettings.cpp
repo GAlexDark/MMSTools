@@ -34,8 +34,9 @@ CELCSettings::createDefault(const QString& iniPath)
     settings.endGroup();
 
     settings.beginGroup(QStringLiteral("DATABASE"));
-    settings.setValue(QStringLiteral("temp_store"), QStringLiteral("MEMORY"));
-    settings.setValue(QStringLiteral("journal_mode"), QStringLiteral("MEMORY"));
+    settings.setValue(QStringLiteral("journal_mode"), QStringLiteral("MEMORY")); // DELETE | TRUNCATE | PERSIST | MEMORY | WAL | OFF
+    settings.setValue(QStringLiteral("synchronous"), QStringLiteral("NORMAL")); // OFF | NORMAL | FULL
+    settings.setValue(QStringLiteral("temp_store"), QStringLiteral("MEMORY")); // DEFAULT | FILE | MEMORY
+    settings.setValue(QStringLiteral("locking_mode"), QStringLiteral("EXCLUSIVE")); // NORMAL | EXCLUSIVE
     settings.endGroup();
-
 }
