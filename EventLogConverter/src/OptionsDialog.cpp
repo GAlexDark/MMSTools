@@ -23,9 +23,9 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Apply"));
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
 
-    bool retVal = connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(doOkClicked()));
+    bool retVal = connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(doOkClicked()));
     Q_ASSERT_X (retVal, "OptionsDialog::OptionsDialog", "doOkClicked() connection is not established");
-    retVal = connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(doCancelClicked()));
+    retVal = connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(doCancelClicked()));
     Q_ASSERT_X (retVal, "OptionsDialog::OptionsDialog", "doCancelClicked() connection is not established");
 
     clearLists();
