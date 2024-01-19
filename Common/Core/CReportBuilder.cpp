@@ -1,5 +1,5 @@
 #include "CReportBuilder.h"
-//#include "Debug.h"
+#include "Debug.h"
 #include "DBStrings.h"
 #include "elcUtils.h"
 
@@ -95,19 +95,19 @@ CReportBuilder::generateReport()
             args.append(QStringLiteral("WHERE "));
             qsizetype size = m_excludedUsernamesList.size() - 1;
             for (qsizetype i = 0; i < size; ++i) {
-                args.append(QStringLiteral("e.username<>%1 AND ").arg(m_excludedUsernamesList.at(i)));
+                args.append(QStringLiteral("e.username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
             } //for
-            args.append(QStringLiteral("e.username<>%1").arg(m_excludedUsernamesList.at(size)));
+            args.append(QStringLiteral("e.username<>'%1'").arg(m_excludedUsernamesList.at(size)));
         }
     } else {
         args.append(QStringLiteral("WHERE "));
         qsizetype size = m_includedUsernamesList.size() - 1;
         for (qsizetype i = 0; i < size; ++i) {
-            args.append(QStringLiteral("e.username=%1 OR ").arg(m_includedUsernamesList.at(i)));
+            args.append(QStringLiteral("e.username='%1' OR ").arg(m_includedUsernamesList.at(i)));
         } //for
-        args.append(QStringLiteral("e.username=%1").arg(m_includedUsernamesList.at(size)));
+        args.append(QStringLiteral("e.username='%1'").arg(m_includedUsernamesList.at(size)));
     }
-
+    __DEBUG( getAllRecords.arg(args) )
     bool retVal = m_db->exec(getAllRecords.arg(args));
     if (retVal) {
         int row = 2;
