@@ -53,8 +53,8 @@ CSVParser::analizeIPAdresses(const QString &ipaddresses)
     if (pos != -1) {
         QString firstip = ipaddresses.mid(0, pos).trimmed();
         QString secondip = ipaddresses.mid(pos + 1).trimmed();
-        bool isPrivateFirstIP = (firstip.indexOf(m_internalipFirstOctet) == 0)? true : false;
-        bool isPrivateSecondIP = (secondip.indexOf(m_internalipFirstOctet) == 0)? true : false;
+        bool isPrivateFirstIP = firstip.startsWith(m_internalipFirstOctet);
+        bool isPrivateSecondIP = secondip.startsWith(m_internalipFirstOctet);
 
         if (isPrivateFirstIP && isPrivateSecondIP) {
             m_externalip.clear();
@@ -69,7 +69,7 @@ CSVParser::analizeIPAdresses(const QString &ipaddresses)
             }
         } // if &&
     } else {
-        if (ipaddresses.indexOf(m_internalipFirstOctet) == 0) {
+        if (ipaddresses.startsWith(m_internalipFirstOctet)) {
             m_externalip.clear();
             m_internalip = ipaddresses;
         } else {
@@ -99,14 +99,17 @@ bool
 CSVParser::parseUserFailedLogonDetails()
 {
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
+    m_username1.clear();
     bool retVal = match.hasMatch();
     if (retVal) {
-        m_username1.clear();
-
         m_authType = match.captured(1).trimmed();
 
         QString ipaddresses = match.captured(2).trimmed();
         analizeIPAdresses(ipaddresses);
+    } else {
+        m_authType.clear();
+        m_externalip.clear();
+        m_internalip.clear();
     }
     return retVal;
 }
@@ -151,7 +154,9 @@ CSVParser::parse(const QString &line)
         m_timestamp.setTimeSpec(Qt::UTC);
         m_timestamptz = m_timestamp.toLocalTime();
 
-        if ((m_details.indexOf("ip address:") == -1) || !parseUserLogonDetails()) {
+        if (m_details.indexOf("ip address:") != -1) {
+            (void)parseUserLogonDetails();
+        } else {
             m_username1.clear();
             m_authType.clear();
             m_externalip.clear();

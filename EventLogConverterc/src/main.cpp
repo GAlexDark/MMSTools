@@ -93,7 +93,8 @@ int main(int argc, char *argv[])
             QString filePath = QFileInfo(files.at(0)).absolutePath();
             reportName = QDir(filePath).filePath(reportName);
         }
-        if (reportName.indexOf(".xlsx") == -1) {
+        //if (reportName.indexOf(".xlsx") == -1) {
+        if (!reportName.endsWith(".xlsx", Qt::CaseInsensitive)) {
             reportName = reportName + ".xlsx";
         }
         reportName = QDir::fromNativeSeparators(reportName);
@@ -150,7 +151,7 @@ int main(int argc, char *argv[])
         consoleOut.outToConsole("Start reading and converting files...");
 
         CSVThreadLoader loader;
-        retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString))); //, Qt::DirectConnection
+        retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
         Q_ASSERT_X(retVal, "connect", "connection is not established");
 
         QString value = settings.getMain("SETTINGS/data_has_headers").toString().trimmed();
