@@ -19,7 +19,7 @@ public:
     virtual ~CSVLoader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, pragmaList_t pragmaList,
+    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const pragmaList_t &pragmaList,
               const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
     bool read();
     QString errorString() const { return m_errorString; }
@@ -35,7 +35,7 @@ private:
     CBasicDatabase  m_db;
     TDataItem   m_data;
 
-    bool initDB(const QString &dbFileName, pragmaList_t pragmaList);
+    bool initDB(const QString &dbFileName, const pragmaList_t &pragmaList);
     bool initBuffer();
 
     bool readLargeFile();

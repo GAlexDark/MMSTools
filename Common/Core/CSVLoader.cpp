@@ -1,12 +1,12 @@
 #include "CSVLoader.h"
 #include <QTextStream>
 
-//#include "Debug.h"
+#include "Debug.h"
 #include "DBStrings.h"
 #include "elcUtils.h"
 
 bool
-CSVLoader::initDB(const QString &dbFileName, pragmaList_t pragmaList)
+CSVLoader::initDB(const QString &dbFileName, const pragmaList_t &pragmaList)
 {
     bool retVal = m_db.init("QSQLITE", dbFileName);
     if (retVal) {
@@ -40,6 +40,26 @@ CSVLoader::initDB(const QString &dbFileName, pragmaList_t pragmaList)
             }
         }
     }
+#ifdef QT_DEBUG
+/********************************************************
+ *
+ * this code only for diagnostic in the debug mode
+ *
+ *******************************************************/
+    if (retVal) {
+        TDataList res = m_db.findInDB("PRAGMA journal_mode;", false);
+        QString value = "journal_mode: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
+        __DEBUG( value )
+        res.clear();
+        res = m_db.findInDB("PRAGMA page_size;", false);
+        value = "page_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
+        __DEBUG( value )
+        res.clear();
+        res = m_db.findInDB("PRAGMA cache_size;", false);
+        value = "cache_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
+        __DEBUG( value )
+    }
+#endif
     if (!retVal) {
         m_errorString = m_db.errorString();
         m_db.close();
@@ -238,7 +258,7 @@ CSVLoader::~CSVLoader()
 }
 
 bool
-CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, pragmaList_t pragmaList,
+CSVLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const pragmaList_t &pragmaList,
                      const QByteArray &eolChars, qint64 bufferSize)
 {
     m_eolChars = eolChars;
