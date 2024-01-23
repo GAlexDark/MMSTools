@@ -29,15 +29,17 @@ public:
     ~CBasicSettings();
 
 public:
-    bool init(const QString& appPath, const QString &fileName);
+    bool init(const QString& appPath, const QString &fileName, bool isTerminalMode);
     QVariant getMain(const QString& keyName) const;
     void setMain(const QString& group, const QString& keyName, const QVariant& value);
 
 protected:
     virtual void createDefault(const QString& iniPath) =0;
+    bool        m_isTerminalMode;
 
 private:
     QSettings*  m_settings;
+
 };
 
 #endif // CBASICSETTINGS_H

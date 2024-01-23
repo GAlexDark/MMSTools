@@ -16,17 +16,24 @@
 ****************************************************************************/
 
 #include "CELCSettings.h"
-#include <QCoreApplication>
+#include <QFileInfo>
+
 void
 CELCSettings::createDefault(const QString& iniPath)
 {
     QSettings settings(iniPath, QSettings::IniFormat);
+    QString filePath = QFileInfo(iniPath).absolutePath();
+    QString fileName = QFileInfo(iniPath).baseName();
 
     settings.beginGroup(QStringLiteral("SETTINGS"));
 #ifdef QT_DEBUG
     settings.setValue(QStringLiteral("db_file_name"), QStringLiteral(TEST_SRCDIR"EventLogConverter.db"));
 #else
-    QString dbName = QStringLiteral("%1.db").arg(QCoreApplication::applicationName());
+#ifdef Q_OS_WIN
+    QString dbName = (m_isTerminalMode)? QStringLiteral("%1/%2.db").arg(filePath, fileName) : QStringLiteral("%1.db").arg(fileName);
+#else
+    QString dbName = QStringLiteral("%1/%2.db").arg(filePath, fileName);
+#endif
     settings.setValue(QStringLiteral("db_file_name"), dbName);
 #endif
     settings.setValue(QStringLiteral("clear_on_startup"), QStringLiteral("yes")); // yes | no

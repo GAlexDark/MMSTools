@@ -57,7 +57,7 @@ CELCCSettingsTest::test_init()
 {
     qDebug() << filePath;
     qDebug() << fileName;
-    bool retVal = CELCCSettings::instance().init(filePath, fileName);
+    bool retVal = CELCCSettings::instance().init(filePath, fileName, false);
     QVERIFY(retVal);
 }
 

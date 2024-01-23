@@ -51,7 +51,7 @@ void CELCWSettingsTest::cleanupTestCase()
 
 void CELCWSettingsTest::test_init()
 {
-    bool retVal = ELCWSettings::instance().init(filePath, fileName);
+    bool retVal = ELCWSettings::instance().init(filePath, fileName, false);
     QVERIFY(retVal);
 }
 

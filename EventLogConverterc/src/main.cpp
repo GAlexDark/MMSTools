@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     consoleOut.outToConsole(QStringLiteral("MMS Event Log Conversion Utility starting..."));
 
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
-    if (!CELCCSettings::instance().init(appPath, iniFile)) {
+    if (!CELCCSettings::instance().init(appPath, iniFile, false)) {
         consoleOut.outToConsole(QStringLiteral("The settings class cannot be initialized."));
         return 1;
     }

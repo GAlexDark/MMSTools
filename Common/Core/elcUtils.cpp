@@ -1,12 +1,10 @@
 #include "elcUtils.h"
-#include "qthread.h"
 
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 #include <QStorageInfo>
 #include <QDir>
-#include <QDebug>
 #include <QCoreApplication>
 
 #include "CBasicDatabase.h"

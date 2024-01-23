@@ -17,8 +17,12 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
     QString appName = QCoreApplication::applicationName();
+#ifdef Q_OS_WIN
     QString appPath = a.applicationDirPath();
-    QCoreApplication::addLibraryPath(QStringLiteral("%1/plugins").arg(appPath));
+#else
+    appPath = QStringLiteral("$XDG_DATA_HOME/%1").arg(appName);
+#endif
+    //QCoreApplication::addLibraryPath(QStringLiteral("%1/plugins").arg(appPath));
 
     QTranslator translator;
     bool retVal = translator.load(QLocale(), appName, QLatin1String("_"), QLatin1String(":/i18n"));
@@ -37,8 +41,25 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+
+#ifdef Q_OS_WIN
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
-    if (!ELCWSettings::instance().init(appPath, iniFile)) {
+    quint32 errorCode = 0;
+    retVal = elcUtils::isTerminalServerMode(errorCode);
+    if (retVal && (errorCode == 0)) {
+        appPath = QStringLiteral("%AppData%/Local/%1").arg(appName);
+        elcUtils::expandEnvironmentStrings(appPath);
+    }
+#else
+    QString iniFile = QStringLiteral("%1.conf").arg(appName);
+    elcUtils::expandEnvironmentStrings(appPath);
+    if (appPath.indexOf('$') != -1) { // the $XDG_DATA_HOME is not defined
+        appPath = QStringLiteral("$HOME/.local/share/%1").arg(appName);
+        elcUtils::expandEnvironmentStrings(appPath);
+    }
+    retval = false;
+#endif
+    if (!ELCWSettings::instance().init(appPath, iniFile, retVal)) {
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("The settings Class cannot be initialized."), QMessageBox::Ok);
         return 1;
     }
