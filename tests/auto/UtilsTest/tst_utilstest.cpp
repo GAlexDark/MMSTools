@@ -16,7 +16,7 @@ private slots:
     void test_parseValuesList1();
     void test_parseValuesList2();
     void test_sanitizeValue();
-//    void test_expand_environment_variables();
+    void test_expandEnvironmentStrings();
 };
 
 UtilsTest::UtilsTest() {}
@@ -135,16 +135,25 @@ UtilsTest::test_sanitizeValue()
     retVal = elcUtils::sanitizeValue("Mr-data01");
     QCOMPARE(retVal, false);
 }
-/*
+
 void
-UtilsTest::test_expand_environment_variables()
+UtilsTest::test_expandEnvironmentStrings()
 {
-    QString data = QStringLiteral("$TMP\\dir1\\$OS\\.myconfigfile");
-    elcUtils::expand_environment_variables(data);
+#ifdef Q_OS_WIN
+    QString data = QStringLiteral("%PUBLIC%\\temp\\eventlogreader");
+    elcUtils::expandEnvironmentStrings(data);
     qDebug() << data;
-    QVERIFY(true);
+    QCOMPARE(data, "C:/Users/Public/temp/eventlogreader");
+
+    data = QStringLiteral("%PUBLIC%/temp/eventlogreader");
+    elcUtils::expandEnvironmentStrings(data);
+    qDebug() << data;
+    QCOMPARE(data, "C:/Users/Public/temp/eventlogreader");
+#else
+    QString data = QStringLiteral("$HOME\\temp\\eventlogreader");
+#endif
 }
-*/
+
 QTEST_APPLESS_MAIN(UtilsTest)
 
 #include "tst_utilstest.moc"

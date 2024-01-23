@@ -111,6 +111,7 @@ elcUtils::waitForEndThread(QThread *obj, unsigned long time)
         QCoreApplication::processEvents();
     }
 }
+
 #ifdef Q_OS_WIN
 bool
 elcUtils::isRemoteSessionMode(DWORD &errorCode)
@@ -147,21 +148,18 @@ elcUtils::isTerminalServerMode(DWORD &errorCode)
     }
     return isTSM;
 }
-#endif
 
-#ifdef Q_OS_WIN
 void
-ExpandEnvStrings(QString &path)
+expandEnvStrings_windows(QString &path)
 {
-    QString buf = QDir::fromNativeSeparators(path);
-    DWORD bufSize = ExpandEnvironmentStrings(buf.toStdWString().c_str(), NULL, 0);
+    DWORD bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), NULL, 0);
     if (bufSize != 0) {
         wchar_t *fullPath = new wchar_t [bufSize];
         Q_CHECK_PTR(fullPath);
 
-        if (ExpandEnvironmentStrings(buf.toStdWString().c_str(), fullPath, bufSize) != 0) {
-            buf = QString::fromWCharArray(fullPath).trimmed();
-            path = QDir::fromNativeSeparators(buf);
+        if (ExpandEnvironmentStrings(path.toStdWString().c_str(), fullPath, bufSize) != 0) {
+            path = QString::fromWCharArray(fullPath).trimmed();
+            path = QDir::fromNativeSeparators(path);
         }
         delete[] fullPath;
         fullPath = nullptr;
@@ -169,9 +167,8 @@ ExpandEnvStrings(QString &path)
 }
 #endif
 
-
 void
-expand_environment_variables(QString &path)
+expandEnvStrings_linux(QString &path)
 {
     QRegularExpression envVar("\\$([A-Za-z0-9_]+)");
     QRegularExpressionMatchIterator i = envVar.globalMatch(path);
@@ -182,8 +179,19 @@ expand_environment_variables(QString &path)
         word = '$' + match1.captured(1);
         value = qgetenv(match1.captured(1).toLatin1().data());
         path.replace(word, value, Qt::CaseInsensitive);
+        path = QDir::fromNativeSeparators(path);
         word.clear();
         value.clear();
     }
+}
+
+void
+elcUtils::expandEnvironmentStrings(QString &path)
+{
+#ifdef Q_OS_WIN
+    expandEnvStrings_windows(path);
+#else
+    expandEnvStrings_linux(path);
+#endif
 }
 

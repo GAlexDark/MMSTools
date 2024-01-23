@@ -22,6 +22,6 @@ namespace elcUtils
     bool isRemoteSessionMode(DWORD &errorCode);
     bool isTerminalServerMode(DWORD &errorCode);
 #endif
-//    void expand_environment_variables(QString &path);
+    void expandEnvironmentStrings(QString &path);
 }
 #endif // ELCUTILS_H
