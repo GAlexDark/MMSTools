@@ -9,10 +9,6 @@
 #include <QDebug>
 #include <QCoreApplication>
 
-#ifdef Q_OS_WIN
-    #include "windows.h"
-#endif
-
 #include "CBasicDatabase.h"
 
 const int defaultStorageBlockSize = 32768;
@@ -115,6 +111,43 @@ elcUtils::waitForEndThread(QThread *obj, unsigned long time)
         QCoreApplication::processEvents();
     }
 }
+#ifdef Q_OS_WIN
+bool
+elcUtils::isRemoteSessionMode(DWORD &errorCode)
+{
+    SetLastError(ERROR_SUCCESS);
+    int retVal = GetSystemMetrics(SM_REMOTESESSION);
+    errorCode = GetLastError();
+    return (retVal > 0)? true : false;
+}
+
+bool
+elcUtils::isTerminalServerMode(DWORD &errorCode)
+{
+    SetLastError(ERROR_SUCCESS);
+    OSVERSIONINFOEX osinfo;
+    ZeroMemory(&osinfo, sizeof(OSVERSIONINFOEX));
+    osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    osinfo.wSuiteMask = VER_SUITE_TERMINAL;
+
+    DWORDLONG conditionMask = 0;
+    VER_SET_CONDITION(conditionMask, VER_SUITENAME, VER_AND);
+
+    bool isTSM = false;
+    errorCode = ERROR_SUCCESS;
+    if (VerifyVersionInfo(&osinfo, VER_SUITENAME, conditionMask)) {
+        if (osinfo.wSuiteMask & VER_SUITE_TERMINAL) {
+            isTSM = true;
+        }
+    } else {
+        errorCode = GetLastError();
+        if (errorCode == ERROR_OLD_WIN_VERSION) {
+            errorCode = ERROR_SUCCESS;
+        }
+    }
+    return isTSM;
+}
+#endif
 
 #ifdef Q_OS_WIN
 void
