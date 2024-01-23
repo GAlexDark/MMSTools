@@ -11,6 +11,10 @@
 
 #include "CBasicDatabase.h"
 
+#ifdef Q_OS_WIN
+#include "windows.h"
+#endif
+
 const int defaultStorageBlockSize = 32768;
 
 bool
@@ -114,7 +118,7 @@ elcUtils::waitForEndThread(QThread *obj, unsigned long time)
 
 #ifdef Q_OS_WIN
 bool
-elcUtils::isRemoteSessionMode(DWORD &errorCode)
+elcUtils::isRemoteSessionMode(quint32 &errorCode)
 {
     SetLastError(ERROR_SUCCESS);
     int retVal = GetSystemMetrics(SM_REMOTESESSION);
@@ -123,7 +127,7 @@ elcUtils::isRemoteSessionMode(DWORD &errorCode)
 }
 
 bool
-elcUtils::isTerminalServerMode(DWORD &errorCode)
+elcUtils::isTerminalServerMode(quint32 &errorCode)
 {
     SetLastError(ERROR_SUCCESS);
     OSVERSIONINFOEX osinfo;
@@ -135,8 +139,8 @@ elcUtils::isTerminalServerMode(DWORD &errorCode)
     VER_SET_CONDITION(conditionMask, VER_SUITENAME, VER_AND);
 
     bool isTSM = false;
-    errorCode = ERROR_SUCCESS;
     if (VerifyVersionInfo(&osinfo, VER_SUITENAME, conditionMask)) {
+        errorCode = ERROR_SUCCESS;
         if (osinfo.wSuiteMask & VER_SUITE_TERMINAL) {
             isTSM = true;
         }

@@ -5,10 +5,6 @@
 #include <QStringList>
 #include <QThread>
 
-#ifdef Q_OS_WIN
-    #include "windows.h"
-#endif
-
 namespace elcUtils
 {
     bool sanitizeValue(const QString &value);
@@ -19,8 +15,8 @@ namespace elcUtils
     QString getFormattedDateTime(const QString &dateTime);
     void waitForEndThread(QThread *obj, unsigned long time);
 #ifdef Q_OS_WIN
-    bool isRemoteSessionMode(DWORD &errorCode);
-    bool isTerminalServerMode(DWORD &errorCode);
+    bool isRemoteSessionMode(quint32 &errorCode);
+    bool isTerminalServerMode(quint32 &errorCode);
 #endif
     void expandEnvironmentStrings(QString &path);
 }
