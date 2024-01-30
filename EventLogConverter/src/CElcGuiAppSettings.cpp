@@ -6,7 +6,7 @@
 *  Event Log Conversion Utility
 *  Event Log Conversion GUI Utility
 *
-*  Module name: CELCSettings.cpp
+*  Module name: CElcGuiAppSettings.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -16,25 +16,20 @@
 *
 ****************************************************************************/
 
-#include "CELCWSettings.h"
+#include "CElcGuiAppSettings.h"
+#include "elcUtils.h"
 
-static ELCWSettings g_elcwSettings;
+static CElcGuiAppSettings g_elcGuiSettings;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
-#else
-    QVariant nullStringValue = QVariant(QString());
-#endif
-
-ELCWSettings& ELCWSettings::instance()
+CElcGuiAppSettings& CElcGuiAppSettings::instance()
 {
-    return g_elcwSettings;
+    return g_elcGuiSettings;
 }
 
 void
-ELCWSettings::createDefault(const QString& iniPath)
+CElcGuiAppSettings::createDefault(const QString& iniPath)
 {
-    CELCSettings::createDefault(iniPath);
+    CElcCommonSettings::createDefault(iniPath);
 
     QSettings settings(iniPath, QSettings::IniFormat);
     settings.beginGroup(QStringLiteral("HISTORY"));

@@ -20,7 +20,7 @@
 #include <QFileInfo>
 
 CBasicSettings::CBasicSettings()
-    : m_isTerminalMode(false), m_settings(nullptr)
+    : m_isRdsEnabled(false), m_settings(nullptr)
 {}
 
 CBasicSettings::~CBasicSettings()
@@ -34,7 +34,7 @@ CBasicSettings::~CBasicSettings()
 bool
 CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTerminalMode)
 {
-    m_isTerminalMode = isTerminalMode;
+    m_isRdsEnabled = isTerminalMode;
     QString iniFileName = QDir(appPath).filePath(fileName);
 
     QFileInfo fileInfo(iniFileName);

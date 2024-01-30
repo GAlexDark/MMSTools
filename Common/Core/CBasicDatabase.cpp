@@ -88,11 +88,6 @@ CBasicDatabase::~CBasicDatabase()
     _Deinit();
 }
 
-/**
- * @brief init member
- * @param dbDriverName - the DB driver name
- * @param connectionString - for the SQLite DB this is the path to the DB file
- */
 bool
 CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
 {
@@ -240,10 +235,11 @@ CBasicDatabase::prepareRequest(const QString &query)
 }
 
 bool
-CBasicDatabase::execRequest(TDataItem data)
+CBasicDatabase::execRequest(TDataItem *data)
 {
-    TDataItem::iterator itStart = data.begin();
-    TDataItem::iterator itEnd = data.end();
+    Q_CHECK_PTR(data);
+    TDataItem::iterator itStart = data->begin();
+    TDataItem::iterator itEnd = data->end();
 
     while (itStart != itEnd) {
         m_SQLRes->bindValue (itStart.key(), itStart.value());
@@ -255,12 +251,13 @@ CBasicDatabase::execRequest(TDataItem data)
 }
 
 bool
-CBasicDatabase::insertToDB(const QString &query, TDataItem data)
+CBasicDatabase::insertToDB(const QString &query, TDataItem *data)
 {
+    Q_CHECK_PTR(data);
     bool retVal = prepareRequest(query);
     if (retVal) {
-        TDataItem::iterator itStart = data.begin();
-        TDataItem::iterator itEnd = data.end();
+        TDataItem::iterator itStart = data->begin();
+        TDataItem::iterator itEnd = data->end();
 
         while (itStart != itEnd) {
             m_SQLRes->bindValue (itStart.key(), itStart.value());

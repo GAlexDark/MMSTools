@@ -1,4 +1,4 @@
-#include "CSVParser.h"
+#include "CEventLogParser.h"
 #include <QRegularExpression>
 
 //#include "Debug.h"
@@ -8,7 +8,7 @@ QRegularExpression reSuccessLogon("^username:\\s(.*?),@N@\\s\\stype:\\s(.*?),@N@
 QRegularExpression reFailedLogon("^type:\\s(.*?)@N@\\s\\sip\\saddress:\\s(.*?)$");
 
 void
-CSVParser::removeQuote(QString &data, QChar quoteChar)
+CEventLogParser::removeQuote(QString &data, QChar quoteChar)
 {    
     if (!data.isEmpty()) {
         if (data.startsWith(quoteChar)) {
@@ -22,7 +22,7 @@ CSVParser::removeQuote(QString &data, QChar quoteChar)
 }
 
 void
-CSVParser::parseHeaderString(QChar quoteChar)
+CEventLogParser::parseHeaderString(QChar quoteChar)
 {
     qsizetype from = 0;
     qsizetype next = m_header.indexOf(',', from);
@@ -47,14 +47,14 @@ CSVParser::parseHeaderString(QChar quoteChar)
 
 //=================================================================================
 void
-CSVParser::analizeIPAdresses(const QString &ipaddresses)
+CEventLogParser::analizeIPAdresses(const QString &ipaddresses)
 {
     qsizetype pos = ipaddresses.indexOf(',');
     if (pos != -1) {
         QString firstip = ipaddresses.mid(0, pos).trimmed();
         QString secondip = ipaddresses.mid(pos + 1).trimmed();
-        bool isPrivateFirstIP = firstip.startsWith(m_internalipFirstOctet);
-        bool isPrivateSecondIP = secondip.startsWith(m_internalipFirstOctet);
+        bool isPrivateFirstIP = firstip.startsWith(m_internalIpFirstOctet);
+        bool isPrivateSecondIP = secondip.startsWith(m_internalIpFirstOctet);
 
         if (isPrivateFirstIP && isPrivateSecondIP) {
             m_externalip.clear();
@@ -69,7 +69,7 @@ CSVParser::analizeIPAdresses(const QString &ipaddresses)
             }
         } // if &&
     } else {
-        if (ipaddresses.startsWith(m_internalipFirstOctet)) {
+        if (ipaddresses.startsWith(m_internalIpFirstOctet)) {
             m_externalip.clear();
             m_internalip = ipaddresses;
         } else {
@@ -80,7 +80,7 @@ CSVParser::analizeIPAdresses(const QString &ipaddresses)
 }
 
 bool
-CSVParser::parseUserSuccessLogonDetails()
+CEventLogParser::parseUserSuccessLogonDetails()
 {
     QRegularExpressionMatch match = reSuccessLogon.match(m_details);
     bool retVal = match.hasMatch();
@@ -96,7 +96,7 @@ CSVParser::parseUserSuccessLogonDetails()
 }
 
 bool
-CSVParser::parseUserFailedLogonDetails()
+CEventLogParser::parseUserFailedLogonDetails()
 {
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
     m_username1.clear();
@@ -115,7 +115,7 @@ CSVParser::parseUserFailedLogonDetails()
 }
 
 bool
-CSVParser::parseUserLogonDetails()
+CEventLogParser::parseUserLogonDetails()
 {
     bool retVal = parseUserSuccessLogonDetails();
     if (!retVal) {
@@ -124,24 +124,19 @@ CSVParser::parseUserLogonDetails()
     return retVal;
 }
 
-/*
-CSVParser::CSVParser(const QString &internalipFirstOctet)
-    : m_internalipFirstOctet(internalipFirstOctet)
-{}
-*/
-
 void
-CSVParser::init(const QString &internalipFirstOctet)
+CEventLogParser::init(const QString &internalIpFirstOctet)
 {
-    m_internalipFirstOctet = internalipFirstOctet;
+    m_internalIpFirstOctet = internalIpFirstOctet;
 }
 
-void
-CSVParser::parse(const QString &line)
+bool
+CEventLogParser::parse(const QString &line)
 {
     m_details = line;
     m_details.replace("\n", "@N@", Qt::CaseInsensitive);
 
+    bool retVal = false;
     QRegularExpressionMatch match = reHeader.match(m_details);
     if (match.hasMatch()) {
         m_header = match.captured(0);
@@ -151,9 +146,14 @@ CSVParser::parse(const QString &line)
         removeQuote(m_details, '"');
 
         m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
-        m_timestamp.setTimeSpec(Qt::UTC);
-        m_timestamptz = m_timestamp.toLocalTime();
-
+        if (m_timestamp.isValid()) {
+            m_timestamp.setTimeSpec(Qt::UTC);
+            m_timestamptz = m_timestamp.toLocalTime();
+            retVal = true;
+        } else {
+            m_timestamptz = QDateTime();
+            m_errorString = QStringLiteral("Error converting Timestamp value: %1").arg(m_timestampISO8601);
+        }
         if (m_details.indexOf("ip address:") != -1) {
             (void)parseUserLogonDetails();
         } else {
@@ -162,11 +162,14 @@ CSVParser::parse(const QString &line)
             m_externalip.clear();
             m_internalip.clear();
         }
+    } else {
+        m_errorString = QStringLiteral("Wrong header.\nDetails: %1").arg(m_details);
     }
+    return retVal;
 }
 
 void
-CSVParser::getParsedData(QString &username,
+CEventLogParser::getParsedData(QString &username,
                    QString &timestampISO8601,
                    QString &requestID,
                    QString &type,

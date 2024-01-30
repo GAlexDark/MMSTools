@@ -11,11 +11,11 @@ CONFIG -= app_bundle
 INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CSVParser.h
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.h
 
 SOURCES +=  \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CSVParser.cpp \
-    tst_csvparser.cpp
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.cpp \
+    tst_ceventlogparsertest.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 OTHER_FILES += data/*

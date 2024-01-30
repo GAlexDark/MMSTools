@@ -14,14 +14,14 @@ INCLUDEPATH += \
 
 HEADERS += \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicSettings.h \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CELCSettings.h \
-    $${PROJECT_ROOT_DIRECTORY}/EventLogConverter/src/CELCWSettings.h
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CElcCommonSettings.h \
+    $${PROJECT_ROOT_DIRECTORY}/EventLogConverter/src/CElcGuiAppSettings.h
 
 SOURCES += \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicSettings.cpp \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CELCSettings.cpp \
-    $${PROJECT_ROOT_DIRECTORY}/EventLogConverter/src/CELCWSettings.cpp \
-    tst_celcwsettingstest.cpp
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CElcCommonSettings.cpp \
+    $${PROJECT_ROOT_DIRECTORY}/EventLogConverter/src/CElcGuiAppSettings.cpp \
+    tst_celcguiappsettingstest.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"

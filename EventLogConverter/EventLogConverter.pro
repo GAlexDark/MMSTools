@@ -29,29 +29,29 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
     ../Common/Core/CBasicDatabase.h \
+    ../Common/Core/CElcCommonSettings.h \
+    ../Common/Core/CEventLogParser.h \
     ../Common/Core/DBStrings.h \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSVLoader.h \
-    ../Common/Core/CSVParser.h \
     ../Common/Core/CSingleApplication.h \
     ../Common/Core/CBasicSettings.h \
-    ../Common/Core/CELCSettings.h \
     ../Common/Core/elcUtils.h \
     ../Common/Core/stdafx.h \
-    src/CELCWSettings.h \
+    src/CElcGuiAppSettings.h \
     src/OptionsDialog.h \
     src/mainwindow.h
 
 SOURCES += \
     ../Common/Core/CBasicDatabase.cpp \
+    ../Common/Core/CElcCommonSettings.cpp \
+    ../Common/Core/CEventLogParser.cpp \
     ../Common/Core/CReportBuilder.cpp \
     ../Common/Core/CSVLoader.cpp \
-    ../Common/Core/CSVParser.cpp \
     ../Common/Core/CSingleApplication.cpp \
     ../Common/Core/CBasicSettings.cpp \
-    ../Common/Core/CELCSettings.cpp \
     ../Common/Core/elcUtils.cpp \
-    src/CELCWSettings.cpp \
+    src/CElcGuiAppSettings.cpp \
     src/OptionsDialog.cpp \
     src/main.cpp \
     src/mainwindow.cpp
@@ -77,7 +77,7 @@ RC_ICONS = img/elc.ico
 MAJOR_VER = 2
 MINOR_VER = 0
 PATCH_VER = 0
-BUILD_VER = 17
+BUILD_VER = 19
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

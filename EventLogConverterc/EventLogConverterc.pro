@@ -38,28 +38,28 @@ HEADERS += \
     ../Common/Core/DBStrings.h \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSVLoader.h \
-    ../Common/Core/CSVParser.h \
+    ../Common/Core/CEventLogParser.h \
     ../Common/Core/CSingleApplication.h \
     ../Common/Core/CBasicSettings.h \
-    ../Common/Core/CELCSettings.h \
+    ../Common/Core/CElcCommonSettings.h \
     ../Common/Core/stdafx.h \
     ../Common/Core/elcUtils.h \
     src/CConsoleOutput.h \
-    src/CELCCSettings.h \
     src/CDataSourceList.h \
+    src/CElcConsoleAppSettings.h \
     src/QCommandLineParserHelper.h
 
 SOURCES += \
     ../Common/Core/CBasicDatabase.cpp \
     ../Common/Core/CReportBuilder.cpp \
     ../Common/Core/CSVLoader.cpp \
-    ../Common/Core/CSVParser.cpp \
+    ../Common/Core/CEventLogParser.cpp \
     ../Common/Core/CSingleApplication.cpp \
     ../Common/Core/CBasicSettings.cpp \
-    ../Common/Core/CELCSettings.cpp \
+    ../Common/Core/CElcCommonSettings.cpp \
     ../Common/Core/elcUtils.cpp \
-    src/CELCCSettings.cpp \
     src/CDataSourceList.cpp \
+    src/CElcConsoleAppSettings.cpp \
     src/QCommandLineParserHelper.cpp \
     src/main.cpp
 
@@ -71,7 +71,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 0
-BUILD_VER = 17
+BUILD_VER = 18
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

@@ -1,14 +1,14 @@
-#ifndef CSVPARSER_H
-#define CSVPARSER_H
+#ifndef CEVENTLOGPARSER_H
+#define CEVENTLOGPARSER_H
 
 #include <QObject>
 #include <QDateTime>
 
-class CSVParser
+class CEventLogParser
 {
 public:
-    void init(const QString &internalipFirstOctet);
-    void parse(const QString& line);
+    void init(const QString &internalIpFirstOctet);
+    bool parse(const QString& line);
     QString errorString() const { return m_errorString; }
 
     void getParsedData(QString &username,
@@ -23,6 +23,9 @@ public:
                        QDateTime &timestampTZ);
 
 private:
+    QString     m_internalIpFirstOctet;
+    QString     m_errorString;
+
     QDateTime   m_timestamp,
                 m_timestamptz;
     QString     m_header,
@@ -36,8 +39,6 @@ private:
                 m_internalip,
                 m_requestID,
                 m_type;
-    QString     m_errorString;
-    QString     m_internalipFirstOctet;
 
     void removeQuote(QString &data, QChar quoteChar);
     void parseHeaderString(QChar quoteChar);
@@ -49,4 +50,4 @@ private:
 
 };
 
-#endif // CSVPARSER_H
+#endif // CEVENTLOGPARSER_H

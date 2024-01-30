@@ -18,11 +18,29 @@ const int defaultStorageBlockSize = 32768;
 bool
 elcUtils::sanitizeValue(const QString &value)
 {
+    return elcUtils::sanitizeValue("^([a-zA-Z0-9_]+)$", value);
+}
+
+bool
+elcUtils::sanitizeValue(const QString &pattern, const QString &value)
+{
     bool retVal = false;
-    static QRegularExpression mask("^([a-zA-Z0-9_]+)$");
+    static QRegularExpression mask(pattern);
     QRegularExpressionMatch match = mask.match(value);
     if (match.hasMatch()) {
         retVal = true;
+    }
+    return retVal;
+}
+
+QString
+elcUtils::sanitizeValue(const QString &value, const QStringList &alloedValues, const QString &defaultValue)
+{
+    QString retVal;
+    if (value.isEmpty()) {
+        retVal = defaultValue;
+    } else {
+        retVal = (alloedValues.contains(value, Qt::CaseInsensitive))? value : defaultValue;
     }
     return retVal;
 }
@@ -96,7 +114,7 @@ elcUtils::getStorageBlockSize(const QString &file)
     if (storage.isValid()) {
         blockSize = storage.blockSize();
     }
-    return (blockSize != -1)? blockSize : defaultStorageBlockSize;
+    return (blockSize == -1)? defaultStorageBlockSize : blockSize;
 }
 
 QString
@@ -115,19 +133,48 @@ elcUtils::waitForEndThread(QThread *obj, unsigned long time)
 }
 
 #ifdef Q_OS_WIN
-bool
-elcUtils::isRemoteSessionMode(quint32 &errorCode)
+
+QString
+elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
 {
-    SetLastError(ERROR_SUCCESS);
-    int retVal = GetSystemMetrics(SM_REMOTESESSION);
-    errorCode = GetLastError();
-    return (retVal > 0)? true : false;
+    LPWSTR buf = nullptr;
+    QString retVal;
+    quint32 messageFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                           FORMAT_MESSAGE_FROM_SYSTEM |
+                           FORMAT_MESSAGE_IGNORE_INSERTS;
+    quint32 len = FormatMessage(messageFlags,
+                                NULL,
+                                errorCode,
+                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                reinterpret_cast<LPWSTR>(&buf),
+                                0, NULL);
+    if (len > 0) {
+        retVal = QString::fromWCharArray(buf);
+        LocalFree(buf);
+    } else {
+        retVal = QStringLiteral("Unknown Windows API error: %1").arg(errorCode);
+    }
+    return retVal;
 }
 
 bool
-elcUtils::isTerminalServerMode(quint32 &errorCode)
+elcUtils::isRdpMode(quint32 &errorCode)
 {
-    SetLastError(ERROR_SUCCESS);
+    SetLastErrorEx(ERROR_SUCCESS, 0);
+    bool retVal = true;
+    errorCode = ERROR_SUCCESS;
+    if (GetSystemMetrics(SM_REMOTESESSION) == 0) {
+        retVal = false;
+        errorCode = GetLastError();
+    }
+    return retVal;
+}
+
+bool
+elcUtils::isRdsMode(quint32 &errorCode)
+{
+    //ref: https://swissdelphicenter.com/en/printcode.php?id=1968
+    SetLastErrorEx(ERROR_SUCCESS, 0);
     OSVERSIONINFOEX osinfo;
     ZeroMemory(&osinfo, sizeof(OSVERSIONINFOEX));
     osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
@@ -136,11 +183,11 @@ elcUtils::isTerminalServerMode(quint32 &errorCode)
     DWORDLONG conditionMask = 0;
     VER_SET_CONDITION(conditionMask, VER_SUITENAME, VER_AND);
 
-    bool isTSM = false;
+    bool isRds = false;
     if (VerifyVersionInfo(&osinfo, VER_SUITENAME, conditionMask)) {
         errorCode = ERROR_SUCCESS;
         if (osinfo.wSuiteMask & VER_SUITE_TERMINAL) {
-            isTSM = true;
+            isRds = true;
         }
     } else {
         errorCode = GetLastError();
@@ -148,18 +195,20 @@ elcUtils::isTerminalServerMode(quint32 &errorCode)
             errorCode = ERROR_SUCCESS;
         }
     }
-    return isTSM;
+    return isRds;
 }
 
 void
 expandEnvStrings_windows(QString &path)
 {
+    SetLastErrorEx(ERROR_SUCCESS, 0);
     DWORD bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), NULL, 0);
     if (bufSize != 0) {
         wchar_t *fullPath = new wchar_t [bufSize];
         Q_CHECK_PTR(fullPath);
 
-        if (ExpandEnvironmentStrings(path.toStdWString().c_str(), fullPath, bufSize) != 0) {
+        bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), fullPath, bufSize);
+        if (bufSize != 0) {
             path = QString::fromWCharArray(fullPath).trimmed();
             path = QDir::fromNativeSeparators(path);
         }
@@ -196,4 +245,3 @@ elcUtils::expandEnvironmentStrings(QString &path)
     expandEnvStrings_linux(path);
 #endif
 }
-

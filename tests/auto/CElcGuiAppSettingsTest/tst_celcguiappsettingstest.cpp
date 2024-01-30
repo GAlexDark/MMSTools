@@ -1,20 +1,20 @@
 #include <QCoreApplication>
 #include <QtTest>
 
-#include "CELCWSettings.h"
+#include "CElcGuiAppSettings.h"
 
 // add necessary includes here
 
 const QString fileName = QStringLiteral("EventLogConverter.ini");
 const QString filePath = QStringLiteral(SRCDIR"data");
 
-class CELCWSettingsTest : public QObject
+class CElcGuiAppSettingsTest : public QObject
 {
     Q_OBJECT
 
 public:
-    CELCWSettingsTest();
-    ~CELCWSettingsTest();
+    CElcGuiAppSettingsTest();
+    ~CElcGuiAppSettingsTest();
 
 private slots:
     void initTestCase();
@@ -25,9 +25,9 @@ private slots:
     void test_checkLastDir();
 };
 
-CELCWSettingsTest::CELCWSettingsTest() {}
+CElcGuiAppSettingsTest::CElcGuiAppSettingsTest() {}
 
-CELCWSettingsTest::~CELCWSettingsTest() {}
+CElcGuiAppSettingsTest::~CElcGuiAppSettingsTest() {}
 
 void
 removeIniFile()
@@ -39,24 +39,24 @@ removeIniFile()
     }
 }
 
-void CELCWSettingsTest::initTestCase()
+void CElcGuiAppSettingsTest::initTestCase()
 {
     removeIniFile();
 }
 
-void CELCWSettingsTest::cleanupTestCase()
+void CElcGuiAppSettingsTest::cleanupTestCase()
 {
     removeIniFile();
 }
 
-void CELCWSettingsTest::test_init()
+void CElcGuiAppSettingsTest::test_init()
 {
-    bool retVal = ELCWSettings::instance().init(filePath, fileName, false);
+    bool retVal = CElcGuiAppSettings::instance().init(filePath, fileName, false);
     QVERIFY(retVal);
 }
 
 void
-CELCWSettingsTest::test_fileExists()
+CElcGuiAppSettingsTest::test_fileExists()
 {
     QString fp = QDir(filePath).filePath(fileName);
     qDebug() << fp;
@@ -66,23 +66,23 @@ CELCWSettingsTest::test_fileExists()
 }
 
 void
-CELCWSettingsTest::test_getDBName()
+CElcGuiAppSettingsTest::test_getDBName()
 {
-    ELCWSettings &settings = ELCWSettings::instance();
+    CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
     QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 
 void
-CELCWSettingsTest::test_checkLastDir()
+CElcGuiAppSettingsTest::test_checkLastDir()
 {
-    ELCWSettings &settings = ELCWSettings::instance();
+    CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
     QString lastDirData = QStringLiteral(SRCDIR"data");
     settings.setMain("HISTORY", "last_dir", lastDirData);
     QString lastDir = settings.getMain("HISTORY/last_dir").toString().trimmed();
     QCOMPARE(lastDir, lastDirData);
 }
 
-QTEST_MAIN(CELCWSettingsTest)
+QTEST_MAIN(CElcGuiAppSettingsTest)
 
-#include "tst_celcwsettingstest.moc"
+#include "tst_celcguiappsettingstest.moc"

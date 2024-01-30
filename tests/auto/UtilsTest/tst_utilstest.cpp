@@ -17,6 +17,9 @@ private slots:
     void test_parseValuesList2();
     void test_sanitizeValue();
     void test_expandEnvironmentStrings();
+#ifdef Q_OS_WIN
+    void test_getWindowsApiErrorMessage();
+#endif
 };
 
 UtilsTest::UtilsTest() {}
@@ -153,6 +156,16 @@ UtilsTest::test_expandEnvironmentStrings()
     QString data = QStringLiteral("$HOME\\temp\\eventlogreader");
 #endif
 }
+
+#ifdef Q_OS_WIN
+void
+UtilsTest::test_getWindowsApiErrorMessage()
+{
+
+    QString retVal = elcUtils::getWindowsApiErrorMessage(0);
+    QCOMPARE(retVal.length(), 29);
+}
+#endif
 
 QTEST_APPLESS_MAIN(UtilsTest)
 

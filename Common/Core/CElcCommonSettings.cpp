@@ -6,7 +6,7 @@
 *  Event Log Conversion Utility
 *  Common module
 *
-*  Module name: CELCSettings.cpp
+*  Module name: CElcCommonSettings.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -15,11 +15,11 @@
 *
 ****************************************************************************/
 
-#include "CELCSettings.h"
+#include "CElcCommonSettings.h"
 #include <QFileInfo>
 
 void
-CELCSettings::createDefault(const QString& iniPath)
+CElcCommonSettings::createDefault(const QString& iniPath)
 {
     QSettings settings(iniPath, QSettings::IniFormat);
     QString filePath = QFileInfo(iniPath).absolutePath();
@@ -30,9 +30,9 @@ CELCSettings::createDefault(const QString& iniPath)
     settings.setValue(QStringLiteral("db_file_name"), QStringLiteral(TEST_SRCDIR"EventLogConverter.db"));
 #else
 #ifdef Q_OS_WIN
-    QString dbName = (m_isTerminalMode)? QStringLiteral("%1/%2.db").arg(filePath, fileName) : QStringLiteral("%1.db").arg(fileName);
+    QString dbName = (m_isRdsEnabled)? QStringLiteral("%1/%2.db").arg(filePath, fileName) : QStringLiteral("%1.db").arg(fileName);
 #else
-    QString dbName = QStringLiteral("%1/%2.db").arg(filePath, fileName);
+    QString dbName = QStringLiteral("$HOME/.local/share/%1/%1.db").arg(fileName);
 #endif
     settings.setValue(QStringLiteral("db_file_name"), dbName);
 #endif

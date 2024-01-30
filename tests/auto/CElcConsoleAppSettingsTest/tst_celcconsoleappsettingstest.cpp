@@ -2,19 +2,19 @@
 #include <QFile>
 #include <QDebug>
 
-#include "CELCCSettings.h"
+#include "CElcConsoleAppSettings.h"
 
 // add necessary includes here
 
 const QString fileName = QStringLiteral("EventLogConverterc.ini");
 const QString filePath = QStringLiteral(SRCDIR"data");
 
-class CELCCSettingsTest : public QObject
+class CElcConsoleAppSettingsTest : public QObject
 {
     Q_OBJECT
 public:
-    CELCCSettingsTest();
-    ~CELCCSettingsTest();
+    CElcConsoleAppSettingsTest();
+    ~CElcConsoleAppSettingsTest();
 
 private slots:
     void initTestCase();
@@ -25,9 +25,9 @@ private slots:
     //void test_getMode();
 };
 
-CELCCSettingsTest::CELCCSettingsTest() {}
+CElcConsoleAppSettingsTest::CElcConsoleAppSettingsTest() {}
 
-CELCCSettingsTest::~CELCCSettingsTest() {}
+CElcConsoleAppSettingsTest::~CElcConsoleAppSettingsTest() {}
 
 void
 removeIniFile()
@@ -41,28 +41,28 @@ removeIniFile()
 }
 
 void
-CELCCSettingsTest::initTestCase()
+CElcConsoleAppSettingsTest::initTestCase()
 {
     removeIniFile();
 }
 
 void
-CELCCSettingsTest::cleanupTestCase()
+CElcConsoleAppSettingsTest::cleanupTestCase()
 {
     removeIniFile();
 }
 
 void
-CELCCSettingsTest::test_init()
+CElcConsoleAppSettingsTest::test_init()
 {
     qDebug() << filePath;
     qDebug() << fileName;
-    bool retVal = CELCCSettings::instance().init(filePath, fileName, false);
+    bool retVal = CElcConsoleAppSettings::instance().init(filePath, fileName, false);
     QVERIFY(retVal);
 }
 
 void
-CELCCSettingsTest::test_fileExists()
+CElcConsoleAppSettingsTest::test_fileExists()
 {
     QString fp = QDir(filePath).filePath(fileName);
     qDebug() << fp;
@@ -72,13 +72,13 @@ CELCCSettingsTest::test_fileExists()
 }
 
 void
-CELCCSettingsTest::test_getDBName()
+CElcConsoleAppSettingsTest::test_getDBName()
 {
-    CELCCSettings &settings = CELCCSettings::instance();
+    CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
     QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 
-QTEST_APPLESS_MAIN(CELCCSettingsTest)
+QTEST_APPLESS_MAIN(CElcConsoleAppSettingsTest)
 
-#include "tst_celccsettings.moc"
+#include "tst_celcconsoleappsettingstest.moc"

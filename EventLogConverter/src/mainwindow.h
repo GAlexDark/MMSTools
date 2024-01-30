@@ -23,6 +23,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QLabel         *m_state;
+    QLabel         *m_mode; // RDS | endpoint (single user)
     QString         m_lastDir;
     QString         m_dbName;
     QStringList     m_fileList;
@@ -36,6 +37,7 @@ private:
     void enableButtons();
 
     void setStateText(const QString &state);
+    void setModeText(const QString &mode);
 
     bool showOptionsDialog( QStringList &includeUsersList, QStringList &excludeUsersList);
 

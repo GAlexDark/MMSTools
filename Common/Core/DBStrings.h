@@ -14,7 +14,7 @@ internalip) VALUES (:username, :timestampISO8601, :requestid, :type, \
 
 inline const QString createEventLogTable = QStringLiteral("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \
 timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, \
-type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME, \
+type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME NOT NULL, \
 PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);");
 
 inline const QString pragmaJournalMode = QStringLiteral("PRAGMA journal_mode = %1;");

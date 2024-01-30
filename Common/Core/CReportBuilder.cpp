@@ -11,18 +11,23 @@ CReportBuilder::~CReportBuilder()
 {
     delete m_db;
     m_db = nullptr;
+
+    m_includedUsernamesList.clear();
+    m_excludedUsernamesList.clear();
 }
 
 bool
-CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList)
+CReportBuilder::init(const QString &dbFileName, const QString &reportName, QStringList *excludedUsernamesList, QStringList *includedUsernamesList)
 {
+    Q_CHECK_PTR(excludedUsernamesList);
+    Q_CHECK_PTR(includedUsernamesList);
     bool retVal = true;
     try {
         m_db = new CBasicDatabase();
 
         m_reportFileName = reportName;
-        m_excludedUsernamesList = excludedUsernamesList;
-        m_includedUsernamesList = includedUsernamesList;
+        m_excludedUsernamesList = *excludedUsernamesList;
+        m_includedUsernamesList = *includedUsernamesList;
 
         retVal = m_db->init("QSQLITE", dbFileName);
         if (retVal) {
@@ -163,8 +168,10 @@ CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(fa
 {}
 
 bool
-CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList &excludedUsernamesList, const QStringList &includedUsernamesList)
+CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, QStringList *excludedUsernamesList, QStringList *includedUsernamesList)
 {
+    Q_CHECK_PTR(excludedUsernamesList);
+    Q_CHECK_PTR(includedUsernamesList);
     return m_builser.init(dbFileName, reportName, excludedUsernamesList, includedUsernamesList);
 }
 

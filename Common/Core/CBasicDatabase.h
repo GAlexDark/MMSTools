@@ -26,7 +26,7 @@
 #include <QList>
 
 
-typedef QMap<QString, QVariant> TDataItem; //список полей для bindValue (в формате ":holder_name", "value")
+typedef QMap<QString, QVariant> TDataItem;
 typedef QList<QStringList> TDataList;
 
 class CBasicDatabase
@@ -40,6 +40,11 @@ public:
     CBasicDatabase *getDBinstance() { return this; }
     QString errorString() const { return m_errorString; }
 
+/*!
+ * bool CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString).
+ * Inited the DB connection with the DB driver name \a dbDriverName and the \a connectionString.
+ * If used QSLite, the \a connectionString is the path to the DB file.
+ */
     bool init(const QString &dbDriverName, const QString &connectionString);
     bool open();
     void close();
@@ -51,9 +56,9 @@ public:
     bool truncateTable(const QString &tableName);
     // add info in the DB
     bool prepareRequest(const QString &query);
-    bool execRequest(TDataItem data);
+    bool execRequest(TDataItem *data);
 
-    bool insertToDB(const QString &query, TDataItem data);
+    bool insertToDB(const QString &query, TDataItem *data);
     // search info in the DB
     TDataList findInDB(const QString &query, bool addColumnHeaders = true);
 

@@ -2,21 +2,21 @@
 #include <QFile>
 #include <QDateTime>
 
-#include "CSVParser.h"
+#include "CEventLogParser.h"
 #include "qtestcase.h"
 
 // add necessary includes here
 
-class CSVParserTest : public QObject
+class CEventLogParserTest : public QObject
 {
     Q_OBJECT
 
-public:
-    CSVParserTest();
-    ~CSVParserTest();
+//public:
+    //    CEventLogParserTest();
+    //    ~CEventLogParserTest();
 
 private:
-    CSVParser m_parser;
+    CEventLogParser m_parser;
 
     QString m_username,
             m_timestampISO8601,
@@ -41,11 +41,11 @@ private slots:
     void test_DateTimeFormats();
 };
 
-CSVParserTest::CSVParserTest() {}
+//CSVParserTest::CSVParserTest() {}
 
-CSVParserTest::~CSVParserTest() {}
+//CEventLogParserTest::~CEventLogParserTest() {}
 
-void CSVParserTest::initTestCase()
+void CEventLogParserTest::initTestCase()
 {
     // All fields are not empty
     QFile file(SRCDIR"data/testcase_success_wAll_ips.csv");
@@ -65,7 +65,7 @@ void CSVParserTest::initTestCase()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 }
 
-void CSVParserTest::test_successAuth_wALL_ips() {
+void CEventLogParserTest::test_successAuth_wALL_ips() {
     qDebug() << "Testcase: Success auth with all IPs (internal + external)";
 
     initTestCase();
@@ -82,7 +82,7 @@ void CSVParserTest::test_successAuth_wALL_ips() {
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
 }
 
-void CSVParserTest::test_failedAuth() {
+void CEventLogParserTest::test_failedAuth() {
     qDebug() << "Testcase: Failed auth";
 
     initTestCase(); // for checking empty fields
@@ -114,7 +114,7 @@ void CSVParserTest::test_failedAuth() {
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
 }
 
-void CSVParserTest::test_successAuth_wINTERNAL_ips() {
+void CEventLogParserTest::test_successAuth_wINTERNAL_ips() {
     qDebug() << "Testcase: Success auth with internal IPs only";
 
     initTestCase(); // for checking empty fields
@@ -146,7 +146,7 @@ void CSVParserTest::test_successAuth_wINTERNAL_ips() {
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:06.777"));
 }
 
-void CSVParserTest::test_successAuth_wEXTERNAL_ips() {
+void CEventLogParserTest::test_successAuth_wEXTERNAL_ips() {
     qDebug() << "Testcase: Success auth with external IPs only";
 
     initTestCase(); // for checking empty fields
@@ -178,7 +178,7 @@ void CSVParserTest::test_successAuth_wEXTERNAL_ips() {
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2022-10-17T09:46:45.443"));
 }
 
-void CSVParserTest::test_otherData1()
+void CEventLogParserTest::test_otherData1()
 {
     qDebug() << "Testcase: Other data #1";
 
@@ -211,7 +211,7 @@ void CSVParserTest::test_otherData1()
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:40:16.293"));
 }
 
-void CSVParserTest::test_otherData2()
+void CEventLogParserTest::test_otherData2()
 {
     qDebug() << "Testcase: Other data #2";
 
@@ -244,7 +244,7 @@ void CSVParserTest::test_otherData2()
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), "2023-05-31T13:19:09.840");
 }
 
-void CSVParserTest::test_otherData3_exception()
+void CEventLogParserTest::test_otherData3_exception()
 {
     qDebug() << "Testcase: Other data #3 - exception";
 
@@ -277,7 +277,7 @@ void CSVParserTest::test_otherData3_exception()
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-31T12:56:50.550"));
 }
 
-void CSVParserTest::test_DateTimeFormats()
+void CEventLogParserTest::test_DateTimeFormats()
 {
     QFile file;
     qDebug() << "Testcase: Check parsing datetime (format24 yyyy-MM-ddTHH:mm:ss.zzzZ)";
@@ -343,6 +343,6 @@ void CSVParserTest::test_DateTimeFormats()
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:39:33.200"));
 }
 
-QTEST_APPLESS_MAIN(CSVParserTest)
+QTEST_APPLESS_MAIN(CEventLogParserTest)
 
-#include "tst_csvparser.moc"
+#include "tst_ceventlogparsertest.moc"

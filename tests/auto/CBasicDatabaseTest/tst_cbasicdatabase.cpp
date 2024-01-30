@@ -200,7 +200,7 @@ void CBasicDatabaseTest::test_InsertBindedValues()
     data[QStringLiteral(":authtype")] = "PASSWORD";
     data[QStringLiteral(":externalip")] = "192.0.2.211";
     data[QStringLiteral(":internalip")] = "10.10.10.10";
-    retVal = m_fakeDB.execRequest(data);
+    retVal = m_fakeDB.execRequest(&data);
     QVERIFY(retVal);
 
     int count = 0;
@@ -210,6 +210,28 @@ void CBasicDatabaseTest::test_InsertBindedValues()
         count++;
     }
     QCOMPARE(count, 1);
+
+    data[QStringLiteral(":username")] = "Ім'я користувача";
+    data[QStringLiteral(":timestampISO8601")] = "Відмітка часу";
+    data[QStringLiteral(":timestamp")] = QDateTime();
+    data[QStringLiteral(":requestid")] = "ID запиту";
+    data[QStringLiteral(":type")] = "Тип";
+    data[QStringLiteral(":details")] = "Деталі";
+    data[QStringLiteral(":username1")] = QString();
+    data[QStringLiteral(":authtype")] = QString();
+    data[QStringLiteral(":externalip")] = QString();
+    data[QStringLiteral(":internalip")] = QString();
+    retVal = m_fakeDB.execRequest(&data);
+    QVERIFY(retVal);
+
+    count = 0;
+    retVal = m_fakeDB.exec("select * from eventlog;");
+    QVERIFY(retVal);
+    while (m_fakeDB.isNext()) {
+        count++;
+    }
+    QCOMPARE(count, 1);
+
 }
 
 QTEST_APPLESS_MAIN(CBasicDatabaseTest)

@@ -6,7 +6,7 @@
 *  Event Log Conversion Utility
 *  Event Log Conversion Console Utility
 *
-*  Module name: CELCCSettings.cpp
+*  Module name: CElcConsoleAppSettings.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -16,19 +16,19 @@
 *
 ****************************************************************************/
 
-#include "CELCCSettings.h"
+#include "CElcConsoleAppSettings.h"
 
-static CELCCSettings g_elccSettings;
+static CElcConsoleAppSettings g_elcConsoleSettings;
 
-CELCCSettings& CELCCSettings::instance()
+CElcConsoleAppSettings& CElcConsoleAppSettings::instance()
 {
-    return g_elccSettings;
+    return g_elcConsoleSettings;
 }
 
 void
-CELCCSettings::createDefault(const QString& iniPath)
+CElcConsoleAppSettings::createDefault(const QString& iniPath)
 {
-    CELCSettings::createDefault(iniPath);
+    CElcCommonSettings::createDefault(iniPath);
 
     QSettings settings(iniPath, QSettings::IniFormat);
     settings.beginGroup(QStringLiteral("SETTINGS"));

@@ -32,10 +32,11 @@ public:
     bool init(const QString& appPath, const QString &fileName, bool isTerminalMode);
     QVariant getMain(const QString& keyName) const;
     void setMain(const QString& group, const QString& keyName, const QVariant& value);
+    bool isRdsEnabled() const { return m_isRdsEnabled; }
 
 protected:
     virtual void createDefault(const QString& iniPath) =0;
-    bool        m_isTerminalMode;
+    bool        m_isRdsEnabled;
 
 private:
     QSettings*  m_settings;

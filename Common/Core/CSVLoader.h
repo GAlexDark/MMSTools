@@ -2,9 +2,10 @@
 #define CSVLOADER_H
 
 #include <QFile>
+#include <QMap>
 #include <QThread>
 
-#include "CSVParser.h"
+#include "CEventLogParser.h"
 #include "CBasicDatabase.h"
 
 const qint64 defBufferSize = 128 * 1024; // 128KB
@@ -12,35 +13,57 @@ const qint64 defMaxFileSize = 1024 * 1024; // 1M
 
 using pragmaList_t = QMap<QString, QString>;
 
-class CSVLoader
+class CTextFileLoader
 {
 public:
-    explicit CSVLoader();
-    virtual ~CSVLoader();
+    explicit CTextFileLoader();
+    virtual ~CTextFileLoader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalipFirstOctet, const pragmaList_t &pragmaList,
-              const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
+    bool init(bool dataHasHeaders, const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
     bool read();
     QString errorString() const { return m_errorString; }
 
 private:
     QFile       m_file;
-    QString     m_errorString;
+
     QByteArray  m_eolChars;
     QByteArray  *m_buffer;
     qint64      m_bufferSize;
     QString     m_fileName;
     bool        m_isHeaders;
-    CBasicDatabase  m_db;
-    TDataItem   m_data;
-
-    bool initDB(const QString &dbFileName, const pragmaList_t &pragmaList);
-    bool initBuffer();
 
     bool readLargeFile();
     bool readSmallFile();
 
+    //std::function<void(const QString&)> m_callbackFunction;
+
+protected:
+    virtual void prepareData(QString &data) = 0;
+    virtual bool convertData(const QString &line) =0;
+
+    QString     m_errorString;
+    QStringList m_fileNames;
+
+    void setFileName(const QString &fileName) { m_fileName = fileName; }
+};
+
+//-------------------------------------------------------------------------
+
+class CEventLogLoader: public CTextFileLoader
+{
+public:
+    ~CEventLogLoader();
+    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet, pragmaList_t *pragmaList,
+              const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
+
+    bool convertData(const QString &line) override;
+    void prepareData(QString &data) override;
+
+private:
+    CEventLogParser   m_parser;
+
+    TDataItem   m_data;
     QString     m_username,
                 m_timestampISO8601,
                 m_requestID,
@@ -52,26 +75,18 @@ private:
                 m_internalIP;
     QDateTime   m_timestampTZ;
 
-    //std::function<void(const QString&)> m_callbackFunction;
+    bool initDB(const QString &dbFileName, pragmaList_t *pragmaList);
 
 protected:
-    QStringList m_fileNames;
-    CSVParser   m_parser;
-
-    void setFileName(const QString &fileName) { m_fileName = fileName; }
-    bool beginTrancaction() { return m_db.beginTransaction(); }
-    bool commit() { return m_db.commitTransaction(); }
-    bool prepareRequest(const QString &query);
-    void closeDB() { m_db.close(); }
+    CBasicDatabase  m_db;
 };
 
 //-------------------------------------------------------------------------
-
-class CSVThreadLoader: public QThread, public CSVLoader
+class CEventLogThreadLoader: public QThread, public CEventLogLoader
 {
     Q_OBJECT
 public:
-    explicit CSVThreadLoader();
+    explicit CEventLogThreadLoader();
     void run();
     bool getStatus() const { return m_retVal; }
 
@@ -79,7 +94,6 @@ signals:
     void sendMessage(const QString &msg);
 
 private:
-    QString m_errorString;
     bool m_retVal;
 
 };

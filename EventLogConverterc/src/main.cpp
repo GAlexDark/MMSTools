@@ -1,9 +1,11 @@
 #include <QCoreApplication>
 #include <QDir>
+#include <QMap>
+
 //#include "Debug.h"
 #include "CSVLoader.h"
 #include "CReportBuilder.h"
-#include "CELCCSettings.h"
+#include "CElcConsoleAppSettings.h"
 #include "CSingleApplication.h"
 #include "CDataSourceList.h"
 #include "QCommandLineParserHelper.h"
@@ -93,7 +95,6 @@ int main(int argc, char *argv[])
             QString filePath = QFileInfo(files.at(0)).absolutePath();
             reportName = QDir(filePath).filePath(reportName);
         }
-        //if (reportName.indexOf(".xlsx") == -1) {
         if (!reportName.endsWith(".xlsx", Qt::CaseInsensitive)) {
             reportName = reportName + ".xlsx";
         }
@@ -123,17 +124,19 @@ int main(int argc, char *argv[])
     consoleOut.outToConsole(QStringLiteral("MMS Event Log Conversion Utility starting..."));
 
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
-    if (!CELCCSettings::instance().init(appPath, iniFile, false)) {
+    if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false)) {
         consoleOut.outToConsole(QStringLiteral("The settings class cannot be initialized."));
         return 1;
     }
 
     //get path to the DB
-    const CELCCSettings &settings = CELCCSettings::instance();
+    CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
     QString dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
     if (dbName.isEmpty()) {
-        consoleOut.outToConsole(QStringLiteral("Unable to get database file name."));
-        return 1;
+        dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
+        settings.setMain(QStringLiteral("SETTINGS"), QStringLiteral("db_file_name"), dbName);
+        consoleOut.outToConsole(QStringLiteral("Unable to get database file name.\n \
+The database file will be created on the default path."));
     }
     QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
     if (cleardb.isEmpty() || (QString::compare(cleardb, "yes", Qt::CaseInsensitive) == 0)) {
@@ -146,37 +149,36 @@ int main(int argc, char *argv[])
         consoleOut.outToConsole(QStringLiteral("The database was clean."));
     }
 
-    bool retVal;
-    {
-        consoleOut.outToConsole("Start reading and converting files...");
+    consoleOut.outToConsole("Start reading and converting files...");
 
-        CSVThreadLoader loader;
-        retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
-        Q_ASSERT_X(retVal, "connect", "connection is not established");
+    CEventLogThreadLoader loader;
+    bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
+    Q_ASSERT_X(retVal, "connect", "connection is not established");
 
-        QString value = settings.getMain("SETTINGS/data_has_headers").toString().trimmed();
-        bool hasHeaders = (value.isEmpty() || QString::compare(value, "yes", Qt::CaseInsensitive) == 0)? true : false;
-        QString internalipFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
-
+    QString value = settings.getMain("SETTINGS/data_has_headers").toString().trimmed();
+    bool hasHeaders = (value.isEmpty() || QString::compare(value, "yes", Qt::CaseInsensitive) == 0)? true : false;
+    QString internalIpFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
+    if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue("^([0-9.]+)$", internalIpFirstOctet)) {
         pragmaList_t pragmaList;
         value = settings.getMain("DATABASE/synchronous").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["synchronous"] = value;
-        }
-        value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["journal_mode"] = value;
-        }
-        value = settings.getMain("DATABASE/temp_store").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["temp_store"] = value;
-        }
-        value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["locking_mode"] = value;
-        }
+        pragmaList["synchronous"] = elcUtils::sanitizeValue(value, QStringList() << "OFF" << "NORMAL" << "FULL", "NORMAL");
 
-        retVal = loader.init(dbName, hasHeaders, internalipFirstOctet, pragmaList, "\r\n");
+        value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
+        pragmaList["journal_mode"] = elcUtils::sanitizeValue(value,
+                                                             QStringList() << "DELETE" << "TRUNCATE" << "PERSIST" << "MEMORY" << "WAL" << "OFF",
+                                                             "MEMORY");
+
+        value = settings.getMain("DATABASE/temp_store").toString().trimmed();
+        pragmaList["temp_store"] = elcUtils::sanitizeValue(value,
+                                                           QStringList() << "DEFAULT" << "FILE" << "MEMORY",
+                                                           "MEMORY");
+
+        value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
+        pragmaList["locking_mode"] = elcUtils::sanitizeValue(value,
+                                                             QStringList() << "NORMAL" << "EXCLUSIVE",
+                                                             "EXCLUSIVE");
+
+        retVal = loader.init(dbName, hasHeaders, internalIpFirstOctet, &pragmaList, "\r\n");
         if (retVal) {
             loader.setFileName(files);
             loader.start();
@@ -187,6 +189,7 @@ int main(int argc, char *argv[])
         }
         QCoreApplication::processEvents();
         QObject::disconnect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
+        pragmaList.clear();
 
         if (retVal) {
             consoleOut.outToConsole(QStringLiteral("Reading file(s) completed"));
@@ -194,11 +197,14 @@ int main(int argc, char *argv[])
             consoleOut.outToConsole(QStringLiteral("Error reading file(s): %1").arg(loader.errorString()));
             return 1;
         }
+    } else {
+        consoleOut.outToConsole(QStringLiteral("Error in internal IP address mask. Please check it in the config file."));
+        return 1;
     }
 
     consoleOut.outToConsole(QStringLiteral("Start generating the report..."));
     CSVThreadReportBuilder report;
-    if (report.init(dbName, reportName, excludedUsers, includedUsers)) {
+    if (report.init(dbName, reportName, &excludedUsers, &includedUsers)) {
         report.start();
 
         consoleOut.outToConsole(QStringLiteral("wait..."));
@@ -206,6 +212,8 @@ int main(int argc, char *argv[])
         retVal = report.getStatus();
     }
     QCoreApplication::processEvents();
+    excludedUsers.clear();
+    includedUsers.clear();
     if (retVal) {
         consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe result in the %1 file.").arg(reportName));
     } else {

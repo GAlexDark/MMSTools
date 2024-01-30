@@ -5,8 +5,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QRegularExpression>
+#include <QMap>
 
-#include "CELCWSettings.h"
+#include "CElcGuiAppSettings.h"
 //#include "Debug.h"
 #include "OptionsDialog.h"
 #include "CSVLoader.h"
@@ -19,6 +20,12 @@ void
 MainWindow::setStateText(const QString &state)
 {
     m_state->setText(state);
+}
+
+void
+MainWindow::setModeText(const QString &mode)
+{
+    m_mode->setText(mode);
 }
 
 void
@@ -83,6 +90,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_state->setMinimumWidth(250);
     ui->statusbar->addWidget(m_state);
 
+    m_mode = new QLabel(this);
+    m_mode->setMinimumWidth(250);
+    ui->statusbar->addWidget(m_mode);
+
     bool retVal = connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
     Q_ASSERT_X(retVal, "connect", "actionAbout_program connection is not established");
     retVal = connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(onAboutQt()));
@@ -98,21 +109,34 @@ MainWindow::MainWindow(QWidget *parent)
     Q_ASSERT_X(retVal, "connect", "pbClearDB connection is not established");
     retVal = connect(ui->pbGenerateReport, SIGNAL(clicked(bool)), this, SLOT(generateReportClick()));
     Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
-
-    const ELCWSettings &settings = ELCWSettings::instance();
+    
+    const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
     m_dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
+    elcUtils::expandEnvironmentStrings(m_dbName);
     m_lastDir = settings.getMain("HISTORY/last_dir").toString().trimmed();
 
     setStateText(tr("Ready"));
 
     m_fileList.clear();
     m_hasHeaders = true;
+#ifdef Q_OS_WIN
+    QString modeInfo = QStringLiteral("%1 | %2");
+    QString rds = (settings.isRdsEnabled())? QStringLiteral("RDP mode") : QStringLiteral("Single mode");
+    QString rdp = QStringLiteral("%SESSIONNAME%");
+    elcUtils::expandEnvironmentStrings(rdp);
+    if (rdp.startsWith('%')) {
+        rdp = QStringLiteral("WinAPI error");
+    }
+    setModeText(modeInfo.arg(rds, rdp));
+#else
+    setModeText(QStringLiteral("Linux Console"));
+#endif
 }
 
 MainWindow::~MainWindow()
 {
     if (!m_lastDir.isEmpty() && QDir(m_lastDir).exists()) {
-        ELCWSettings &settings = ELCWSettings::instance();
+        CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
         settings.setMain("HISTORY", "last_dir", m_lastDir);
     }
 
@@ -204,53 +228,59 @@ MainWindow::convertEventLogClick()
     disableButtons();
 
     if (!m_fileList.isEmpty()) {
-        CSVThreadLoader loader;
+        CEventLogThreadLoader loader;
         bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
         Q_ASSERT_X(retVal, "connect", "connection is not established");
+        
+        const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+        QString internalIpFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
+        if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue("^([0-9.]+)$", internalIpFirstOctet)) {
+            pragmaList_t pragmaList;
+            QString value = settings.getMain("DATABASE/synchronous").toString().trimmed();
+            pragmaList["synchronous"] = elcUtils::sanitizeValue(value,
+                                                                QStringList() << "OFF" << "NORMAL" << "FULL",
+                                                                "NORMAL");
 
-        const ELCWSettings &settings = ELCWSettings::instance();
-        QString internalipFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
+            value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
+            pragmaList["journal_mode"] = elcUtils::sanitizeValue(value,
+                                                                 QStringList() << "DELETE" << "TRUNCATE" << "PERSIST" << "MEMORY" << "WAL" << "OFF",
+                                                                 "MEMORY");
 
-        pragmaList_t pragmaList;
-        QString value = settings.getMain("DATABASE/synchronous").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["synchronous"] = value;
-        }
-        value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["journal_mode"] = value;
-        }
-        value = settings.getMain("DATABASE/temp_store").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["temp_store"] = value;
-        }
-        value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
-        if (!value.isEmpty()) {
-            pragmaList["locking_mode"] = value;
-        }
+            value = settings.getMain("DATABASE/temp_store").toString().trimmed();
+            pragmaList["temp_store"] = elcUtils::sanitizeValue(value,
+                                                               QStringList() << "DEFAULT" << "FILE" << "MEMORY",
+                                                               "MEMORY");
 
-        setInfoText(tr("Start reading and converting file(s)..."));
-        setStateText(tr("Read and converting"));
-        QCoreApplication::processEvents();
+            value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
+            pragmaList["locking_mode"] = elcUtils::sanitizeValue(value,
+                                                                 QStringList() << "NORMAL" << "EXCLUSIVE",
+                                                                 "EXCLUSIVE");
 
-        retVal = loader.init(m_dbName, m_hasHeaders, internalipFirstOctet, pragmaList, "\r\n");
-        if (retVal) {
-            loader.setFileName(m_fileList);
-            loader.start();
+            setInfoText(tr("Start reading and converting file(s)..."));
+            setStateText(tr("Read and converting"));
+            QCoreApplication::processEvents();
 
-            setInfoText(tr("wait..."));
-            elcUtils::waitForEndThread(&loader, 100);
-            retVal = loader.getStatus();
-        }
-        QCoreApplication::processEvents();
-        QObject::disconnect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
+            retVal = loader.init(m_dbName, m_hasHeaders, internalIpFirstOctet, &pragmaList, "\r\n");
+            if (retVal) {
+                loader.setFileName(m_fileList);
+                loader.start();
 
-        if (retVal) {
-            setInfoText(tr("Reading file(s) completed"));
-            setStateText(tr("Reading complete"));
+                setInfoText(tr("wait..."));
+                elcUtils::waitForEndThread(&loader, 100);
+                retVal = loader.getStatus();
+            }
+            QCoreApplication::processEvents();
+            QObject::disconnect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
+
+            if (retVal) {
+                setInfoText(tr("Reading file(s) completed"));
+                setStateText(tr("Reading complete"));
+            } else {
+                setInfoText(tr("Error reading file(s): %1").arg(loader.errorString()));
+                setStateText(tr("Error reading"));
+            }
         } else {
-            setInfoText(tr("Error reading file(s): %1").arg(loader.errorString()));
-            setStateText(tr("Error reading"));
+            setInfoText(tr("Error in internal IP address mask. Please check it in the config file."));
         }
     } else {
         QString buf = tr("No files selected");
@@ -317,7 +347,7 @@ MainWindow::generateReportClick()
             QCoreApplication::processEvents();
 
             CSVThreadReportBuilder report;
-            if (report.init(m_dbName, reportName, excludedUsers, includedUsers)) {
+            if (report.init(m_dbName, reportName, &excludedUsers, &includedUsers)) {
                 report.start();
 
                 setInfoText(tr("wait..."));
@@ -325,6 +355,8 @@ MainWindow::generateReportClick()
                 retVal = report.getStatus();
             }
             QCoreApplication::processEvents();
+            excludedUsers.clear();
+            includedUsers.clear();
             if (retVal) {
                 setInfoText(tr("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
                 setStateText(tr("Report created"));

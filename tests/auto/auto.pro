@@ -3,10 +3,10 @@ TEMPLATE = subdirs
 SUBDIRS += \
     CDataSourceListTest \
     CSVLoaderTest \
-    CSVParserTest \
+    CEventLogParserTest \
     CSingleApplicationTest \
-    CELCCSettingsTest \
+    CElcConsoleAppSettingsTest \
     CBasicDatabaseTest \
-    CELCWSettingsTest \
+    CElcGuiAppSettingsTest \
     UtilsTest
 

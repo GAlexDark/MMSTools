@@ -4,29 +4,25 @@
 *  Contact: galexsoftware@gmail.com
 *
 *  Event Log Conversion Utility
-*  Event Log Conversion Console Utility
+*  Common module
 *
-*  Module name: CELCCSettings.h
+*  Module name: CElcCommonSettings.n
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
 *  Abstract:
-*     The class for initializing the settings class instance of the
-*     Event Log Conversion Console Utility.
+*     The base class for creating default settings in the ini file.
 *
 ****************************************************************************/
 
-#ifndef CELCCSETTINGS_H
-#define CELCCSETTINGS_H
-#include "CELCSettings.h"
+#ifndef CELCCOMMONSETTINGS_H
+#define CELCCOMMONSETTINGS_H
+#include "CBasicSettings.h"
 
-class CELCCSettings : public CELCSettings
+class CElcCommonSettings : public CBasicSettings
 {
-public:
-    static CELCCSettings& instance();
-
-private:
+protected:
     void createDefault(const QString& iniPath) override;
 };
 
-#endif // CELCCSETTINGS_H
+#endif // CELCCOMMONSETTINGS_H

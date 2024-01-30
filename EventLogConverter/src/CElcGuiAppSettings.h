@@ -6,7 +6,7 @@
 *  Event Log Conversion Utility
 *  Event Log Conversion GUI Utility
 *
-*  Module name: CELCWSettings.h
+*  Module name: CElcGuiAppSettings.h
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -16,18 +16,18 @@
 *
 ****************************************************************************/
 
-#ifndef CELCWSETTINGS_H
-#define CELCWSETTINGS_H
+#ifndef CELCGUIAPPSETTINGS_H
+#define CELCGUIAPPSETTINGS_H
 
-#include <CELCSettings.h>
+#include <CElcCommonSettings.h>
 
-class ELCWSettings : public CELCSettings
+class CElcGuiAppSettings : public CElcCommonSettings
 {
 public:
-    static ELCWSettings& instance();
+    static CElcGuiAppSettings& instance();
 
 private:
     void createDefault(const QString& iniPath) override;
 };
 
-#endif // CELCWSETTINGS_H
+#endif // CELCGUIAPPSETTINGS_H
