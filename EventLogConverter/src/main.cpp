@@ -14,6 +14,17 @@
 void
 initTranslation(QTranslator *translator, QApplication *qa, const QStringList &list, const QString &fileName)
 {
+#ifdef Q_OS_LINUX
+    QString locales = setlocale(LC_ALL, NULL);
+    if (locales.contains("ru_RU")) {
+        QLocale::setDefault(QLocale::Russian);
+    } else {
+        if (locales.contains("uk_UA")) {
+            QLocale::setDefault(QLocale::Ukrainian);
+        }
+    }
+#endif
+
     if (list.contains("--russian", Qt::CaseSensitive)) {
         QLocale::setDefault(QLocale::Russian);
         QMessageBox::information(nullptr, "Language", "Set Russian");
@@ -49,9 +60,8 @@ createConfigInfo(const QString &appName, const QStringList &list, QString &path,
         QString msg = elcUtils::getWindowsApiErrorMessage(errorCode);
         QMessageBox::warning(nullptr, "Warning", QString("Error checking RDS mode: %1\nThe utility will be launched in the single user mode!").arg(msg));
     }
-    if (isRdsMode || list.contains("--enablerds", Qt::CaseSensitive)) {
+    if (!isRdsMode || list.contains("--enablerds", Qt::CaseSensitive)) {
         path = QStringLiteral("%AppData%/%1").arg(appName); // %SystemDrive%:/Users/%UserName%/AppData/Roaming/%1
-        elcUtils::expandEnvironmentStrings(path);
     }
 #else
     fileName = QStringLiteral("%1.conf").arg(appName);
@@ -88,6 +98,7 @@ int main(int argc, char *argv[])
     QString iniFile;
     bool isRdsMode;
     createConfigInfo(appName, argsList, appPath,iniFile, isRdsMode);
+    elcUtils::expandEnvironmentStrings(appPath);
     if (!CElcGuiAppSettings::instance().init(appPath, iniFile, isRdsMode)) {
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("The settings Class cannot be initialized."), QMessageBox::Ok);
         return 1;
@@ -102,12 +113,21 @@ int main(int argc, char *argv[])
         QMessageBox::warning(nullptr, QObject::tr("Warning") ,QObject::tr("Unable to get database file name.\n \
 The database file will be created on the default path."), QMessageBox::Ok);
     }
+    elcUtils::expandEnvironmentStrings(dbName);
+    if (!QDir(dbName).exists()) {
+        QDir dir;
+        bool retVal = dir.mkdir(QFileInfo(dbName).absolutePath());
+        if (!retVal) {
+            QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1").arg(QFileInfo(dbName).absolutePath()), QMessageBox::Ok);
+            return 1;
+        }
+    }
     QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
     if (cleardb.isEmpty() || (QString::compare(cleardb, "yes", Qt::CaseInsensitive) == 0)) {
         elcUtils::expandEnvironmentStrings(dbName);
         QString errorString;
         if (!elcUtils::trunvateDB(dbName, errorString)) {
-            QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1").arg(errorString), QMessageBox::Ok);
+            QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\n%2").arg(errorString, dbName), QMessageBox::Ok);
             return 1;
         }
     }
