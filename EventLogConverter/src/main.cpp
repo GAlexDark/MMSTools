@@ -27,14 +27,12 @@ initTranslation(QTranslator *translator, QApplication *qa, const QStringList &li
 
     if (list.contains("--russian", Qt::CaseSensitive)) {
         QLocale::setDefault(QLocale::Russian);
-        QMessageBox::information(nullptr, "Language", "Set Russian");
     } else {
         if (list.contains("--ukrainian", Qt::CaseSensitive)) {
             QLocale::setDefault(QLocale::Ukrainian);
-            QMessageBox::information(nullptr, "Language", "Set Ukrainian");
         }
     }
-
+#if QT_VERSION == QT_VERSION_CHECK(6, 3, 2)
     bool retVal = translator->load(QLocale(), fileName, QLatin1String("_"), QLatin1String(":/i18n"));
     if (retVal) {
         retVal = qa->installTranslator(translator);
@@ -46,6 +44,9 @@ initTranslation(QTranslator *translator, QApplication *qa, const QStringList &li
             QMessageBox::warning(nullptr, "Warning", "Error loading localization resources.");
         }
     }
+#else
+    Q_ASSERT_X(false, Q_FUNC_INFO, "This code was tested and works correctly in Qt 6.3.2 only");
+#endif
 }
 
 void
@@ -60,7 +61,7 @@ createConfigInfo(const QString &appName, const QStringList &list, QString &path,
         QString msg = elcUtils::getWindowsApiErrorMessage(errorCode);
         QMessageBox::warning(nullptr, "Warning", QString("Error checking RDS mode: %1\nThe utility will be launched in the single user mode!").arg(msg));
     }
-    if (!isRdsMode || list.contains("--enablerds", Qt::CaseSensitive)) {
+    if (isRdsMode || list.contains("--enablerds", Qt::CaseSensitive)) {
         path = QStringLiteral("%AppData%/%1").arg(appName); // %SystemDrive%:/Users/%UserName%/AppData/Roaming/%1
     }
 #else
@@ -96,9 +97,14 @@ int main(int argc, char *argv[])
         return 1;
     }
     QString iniFile;
+    QString errorString;
     bool isRdsMode;
     createConfigInfo(appName, argsList, appPath,iniFile, isRdsMode);
     elcUtils::expandEnvironmentStrings(appPath);
+    if (!elcUtils::mkPath(appPath, errorString)) {
+        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1\nDetails: %2").arg(appPath, errorString), QMessageBox::Ok);
+        return 1;
+    }
     if (!CElcGuiAppSettings::instance().init(appPath, iniFile, isRdsMode)) {
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("The settings Class cannot be initialized."), QMessageBox::Ok);
         return 1;
@@ -114,20 +120,16 @@ int main(int argc, char *argv[])
 The database file will be created on the default path."), QMessageBox::Ok);
     }
     elcUtils::expandEnvironmentStrings(dbName);
-    if (!QDir(dbName).exists()) {
-        QDir dir;
-        bool retVal = dir.mkdir(QFileInfo(dbName).absolutePath());
-        if (!retVal) {
-            QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1").arg(QFileInfo(dbName).absolutePath()), QMessageBox::Ok);
-            return 1;
-        }
+    QString dbPath = QFileInfo(dbName).absolutePath();
+    if (!elcUtils::mkPath(dbPath, errorString)) {
+        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1\nDetails: %2").arg(dbPath, errorString), QMessageBox::Ok);
+        return 1;
     }
     QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
     if (cleardb.isEmpty() || (QString::compare(cleardb, "yes", Qt::CaseInsensitive) == 0)) {
         elcUtils::expandEnvironmentStrings(dbName);
-        QString errorString;
         if (!elcUtils::trunvateDB(dbName, errorString)) {
-            QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\n%2").arg(errorString, dbName), QMessageBox::Ok);
+            QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\nDetails: %2").arg(dbName, errorString), QMessageBox::Ok);
             return 1;
         }
     }

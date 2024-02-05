@@ -38,5 +38,6 @@ namespace elcUtils
     bool isRdsMode(quint32 &errorCode);
 #endif
     void expandEnvironmentStrings(QString &path);
+    bool mkPath(const QString &dirPath, QString &errorString);
 }
 #endif // ELCUTILS_H

@@ -245,3 +245,23 @@ elcUtils::expandEnvironmentStrings(QString &path)
     expandEnvStrings_linux(path);
 #endif
 }
+
+bool
+elcUtils::mkPath(const QString &dirPath, QString &errorString)
+{
+    QFileInfo fi(dirPath);
+    bool retVal=fi.permission(QFile::WriteUser);
+    if (retVal) {
+        QDir dir;
+        retVal = dir.exists(dirPath);
+        if (!retVal) {
+            retVal = dir.mkpath(dirPath);
+            if (!retVal) {
+                errorString = QStringLiteral("Error create directory path");
+            }
+        }
+    } else {
+        errorString = QStringLiteral("Access denied");
+    }
+    return retVal;
+}

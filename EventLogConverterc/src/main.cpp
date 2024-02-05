@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
     }
 
     consoleOut.outToConsole(QStringLiteral("MMS Event Log Conversion Utility starting..."));
-
+    QString errorString;
     QString iniFile = QStringLiteral("%1.ini").arg(appName);
     if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false)) {
         consoleOut.outToConsole(QStringLiteral("The settings class cannot be initialized."));
@@ -138,10 +138,15 @@ int main(int argc, char *argv[])
         consoleOut.outToConsole(QStringLiteral("Unable to get database file name.\n \
 The database file will be created on the default path."));
     }
+    elcUtils::expandEnvironmentStrings(dbName);
+    QString dbPath = QFileInfo(dbName).absolutePath();
+    if (!elcUtils::mkPath(dbPath, errorString)) {
+        consoleOut.outToConsole(QStringLiteral("Cannot create folder: %1\nDetails: %2").arg(dbPath, errorString));
+        return 1;
+    }
     QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
     if (cleardb.isEmpty() || (QString::compare(cleardb, "yes", Qt::CaseInsensitive) == 0)) {
         consoleOut.outToConsole(QStringLiteral("Starting cleaning database..."));
-        QString errorString;
         if (!elcUtils::trunvateDB(dbName, errorString)) {
             consoleOut.outToConsole(QStringLiteral("Cannot clean database: %1").arg(errorString));
             return 1;
