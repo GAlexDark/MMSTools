@@ -29,11 +29,13 @@ CTextFileLoader::readSmallFile()
         list.append(buffer.split(m_eolChars));
 
         QString line;
+        m_lineNumber = 1;
         qsizetype firstDataColumn = (m_isHeaders)? 1 : 0;
         qsizetype columnCount = list.size();
         for (qsizetype i = firstDataColumn; i < columnCount; ++i) {
             line = list.at(i);
             retVal = convertData(line);
+            m_lineNumber++;
             if (!retVal) {
                 break;
             }
@@ -55,6 +57,7 @@ CTextFileLoader::readLargeFile()
     bool isEOF = false;
     bool retVal = true;
     qint64 bytesRead;
+    m_lineNumber = 1;
 
     memset(m_buffer->data(), 0, m_buffer->size());
 
@@ -67,6 +70,7 @@ CTextFileLoader::readLargeFile()
             if (nextPosition != -1) {
                 line.clear();
                 line.append(m_buffer->mid(prevPosition, nextPosition));
+                m_lineNumber++;
 
                 prevPosition = nextPosition + eolCharsLen;
             }
@@ -88,8 +92,8 @@ CTextFileLoader::readLargeFile()
             }
             line.clear();
             line.append(m_buffer->mid(prevPosition, nextPosition - prevPosition));
-
             retVal = convertData(line);
+            m_lineNumber++;
 
             prevPosition = nextPosition + eolCharsLen;
         } // internal while
@@ -110,7 +114,7 @@ CTextFileLoader::readLargeFile()
 }
 
 CTextFileLoader::CTextFileLoader()
-    : m_buffer(nullptr), m_bufferSize(defBufferSize), m_fileName(""), m_isHeaders(false), m_errorString("")
+    : m_buffer(nullptr), m_bufferSize(defBufferSize), m_fileName(""), m_isHeaders(false), m_errorString(""), m_lineNumber(0)
 {
     m_eolChars.clear();
     m_fileNames.clear();
@@ -251,24 +255,28 @@ CEventLogLoader::init(const QString &dbFileName, bool dataHasHeaders, const QStr
 
 bool CEventLogLoader::convertData(const QString &line)
 {
-    (void)m_parser.parse(line);
-    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
-                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
+    bool retVal = m_parser.parse(line);
+    if (retVal) {
+        m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
+                               m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
-    m_data[QStringLiteral(":username")] = m_username;
-    m_data[QStringLiteral(":timestampISO8601")] = m_timestampISO8601;
-    m_data[QStringLiteral(":timestamp")] = m_timestampTZ;
-    m_data[QStringLiteral(":requestid")] = m_requestID;
-    m_data[QStringLiteral(":type")] = m_type;
-    m_data[QStringLiteral(":details")] = m_details;
-    m_data[QStringLiteral(":username1")] = m_username1;
-    m_data[QStringLiteral(":authtype")] = m_authType;
-    m_data[QStringLiteral(":externalip")] = m_externalIP;
-    m_data[QStringLiteral(":internalip")] = m_internalIP;
-    bool retVal = m_db.execRequest(&m_data);
-    m_data.clear();
-    if (!retVal) {
-        m_errorString = m_db.errorString();
+        m_data[QStringLiteral(":username")] = m_username;
+        m_data[QStringLiteral(":timestampISO8601")] = m_timestampISO8601;
+        m_data[QStringLiteral(":timestamp")] = m_timestampTZ;
+        m_data[QStringLiteral(":requestid")] = m_requestID;
+        m_data[QStringLiteral(":type")] = m_type;
+        m_data[QStringLiteral(":details")] = m_details;
+        m_data[QStringLiteral(":username1")] = m_username1;
+        m_data[QStringLiteral(":authtype")] = m_authType;
+        m_data[QStringLiteral(":externalip")] = m_externalIP;
+        m_data[QStringLiteral(":internalip")] = m_internalIP;
+        retVal = m_db.execRequest(&m_data);
+        m_data.clear();
+        if (!retVal) {
+            m_errorString = m_db.errorString();
+        }
+    } else {
+        m_errorString = QStringLiteral("Parsing error at line number %1: %2").arg(m_lineNumber).arg(line);
     }
     return retVal;
 }
@@ -312,7 +320,8 @@ CEventLogThreadLoader::run()
                             break;
                         }
                     }
-                    emit sendMessage( tr("The file %1 was read").arg(fileName) );
+                    QString msg = (m_retVal)? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
+                    emit sendMessage( msg );
                 } //for
             }
         }

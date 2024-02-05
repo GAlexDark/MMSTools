@@ -4,19 +4,24 @@
 <context>
     <name>CEventLogThreadLoader</name>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="296"/>
+        <location filename="../../Common/Core/CSVLoader.cpp" line="304"/>
         <source>Preparing to read the file(s).</source>
         <translation>Подготовка к чтению файла(-ов).</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="305"/>
+        <location filename="../../Common/Core/CSVLoader.cpp" line="313"/>
         <source>Reading of the file %1 has started.</source>
         <translation>Чтение файла %1 началось.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="315"/>
+        <location filename="../../Common/Core/CSVLoader.cpp" line="323"/>
         <source>The file %1 was read</source>
         <translation>Файл %1 прочитан</translation>
+    </message>
+    <message>
+        <location filename="../../Common/Core/CSVLoader.cpp" line="323"/>
+        <source>The file %1 was not read</source>
+        <translation>Файл %1 не прочитан</translation>
     </message>
 </context>
 <context>
@@ -46,7 +51,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="23"/>
-        <location filename="../src/mainwindow.cpp" line="201"/>
+        <location filename="../src/mainwindow.cpp" line="202"/>
         <source>MMS Event Log Conversion Utility</source>
         <translation>Утилита преобразования журналов событий MMS</translation>
     </message>
@@ -103,8 +108,8 @@
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="118"/>
-        <location filename="../src/mainwindow.cpp" line="305"/>
-        <location filename="../src/mainwindow.cpp" line="370"/>
+        <location filename="../src/mainwindow.cpp" line="306"/>
+        <location filename="../src/mainwindow.cpp" line="371"/>
         <source>Ready</source>
         <translation>Готов</translation>
     </message>
@@ -136,12 +141,12 @@ Copyright (C) 2023 Алексей Гаенко
         <translation>Выбранный(-е) файл(ы): </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="206"/>
+        <location filename="../src/mainwindow.cpp" line="207"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="207"/>
+        <location filename="../src/mainwindow.cpp" line="208"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
@@ -176,81 +181,81 @@ Copyright (C) 2023 Алексей Гаенко
         <translation>&lt;p&gt;С разработчиками утилиты преобразования журнала событий MMS можно связаться по электронной почте:&lt;/p&gt;%1&lt;p&gt;Пожалуйста, используйте %2 для больших фрагментов текста.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="200"/>
+        <location filename="../src/mainwindow.cpp" line="201"/>
         <source>Do the data file(s) have headers?</source>
         <translation>Файл(ы) данных имеет(-ют) заголовки?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="202"/>
+        <location filename="../src/mainwindow.cpp" line="203"/>
         <source>Yes - The data file(s) has headers,
 No - Otherwise.</source>
         <translation>Да - Файл(ы) данных имеет(-ют) заголовки,
 Нет - В противном случае.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="214"/>
+        <location filename="../src/mainwindow.cpp" line="215"/>
         <source>The data file(s) has headers</source>
         <translation>Файл(ы) данных имеет(-ют) заголовки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="216"/>
+        <location filename="../src/mainwindow.cpp" line="217"/>
         <source>The data file(s) has no headers</source>
         <translation>Файл(ы) данных не имеет(-ют) заголовков</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="219"/>
-        <location filename="../src/mainwindow.cpp" line="286"/>
+        <location filename="../src/mainwindow.cpp" line="220"/>
+        <location filename="../src/mainwindow.cpp" line="287"/>
         <source>No files selected</source>
         <translation>Файлы не выбраны</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="260"/>
+        <location filename="../src/mainwindow.cpp" line="261"/>
         <source>Read and converting</source>
         <translation>Чтение и конвертация</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="276"/>
+        <location filename="../src/mainwindow.cpp" line="277"/>
         <source>Reading file(s) completed</source>
         <translation>Чтение файла(-ов) окончено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="277"/>
+        <location filename="../src/mainwindow.cpp" line="278"/>
         <source>Reading complete</source>
         <translation>Чтение окончено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="279"/>
+        <location filename="../src/mainwindow.cpp" line="280"/>
         <source>Error reading file(s): %1</source>
         <translation>Ошибка чтения файла(-ов): %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="280"/>
+        <location filename="../src/mainwindow.cpp" line="281"/>
         <source>Error reading</source>
         <translation>Ошибка чтения</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="283"/>
+        <location filename="../src/mainwindow.cpp" line="284"/>
         <source>Error in internal IP address mask. Please check it in the config file.</source>
         <translation>Ошибка в маске внутреннего IP-адреса. Пожалуйста, проверьте это в файле конфигурации.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="299"/>
+        <location filename="../src/mainwindow.cpp" line="300"/>
         <source>Starting cleaning database...</source>
         <translation>Начало очистки БД...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="307"/>
+        <location filename="../src/mainwindow.cpp" line="308"/>
         <source>Cannot clean database: %1</source>
         <translation>Невозможно очистить БД: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="308"/>
-        <location filename="../src/mainwindow.cpp" line="365"/>
+        <location filename="../src/mainwindow.cpp" line="309"/>
+        <location filename="../src/mainwindow.cpp" line="366"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="325"/>
+        <location filename="../src/mainwindow.cpp" line="326"/>
         <source>Additional report filtering settings:</source>
         <translation>Дополнительные настройки фильтрации отчетов:</translation>
     </message>
@@ -263,80 +268,80 @@ No - Otherwise.</source>
         <translation type="vanished">Список исключенных пользователей пуст.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="338"/>
+        <location filename="../src/mainwindow.cpp" line="339"/>
         <source>Save MMS Event Log report</source>
         <translation>Сохранить отчет журнала событий MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="342"/>
+        <location filename="../src/mainwindow.cpp" line="343"/>
         <source>The report will be created here: %1</source>
         <translation>Отчет будет создан здесь: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="268"/>
-        <location filename="../src/mainwindow.cpp" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="269"/>
+        <location filename="../src/mainwindow.cpp" line="354"/>
         <source>wait...</source>
         <translation>Подождите...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="259"/>
+        <location filename="../src/mainwindow.cpp" line="260"/>
         <source>Start reading and converting file(s)...</source>
         <translation>Начало чтения и конвертации файла(-ов)...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="319"/>
+        <location filename="../src/mainwindow.cpp" line="320"/>
         <source>Start generating the report...</source>
         <translation>Начало создания отчета...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="320"/>
+        <location filename="../src/mainwindow.cpp" line="321"/>
         <source>Start generating the report</source>
         <translation>Начало создания отчета</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="327"/>
+        <location filename="../src/mainwindow.cpp" line="328"/>
         <source>	The included users list is empty.</source>
         <translation>	Список включенных пользователей пуст.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="329"/>
+        <location filename="../src/mainwindow.cpp" line="330"/>
         <source>	The included users: %1</source>
         <translation>	Список включенных пользователей: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
         <source>	The excluded users list is empty.</source>
         <translation>	Список исключенных пользователей пуст.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="334"/>
+        <location filename="../src/mainwindow.cpp" line="335"/>
         <source>	The excluded users: %1</source>
         <translation>	Список исключенных пользователей: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="346"/>
         <source>Generating report...</source>
         <translation>Создание отчета...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="362"/>
         <source>Report generating finished.
 The report was saved in the %1 file.</source>
         <translation>Формирование отчета завершено.
 Отчет сохранен в файле %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Report created</source>
         <translation>Отчет создан</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="364"/>
+        <location filename="../src/mainwindow.cpp" line="365"/>
         <source>Error generate report: %1</source>
         <translation>Ошибка создания отчета: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="369"/>
+        <location filename="../src/mainwindow.cpp" line="370"/>
         <source>Report name is empty</source>
         <translation>Название отчета пусто</translation>
     </message>
@@ -425,7 +430,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Сохранить отчет MMS EventLog</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="340"/>
+        <location filename="../src/mainwindow.cpp" line="341"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
@@ -470,7 +475,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Файл %1 распарсен</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="347"/>
         <source>Generating report</source>
         <translation>Создание отчета</translation>
     </message>
@@ -483,7 +488,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Файл %1 сохранен</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="304"/>
+        <location filename="../src/mainwindow.cpp" line="305"/>
         <source>Database was cleared</source>
         <translation>БД очищена</translation>
     </message>
@@ -547,7 +552,7 @@ Copyright (C) 2023 Алексей Гаенко
     <message>
         <location filename="../src/OptionsDialog.cpp" line="49"/>
         <location filename="../src/OptionsDialog.cpp" line="62"/>
-        <location filename="../src/main.cpp" line="102"/>
+        <location filename="../src/main.cpp" line="119"/>
         <source>Warning</source>
         <translation>Внимание</translation>
     </message>
@@ -558,33 +563,50 @@ Copyright (C) 2023 Алексей Гаенко
         <translation>Недопустимый символ в значении %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="83"/>
+        <location filename="../src/main.cpp" line="94"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="84"/>
+        <location filename="../src/main.cpp" line="95"/>
         <source>The another copy of the Utility is still running. Please close it.</source>
         <translation>Другая копия утилиты все еще работает. Пожалуйста, закройте ее.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="92"/>
-        <location filename="../src/main.cpp" line="110"/>
+        <location filename="../src/main.cpp" line="105"/>
+        <location filename="../src/main.cpp" line="109"/>
+        <location filename="../src/main.cpp" line="125"/>
+        <location filename="../src/main.cpp" line="132"/>
         <location filename="../src/mainwindow.cpp" line="75"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="92"/>
+        <location filename="../src/main.cpp" line="105"/>
+        <location filename="../src/main.cpp" line="125"/>
+        <source>Cannot create folder: %1
+Details: %2</source>
+        <translation>Невозможно создать папку: %1
+Детали: %2</translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="109"/>
         <source>The settings Class cannot be initialized.</source>
         <translation>Класс настроек не может быть инициализирован.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="102"/>
+        <location filename="../src/main.cpp" line="119"/>
         <source>Unable to get database file name.
  The database file will be created on the default path.</source>
         <translation>Невозможно получить имя файла базы данных.
   Файл базы данных будет создан по пути по умолчанию.</translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="132"/>
+        <source>Cannot open database: %1
+Details: %2</source>
+        <translation>Невозможно открыть базу данных: %1
+Детали: %2</translation>
     </message>
     <message>
         <source>The settings class cannot be initialized.</source>
@@ -595,9 +617,8 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Невозможно получить имя файла базы данных.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="110"/>
         <source>Cannot open database: %1</source>
-        <translation>Невозможно открыть базу данных: %1</translation>
+        <translation type="vanished">Невозможно открыть базу данных: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="75"/>

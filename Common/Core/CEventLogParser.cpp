@@ -117,9 +117,13 @@ CEventLogParser::parseUserFailedLogonDetails()
 bool
 CEventLogParser::parseUserLogonDetails()
 {
-    bool retVal = parseUserSuccessLogonDetails();
-    if (!retVal) {
-        retVal = parseUserFailedLogonDetails();
+    bool retVal = false;
+    if (QString::compare(m_type, QStringLiteral("Вхід користувача - успішно"), Qt::CaseInsensitive) == 0) {
+        retVal = parseUserSuccessLogonDetails();
+    } else {
+        if (QString::compare(m_type, QStringLiteral("Вхід користувача - невдало"), Qt::CaseInsensitive) == 0) {
+            retVal = parseUserFailedLogonDetails();
+        }
     }
     return retVal;
 }
@@ -154,9 +158,7 @@ CEventLogParser::parse(const QString &line)
             m_timestamptz = QDateTime();
             m_errorString = QStringLiteral("Error converting Timestamp value: %1").arg(m_timestampISO8601);
         }
-        if (m_details.indexOf("ip address:") != -1) {
-            (void)parseUserLogonDetails();
-        } else {
+        if (!parseUserLogonDetails()) {
             m_username1.clear();
             m_authType.clear();
             m_externalip.clear();

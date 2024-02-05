@@ -44,6 +44,7 @@ protected:
 
     QString     m_errorString;
     QStringList m_fileNames;
+    quint64      m_lineNumber;
 
     void setFileName(const QString &fileName) { m_fileName = fileName; }
 };
