@@ -17,7 +17,7 @@ CReportBuilder::~CReportBuilder()
 }
 
 bool
-CReportBuilder::init(const QString &dbFileName, const QString &reportName, QStringList *excludedUsernamesList, QStringList *includedUsernamesList)
+CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
 {
     Q_CHECK_PTR(excludedUsernamesList);
     Q_CHECK_PTR(includedUsernamesList);
@@ -168,7 +168,7 @@ CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(fa
 {}
 
 bool
-CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, QStringList *excludedUsernamesList, QStringList *includedUsernamesList)
+CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
 {
     Q_CHECK_PTR(excludedUsernamesList);
     Q_CHECK_PTR(includedUsernamesList);

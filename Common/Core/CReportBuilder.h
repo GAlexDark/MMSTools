@@ -12,7 +12,7 @@ class CReportBuilder
 public:
     explicit CReportBuilder();
     virtual ~CReportBuilder();
-    bool init(const QString &dbFileName, const QString &reportName, QStringList *excludedUsernamesList, QStringList *includedUsernamesList);
+    bool init(const QString &dbFileName, const QString &reportName, const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList);
     QString errorString() const { return m_errorString; }
     bool generateReport();
 
@@ -33,7 +33,7 @@ class CSVThreadReportBuilder: public QThread
 {
 public:
     explicit CSVThreadReportBuilder();
-    bool init(const QString &dbFileName, const QString &reportName, QStringList *excludedUsernamesList, QStringList *includedUsernamesList);
+    bool init(const QString &dbFileName, const QString &reportName, const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList);
     void run();
     QString errorString() const { return m_errorString; }
     bool getStatus() const { return m_retVal; }
