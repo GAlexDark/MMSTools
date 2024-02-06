@@ -196,7 +196,7 @@ MainWindow::openFileClick()
         QCoreApplication::processEvents();
 
         // ref: https://github.com/mu-editor/mu/issues/832
-        QMessageBox messageBox = QMessageBox(this);
+        QMessageBox messageBox(this);
         messageBox.setText(tr("Do the data file(s) have headers?"));
         messageBox.setWindowTitle(tr("MMS Event Log Conversion Utility"));
         messageBox.setInformativeText(tr("Yes - The data file(s) has headers,\nNo - Otherwise."));
@@ -205,11 +205,7 @@ MainWindow::openFileClick()
         messageBox.setDefaultButton(QMessageBox::Yes);
         messageBox.button(QMessageBox::Yes)->setText(tr("Yes"));
         messageBox.button(QMessageBox::No)->setText(tr("No"));
-        m_hasHeaders = (messageBox.exec() == 0x4000);
-        /*
-        Yes - 16348 - 0x04000 - 0000 0100 0000 0000 0000
-         No - 65536 - 0x10000 - 0001 0000 0000 0000 0000
-        */
+        m_hasHeaders = (messageBox.exec() == QMessageBox::Yes);
         if (m_hasHeaders) {
             setInfoText(tr("The data file(s) has headers"));
         } else {
