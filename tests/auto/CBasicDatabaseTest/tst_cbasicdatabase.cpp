@@ -9,6 +9,9 @@
 
 const int recordCount = 51;
 
+inline const QString selectCount = QStringLiteral("select count() from eventlog;");
+inline const QString selectAll = QStringLiteral("select * from eventlog;");
+
 class CBasicDatabaseTest : public QObject
 {
     Q_OBJECT
@@ -76,7 +79,7 @@ void CBasicDatabaseTest::test_getDBinstance()
 
 void CBasicDatabaseTest::test_initDB()
 {
-    bool retVal = m_fakeDB.init("QSQLITE", SRCDIR"data/fakedb.db");
+    bool retVal = m_fakeDB.init(QStringLiteral("QSQLITE"), SRCDIR"data/fakedb.db");
     QVERIFY(retVal);
 }
 
@@ -113,12 +116,12 @@ void CBasicDatabaseTest::test_importData()
 
 void CBasicDatabaseTest::test_findInDBvar1()
 {
-    TDataList res = m_fakeDB.findInDB("select count() from eventlog;", false);
+    TDataList res = m_fakeDB.findInDB(selectCount, false);
     int columnCount = res.at(0).at(0).toInt();
     qDebug() << columnCount;
     QCOMPARE(columnCount, recordCount);
 
-    TDataList res1 = m_fakeDB.findInDB("select count() from eventlog;", true);
+    TDataList res1 = m_fakeDB.findInDB(selectCount, true);
     columnCount = res1.at(1).at(0).toInt();
     qDebug() << columnCount;
     QCOMPARE(columnCount, recordCount);
@@ -126,17 +129,17 @@ void CBasicDatabaseTest::test_findInDBvar1()
 
 void CBasicDatabaseTest::test_findInDBvar2()
 {
-    TDataList retVal = m_fakeDB.findInDB("select * from eventlog;", false);
+    TDataList retVal = m_fakeDB.findInDB(selectAll, false);
     QCOMPARE(retVal.count(), recordCount);
 
-    TDataList retVal1 = m_fakeDB.findInDB("select * from eventlog;", true);
+    TDataList retVal1 = m_fakeDB.findInDB(selectAll, true);
     QCOMPARE(retVal1.count(), recordCount + 1);
 }
 
 void CBasicDatabaseTest::test_findInDBvar3()
 {
     int count = 0;
-    bool retVal = m_fakeDB.exec("select * from eventlog;");
+    bool retVal = m_fakeDB.exec(selectAll);
     QVERIFY(retVal);
     while (m_fakeDB.isNext()) {
         count++;
@@ -204,7 +207,7 @@ void CBasicDatabaseTest::test_InsertBindedValues()
     QVERIFY(retVal);
 
     int count = 0;
-    retVal = m_fakeDB.exec("select * from eventlog;");
+    retVal = m_fakeDB.exec(selectAll);
     QVERIFY(retVal);
     while (m_fakeDB.isNext()) {
         count++;
@@ -225,7 +228,7 @@ void CBasicDatabaseTest::test_InsertBindedValues()
     QVERIFY(retVal);
 
     count = 0;
-    retVal = m_fakeDB.exec("select * from eventlog;");
+    retVal = m_fakeDB.exec(selectAll);
     QVERIFY(retVal);
     while (m_fakeDB.isNext()) {
         count++;

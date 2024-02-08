@@ -7,6 +7,9 @@ QRegularExpression reHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
 QRegularExpression reSuccessLogon("^username:\\s(.*?),@N@\\s\\stype:\\s(.*?),@N@\\s\\sip\\saddress:\\s(.*?)$");
 QRegularExpression reFailedLogon("^type:\\s(.*?)@N@\\s\\sip\\saddress:\\s(.*?)$");
 
+inline QString authSuccess = QStringLiteral("Вхід користувача - успішно");
+inline QString authFailed = QStringLiteral("Вхід користувача - невдало");
+
 void
 CEventLogParser::removeQuote(QString &data, QChar quoteChar)
 {    
@@ -118,10 +121,10 @@ bool
 CEventLogParser::parseUserLogonDetails()
 {
     bool retVal = false;
-    if (QString::compare(m_type, QStringLiteral("Вхід користувача - успішно"), Qt::CaseInsensitive) == 0) {
+    if (QString::compare(m_type, authSuccess, Qt::CaseInsensitive) == 0) {
         retVal = parseUserSuccessLogonDetails();
     } else {
-        if (QString::compare(m_type, QStringLiteral("Вхід користувача - невдало"), Qt::CaseInsensitive) == 0) {
+        if (QString::compare(m_type, authFailed, Qt::CaseInsensitive) == 0) {
             retVal = parseUserFailedLogonDetails();
         }
     }
@@ -138,7 +141,7 @@ bool
 CEventLogParser::parse(const QString &line)
 {
     m_details = line;
-    m_details.replace("\n", "@N@", Qt::CaseInsensitive);
+    m_details.replace('\n', QLatin1String("@N@"), Qt::CaseInsensitive);
 
     bool retVal = false;
     QRegularExpressionMatch match = reHeader.match(m_details);

@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
             QDir dir = sf.absoluteDir();
             QString mask = sf.fileName().trimmed();
             if (mask.isEmpty()) {
-                mask = "*.csv"; // default mask
+                mask = QStringLiteral("*.csv"); // default mask
             }
             if (dir.exists()) {
                 searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
@@ -89,17 +89,17 @@ int main(int argc, char *argv[])
         reportName = cmd.reportName();
         if (reportName.isEmpty()) {
             QDateTime now = QDateTime::currentDateTime();
-            reportName = QString("%1_report.xlsx").arg(now.toString("ddMMyyyy-hhmmsszzz"));
+            reportName = QStringLiteral("%1_report.xlsx").arg(now.toString(QStringLiteral("ddMMyyyy-hhmmsszzz")));
         }
         if ((reportName.indexOf('/') == -1) || (reportName.indexOf('\\') == -1)) {
             QString filePath = QFileInfo(files.at(0)).absolutePath();
             reportName = QDir(filePath).filePath(reportName);
         }
-        if (!reportName.endsWith(".xlsx", Qt::CaseInsensitive)) {
-            reportName = reportName + ".xlsx";
+        if (!reportName.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
+            reportName = reportName + QStringLiteral(".xlsx");
         }
         reportName = QDir::fromNativeSeparators(reportName);
-        reportName.replace("//", "/");
+        reportName.replace(QLatin1String("//"), QLatin1String("/"));
 
         excludedUsers = cmd.excludedUsernames();
         QString buf;
@@ -131,10 +131,10 @@ int main(int argc, char *argv[])
 
     //get path to the DB
     CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
-    QString dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
+    QString dbName =  QDir::fromNativeSeparators(settings.getMain(SettingsDbFileName).toString().trimmed());
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
-        settings.setMain(QStringLiteral("SETTINGS"), QStringLiteral("db_file_name"), dbName);
+        settings.setMain(SettingsGroup, KeyDbFileName, dbName);
         consoleOut.outToConsole(QStringLiteral("Unable to get database file name.\n \
 The database file will be created on the default path."));
     }
@@ -144,8 +144,8 @@ The database file will be created on the default path."));
         consoleOut.outToConsole(QStringLiteral("Cannot create folder: %1\nDetails: %2").arg(dbPath, errorString));
         return 1;
     }
-    QString cleardb = settings.getMain("SETTINGS/clear_on_startup").toString().trimmed();
-    if (cleardb.isEmpty() || (QString::compare(cleardb, "yes", Qt::CaseInsensitive) == 0)) {
+    QString cleardb = settings.getMain(SettingsClearOnStartup).toString().trimmed();
+    if (cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0)) {
         consoleOut.outToConsole(QStringLiteral("Starting cleaning database..."));
         if (!elcUtils::trunvateDB(dbName, errorString)) {
             consoleOut.outToConsole(QStringLiteral("Cannot clean database: %1").arg(errorString));
@@ -160,28 +160,23 @@ The database file will be created on the default path."));
     bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
     Q_ASSERT_X(retVal, "connect", "connection is not established");
 
-    QString value = settings.getMain("SETTINGS/data_has_headers").toString().trimmed();
-    bool hasHeaders = (value.isEmpty() || QString::compare(value, "yes", Qt::CaseInsensitive) == 0)? true : false;
-    QString internalIpFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
-    if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue("^([0-9.]+)$", internalIpFirstOctet)) {
+    QString internalIpFirstOctet = settings.getMain(SettingsInternalIpStartOctet).toString().trimmed();
+    if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue(QStringLiteral("^([0-9.]+)$"), internalIpFirstOctet)) {
+        QString value = settings.getMain(SettingsDataHasHeaders).toString().trimmed();
+        bool hasHeaders = (value.isEmpty() || QString::compare(value, QLatin1String("yes"), Qt::CaseInsensitive) == 0)? true : false;
+
         pragmaList_t pragmaList;
-        value = settings.getMain("DATABASE/synchronous").toString().trimmed();
-        pragmaList["synchronous"] = elcUtils::sanitizeValue(value, QStringList() << "OFF" << "NORMAL" << "FULL", "NORMAL");
+        value = settings.getMain(DatabaseSynchronous).toString().trimmed();
+        pragmaList["synchronous"] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
 
-        value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
-        pragmaList["journal_mode"] = elcUtils::sanitizeValue(value,
-                                                             QStringList() << "DELETE" << "TRUNCATE" << "PERSIST" << "MEMORY" << "WAL" << "OFF",
-                                                             "MEMORY");
+        value = settings.getMain(DatabaseJournalMode).toString().trimmed();
+        pragmaList["journal_mode"] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
 
-        value = settings.getMain("DATABASE/temp_store").toString().trimmed();
-        pragmaList["temp_store"] = elcUtils::sanitizeValue(value,
-                                                           QStringList() << "DEFAULT" << "FILE" << "MEMORY",
-                                                           "MEMORY");
+        value = settings.getMain(DatabaseTempStore).toString().trimmed();
+        pragmaList["temp_store"] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
 
-        value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
-        pragmaList["locking_mode"] = elcUtils::sanitizeValue(value,
-                                                             QStringList() << "NORMAL" << "EXCLUSIVE",
-                                                             "EXCLUSIVE");
+        value = settings.getMain(DatabaseLockingMode).toString().trimmed();
+        pragmaList["locking_mode"] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
 
         retVal = loader.init(dbName, hasHeaders, internalIpFirstOctet, &pragmaList, "\r\n");
         if (retVal) {

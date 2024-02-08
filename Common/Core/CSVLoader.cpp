@@ -182,20 +182,20 @@ CTextFileLoader::read()
 bool
 CEventLogLoader::initDB(const QString &dbFileName, pragmaList_t *pragmaList)
 {
-    bool retVal = m_db.init("QSQLITE", dbFileName);
+    bool retVal = m_db.init(QStringLiteral("QSQLITE"), dbFileName);
     if (retVal) {
         retVal = m_db.open();
         if (retVal) {
             QStringList dbCommandItems;
             dbCommandItems.append(pragmaUTF8);
-            dbCommandItems.append(pragmaSynchronous.arg(pragmaList->value("synchronous")));
+            dbCommandItems.append(pragmaSynchronous.arg(pragmaList->value(QStringLiteral("synchronous"))));
 
             int blockSize = elcUtils::getStorageBlockSize(dbFileName);
             dbCommandItems.append(pragmaPageSize.arg(blockSize));
 
-            dbCommandItems.append(pragmaJournalMode.arg(pragmaList->value("journal_mode")));
-            dbCommandItems.append(pragmaTempStore.arg(pragmaList->value("temp_store")));
-            dbCommandItems.append(pragmaLockingMode.arg(pragmaList->value("locking_mode")));
+            dbCommandItems.append(pragmaJournalMode.arg(pragmaList->value(QStringLiteral("journal_mode"))));
+            dbCommandItems.append(pragmaTempStore.arg(pragmaList->value(QStringLiteral("temp_store"))));
+            dbCommandItems.append(pragmaLockingMode.arg(pragmaList->value(QStringLiteral("locking_mode"))));
             dbCommandItems.append(createEventLogTable);
 
             for (qsizetype i = 0; i < dbCommandItems.size(); ++i) {
@@ -213,15 +213,15 @@ CEventLogLoader::initDB(const QString &dbFileName, pragmaList_t *pragmaList)
  *
  *******************************************************/
     if (retVal) {
-        TDataList res = m_db.findInDB("PRAGMA journal_mode;", false);
+        TDataList res = m_db.findInDB(QStringLiteral("PRAGMA journal_mode;"), false);
         QString value = "journal_mode: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
         res.clear();
-        res = m_db.findInDB("PRAGMA page_size;", false);
+        res = m_db.findInDB(QStringLiteral("PRAGMA page_size;"), false);
         value = "page_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
         res.clear();
-        res = m_db.findInDB("PRAGMA cache_size;", false);
+        res = m_db.findInDB(QStringLiteral("PRAGMA cache_size;"), false);
         value = "cache_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
     }
@@ -284,9 +284,9 @@ bool CEventLogLoader::convertData(const QString &line)
 void
 CEventLogLoader::prepareData(QString &data)
 {
-    data.replace("\r\n", "@RN@", Qt::CaseInsensitive );
-    data.replace("\n", "@N@", Qt::CaseInsensitive);
-    data.replace("@RN@", "\r\n", Qt::CaseInsensitive );
+    data.replace(QLatin1String("\r\n"), QLatin1String("@RN@"), Qt::CaseInsensitive );
+    data.replace('\n', QLatin1String("@N@"), Qt::CaseInsensitive);
+    data.replace(QLatin1String("@RN@"), QLatin1String("\r\n"), Qt::CaseInsensitive );
 }
 
 //--------------------------------------------------------------------------

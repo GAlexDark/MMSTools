@@ -19,6 +19,18 @@
 #define CELCCOMMONSETTINGS_H
 #include "CBasicSettings.h"
 
+inline const QString SettingsDbFileName = QStringLiteral("SETTINGS/db_file_name");
+inline const QString KeyDbFileName = QStringLiteral("db_file_name");
+inline const QString SettingsClearOnStartup = QStringLiteral("SETTINGS/clear_on_startup");
+inline const QString SettingsInternalIpStartOctet = QStringLiteral("SETTINGS/internal_ip_start_octet");
+inline const QString DatabaseSynchronous = QStringLiteral("DATABASE/synchronous");
+inline const QString DatabaseJournalMode = QStringLiteral("DATABASE/journal_mode");
+inline const QString DatabaseTempStore = QStringLiteral("DATABASE/temp_store");
+inline const QString DatabaseLockingMode = QStringLiteral("DATABASE/locking_mode");
+
+inline const QString SettingsGroup = QStringLiteral("SETTINGS");
+inline const QString DatabaseGroup = QStringLiteral("DATABASE");
+
 class CElcCommonSettings : public CBasicSettings
 {
 protected:

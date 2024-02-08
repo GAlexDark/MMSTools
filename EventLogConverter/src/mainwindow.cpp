@@ -4,7 +4,6 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QRegularExpression>
 #include <QMap>
 
 #include "CElcGuiAppSettings.h"
@@ -111,9 +110,9 @@ MainWindow::MainWindow(QWidget *parent)
     Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
     
     const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    m_dbName =  QDir::fromNativeSeparators(settings.getMain("SETTINGS/db_file_name").toString().trimmed());
+    m_dbName =  QDir::fromNativeSeparators(settings.getMain(SettingsDbFileName).toString().trimmed());
     elcUtils::expandEnvironmentStrings(m_dbName);
-    m_lastDir = settings.getMain("HISTORY/last_dir").toString().trimmed();
+    m_lastDir = settings.getMain(HistoryLastDir).toString().trimmed();
 
     setStateText(tr("Ready"));
 
@@ -137,7 +136,7 @@ MainWindow::~MainWindow()
 {
     if (!m_lastDir.isEmpty() && QDir(m_lastDir).exists()) {
         CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-        settings.setMain("HISTORY", "last_dir", m_lastDir);
+        settings.setMain(HistoryGroup, KeyLastDir, m_lastDir);
     }
 
     delete m_state;
@@ -161,14 +160,12 @@ MainWindow::onAboutQt()
 void
 MainWindow::onContact()
 {
+    QString contacts = QStringLiteral("<p>&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"mailto:%1\">%1</a></p>").arg(CONTACT);
     QMessageBox dlg(QMessageBox::Information, tr("Contacts - MMS Event Log Conversion Utility"),
                     tr("<p>The MMS Event Log Conversion Utility developers can be reached at the mail:</p>"
-                           "%1"
-                           "<p>Please use %2 for bigger chunks of text.</p>")
-                        .arg(QStringLiteral("<p>&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"mailto:%1\">%1</a></p>").arg(CONTACT))
-                        .arg("<a href=\"https://pastebin.com\">"
-                             "https://pastebin.com"
-                             "</a>"),
+                       "%1"
+                       "<p>Please use %2 for bigger chunks of text.</p>")
+                        .arg(contacts, "<a href=\"https://pastebin.com\">https://pastebin.com</a>"),
                     QMessageBox::Ok);
     dlg.exec();
 }
@@ -229,28 +226,20 @@ MainWindow::convertEventLogClick()
         Q_ASSERT_X(retVal, "connect", "connection is not established");
         
         const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-        QString internalIpFirstOctet = settings.getMain("SETTINGS/internal_ip_start_octet").toString().trimmed();
-        if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue("^([0-9.]+)$", internalIpFirstOctet)) {
+        QString internalIpFirstOctet = settings.getMain(SettingsInternalIpStartOctet).toString().trimmed();
+        if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue(QStringLiteral("^([0-9.]+)$"), internalIpFirstOctet)) {
             pragmaList_t pragmaList;
-            QString value = settings.getMain("DATABASE/synchronous").toString().trimmed();
-            pragmaList["synchronous"] = elcUtils::sanitizeValue(value,
-                                                                QStringList() << "OFF" << "NORMAL" << "FULL",
-                                                                "NORMAL");
+            QString value = settings.getMain(DatabaseSynchronous).toString().trimmed();
+            pragmaList[QStringLiteral("synchronous")] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
 
-            value = settings.getMain("DATABASE/journal_mode").toString().trimmed();
-            pragmaList["journal_mode"] = elcUtils::sanitizeValue(value,
-                                                                 QStringList() << "DELETE" << "TRUNCATE" << "PERSIST" << "MEMORY" << "WAL" << "OFF",
-                                                                 "MEMORY");
+            value = settings.getMain(DatabaseJournalMode).toString().trimmed();
+            pragmaList[QStringLiteral("journal_mode")] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
 
-            value = settings.getMain("DATABASE/temp_store").toString().trimmed();
-            pragmaList["temp_store"] = elcUtils::sanitizeValue(value,
-                                                               QStringList() << "DEFAULT" << "FILE" << "MEMORY",
-                                                               "MEMORY");
+            value = settings.getMain(DatabaseTempStore).toString().trimmed();
+            pragmaList[QStringLiteral("temp_store")] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
 
-            value = settings.getMain("DATABASE/locking_mode").toString().trimmed();
-            pragmaList["locking_mode"] = elcUtils::sanitizeValue(value,
-                                                                 QStringList() << "NORMAL" << "EXCLUSIVE",
-                                                                 "EXCLUSIVE");
+            value = settings.getMain(DatabaseLockingMode).toString().trimmed();
+            pragmaList[QStringLiteral("locking_mode")] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
 
             setInfoText(tr("Start reading and converting file(s)..."));
             setStateText(tr("Read and converting"));

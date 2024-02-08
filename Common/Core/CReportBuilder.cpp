@@ -1,5 +1,5 @@
 #include "CReportBuilder.h"
-#include "Debug.h"
+//#include "Debug.h"
 #include "DBStrings.h"
 #include "elcUtils.h"
 
@@ -29,7 +29,7 @@ CReportBuilder::init(const QString &dbFileName, const QString &reportName, const
         m_excludedUsernamesList = *excludedUsernamesList;
         m_includedUsernamesList = *includedUsernamesList;
 
-        retVal = m_db->init("QSQLITE", dbFileName);
+        retVal = m_db->init(QStringLiteral("QSQLITE"), dbFileName);
         if (retVal) {
             retVal = m_db->open();
             if (retVal) {
@@ -91,7 +91,7 @@ CReportBuilder::generateReport()
     // Set datetime format
     QXlsx::Format dateFormat;
     dateFormat.setHorizontalAlignment(QXlsx::Format::AlignRight);
-    dateFormat.setNumberFormat("dd.mm.yyyy hh:mm:ss");
+    dateFormat.setNumberFormat(QStringLiteral("dd.mm.yyyy hh:mm:ss"));
 
     QString args;
     args.clear();
@@ -112,7 +112,9 @@ CReportBuilder::generateReport()
         } //for
         args.append(QStringLiteral("e.username='%1'").arg(m_includedUsernamesList.at(size)));
     }
-    __DEBUG( getAllRecords.arg(args) )
+//    __DEBUG( getAllRecords.arg(args) )
+    const QString eolMaskCode = QStringLiteral("@N@");
+    const QString eolChar = QStringLiteral("\n");
     bool retVal = m_db->exec(getAllRecords.arg(args));
     if (retVal) {
         int row = 2;
@@ -133,7 +135,7 @@ CReportBuilder::generateReport()
             xlsxReport.write(row, colType, writeValue);
 
             buf = m_db->geValue(5).toString();
-            buf.replace("@N@", "\n", Qt::CaseInsensitive);
+            buf.replace(eolMaskCode, eolChar, Qt::CaseInsensitive);
             writeValue = buf;
             xlsxReport.write(row, colDetails, writeValue);
 

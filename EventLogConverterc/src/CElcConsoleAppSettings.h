@@ -20,6 +20,8 @@
 #define CELCCONSOLEAPPSETTINGS_H
 #include "CElcCommonSettings.h"
 
+inline const QString SettingsDataHasHeaders = QStringLiteral("SETTINGS/data_has_headers");
+
 class CElcConsoleAppSettings : public CElcCommonSettings
 {
 public:

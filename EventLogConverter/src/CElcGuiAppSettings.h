@@ -21,6 +21,10 @@
 
 #include <CElcCommonSettings.h>
 
+inline const QString HistoryLastDir = QStringLiteral("HISTORY/last_dir");
+inline const QString KeyLastDir = QStringLiteral("last_dir");
+inline const QString HistoryGroup = QStringLiteral("HISTORY");
+
 class CElcGuiAppSettings : public CElcCommonSettings
 {
 public:

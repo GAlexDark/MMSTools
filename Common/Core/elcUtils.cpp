@@ -18,7 +18,7 @@ const int defaultStorageBlockSize = 32768;
 bool
 elcUtils::sanitizeValue(const QString &value)
 {
-    return elcUtils::sanitizeValue("^([a-zA-Z0-9_]+)$", value);
+    return elcUtils::sanitizeValue(QStringLiteral("^([a-zA-Z0-9_]+)$"), value);
 }
 
 bool
@@ -91,11 +91,11 @@ bool
 elcUtils::trunvateDB(const QString &connectionString, QString &errorString)
 {
     CBasicDatabase db;
-    bool retVal = db.init("QSQLITE", connectionString);
+    bool retVal = db.init(QStringLiteral("QSQLITE"), connectionString);
     if (retVal) {
         retVal = db.open();
         if (retVal) {
-            retVal = db.truncateTable("eventlog");
+            retVal = db.truncateTable(QStringLiteral("eventlog"));
             db.close();
         }
     }
@@ -121,7 +121,7 @@ QString
 elcUtils::getFormattedDateTime(const QString &dateTime)
 {
     QDateTime buildDate = QDateTime::fromString(dateTime);
-    return buildDate.toString("yyyyMMddhhmm");
+    return buildDate.toString(QStringLiteral("yyyyMMddhhmm"));
 }
 
 void
@@ -221,7 +221,7 @@ expandEnvStrings_windows(QString &path)
 void
 expandEnvStrings_linux(QString &path)
 {
-    QRegularExpression envVar("\\$([A-Za-z0-9_]+)");
+    QRegularExpression envVar(QStringLiteral("\\$([A-Za-z0-9_]+)"));
     QRegularExpressionMatchIterator i = envVar.globalMatch(path);
     QString word;
     QByteArray value;

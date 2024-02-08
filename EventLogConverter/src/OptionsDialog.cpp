@@ -1,7 +1,6 @@
 #include "OptionsDialog.h"
 #include "qpushbutton.h"
 #include "ui_OptionsDialog.h"
-#include <QRegularExpression>
 #include <QMessageBox>
 
 #include "elcUtils.h"

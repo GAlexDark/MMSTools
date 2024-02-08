@@ -5,8 +5,8 @@
 
 // add necessary includes here
 
-const QString fileName = QStringLiteral("EventLogConverter.ini");
-const QString filePath = QStringLiteral(SRCDIR"data");
+inline const QString fileName = QStringLiteral("EventLogConverter.ini");
+inline const QString filePath = QStringLiteral(SRCDIR"data");
 
 class CElcGuiAppSettingsTest : public QObject
 {
@@ -69,7 +69,7 @@ void
 CElcGuiAppSettingsTest::test_getDBName()
 {
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
+    QString retVal = settings.getMain(SettingsDbFileName).toString().trimmed();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 
@@ -77,10 +77,9 @@ void
 CElcGuiAppSettingsTest::test_checkLastDir()
 {
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    QString lastDirData = QStringLiteral(SRCDIR"data");
-    settings.setMain("HISTORY", "last_dir", lastDirData);
-    QString lastDir = settings.getMain("HISTORY/last_dir").toString().trimmed();
-    QCOMPARE(lastDir, lastDirData);
+    settings.setMain(HistoryGroup, KeyLastDir, filePath);
+    QString lastDir = settings.getMain(HistoryLastDir).toString().trimmed();
+    QCOMPARE(lastDir, filePath);
 }
 
 QTEST_MAIN(CElcGuiAppSettingsTest)

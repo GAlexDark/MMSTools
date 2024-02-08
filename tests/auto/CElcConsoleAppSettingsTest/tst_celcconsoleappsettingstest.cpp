@@ -6,8 +6,8 @@
 
 // add necessary includes here
 
-const QString fileName = QStringLiteral("EventLogConverterc.ini");
-const QString filePath = QStringLiteral(SRCDIR"data");
+inline const QString fileName = QStringLiteral("EventLogConverterc.ini");
+inline const QString filePath = QStringLiteral(SRCDIR"data");
 
 class CElcConsoleAppSettingsTest : public QObject
 {
@@ -75,7 +75,7 @@ void
 CElcConsoleAppSettingsTest::test_getDBName()
 {
     CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
-    QString retVal = settings.getMain("SETTINGS/db_file_name").toString().trimmed();
+    QString retVal = settings.getMain(SettingsDbFileName).toString().trimmed();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 
