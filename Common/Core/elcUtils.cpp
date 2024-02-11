@@ -5,6 +5,7 @@
 #include <QRegularExpressionMatchIterator>
 #include <QStorageInfo>
 #include <QDir>
+#include <QDirIterator>
 #include <QCoreApplication>
 
 #include "CBasicDatabase.h"
@@ -25,7 +26,7 @@ bool
 elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 {
     bool retVal = false;
-    static QRegularExpression mask(pattern);
+    QRegularExpression mask(pattern);
     QRegularExpressionMatch match = mask.match(value);
     if (match.hasMatch()) {
         retVal = true;
@@ -74,15 +75,15 @@ void
 elcUtils::parseValuesList(QStringList &data)
 {
     if (!data.isEmpty()) {
-        if (data.size() == 1) {
-            QString buf = data.at(0).trimmed();
-            if ((buf.indexOf(',') != -1) || (buf.indexOf(';') != -1)) {
-                data.clear();
-                data.append(parseValuesList(buf));
-            }
+        QString buf;
+        if (data.size() > 1) {
+            buf = data.join(';');
         } else {
-            data.removeAll(QString(""));
-            data.removeDuplicates();
+            buf = data.at(0).trimmed();
+        }
+        if ((buf.indexOf(',') != -1) || (buf.indexOf(';') != -1)) {
+            data.clear();
+            data.append(parseValuesList(buf));
         }
     }
 }
@@ -262,6 +263,18 @@ elcUtils::mkPath(const QString &dirPath, QString &errorString)
         }
     } else {
         errorString = QStringLiteral("Access denied");
+    }
+    return retVal;
+}
+
+QStringList
+elcUtils::getDataSourceList(const QString &path, const QStringList &mask)
+{
+    QStringList retVal;
+
+    QDirIterator it(path, mask, QDir::Files);
+    while(it.hasNext()) {
+        retVal.append(it.next());
     }
     return retVal;
 }

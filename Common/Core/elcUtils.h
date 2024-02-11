@@ -57,5 +57,6 @@ inline const QStringList plLockingMode = { pvNormal, pvExclusive };
 #endif
     void expandEnvironmentStrings(QString &path);
     bool mkPath(const QString &dirPath, QString &errorString);
+    QStringList getDataSourceList(const QString &path, const QStringList &mask);
 }
 #endif // ELCUTILS_H

@@ -1,7 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    CDataSourceListTest \
     CSVLoaderTest \
     CEventLogParserTest \
     CSingleApplicationTest \

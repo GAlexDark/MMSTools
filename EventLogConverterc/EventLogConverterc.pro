@@ -45,7 +45,6 @@ HEADERS += \
     ../Common/Core/stdafx.h \
     ../Common/Core/elcUtils.h \
     src/CConsoleOutput.h \
-    src/CDataSourceList.h \
     src/CElcConsoleAppSettings.h \
     src/QCommandLineParserHelper.h
 
@@ -58,7 +57,6 @@ SOURCES += \
     ../Common/Core/CBasicSettings.cpp \
     ../Common/Core/CElcCommonSettings.cpp \
     ../Common/Core/elcUtils.cpp \
-    src/CDataSourceList.cpp \
     src/CElcConsoleAppSettings.cpp \
     src/QCommandLineParserHelper.cpp \
     src/main.cpp
@@ -71,7 +69,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 0
-BUILD_VER = 20
+BUILD_VER = 21
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

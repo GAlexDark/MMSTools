@@ -18,3 +18,7 @@ SOURCES +=  \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.cpp \
     tst_utilstest.cpp
+
+DEFINES += SRCDIR=\\\"$$PWD/\\\"
+DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
+OTHER_FILES += data/*

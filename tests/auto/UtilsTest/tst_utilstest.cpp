@@ -1,8 +1,26 @@
 #include <QtTest>
 #include <QDebug>
+#include <QFile>
 
 #include "elcUtils.h"
 // add necessary includes here
+
+const int filesCount = 16;
+
+void
+createTestFile(const QString &fileName)
+{
+    QFile f(fileName);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (f.open(QIODeviceBase::WriteOnly)) {
+#else
+    if (f.open(QIODevice::WriteOnly)) {
+#endif
+        f.write("test");
+        f.close();
+    }
+}
 
 class UtilsTest : public QObject
 {
@@ -12,6 +30,9 @@ public:
     UtilsTest();
     ~UtilsTest();
 
+private:
+    QString     m_basePath,
+                m_newDir;
 private slots:
     void test_parseValuesList1();
     void test_parseValuesList2();
@@ -20,9 +41,15 @@ private slots:
 #ifdef Q_OS_WIN
     void test_getWindowsApiErrorMessage();
 #endif
+
+    void initTestCase();
+    void cleanupTestCase();
+    void test_dataSourceListCount();
 };
 
-UtilsTest::UtilsTest() {}
+UtilsTest::UtilsTest()
+    : m_basePath(SRCDIR"data"), m_newDir("source")
+{}
 
 UtilsTest::~UtilsTest() {}
 
@@ -166,6 +193,38 @@ UtilsTest::test_getWindowsApiErrorMessage()
     QCOMPARE(retVal.length(), 29);
 }
 #endif
+
+void
+UtilsTest::initTestCase()
+{
+    QDir dir(m_basePath);
+    bool retVal = dir.mkdir(m_newDir);
+    if (retVal) {
+        QString tstPath = m_basePath + '/' + m_newDir + "/file";
+        tstPath = QDir::fromNativeSeparators(tstPath);
+        QString fileTempl = "%1%2.csv";
+        for (int i = 0; i < filesCount; ++i) {
+            createTestFile(fileTempl.arg(tstPath).arg(i));
+        }
+    }
+    QVERIFY(retVal);
+}
+
+void
+UtilsTest::cleanupTestCase()
+{
+    QString tstPath = m_basePath + '/' + m_newDir;
+    QDir dir(tstPath);
+    dir.removeRecursively();
+}
+
+void
+UtilsTest::test_dataSourceListCount()
+{
+    QString tstPath = m_basePath + '/' + m_newDir;
+    QStringList retVal = elcUtils::getDataSourceList(tstPath, QStringList() << "*.csv");
+    QCOMPARE(retVal.size(), filesCount);
+}
 
 QTEST_APPLESS_MAIN(UtilsTest)
 

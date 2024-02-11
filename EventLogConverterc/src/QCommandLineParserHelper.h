@@ -4,6 +4,8 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 
+enum RunningMode { RUNNINGMODE_DEFAULT, RUNNINGMODE_IMPORT_ONLY, RUNNINGMODE_REPORT_ONLY };
+
 class QCommandLineParserHelper
 {
 public:
@@ -16,6 +18,13 @@ public:
     QStringList excludedUsernames();
     QStringList includedUsernames();
     void showHelpAndExit();
+    RunningMode getRunningMode();
+
+    bool getDataFilesList(QStringList &fileList);
+    QString getReportName();
+    bool getExcludedUserNames(QStringList &excludedUsersList);
+    bool getIncludedUserNames(QStringList &includedUsersList);
+    QString errorString() const { return m_errorString; }
 
 private:
     QCommandLineParser  m_parser;
@@ -25,9 +34,13 @@ private:
                         m_isReportName,
                         m_isExcluded,
                         m_isIncluded;
+    bool                m_isImportOnly,
+                        m_isReportOnly;
 
     QStringList         m_filesList;
+    QString             m_errorString;
 
+    bool checkData(const QStringList &data);
 };
 
 #endif // QCOMMANDLINEPARSERHELPER_H
