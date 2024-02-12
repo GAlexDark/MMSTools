@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     RunningMode runningMode = cmd.getRunningMode();
 
-    if (runningMode == RUNNINGMODE_DEFAULT) {
+    if (runningMode == RUNNINGMODE_DEFAULT || runningMode == RUNNINGMODE_CLEAN_DB) {
         QString cleardb = settings.getMain(SettingsClearOnStartup).toString().trimmed();
         if (cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0)) {
             consoleOut.outToConsole(QStringLiteral("Starting cleaning database..."));
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
 /* IMPORT */
 
-    if (runningMode != RUNNINGMODE_REPORT_ONLY) {
+    if (runningMode != RUNNINGMODE_REPORT_ONLY && runningMode != RUNNINGMODE_CLEAN_DB) {
         QString internalIpFirstOctet = settings.getMain(SettingsInternalIpStartOctet).toString().trimmed();
         if (internalIpFirstOctet.isEmpty() || !elcUtils::sanitizeValue(QStringLiteral("^([0-9.]+)$"), internalIpFirstOctet)) {
             consoleOut.outToConsole(QStringLiteral("Error in internal IP address mask. Please check it in the config file."));
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     }
 /* REPORTING */
 
-    if (runningMode != RUNNINGMODE_IMPORT_ONLY) {
+    if (runningMode != RUNNINGMODE_IMPORT_ONLY && runningMode != RUNNINGMODE_CLEAN_DB) {
         QString reportName = cmd.getReportName();
 
         QStringList excludedUsers, includedUsers;

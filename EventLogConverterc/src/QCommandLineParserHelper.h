@@ -4,7 +4,7 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 
-enum RunningMode { RUNNINGMODE_DEFAULT, RUNNINGMODE_IMPORT_ONLY, RUNNINGMODE_REPORT_ONLY };
+enum RunningMode { RUNNINGMODE_DEFAULT, RUNNINGMODE_IMPORT_ONLY, RUNNINGMODE_REPORT_ONLY, RUNNINGMODE_CLEAN_DB };
 
 class QCommandLineParserHelper
 {
@@ -35,7 +35,8 @@ private:
                         m_isExcluded,
                         m_isIncluded;
     bool                m_isImportOnly,
-                        m_isReportOnly;
+                        m_isReportOnly,
+                        m_isCleanDbOnly;
 
     QStringList         m_filesList;
     QString             m_errorString;

@@ -37,6 +37,7 @@ In this mode cleaning the database on startup will be ignored. When using this o
     const QString reportOnlyDescription = QStringLiteral("The utility starts in the generation report-only mode without importing data. \
 In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\n \
 If these options are not specified, data will be imported and the report generated.");
+    const QString cleanDbOnlyDescription = QStringLiteral("The utility starts in the clear database-only mode without import data and report generation.");
     const QString pathDescription = QStringLiteral("Path to the directory with the MMS Event Log files for the report.");
     const QString filesDescription = QStringLiteral("MMS Event Log data file(s) for the report. Usage:\n-f file1 -f file2 ... -f fileN");
     const QString reportNameDescription = QStringLiteral("Path to the directory and name of the report file.");
@@ -52,29 +53,34 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
         QCommandLineOption reportOnlyOption(QStringList() << "reportonly", reportOnlyDescription);
         retVal = m_parser.addOption(reportOnlyOption);
         if (retVal) {
-            QCommandLineOption pathOption(QStringList() << "p" << "path", pathDescription, "path");
-            retVal = m_parser.addOption(pathOption);
+            QCommandLineOption cleanDbOnlyOption(QStringList() << "cleandb", cleanDbOnlyDescription);
+            retVal = m_parser.addOption(cleanDbOnlyOption);
             if (retVal) {
-                QCommandLineOption filesOption(QStringList() << "f" << "files", filesDescription, "files");
-                retVal = m_parser.addOption(filesOption);
+                QCommandLineOption pathOption(QStringList() << "p" << "path", pathDescription, "path");
+                retVal = m_parser.addOption(pathOption);
                 if (retVal) {
-                    QCommandLineOption reportNameOption(QStringList() << "r" << "report", reportNameDescription, "reportname");
-                    retVal = m_parser.addOption(reportNameOption);
+                    QCommandLineOption filesOption(QStringList() << "f" << "files", filesDescription, "files");
+                    retVal = m_parser.addOption(filesOption);
                     if (retVal) {
-                        QCommandLineOption excludeOption(QStringList() << "e" << "exclude", excludeDescription, "usernames");
-                        retVal = m_parser.addOption(excludeOption);
+                        QCommandLineOption reportNameOption(QStringList() << "r" << "report", reportNameDescription, "reportname");
+                        retVal = m_parser.addOption(reportNameOption);
                         if (retVal) {
-                            QCommandLineOption includeOption(QStringList() << "i" << "include", includeDescription, "usernames");
-                            retVal = m_parser.addOption(includeOption);
+                            QCommandLineOption excludeOption(QStringList() << "e" << "exclude", excludeDescription, "usernames");
+                            retVal = m_parser.addOption(excludeOption);
                             if (retVal) {
-                                m_parser.process(app);
-                                m_isImportOnly = m_parser.isSet(importOnlyOption);
-                                m_isReportOnly = m_parser.isSet(reportOnlyOption);
-                                m_isPath = m_parser.isSet(pathOption);
-                                m_isFiles = m_parser.isSet(filesOption);
-                                m_isReportName = m_parser.isSet(reportNameOption);
-                                m_isExcluded = m_parser.isSet(excludeOption);
-                                m_isIncluded = m_parser.isSet(includeOption);
+                                QCommandLineOption includeOption(QStringList() << "i" << "include", includeDescription, "usernames");
+                                retVal = m_parser.addOption(includeOption);
+                                if (retVal) {
+                                    m_parser.process(app);
+                                    m_isImportOnly = m_parser.isSet(importOnlyOption);
+                                    m_isReportOnly = m_parser.isSet(reportOnlyOption);
+                                    m_isCleanDbOnly = m_parser.isSet(cleanDbOnlyOption);
+                                    m_isPath = m_parser.isSet(pathOption);
+                                    m_isFiles = m_parser.isSet(filesOption);
+                                    m_isReportName = m_parser.isSet(reportNameOption);
+                                    m_isExcluded = m_parser.isSet(excludeOption);
+                                    m_isIncluded = m_parser.isSet(includeOption);
+                                }
                             }
                         }
                     }
@@ -85,8 +91,13 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
 
     if (retVal) {
         const QString error1 = QStringLiteral("The '%1' and '%2' options cannot be specified at the same time.");
-        if (m_isImportOnly && m_isReportOnly) {
-            m_errorString = error1.arg("--importonly", "--reportonly");
+        bool comb1 = m_isImportOnly && m_isReportOnly && m_isCleanDbOnly;
+        bool comb2 = m_isImportOnly && m_isReportOnly;
+        bool comb3 = m_isImportOnly && m_isCleanDbOnly;
+        bool comb4 = m_isReportOnly && m_isCleanDbOnly;
+
+        if (comb1 || comb2 || comb3 || comb4) {
+            m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
             retVal = false;
         }
         if (retVal && m_isExcluded && m_isIncluded) {
@@ -143,16 +154,17 @@ RunningMode
 QCommandLineParserHelper::getRunningMode()
 {
     RunningMode retVal = RUNNINGMODE_DEFAULT;
-    if (m_isImportOnly) {
-        retVal = RUNNINGMODE_IMPORT_ONLY;
-        m_isReportOnly = false;
+    if (m_isCleanDbOnly) {
+        retVal = RUNNINGMODE_CLEAN_DB;
     } else {
-        if (m_isReportOnly) {
-            retVal = RUNNINGMODE_REPORT_ONLY;
-            m_isImportOnly = false;
+        if (m_isImportOnly) {
+            retVal = RUNNINGMODE_IMPORT_ONLY;
+        } else {
+            if (m_isReportOnly) {
+                retVal = RUNNINGMODE_REPORT_ONLY;
+            }
         }
     }
-
     return retVal;
 }
 
