@@ -1,3 +1,19 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2023-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Event Log Conversion GUI Utility
+*
+*  Module name: mainwindow.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     Main file
+*
+****************************************************************************/
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -6,21 +22,13 @@
 #include <QLabel>
 #include <QFile>
 
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-const int simpleReport = 0;
-const int multiReport = 1;
-const int autoReport = 2;
 
 class MainWindow : public QMainWindow
-
 {
     Q_OBJECT
 
@@ -28,60 +36,34 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    QString getDBErrorText() const { return m_dbErrorText; }
-    QString getFileErrorText() const { return m_fileErrorText; }
-
 private:
     Ui::MainWindow *ui;
     QLabel         *m_state;
+    QLabel         *m_mode; // RDS | endpoint (single user)
+    QString         m_lastDir;
+    QString         m_dbName;
+    QStringList     m_fileList;
+    QByteArray      m_fdState;
 
-    QString         m_filename,
-                    m_fileErrorText;
-    QFile           m_file;
-
-    QString         m_buffer;
-    QStringList     m_stringList;
-
-    int             m_logType;
     bool            m_isButtonsDisabled;
+    bool            m_hasHeaders;
 
-    QSqlDatabase    m_db,
-                    m_excelDB;
-    QSqlQuery       m_dbreq;
-    QString         m_ConnectionName,
-                    m_dbErrorText;
-    bool            m_isHasError;
-    int             m_mode;
 
     void disableButtons();
     void enableButtons();
 
-    bool _exec(const QString &query);
-    bool _exec();
-    bool openDB(const QString &dbName);
-    void closeDB();
-    bool prepareRequest(const QString &query);
-    bool beginTransaction();
-    bool commitTransaction();
-
-    bool openEventLogFile();
-    void closeEventLogFile() { m_file.close(); };
-    bool readEventLogFile();
-    void removeCRLF();
-    bool splitIntoLines(QChar eolChar);
-
-    bool doParseEventLogFile();
-    bool doGenerateReport(const QString &fileName = QString());
-    void doParseDone();
-    void doClearDB();
     void setStateText(const QString &state);
-    void setInfoText(const QString &info);
+    void setModeText(const QString &mode);
+
+    bool showOptionsDialog( QStringList &includeUsersList, QStringList &excludeUsersList);
 
 private slots:
     //window menu
     void onAboutProgram();
     void onAboutQt();
+    void onContact();
 
+    void setInfoText(const QString &info);
     //
     void openFileClick();
     void convertEventLogClick();

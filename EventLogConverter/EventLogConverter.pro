@@ -1,13 +1,15 @@
-QT       += core gui sql
+TEMPLATE = app
+
+QT += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
-CONFIG += cmdline precompile_header
+QT_CVERSION = c++11
+CONFIG += QT_CVERSION precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
-#CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -pg -no-pie #-g3 -pg
-#CONFIG(debug, debug|release): QMAKE_LFLAGS_DEBUG += -pg -no-pie #-pg -lgmon
+
+DEFINES += QT_USE_QSTRINGBUILDER
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -19,45 +21,80 @@ QXLSX_HEADERPATH=../Common/3dparty/QXlsx/header/  # current QXlsx header path is
 QXLSX_SOURCEPATH=../Common/3dparty/QXlsx/source/  # current QXlsx source path is ./source/
 include(../Common/3dparty/QXlsx/QXlsx.pri)
 
-
-INCLUDEPATH += ../Common/Settings
+INCLUDEPATH += ../Common/Core
 INCLUDEPATH += . src
 
 # Use Precompiled headers (PCH)
-PRECOMPILED_HEADER  = src/stdafx.h
+PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
-    src/stdafx.h \
-    ../Common/Settings/QPayKioskSettings.h \
-    src/mainwindow.h \
-    src/ELCSettings.h \
+    ../Common/Core/CBasicDatabase.h \
+    ../Common/Core/CElcCommonSettings.h \
+    ../Common/Core/CEventLogParser.h \
+    ../Common/Core/DBStrings.h \
+    ../Common/Core/CReportBuilder.h \
+    ../Common/Core/CSVLoader.h \
+    ../Common/Core/CSingleApplication.h \
+    ../Common/Core/CBasicSettings.h \
+    ../Common/Core/elcUtils.h \
+    ../Common/Core/stdafx.h \
+    src/CElcGuiAppSettings.h \
+    src/OptionsDialog.h \
+    src/mainwindow.h
 
 SOURCES += \
-    ../Common/Settings/QPayKioskSettings.cpp \
+    ../Common/Core/CBasicDatabase.cpp \
+    ../Common/Core/CElcCommonSettings.cpp \
+    ../Common/Core/CEventLogParser.cpp \
+    ../Common/Core/CReportBuilder.cpp \
+    ../Common/Core/CSVLoader.cpp \
+    ../Common/Core/CSingleApplication.cpp \
+    ../Common/Core/CBasicSettings.cpp \
+    ../Common/Core/elcUtils.cpp \
+    src/CElcGuiAppSettings.cpp \
+    src/OptionsDialog.cpp \
     src/main.cpp \
-    src/mainwindow.cpp \
-    src/ELCSettings.cpp
+    src/mainwindow.cpp
 
 FORMS += \
+    src/OptionsDialog.ui \
     src/mainwindow.ui
 
-LANGUAGES = ru en uk
 TRANSLATIONS += \
     i18n/$${TARGET}_ru_RU.ts \
     i18n/$${TARGET}_uk_UA.ts
 
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+CONFIG += lrelease
 
-MOC_DIR = moc
-OBJECTS_DIR = obj
-UI_DIR = GeneratedFiles
-UI_HEADERS_DIR = GeneratedFiles
-UI_SOURCES_DIR = GeneratedFiles
-#RCC_DIR = rcc
+include(../deployment.pri)
 
-RESOURCES += EventLogConverter.qrc
-RC_FILE = $${TARGET}.rc
+RESOURCES += $${TARGET}.qrc
 
+include(../MMSTools.pri)
+
+RC_ICONS = img/elc.ico
+
+MAJOR_VER = 2
+MINOR_VER = 0
+PATCH_VER = 1
+BUILD_VER = 22
+BUILD_DATE = $$_DATE_
+
+VER_PE = $${MAJOR_VER}.$${MINOR_VER}
+win32:VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER}.$${BUILD_VER} # major.minor.patch.build
+else: VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
+
+VERSION_PE_HEADER = $${VER_PE}
+VERSION = $${VERSTR}
+QMAKE_TARGET_DESCRIPTION = MMS Event Log Conversion GUI Utility
+QMAKE_TARGET_COPYRIGHT = (C) 2023 Oleksii Gaienko
+QMAKE_TARGET_PRODUCT = MMS Event Log Conversion Utility
+QMAKE_TARGET_INTERNALNAME = $${TARGET}
+QMAKE_TARGET_COMMENTS = support@galexsoftware.info
+
+DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
+DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"
+DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
+DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""
+DEFINES += QT_VER=\\\"$${QT_VERSION}\\\"
+DEFINES += CONTACT=\\\"support@galexsoftware.info\\\"

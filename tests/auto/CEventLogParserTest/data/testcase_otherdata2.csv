@@ -1,0 +1,185 @@
+﻿"mr_data","2023-05-31T10:19:09.84Z","9afa5af2e524f0ed","Financial Guarantee","Maximum Sales Volume Distribution modified
+  {
+  ""max sales volume update list"": [
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""56X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 2.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 18.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 12.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 18.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""99X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 32.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 18.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    },
+    {
+      ""brpEic"": ""99X0000000000000"",
+      ""mpEic"": ""62X0000000000000"",
+      ""mba"": ""99Y0000F--000000"",
+      ""share"": 0.0,
+      ""proRata"": false,
+      ""validFrom"": ""2023-06-02"",
+      ""validTo"": ""2023-06-02"",
+      ""type"": ""VALIDATE_SCHEDULES""
+    }
+  ]
+}"
