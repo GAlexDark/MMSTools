@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2023-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CSVLoader.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The classes for loading data from the text files to the DB.
+*
+****************************************************************************/
+
 #include "CSVLoader.h"
 #include <QTextStream>
 

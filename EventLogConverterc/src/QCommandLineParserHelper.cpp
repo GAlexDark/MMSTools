@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Event Log Conversion Console Utility
+*
+*  Module name: QCommandLineParserHelper.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The console utility input arguments parsing class.
+*
+****************************************************************************/
+
 #include "QCommandLineParserHelper.h"
 #include <QFileInfo>
 #include <QDir>
@@ -37,7 +54,7 @@ In this mode cleaning the database on startup will be ignored. When using this o
     const QString reportOnlyDescription = QStringLiteral("The utility starts in the generation report-only mode without importing data. \
 In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\n \
 If these options are not specified, data will be imported and the report generated.");
-    const QString cleanDbOnlyDescription = QStringLiteral("The utility starts in the clear database-only mode without import data and report generation.");
+    const QString cleanDbOnlyDescription = QStringLiteral("The utility starts in the clean database-only mode without import data and report generation.");
     const QString pathDescription = QStringLiteral("Path to the directory with the MMS Event Log files for the report.");
     const QString filesDescription = QStringLiteral("MMS Event Log data file(s) for the report. Usage:\n-f file1 -f file2 ... -f fileN");
     const QString reportNameDescription = QStringLiteral("Path to the directory and name of the report file.");

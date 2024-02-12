@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Common module
+*  Common module
+*
+*  Module name: elcUtils.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The common constants and functions
+*
+****************************************************************************/
+
 #include "elcUtils.h"
 
 #include <QRegularExpression>
@@ -35,13 +52,13 @@ elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 }
 
 QString
-elcUtils::sanitizeValue(const QString &value, const QStringList &alloedValues, const QString &defaultValue)
+elcUtils::sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue)
 {
     QString retVal;
     if (value.isEmpty()) {
         retVal = defaultValue;
     } else {
-        retVal = (alloedValues.contains(value, Qt::CaseInsensitive))? value : defaultValue;
+        retVal = (allowedValues.contains(value, Qt::CaseInsensitive))? value : defaultValue;
     }
     return retVal;
 }

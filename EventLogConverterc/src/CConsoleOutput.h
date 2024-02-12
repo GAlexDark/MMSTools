@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Event Log Conversion Console Utility
+*
+*  Module name: CConsoleOutput.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The class for output messages to the console
+*
+****************************************************************************/
+
 #ifndef CCONSOLEOUTPUT_H
 #define CCONSOLEOUTPUT_H
 

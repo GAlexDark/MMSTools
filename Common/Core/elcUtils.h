@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Common module
+*  Common module
+*
+*  Module name: elcUtils.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The common constants and functions
+*
+****************************************************************************/
+
 #ifndef ELCUTILS_H
 #define ELCUTILS_H
 
@@ -43,7 +60,7 @@ inline const QStringList plLockingMode = { pvNormal, pvExclusive };
  */
     bool sanitizeValue(const QString &value);
     bool sanitizeValue(const QString &pattern, const QString &value);
-    QString sanitizeValue(const QString &value, const QStringList &alloedValues, const QString &defaultValue);
+    QString sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue);
     QStringList parseValuesList(QString data);
     void parseValuesList(QStringList &data);
     bool trunvateDB(const QString &connectionString, QString &errorString);

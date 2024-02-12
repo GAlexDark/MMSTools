@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2023-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: DBStrings.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The strings used for work with the DB.
+*
+****************************************************************************/
+
 #ifndef DBSTRINGS_H
 #define DBSTRINGS_H
 

@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Event Log Conversion Console Utility
+*
+*  Module name: main.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     Main file
+*
+****************************************************************************/
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QMap>

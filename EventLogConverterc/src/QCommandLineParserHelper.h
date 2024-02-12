@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Event Log Conversion Console Utility
+*
+*  Module name: QCommandLineParserHelper.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The console utility input arguments parsing class.
+*
+****************************************************************************/
+
 #ifndef QCOMMANDLINEPARSERHELPER_H
 #define QCOMMANDLINEPARSERHELPER_H
 

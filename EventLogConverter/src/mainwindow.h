@@ -1,3 +1,19 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2023-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Event Log Conversion GUI Utility
+*
+*  Module name: mainwindow.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     Main file
+*
+****************************************************************************/
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H

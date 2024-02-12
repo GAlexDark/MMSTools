@@ -1,3 +1,21 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2023-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CReportBuilder.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The classes for creating the report from MMS Event Logs.
+*
+****************************************************************************/
+
+
 #ifndef CREPORTBUILDER_H
 #define CREPORTBUILDER_H
 

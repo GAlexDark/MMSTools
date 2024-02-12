@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CEventLogParser.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The class for MMS Event logs parsing.
+*
+****************************************************************************/
+
 #ifndef CEVENTLOGPARSER_H
 #define CEVENTLOGPARSER_H
 

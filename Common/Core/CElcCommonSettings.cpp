@@ -1,6 +1,6 @@
 /****************************************************************************
 *
-*  Copyright (c) Oleksii Gaienko, 2023
+*  Copyright (c) Oleksii Gaienko, 2023-2024
 *  Contact: galexsoftware@gmail.com
 *
 *  Event Log Conversion Utility
