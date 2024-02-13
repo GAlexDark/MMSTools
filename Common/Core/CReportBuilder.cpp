@@ -132,6 +132,17 @@ CReportBuilder::generateReport()
 //    __DEBUG( getAllRecords.arg(args) )
     const QString eolMaskCode = QStringLiteral("@N@");
     const QString eolChar = QStringLiteral("\n");
+    const QString emptyChar = QStringLiteral("");
+
+    const QString vs_long = QStringLiteral("VALIDATE_SCHEDULES");
+    const QString vs_short = QStringLiteral("V_S");
+    const QString std_long = QStringLiteral("SEND_TO_DAM");
+    const QString std_short = QStringLiteral("S_T_D");
+    const QString doubleSpace = QStringLiteral("  ");
+    const QString space = QStringLiteral(" ");
+    const QString doubleBackslash = QStringLiteral("\"\"");
+    const QString backslash = QStringLiteral("\"");
+
     bool retVal = m_db->exec(getAllRecords.arg(args));
     if (retVal) {
         int row = 2;
@@ -153,6 +164,16 @@ CReportBuilder::generateReport()
 
             buf = m_db->geValue(5).toString();
             buf.replace(eolMaskCode, eolChar, Qt::CaseInsensitive);
+            buf.replace(doubleBackslash, backslash);
+            //ref: https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3
+            if (buf.length() > 32767) { //this line is too long
+                buf.replace(eolChar, emptyChar);
+                while (buf.indexOf(doubleSpace) != -1) {
+                    buf.replace(doubleSpace, space);
+                }
+                buf.replace(vs_long, vs_short);
+                buf.replace(std_long, std_short);
+            }
             writeValue = buf;
             xlsxReport.write(row, colDetails, writeValue);
 
