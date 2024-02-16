@@ -86,10 +86,13 @@ int main(int argc, char *argv[])
 /* PREPARE */
 
     RunningMode runningMode = cmd.getRunningMode();
-
     if (runningMode == RUNNINGMODE_DEFAULT || runningMode == RUNNINGMODE_CLEAN_DB) {
         QString cleardb = settings.getMain(SettingsClearOnStartup).toString().trimmed();
-        if (cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0)) {
+        bool comb1 = cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0);
+        if (runningMode == RUNNINGMODE_CLEAN_DB) { //ignoring settings
+            comb1 = true;
+        }
+        if (comb1) {
             consoleOut.outToConsole(QStringLiteral("Starting cleaning database..."));
             if (!elcUtils::trunvateDB(dbName, errorString)) {
                 consoleOut.outToConsole(QStringLiteral("Cannot clean database: %1").arg(errorString));
