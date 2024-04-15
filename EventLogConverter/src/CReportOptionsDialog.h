@@ -14,7 +14,7 @@ class CReportOptionsDialog : public QDialog
 public:
     explicit CReportOptionsDialog(const quint16 logID, const QStringList &logsList, QWidget *parent = nullptr);
     ~CReportOptionsDialog();
-    void getOptions(quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList);
+    bool getOptions(quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList);
 
 private slots:
     void doOkClicked();
@@ -23,6 +23,7 @@ private slots:
 private:
     Ui::CReportOptionsDialog *ui;
     quint16 m_logID;
+    bool    m_isOkClicked;
 
     QStringList m_includeUsersList;
     QStringList m_excludeUsersList;

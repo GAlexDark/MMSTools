@@ -79,14 +79,16 @@ bool
 MainWindow::showReportOptionsDialog(const QStringList &logsList, quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList)
 {
     bool retVal = true;
+    m_errorString.clear();
     try {
         CReportOptionsDialog *wnd = new CReportOptionsDialog(logID, logsList, this);
         wnd->exec();
-        wnd->getOptions(logID, includeUsersList, excludeUsersList);
+        retVal = wnd->getOptions(logID, includeUsersList, excludeUsersList);
         delete wnd;
     } catch (const std::bad_alloc &e) {
         retVal = false;
-        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Critical error: %1").arg(e.what()), QMessageBox::Ok);
+        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
 
     return retVal;
@@ -260,7 +262,13 @@ MainWindow::openFileClick()
         } else {
             if (!m_errorString.isEmpty()) {
                 setInfoText(tr("Error open options dialog."));
+                setInfoText(m_errorString);
                 setStateText(tr("Error"));
+            } else {
+                QString buf = tr("File selection canceled.");
+                setInfoText(buf);
+                setStateText(buf);
+                m_fileList.clear();
             }
         }
     } else {
@@ -420,8 +428,13 @@ MainWindow::generateReportClick()
             setStateText(tr("Ready"));
         }
     } else {
-        setInfoText(tr("Error open options dialog."));
-        setStateText(tr("Error"));
+        if (!m_errorString.isEmpty()) {
+            setInfoText(tr("Error open options dialog."));
+            setInfoText(m_errorString);
+            setStateText(tr("Error"));
+        } else {
+            setInfoText(tr("Report generation canceled."));
+        }
     }
 
     enableButtons();

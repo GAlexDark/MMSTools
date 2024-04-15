@@ -28,6 +28,7 @@ CReportOptionsDialog::CReportOptionsDialog(const quint16 logID, const QStringLis
     ui->comboBox->setCurrentIndex(logID);
 
     m_logID = logID;
+    m_isOkClicked = false;
     clearLists();
 }
 
@@ -36,12 +37,13 @@ CReportOptionsDialog::~CReportOptionsDialog()
     delete ui;
 }
 
-void
+bool
 CReportOptionsDialog::getOptions(quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList)
 {
     logID = m_logID;
     includeUsersList = m_includeUsersList;
     excludeUsersList = m_excludeUsersList;
+    return m_isOkClicked;
 }
 
 void
@@ -90,6 +92,7 @@ CReportOptionsDialog::doOkClicked()
     }
 
     if (!isError) {
+        m_isOkClicked = true;
         close();
     }
 }
@@ -99,5 +102,6 @@ CReportOptionsDialog::doCancelClicked()
 {
     clearLists();
     m_logID = 0;
+    m_isOkClicked = false;
     close();
 }
