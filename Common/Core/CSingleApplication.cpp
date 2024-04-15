@@ -7,9 +7,9 @@
 
 //#include "Debug.h"
 
-inline const QString sharedMemory_prefix = QStringLiteral("_m");
-inline const QString semaphore_prefix = QStringLiteral("_s");
-inline const QString ELC_PID_FILENAME = QStringLiteral("PID");
+const QString sharedMemory_prefix = QLatin1String("_m");
+const QString semaphore_prefix = QLatin1String("_s");
+const QString ELC_PID_FILENAME = QLatin1String("PID");
 
 /*
 https://stackoverflow.com/questions/17431205/qsharedmemory-signals-and-qbuffer

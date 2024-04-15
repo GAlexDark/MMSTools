@@ -11,9 +11,11 @@ CONFIG -= app_bundle
 INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicParser.h \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.h
 
 SOURCES +=  \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicParser.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.cpp \
     tst_ceventlogparsertest.cpp
 

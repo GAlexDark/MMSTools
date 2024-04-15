@@ -1,35 +1,33 @@
-#ifndef OPTIONSDIALOG_H
-#define OPTIONSDIALOG_H
+#ifndef CREPORTOPTIONSDIALOG_H
+#define CREPORTOPTIONSDIALOG_H
 
 #include <QDialog>
 
 namespace Ui {
-class OptionsDialog;
+class CReportOptionsDialog;
 }
 
-class OptionsDialog : public QDialog
+class CReportOptionsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit OptionsDialog(QWidget *parent = nullptr);
-    ~OptionsDialog();
-
-    QStringList getIncludeUsersList() const { return m_includeUsersList; }
-    QStringList getExcludeUsersList() const { return m_excludeUsersList; }
+    explicit CReportOptionsDialog(const quint16 logID, const QStringList &logsList, QWidget *parent = nullptr);
+    ~CReportOptionsDialog();
+    void getOptions(quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList);
 
 private slots:
     void doOkClicked();
     void doCancelClicked();
 
 private:
-    Ui::OptionsDialog *ui;
+    Ui::CReportOptionsDialog *ui;
+    quint16 m_logID;
 
     QStringList m_includeUsersList;
     QStringList m_excludeUsersList;
 
-    bool sanitizeValue(const QString &value);
     void clearLists();
 };
 
-#endif // OPTIONSDIALOG_H
+#endif // CREPORTOPTIONSDIALOG_H

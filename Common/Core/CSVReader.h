@@ -15,96 +15,86 @@
 *
 ****************************************************************************/
 
-#ifndef CSVLOADER_H
-#define CSVLOADER_H
+#ifndef CSVREADER_H
+#define CSVREADER_H
 
 #include <QFile>
 #include <QMap>
 #include <QThread>
 
-#include "CEventLogParser.h"
+#include "CBasicParser.h"
 #include "CBasicDatabase.h"
+#include "MMSTypes.h"
 
-const qint64 defBufferSize = 128 * 1024; // 128KB
 const qint64 defMaxFileSize = 1024 * 1024; // 1M
 
-using pragmaList_t = QMap<QString, QString>;
-
-class CTextFileLoader
+class CTextFileReader
 {
 public:
-    explicit CTextFileLoader();
-    virtual ~CTextFileLoader();
+    explicit CTextFileReader();
+    virtual ~CTextFileReader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    bool init(bool dataHasHeaders, const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
+    bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
     bool read();
     QString errorString() const { return m_errorString; }
 
 private:
     QFile       m_file;
 
+    char        m_delimiterChar;
+    char        m_quoteChar;
     QByteArray  m_eolChars;
+
     QByteArray  *m_buffer;
-    qint64      m_bufferSize;
     QString     m_fileName;
     bool        m_isHeaders;
 
+    bool checkBOM(const QByteArray &buffer);
     bool readLargeFile();
     bool readSmallFile();
 
     //std::function<void(const QString&)> m_callbackFunction;
 
 protected:
-    virtual void prepareData(QString &data) = 0;
-    virtual bool convertData(const QString &line) =0;
+    qint64 indexOfEol(const QByteArray *data, const qint64 startPos, const qint64 size);
+    virtual bool convertData(const QString &line) = 0;
 
     QString     m_errorString;
     QStringList m_fileNames;
-    quint64      m_lineNumber;
+    quint64     m_lineNumber;
 
     void setFileName(const QString &fileName) { m_fileName = fileName; }
 };
 
 //-------------------------------------------------------------------------
 
-class CEventLogLoader: public CTextFileLoader
+class CMmsLogsReader: public CTextFileReader
 {
 public:
-    ~CEventLogLoader();
-    bool init(const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet, pragmaList_t *pragmaList,
-              const QByteArray &eolChars = "\n", qint64 bufferSize = defBufferSize);
+    CMmsLogsReader();
+    ~CMmsLogsReader();
+    bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
+              const QString &internalIpFirstOctet, mms::pragmaList_t *pragmaList);
 
     bool convertData(const QString &line) override;
-    void prepareData(QString &data) override;
+    QString insertString() const { return m_parser->insertString(); }
 
 private:
-    CEventLogParser   m_parser;
-
-    TDataItem   m_data;
-    QString     m_username,
-                m_timestampISO8601,
-                m_requestID,
-                m_type,
-                m_details,
-                m_username1,
-                m_authType,
-                m_externalIP,
-                m_internalIP;
-    QDateTime   m_timestampTZ;
-
-    bool initDB(const QString &dbFileName, pragmaList_t *pragmaList);
+    pBasicParser    m_parser; // don't use the 'detele' operator, the ParserManager manage resources
+    dataItem_t      m_data;
+    bool initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList);
 
 protected:
     CBasicDatabase  m_db;
 };
 
 //-------------------------------------------------------------------------
-class CEventLogThreadLoader: public QThread, public CEventLogLoader
+class CMmsLogsThreadReader: public QThread, public CMmsLogsReader
 {
     Q_OBJECT
 public:
-    explicit CEventLogThreadLoader();
+    explicit CMmsLogsThreadReader();
     void run();
     bool getStatus() const { return m_retVal; }
 
@@ -116,4 +106,4 @@ private:
 
 };
 
-#endif // CSVLOADER_H
+#endif // CSVREADER_H

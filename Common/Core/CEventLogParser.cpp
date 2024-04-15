@@ -19,86 +19,20 @@
 #include "CEventLogParser.h"
 #include <QRegularExpression>
 
+#include "DBStrings.h"
+
 //#include "Debug.h"
 
-QRegularExpression reHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
-QRegularExpression reSuccessLogon("^username:\\s(.*?),@N@\\s\\stype:\\s(.*?),@N@\\s\\sip\\saddress:\\s(.*?)$");
-QRegularExpression reFailedLogon("^type:\\s(.*?)@N@\\s\\sip\\saddress:\\s(.*?)$");
+QRegularExpression reEventLogHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
+QRegularExpression reSuccessLogon("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$");
+QRegularExpression reFailedLogon("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$");
 
-inline QString authSuccess = QStringLiteral("Вхід користувача - успішно");
-inline QString authFailed = QStringLiteral("Вхід користувача - невдало");
-
-void
-CEventLogParser::removeQuote(QString &data, QChar quoteChar)
-{    
-    if (!data.isEmpty()) {
-        if (data.startsWith(quoteChar)) {
-            data = data.mid(1);
-        }
-        qsizetype lastChar = data.length() - 1;
-        if (data.endsWith(quoteChar)) {
-            data = data.left(lastChar);
-        }
-    }
-}
-
-void
-CEventLogParser::parseHeaderString(QChar quoteChar)
-{
-    qsizetype from = 0;
-    qsizetype next = m_header.indexOf(',', from);
-    m_username = m_header.mid(from, next);
-    removeQuote(m_username, quoteChar);
-    from = next +1;
-
-    next = m_header.indexOf(',', from);
-    m_timestampISO8601 = m_header.mid(from, next - from);
-    removeQuote(m_timestampISO8601, quoteChar);
-    from = next +1;
-
-    next = m_header.indexOf(',', from);
-    m_requestID = m_header.mid(from, next - from);
-    removeQuote(m_requestID, quoteChar);
-    from = next +1;
-
-    next = m_header.indexOf(',', from);
-    m_type = m_header.mid(from, next - from);
-    removeQuote(m_type, quoteChar);
-}
+const QString authSuccessUk("Вхід користувача - успішно");
+const QString authSuccessEn("User login - successful");
+const QString authFailedUk("Вхід користувача - невдало");
+const QString authFailedEn("User login - unsuccessful");
 
 //=================================================================================
-void
-CEventLogParser::analizeIPAdresses(const QString &ipaddresses)
-{
-    qsizetype pos = ipaddresses.indexOf(',');
-    if (pos != -1) {
-        QString firstip = ipaddresses.mid(0, pos).trimmed();
-        QString secondip = ipaddresses.mid(pos + 1).trimmed();
-        bool isPrivateFirstIP = firstip.startsWith(m_internalIpFirstOctet);
-        bool isPrivateSecondIP = secondip.startsWith(m_internalIpFirstOctet);
-
-        if (isPrivateFirstIP && isPrivateSecondIP) {
-            m_externalip.clear();
-            m_internalip = ipaddresses;
-        } else {
-            if (isPrivateFirstIP) {
-                m_externalip = secondip;
-                m_internalip = firstip;
-            } else {
-                m_externalip = firstip;
-                m_internalip = secondip;
-            }
-        } // if &&
-    } else {
-        if (ipaddresses.startsWith(m_internalIpFirstOctet)) {
-            m_externalip.clear();
-            m_internalip = ipaddresses;
-        } else {
-            m_externalip = ipaddresses;
-            m_internalip.clear();
-        }
-    } // (pos != -1)
-}
 
 bool
 CEventLogParser::parseUserSuccessLogonDetails()
@@ -107,7 +41,6 @@ CEventLogParser::parseUserSuccessLogonDetails()
     bool retVal = match.hasMatch();
     if (retVal) {
         m_username1 = match.captured(1).trimmed();
-
         m_authType = match.captured(2).trimmed();
 
         QString ipaddresses = match.captured(3).trimmed();
@@ -139,36 +72,41 @@ bool
 CEventLogParser::parseUserLogonDetails()
 {
     bool retVal = false;
-    if (QString::compare(m_type, authSuccess, Qt::CaseInsensitive) == 0) {
+    if ((QString::compare(m_type, authSuccessUk, Qt::CaseInsensitive) == 0) ||
+        (QString::compare(m_type, authSuccessEn, Qt::CaseInsensitive) == 0)) {
         retVal = parseUserSuccessLogonDetails();
     } else {
-        if (QString::compare(m_type, authFailed, Qt::CaseInsensitive) == 0) {
+        if ((QString::compare(m_type, authFailedUk, Qt::CaseInsensitive) == 0) ||
+            (QString::compare(m_type, authFailedEn, Qt::CaseInsensitive) == 0)) {
             retVal = parseUserFailedLogonDetails();
         }
     }
     return retVal;
 }
 
-void
-CEventLogParser::init(const QString &internalIpFirstOctet)
+CEventLogParser::CEventLogParser()
 {
-    m_internalIpFirstOctet = internalIpFirstOctet;
+    m_delimiterChar = ',';
+    m_quoteChar = '"';
+    m_eolChars = "\r\n";
 }
 
 bool
 CEventLogParser::parse(const QString &line)
 {
     m_details = line;
-    m_details.replace('\n', QLatin1String("@N@"), Qt::CaseInsensitive);
 
     bool retVal = false;
-    QRegularExpressionMatch match = reHeader.match(m_details);
+    QRegularExpressionMatch match = reEventLogHeader.match(m_details);
     if (match.hasMatch()) {
-        m_header = match.captured(0);
-        parseHeaderString('"');
+        m_header = match.captured(1);
+        m_username = match.captured(2);
+        m_timestampISO8601 = match.captured(3);
+        m_requestID = match.captured(4);
+        m_type = match.captured(5);
 
         m_details = m_details.mid(m_header.length() + 1);
-        removeQuote(m_details, '"');
+        removeQuote(m_details, m_quoteChar);
 
         m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
         if (m_timestamp.isValid()) {
@@ -189,6 +127,27 @@ CEventLogParser::parse(const QString &line)
         m_errorString = QStringLiteral("Wrong header.\nDetails: %1").arg(m_details);
     }
     return retVal;
+}
+
+void
+CEventLogParser::convertData(mms::dataItem_t &data)
+{
+    data[phUsername] = m_username;
+    data[phTimestampISO8601] = m_timestampISO8601;
+    data[phTimestamp] = m_timestamptz;
+    data[phRequestID] = m_requestID;
+    data[phType] = m_type;
+    data[phDetails] = m_details;
+    data[phUsername1] = m_username1;
+    data[phAuthType] = m_authType;
+    data[phExternalip] = m_externalip;
+    data[phInternalip] = m_internalip;
+}
+
+QString
+CEventLogParser::insertString() const
+{
+    return eventlog::insertData;
 }
 
 void
@@ -215,4 +174,8 @@ CEventLogParser::getParsedData(QString &username,
     timestampTZ = m_timestamptz;
 }
 
-
+QString
+CEventLogParser::createTable() const
+{
+    return eventlog::createTable;
+}

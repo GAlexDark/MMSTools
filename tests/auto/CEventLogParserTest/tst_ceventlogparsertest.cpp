@@ -31,8 +31,11 @@ private:
 
 private slots:
     void initTestCase();
-    void test_successAuth_wALL_ips();
-    void test_failedAuth();
+    void initTestCaseEng();
+    void test_successAuth_wALL_ipsUkrLang();
+    void test_successAuth_wALL_ipsEngLang();
+    void test_failedAuthUkrLang();
+    void test_failedAuthEngLang();
     void test_successAuth_wINTERNAL_ips();
     void test_successAuth_wEXTERNAL_ips();
     void test_otherData1();
@@ -65,7 +68,27 @@ void CEventLogParserTest::initTestCase()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 }
 
-void CEventLogParserTest::test_successAuth_wALL_ips() {
+void CEventLogParserTest::initTestCaseEng()
+{
+    // All fields are not empty
+    QFile file(SRCDIR"data/testcase_success_wAll_ips_engLang.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
+    QVERIFY(retVal);
+    QByteArray buf = file.readAll();
+    QVERIFY(!buf.isEmpty());
+    file.close();
+
+    m_parser.init("10.");
+    m_parser.parse(buf);
+    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
+                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
+}
+
+void CEventLogParserTest::test_successAuth_wALL_ipsUkrLang() {
     qDebug() << "Testcase: Success auth with all IPs (internal + external)";
 
     initTestCase();
@@ -74,7 +97,7 @@ void CEventLogParserTest::test_successAuth_wALL_ips() {
     QCOMPARE(m_timestampISO8601, QString("2023-05-09T11:19:57.36Z"));
     QCOMPARE(m_requestID, QString("edbfa4ea24038861"));
     QCOMPARE(m_type, QString("Вхід користувача - успішно"));
-    QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
+    QCOMPARE(m_details, QString("username: mr_data,\n  type: PASSWORD,\n  ip address: 192.0.2.211, 10.10.10.10"));
     QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString("192.0.2.211"));
@@ -82,7 +105,24 @@ void CEventLogParserTest::test_successAuth_wALL_ips() {
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
 }
 
-void CEventLogParserTest::test_failedAuth() {
+void CEventLogParserTest::test_successAuth_wALL_ipsEngLang() {
+    qDebug() << "Testcase: Success auth with all IPs (internal + external)";
+
+    initTestCaseEng();
+
+    QCOMPARE(m_username, QString("mr_data"));
+    QCOMPARE(m_timestampISO8601, QString("2023-05-09T11:19:57.36Z"));
+    QCOMPARE(m_requestID, QString("edbfa4ea24038861"));
+    QCOMPARE(m_type, QString("User login - successful"));
+    QCOMPARE(m_details, QString("username: mr_data,\n  type: PASSWORD,\n  ip address: 192.0.2.211, 10.10.10.10"));
+    QCOMPARE(m_username1, QString("mr_data"));
+    QCOMPARE(m_authType, QString("PASSWORD"));
+    QCOMPARE(m_externalIP, QString("192.0.2.211"));
+    QCOMPARE(m_internalIP, QString("10.10.10.10"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
+}
+
+void CEventLogParserTest::test_failedAuthUkrLang() {
     qDebug() << "Testcase: Failed auth";
 
     initTestCase(); // for checking empty fields
@@ -106,7 +146,39 @@ void CEventLogParserTest::test_failedAuth() {
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:25:46.717Z"));
     QCOMPARE(m_requestID, QString("693d40a5f9e0e2ec"));
     QCOMPARE(m_type, QString("Вхід користувача - невдало"));
-    QCOMPARE(m_details, QString("type: PASSWORD@N@  ip address: 10.10.10.10"));
+    QCOMPARE(m_details, QString("type: PASSWORD\n  ip address: 10.10.10.10"));
+    QCOMPARE(m_username1, QString());
+    QCOMPARE(m_authType, QString("PASSWORD"));
+    QCOMPARE(m_externalIP, QString());
+    QCOMPARE(m_internalIP, QString("10.10.10.10"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
+}
+
+void CEventLogParserTest::test_failedAuthEngLang() {
+    qDebug() << "Testcase: Failed auth";
+
+    initTestCase(); // for checking empty fields
+
+    QFile file(SRCDIR"data/testcase_failed_engLang.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
+    QVERIFY(retVal);
+    QByteArray buf = file.readAll();
+    QVERIFY(!buf.isEmpty());
+    file.close();
+
+    m_parser.parse(buf);
+    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
+                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
+
+    QCOMPARE(m_username, QString());
+    QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:25:46.717Z"));
+    QCOMPARE(m_requestID, QString("693d40a5f9e0e2ec"));
+    QCOMPARE(m_type, QString("User login - unsuccessful"));
+    QCOMPARE(m_details, QString("type: PASSWORD\n  ip address: 10.10.10.10"));
     QCOMPARE(m_username1, QString());
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString());
@@ -138,7 +210,7 @@ void CEventLogParserTest::test_successAuth_wINTERNAL_ips() {
     QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:40:06.777Z"));
     QCOMPARE(m_requestID, QString("10ff82c8e706c291"));
     QCOMPARE(m_type, QString("Вхід користувача - успішно"));
-    QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 10.10.1.13, 10.10.10.10"));
+    QCOMPARE(m_details, QString("username: mr_data,\n  type: PASSWORD,\n  ip address: 10.10.1.13, 10.10.10.10"));
     QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString());
@@ -170,7 +242,7 @@ void CEventLogParserTest::test_successAuth_wEXTERNAL_ips() {
     QCOMPARE(m_timestampISO8601, QString("2022-10-17T06:46:45.443Z"));
     QCOMPARE(m_requestID, QString("7eab70f76c744995"));
     QCOMPARE(m_type, QString("Вхід користувача - успішно"));
-    QCOMPARE(m_details, QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.118"));
+    QCOMPARE(m_details, QString("username: mr_data,\n  type: PASSWORD,\n  ip address: 192.0.2.118"));
     QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString("192.0.2.118"));

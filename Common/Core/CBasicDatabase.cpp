@@ -20,6 +20,8 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlRecord>
 
+//#include "Debug.h"
+
 void
 CBasicDatabase::_Deinit()
 {
@@ -119,6 +121,7 @@ CBasicDatabase::open()
         if (retVal) {
             try {
                 m_SQLRes = new QSqlQuery(m_db); // <-- единое связывание всех запросов
+                Q_CHECK_PTR(m_SQLRes);
 
             } catch (const std::bad_alloc &e) {
                 m_errorString = QStringLiteral("Fatal SQL Query Error: %1").arg(e.what());
@@ -206,7 +209,7 @@ CBasicDatabase::optimizeDatabaseSize()
     if (m_SQLRes->isActive()) {
         m_SQLRes->finish();
     }
-    return _exec(QStringLiteral("VACUUM;"));
+    return _exec(QLatin1String("VACUUM;"));
 }
 
 bool
@@ -215,7 +218,7 @@ CBasicDatabase::truncateTable(const QString &tableName)
     if (m_SQLRes->isActive()) {
         m_SQLRes->finish();
     }
-    bool retVal = _exec(QStringLiteral("drop table if exists [%1];").arg(tableName));
+    bool retVal = _exec(QLatin1String("drop table if exists [%1];").arg(tableName));
     if (retVal) {
         retVal = optimizeDatabaseSize();
     }
@@ -235,11 +238,11 @@ CBasicDatabase::prepareRequest(const QString &query)
 }
 
 bool
-CBasicDatabase::execRequest(TDataItem *data)
+CBasicDatabase::execRequest(pDataItem data)
 {
     Q_CHECK_PTR(data);
-    TDataItem::iterator itStart = data->begin();
-    TDataItem::iterator itEnd = data->end();
+    dataItem_t::iterator itStart = data->begin();
+    dataItem_t::iterator itEnd = data->end();
 
     while (itStart != itEnd) {
         m_SQLRes->bindValue (itStart.key(), itStart.value());
@@ -251,13 +254,13 @@ CBasicDatabase::execRequest(TDataItem *data)
 }
 
 bool
-CBasicDatabase::insertToDB(const QString &query, TDataItem *data)
+CBasicDatabase::insertToDB(const QString &query, pDataItem data)
 {
     Q_CHECK_PTR(data);
     bool retVal = prepareRequest(query);
     if (retVal) {
-        TDataItem::iterator itStart = data->begin();
-        TDataItem::iterator itEnd = data->end();
+        dataItem_t::iterator itStart = data->begin();
+        dataItem_t::iterator itEnd = data->end();
 
         while (itStart != itEnd) {
             m_SQLRes->bindValue (itStart.key(), itStart.value());
@@ -269,11 +272,11 @@ CBasicDatabase::insertToDB(const QString &query, TDataItem *data)
     return retVal;
 }
 
-TDataList
+dataList_t
 CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
 {
     bool hasResult = false;
-    TDataList retVal;
+    dataList_t retVal;
     if (exec(query)) {
         QStringList item;
 
@@ -296,7 +299,7 @@ CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
         }
         m_SQLRes->finish();
     }
-    return (hasResult)? retVal : TDataList();
+    return (hasResult)? retVal : dataList_t();
 }
 
 bool

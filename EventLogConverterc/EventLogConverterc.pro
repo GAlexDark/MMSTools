@@ -33,30 +33,13 @@ INCLUDEPATH += . src
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
+include(../commonmodules.pro)
 HEADERS += \
-    ../Common/Core/CBasicDatabase.h \
-    ../Common/Core/DBStrings.h \
-    ../Common/Core/CReportBuilder.h \
-    ../Common/Core/CSVLoader.h \
-    ../Common/Core/CEventLogParser.h \
-    ../Common/Core/CSingleApplication.h \
-    ../Common/Core/CBasicSettings.h \
-    ../Common/Core/CElcCommonSettings.h \
-    ../Common/Core/stdafx.h \
-    ../Common/Core/elcUtils.h \
     src/CConsoleOutput.h \
     src/CElcConsoleAppSettings.h \
     src/QCommandLineParserHelper.h
 
 SOURCES += \
-    ../Common/Core/CBasicDatabase.cpp \
-    ../Common/Core/CReportBuilder.cpp \
-    ../Common/Core/CSVLoader.cpp \
-    ../Common/Core/CEventLogParser.cpp \
-    ../Common/Core/CSingleApplication.cpp \
-    ../Common/Core/CBasicSettings.cpp \
-    ../Common/Core/CElcCommonSettings.cpp \
-    ../Common/Core/elcUtils.cpp \
     src/CElcConsoleAppSettings.cpp \
     src/QCommandLineParserHelper.cpp \
     src/main.cpp
@@ -69,7 +52,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 1
-BUILD_VER = 22
+BUILD_VER = 24
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

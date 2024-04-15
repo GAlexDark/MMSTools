@@ -26,6 +26,7 @@
 #include "CSingleApplication.h"
 #include "CElcGuiAppSettings.h"
 #include "elcUtils.h"
+#include "CParserManager.h"
 
 void
 initTranslation(QTranslator *translator, QApplication *qa, const QStringList &list, const QString &fileName)
@@ -57,7 +58,7 @@ initTranslation(QTranslator *translator, QApplication *qa, const QStringList &li
         QLocale loc;
         QStringList lang = loc.uiLanguages();
         if ( (lang.contains(QLatin1String("uk-UA"), Qt::CaseInsensitive)) || (lang.contains(QLatin1String("ru-RU"), Qt::CaseInsensitive)) ) {
-            QMessageBox::warning(nullptr, QStringLiteral("Warning"), QStringLiteral("Error loading localization resources."));
+            QMessageBox::warning(nullptr, "Warning", "Error loading localization resources.");
         }
     }
 #else
@@ -69,19 +70,19 @@ void
 createConfigInfo(const QString &appName, const QStringList &list, QString &path, QString &fileName, bool &isRdsMode)
 {
 #ifdef Q_OS_WIN
-    fileName = QStringLiteral("%1.ini").arg(appName);
+    fileName = QLatin1String("%1.ini").arg(appName);
     quint32 errorCode = 0;
     isRdsMode = elcUtils::isRdsMode(errorCode);
     if (errorCode != 0) {
         isRdsMode = false;
         QString msg = elcUtils::getWindowsApiErrorMessage(errorCode);
-        QMessageBox::warning(nullptr, QStringLiteral("Warning"), QStringLiteral("Error checking RDS mode: %1\nThe utility will be launched in the single user mode!").arg(msg));
+        QMessageBox::warning(nullptr, "Warning", QString("Error checking RDS mode: %1\nThe utility will be launched in the single user mode!").arg(msg));
     }
     if (isRdsMode || list.contains(QLatin1String("--enablerds"), Qt::CaseSensitive)) {
         path = QStringLiteral("%AppData%/%1").arg(appName); // %SystemDrive%:/Users/%UserName%/AppData/Roaming/%1
     }
 #else
-    fileName = QStringLiteral("%1.conf").arg(appName);
+    fileName = QLatin1String("%1.conf").arg(appName);
     isRdsMode = false;
 #endif
 }
@@ -99,13 +100,13 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_WIN
     QString appPath = a.applicationDirPath();
 #else
-    QString appPath = QStringLiteral("$HOME/.config/%1").arg(appName);
+    QString appPath = QLatin1String("$HOME/.config/%1").arg(appName);
 #endif
 
     QTranslator translator;
     initTranslation(&translator, &a, argsList, appName);
 
-    CSingleApplication sa(QStringLiteral("elcw_instance"));
+    CSingleApplication sa(QLatin1String("elcw_instance"));
     if (sa.isRunning()) {
         QMessageBox::information(nullptr, QObject::tr("Information"),
                                  QObject::tr("The another copy of the Utility is still running. Please close it."),
@@ -125,13 +126,13 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("The settings Class cannot be initialized."), QMessageBox::Ok);
         return 1;
     }
-
+    CParserManager::instance().init();
     //get path to the DB
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    QString dbName =  QDir::fromNativeSeparators(settings.getMain(SettingsDbFileName).toString().trimmed());
+    QString dbName =  QDir::fromNativeSeparators(settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
-        settings.setMain(SettingsGroup, KeyDbFileName, dbName);
+        settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
         QMessageBox::warning(nullptr, QObject::tr("Warning") ,QObject::tr("Unable to get database file name.\n \
 The database file will be created on the default path."), QMessageBox::Ok);
     }
@@ -141,10 +142,14 @@ The database file will be created on the default path."), QMessageBox::Ok);
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1\nDetails: %2").arg(dbPath, errorString), QMessageBox::Ok);
         return 1;
     }
-    QString cleardb = settings.getMain(SettingsClearOnStartup).toString().trimmed();
+    QString cleardb = settings.getMain(QLatin1String("SETTINGS/clear_on_startup")).toString().trimmed();
     if (cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0)) {
         elcUtils::expandEnvironmentStrings(dbName);
-        if (!elcUtils::trunvateDB(dbName, errorString)) {
+        const CParserManager &parserManager = CParserManager::instance();
+        qsizetype count = parserManager.getItemCount();
+        QStringList tables = parserManager.getTablesList();
+        QStringList creationStrings = parserManager.getCreateTableRequestList();
+        if (!elcUtils::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
             QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\nDetails: %2").arg(dbName, errorString), QMessageBox::Ok);
             return 1;
         }

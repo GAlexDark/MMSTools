@@ -22,11 +22,11 @@
 #include <QLabel>
 #include <QFile>
 
+#include "MMSTypes.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
 
 class MainWindow : public QMainWindow
 {
@@ -48,6 +48,8 @@ private:
     bool            m_isButtonsDisabled;
     bool            m_hasHeaders;
 
+    quint16         m_logId;
+    mms::ffs_t      m_ffs;
 
     void disableButtons();
     void enableButtons();
@@ -55,7 +57,8 @@ private:
     void setStateText(const QString &state);
     void setModeText(const QString &mode);
 
-    bool showOptionsDialog( QStringList &includeUsersList, QStringList &excludeUsersList);
+    bool showReportOptionsDialog(const QStringList &logsList, quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList);
+    bool showReadFilesOptionsDialog(const QStringList &logsList, quint16 &logID, bool &hasHeaders);
 
 private slots:
     //window menu

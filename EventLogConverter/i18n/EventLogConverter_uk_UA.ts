@@ -4,24 +4,128 @@
 <context>
     <name>CEventLogThreadLoader</name>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="304"/>
+        <source>Preparing to read the file(s).</source>
+        <translation type="vanished">Підготовка до читання файлу(ів).</translation>
+    </message>
+    <message>
+        <source>Reading of the file %1 has started.</source>
+        <translation type="vanished">Читання файлу %1 розпочалося.</translation>
+    </message>
+    <message>
+        <source>The file %1 was read</source>
+        <translation type="vanished">Файл %1 прочитаний</translation>
+    </message>
+    <message>
+        <source>The file %1 was not read</source>
+        <translation type="vanished">Файл %1 не прочитаний</translation>
+    </message>
+</context>
+<context>
+    <name>CLoadFilesOptionsDialog</name>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.ui" line="14"/>
+        <source>Additional file reading settings</source>
+        <translation>Додаткові параметри читання файлів</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.ui" line="100"/>
+        <source>Do the data file(s) have headers?</source>
+        <translation>Файл(и) даних містить(-ять) заголовки?</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.ui" line="112"/>
+        <source>Yes</source>
+        <translation>Так</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.ui" line="125"/>
+        <source>No</source>
+        <translation>Ні</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.ui" line="133"/>
+        <source>Type of the MMS log:</source>
+        <translation>Тип журналу MMS:</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.ui" line="141"/>
+        <source>Please select type of the MMS log</source>
+        <translation>Будь ласка, виберіть тип журналу MMS</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="13"/>
+        <source>Apply</source>
+        <translation>Застосувати</translation>
+    </message>
+</context>
+<context>
+    <name>CMmsLogsThreadReader</name>
+    <message>
+        <location filename="../../Common/Core/CSVReader.cpp" line="446"/>
         <source>Preparing to read the file(s).</source>
         <translation>Підготовка до читання файлу(ів).</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="313"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="455"/>
         <source>Reading of the file %1 has started.</source>
         <translation>Читання файлу %1 розпочалося.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="323"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="460"/>
         <source>The file %1 was read</source>
         <translation>Файл %1 прочитаний</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVLoader.cpp" line="323"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="460"/>
         <source>The file %1 was not read</source>
         <translation>Файл %1 не прочитаний</translation>
+    </message>
+</context>
+<context>
+    <name>CReportOptionsDialog</name>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="32"/>
+        <source>Additional report filtering settings</source>
+        <translation>Додаткові параметри фільтрації звітів</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="112"/>
+        <source>MMS report type:</source>
+        <translation>Тип звіту MMS:</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="120"/>
+        <source>Please select type of the MMS report</source>
+        <translation>Будь ласка, виберіть тип звіту MMS</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="128"/>
+        <source>Usernames included in the report</source>
+        <translation>Імена користувачів, включених до звіту</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="138"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be included from the report.. When this option is used, the exclusion option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених «,» або «;», які будуть включені до звіту. Якщо використовується цей параметр, параметр виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="145"/>
+        <source>Usernames excluded from the report</source>
+        <translation>Імена користувачів, що виключаються зі звіту</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.ui" line="155"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be excluded from the report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos;, які потрібно виключити зі звіту.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.cpp" line="22"/>
+        <source>Apply</source>
+        <translation>Застосувати</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="vanished">Скасувати</translation>
     </message>
 </context>
 <context>
@@ -51,7 +155,6 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="23"/>
-        <location filename="../src/mainwindow.cpp" line="202"/>
         <source>MMS Event Log Conversion Utility</source>
         <translation>Утиліта перетворення журналів подій MMS</translation>
     </message>
@@ -107,9 +210,9 @@
         <translation>Про версію Qt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="118"/>
-        <location filename="../src/mainwindow.cpp" line="306"/>
-        <location filename="../src/mainwindow.cpp" line="371"/>
+        <location filename="../src/mainwindow.cpp" line="151"/>
+        <location filename="../src/mainwindow.cpp" line="367"/>
+        <location filename="../src/mainwindow.cpp" line="434"/>
         <source>Ready</source>
         <translation>Готовий</translation>
     </message>
@@ -126,37 +229,34 @@ Copyright (C) 2023 Олексій Гаєнко
   https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="185"/>
+        <location filename="../src/mainwindow.cpp" line="220"/>
         <source>Open MMS Event Log file</source>
         <translation>Відкрити журнал подій MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="185"/>
         <source>MMS Eventlog (*.csv)</source>
-        <translation>Журнал подій MMS (*.csv)</translation>
+        <translation type="vanished">Журнал подій MMS (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="191"/>
+        <location filename="../src/mainwindow.cpp" line="228"/>
         <source>The selected file(s): </source>
         <translation>Вибраний(-і) файл(и): </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="207"/>
         <source>Yes</source>
-        <translation>Так</translation>
+        <translation type="vanished">Так</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="208"/>
         <source>No</source>
-        <translation>Ні</translation>
+        <translation type="vanished">Ні</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="195"/>
+        <location filename="../src/mainwindow.cpp" line="242"/>
         <source>The file(s) was selected</source>
         <translation>Файл(и) обраний(-і)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="151"/>
+        <location filename="../src/mainwindow.cpp" line="184"/>
         <source>MMS Event Log Conversion Utility
 Version %1
 Copyright (C) 2023 Oleksii Gaienko
@@ -171,91 +271,92 @@ Copyright (C) 2023 Олексій Гаєнко
   https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="164"/>
+        <location filename="../src/mainwindow.cpp" line="198"/>
         <source>Contacts - MMS Event Log Conversion Utility</source>
         <translation>Контакти - Утиліта перетворення журналыв подій MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="165"/>
+        <location filename="../src/mainwindow.cpp" line="199"/>
         <source>&lt;p&gt;The MMS Event Log Conversion Utility developers can be reached at the mail:&lt;/p&gt;%1&lt;p&gt;Please use %2 for bigger chunks of text.&lt;/p&gt;</source>
         <translation>&lt;p&gt;З розробниками утиліти перетворення журналу подій MMS можна зв&apos;язатися електронною поштою:&lt;/p&gt;%1&lt;p&gt;Будь ласка, використовуйте %2 для великих фрагментів тексту.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="201"/>
         <source>Do the data file(s) have headers?</source>
-        <translation>Файл(и) даних містить(-ять) заголовки?</translation>
+        <translation type="vanished">Файл(и) даних містить(-ять) заголовки?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="203"/>
         <source>Yes - The data file(s) has headers,
 No - Otherwise.</source>
-        <translation>Так - Файл(и) даних мають заголовки,
+        <translation type="vanished">Так - Файл(и) даних мають заголовки,
 Ні - В противному випадку.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="215"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
         <source>The data file(s) has headers</source>
         <translation>Файл(и) даних містить(-ять) заголовки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="217"/>
+        <location filename="../src/mainwindow.cpp" line="252"/>
         <source>The data file(s) has no headers</source>
         <translation>Файл(и) даних не містить(-ять) заголовків</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="220"/>
-        <location filename="../src/mainwindow.cpp" line="287"/>
+        <location filename="../src/mainwindow.cpp" line="284"/>
+        <location filename="../src/mainwindow.cpp" line="344"/>
         <source>No files selected</source>
         <translation>Файли не вибрані</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="261"/>
+        <location filename="../src/mainwindow.cpp" line="318"/>
         <source>Read and converting</source>
         <translation>Читання та конвертація</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="277"/>
+        <location filename="../src/mainwindow.cpp" line="334"/>
         <source>Reading file(s) completed</source>
         <translation>Читання файлів закінчено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="278"/>
+        <location filename="../src/mainwindow.cpp" line="335"/>
         <source>Reading complete</source>
         <translation>Читання закінчено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="280"/>
+        <location filename="../src/mainwindow.cpp" line="337"/>
         <source>Error reading file(s): %1</source>
         <translation>Помилка читання файлу(-ів): %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="281"/>
+        <location filename="../src/mainwindow.cpp" line="258"/>
+        <location filename="../src/mainwindow.cpp" line="338"/>
         <source>Error reading</source>
         <translation>Помилка читання</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="284"/>
+        <location filename="../src/mainwindow.cpp" line="341"/>
         <source>Error in internal IP address mask. Please check it in the config file.</source>
         <translation>Помилка в масці внутрішньої IP-адреси. Будь ласка, перевірте це у конфігураційному файлі.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="300"/>
+        <location filename="../src/mainwindow.cpp" line="357"/>
         <source>Starting cleaning database...</source>
         <translation>Початок очищення БД...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="308"/>
+        <location filename="../src/mainwindow.cpp" line="369"/>
         <source>Cannot clean database: %1</source>
         <translation>Неможливо очистити БД: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="309"/>
-        <location filename="../src/mainwindow.cpp" line="366"/>
+        <location filename="../src/mainwindow.cpp" line="281"/>
+        <location filename="../src/mainwindow.cpp" line="370"/>
+        <location filename="../src/mainwindow.cpp" line="429"/>
+        <location filename="../src/mainwindow.cpp" line="438"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="326"/>
+        <location filename="../src/mainwindow.cpp" line="388"/>
         <source>Additional report filtering settings:</source>
         <translation>Додаткові параметри фільтрації звітів:</translation>
     </message>
@@ -268,80 +369,126 @@ No - Otherwise.</source>
         <translation type="vanished">Список виключених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="339"/>
+        <location filename="../src/mainwindow.cpp" line="402"/>
         <source>Save MMS Event Log report</source>
         <translation>Зберегти звіт журналу MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="343"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>The report will be created here: %1</source>
         <translation>Звіт буде створено тут: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="269"/>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="326"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>wait...</source>
         <translation>Зачекайте...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="260"/>
+        <location filename="../src/mainwindow.cpp" line="222"/>
+        <source>MMS log files (*.csv)</source>
+        <translation>Журнали подій MMS (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="233"/>
+        <source>%1 - this file have zero size and will be removed from the list.</source>
+        <translation>%1 - цей файл має нульовий розмір і буде видалено зі списку.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="386"/>
+        <source>Event Log</source>
+        <translation>Журнал подій</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="386"/>
+        <source>Audit Trail Log</source>
+        <translation>Журнал аудиту</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="254"/>
+        <source>Selected Log type: %1</source>
+        <translation>Вибраний тип журналу: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="257"/>
+        <source>Unknown MMS Log type.</source>
+        <translation>Невідомий тип журналу MMS.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="280"/>
+        <location filename="../src/mainwindow.cpp" line="437"/>
+        <source>Error open options dialog.</source>
+        <translation>Помилка відкриття діалогового вікна параметрів.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="317"/>
         <source>Start reading and converting file(s)...</source>
         <translation>Початок читання та конвертації файлу(-ів)...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="320"/>
+        <location filename="../src/mainwindow.cpp" line="381"/>
         <source>Start generating the report...</source>
         <translation>Початок створення звіту...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="321"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
         <source>Start generating the report</source>
         <translation>Початок створення звіту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="328"/>
+        <location filename="../src/mainwindow.cpp" line="386"/>
+        <source>(Experimental) Summary report</source>
+        <translation>(Експериментальний) Зведений звіт</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="390"/>
         <source>	The included users list is empty.</source>
         <translation>	Перелік включених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="330"/>
+        <location filename="../src/mainwindow.cpp" line="392"/>
         <source>	The included users: %1</source>
         <translation>	Включені користувачі: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>	The excluded users list is empty.</source>
         <translation>	Перелік виключених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="335"/>
+        <location filename="../src/mainwindow.cpp" line="397"/>
         <source>	The excluded users: %1</source>
         <translation>	Виключені користувачі: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="399"/>
+        <source>Selected report type: %1</source>
+        <translation>Вибраний тип звіту: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="409"/>
         <source>Generating report...</source>
         <translation>Створення звіту...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="425"/>
         <source>Report generating finished.
 The report was saved in the %1 file.</source>
         <translation>Формування звіту завершено.
 Звіт збережено у файлі %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="363"/>
+        <location filename="../src/mainwindow.cpp" line="426"/>
         <source>Report created</source>
         <translation>Звіт створено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="365"/>
+        <location filename="../src/mainwindow.cpp" line="428"/>
         <source>Error generate report: %1</source>
         <translation>Помилка створення звіту: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="370"/>
+        <location filename="../src/mainwindow.cpp" line="433"/>
         <source>Report name is empty</source>
         <translation>Відсутня назва звіту</translation>
     </message>
@@ -367,7 +514,7 @@ Version 1.0
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="179"/>
-        <location filename="../src/mainwindow.cpp" line="150"/>
+        <location filename="../src/mainwindow.cpp" line="183"/>
         <source>About MMS Event Log Conversion Utility</source>
         <translation>Про утиліту перетворення журналу подій MMS</translation>
     </message>
@@ -422,7 +569,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Зберегти звіт MMS EventLog</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="341"/>
+        <location filename="../src/mainwindow.cpp" line="404"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
@@ -467,7 +614,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 розпарений</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="347"/>
+        <location filename="../src/mainwindow.cpp" line="410"/>
         <source>Generating report</source>
         <translation>Створення звіту</translation>
     </message>
@@ -480,7 +627,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 збережено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="305"/>
+        <location filename="../src/mainwindow.cpp" line="366"/>
         <source>Database was cleared</source>
         <translation>БД очищена</translation>
     </message>
@@ -488,101 +635,109 @@ Copyright (C) 2023 Олексій Гаєнко
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../src/OptionsDialog.ui" line="32"/>
         <source>Additional report filtering settings</source>
-        <translation>Додаткові параметри фільтрації звітів</translation>
+        <translation type="vanished">Додаткові параметри фільтрації звітів</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.ui" line="103"/>
         <source>Usernames included in the report</source>
-        <translation>Імена користувачів, включених до звіту</translation>
+        <translation type="vanished">Імена користувачів, включених до звіту</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.ui" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be included from the report.. When this option is used, the exclusion option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених «,» або «;», які будуть включені до звіту. Якщо використовується цей параметр, параметр виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених «,» або «;», які будуть включені до звіту. Якщо використовується цей параметр, параметр виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List of usernames separated by &apos;,&apos; or &apos;;&apos; and only those included in the report. When this option is used, the exclude option is ignored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos; і лише ті, що включені до звіту. У разі використання цієї опції опція виключення ігнорується.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.ui" line="130"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The list of usernames, separated by &apos;,&apos; or &apos;;&apos;, to be excluded from the report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos;, які потрібно виключити зі звіту.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Перелік імен користувачів, розділених символами &apos;,&apos; або &apos;;&apos;, які потрібно виключити зі звіту.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.ui" line="120"/>
         <source>Usernames excluded from the report</source>
-        <translation>Імена користувачів, що виключаються зі звіту</translation>
+        <translation type="vanished">Імена користувачів, що виключаються зі звіту</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.cpp" line="23"/>
         <source>Apply</source>
-        <translation>Застосувати</translation>
+        <translation type="vanished">Застосувати</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.cpp" line="24"/>
         <source>Cancel</source>
-        <translation>Скасувати</translation>
+        <translation type="vanished">Скасувати</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/OptionsDialog.cpp" line="49"/>
-        <location filename="../src/OptionsDialog.cpp" line="62"/>
-        <location filename="../src/main.cpp" line="119"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="45"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="51"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="58"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="68"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="82"/>
+        <location filename="../src/main.cpp" line="136"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../src/OptionsDialog.cpp" line="49"/>
-        <location filename="../src/OptionsDialog.cpp" line="62"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="45"/>
+        <source>The presence/absence of headers in the file(s) is not specified.</source>
+        <translation>Наявність/відсутність заголовків у файлі(ах) не вказано.</translation>
+    </message>
+    <message>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="51"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="58"/>
+        <source>The MMS log type is not selected.</source>
+        <translation>Тип журналу MMS не вибрано.</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.cpp" line="68"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="82"/>
         <source>Invalid character in the value %1</source>
         <translation>Неприпустимий символ у значенні %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="94"/>
+        <location filename="../src/main.cpp" line="111"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="95"/>
+        <location filename="../src/main.cpp" line="112"/>
         <source>The another copy of the Utility is still running. Please close it.</source>
         <translation>Інша копія утиліти все ще працює. Будь ласка, закрийте її.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="105"/>
-        <location filename="../src/main.cpp" line="109"/>
-        <location filename="../src/main.cpp" line="125"/>
-        <location filename="../src/main.cpp" line="132"/>
-        <location filename="../src/mainwindow.cpp" line="75"/>
+        <location filename="../src/main.cpp" line="122"/>
+        <location filename="../src/main.cpp" line="126"/>
+        <location filename="../src/main.cpp" line="142"/>
+        <location filename="../src/main.cpp" line="154"/>
+        <location filename="../src/mainwindow.cpp" line="89"/>
+        <location filename="../src/mainwindow.cpp" line="108"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="105"/>
-        <location filename="../src/main.cpp" line="125"/>
+        <location filename="../src/main.cpp" line="122"/>
+        <location filename="../src/main.cpp" line="142"/>
         <source>Cannot create folder: %1
 Details: %2</source>
         <translation>Неможливо створити папку: %1
 Деталі: %2</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="109"/>
+        <location filename="../src/main.cpp" line="126"/>
         <source>The settings Class cannot be initialized.</source>
         <translation>Клас налаштувань не може бути ініціалізований.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="119"/>
+        <location filename="../src/main.cpp" line="136"/>
         <source>Unable to get database file name.
  The database file will be created on the default path.</source>
         <translation>Не вдалося отримати назву файлу бази даних.
   Файл бази даних буде створено за типовим шляхом.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="132"/>
+        <location filename="../src/main.cpp" line="154"/>
         <source>Cannot open database: %1
 Details: %2</source>
         <translation>Неможливо відкрити базу даних: %1
@@ -597,9 +752,20 @@ Details: %2</source>
         <translation type="vanished">Неможливо відкрити базу даних: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="75"/>
+        <location filename="../src/mainwindow.cpp" line="89"/>
+        <location filename="../src/mainwindow.cpp" line="108"/>
         <source>Critical error: %1</source>
         <translation>Критична помилка: %1</translation>
+    </message>
+    <message>
+        <location filename="../../Common/Core/CAuditTrailParser.h" line="32"/>
+        <source>Audit Trail Log</source>
+        <translation>Журнал аудиту</translation>
+    </message>
+    <message>
+        <location filename="../../Common/Core/CEventLogParser.h" line="49"/>
+        <source>Event Log</source>
+        <translation>Журнал подій</translation>
     </message>
 </context>
 </TS>

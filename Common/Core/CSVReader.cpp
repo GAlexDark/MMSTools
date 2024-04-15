@@ -15,48 +15,150 @@
 *
 ****************************************************************************/
 
-#include "CSVLoader.h"
-#include <QTextStream>
+#include "CSVReader.h"
+#include <QElapsedTimer>
 
-#include "Debug.h"
+#ifdef QT_DEBUG
+  #include "Debug.h"
+#endif
 #include "DBStrings.h"
 #include "elcUtils.h"
+#include "CParserManager.h"
 
 bool
-CTextFileLoader::readSmallFile()
+CTextFileReader::checkBOM(const QByteArray &buffer)
 {
-    QString buffer;
     bool retVal = true;
-    QTextStream textStream(&m_file);
+    m_errorString.clear();
+    static const char utf8bomRaw[] = {'\xef', '\xbb', '\xbf'};
+    QByteArray utf8bom = QByteArray::fromRawData(utf8bomRaw, sizeof(utf8bomRaw));
+    QByteArray bom = buffer.sliced(0, sizeof(utf8bomRaw));
+    if (bom != utf8bom) {
+        retVal = false;
+        m_errorString = QStringLiteral("Wrong BOM header. The file mush have UTF-8 BOM 0xef 0xbb 0xbf header");
+    }
+
+    return retVal;
+}
+
+qint64
+CTextFileReader::indexOfEol(const QByteArray *data, const qint64 startPos, const qint64 size)
+{
+    qint64 retVal = -1;
+    qint64 index = startPos;
+    qint64 eolCharLength = m_eolChars.length();
+    bool isQuoted = false;
+    bool isFound = false;
+
+    while (!isFound && (index <= size - eolCharLength)) {
+        if (data->at(index) == m_quoteChar) {
+            isQuoted = !isQuoted;
+            index++;
+        } else {
+            switch (eolCharLength) {
+            case 1:
+                if (data->at(index) == '\n') {
+                    if (isQuoted) {
+                        index++;
+                    } else {
+                        retVal = index;
+                        isFound = true;
+                    }
+                } else {
+                    index++;
+                }
+                break;
+            case 2:
+                if (data->at(index) == '\r') {
+                    if (data->at(index + 1) == '\n') {
+                        if (isQuoted) {
+                            index++;
+                        } else {
+                            retVal = index;
+                            isFound = true;
+                        }
+                    }
+                } else {
+                    index++;
+                }
+                break;
+            }
+        } // else
+    } //while
+
+    return retVal;
+}
+
+bool
+CTextFileReader::readSmallFile()
+{
+    // "284 590 milliseconds" 4,74316667 minutes
+    // "317 529 milliseconds" 5,29215 minutes
+    // "292 992 milliseconds" 4,8832 minutes
+    // "132 515 milliseconds" 2,20858333 minutes
+    // "139 280 milliseconds" 2,32133333 minutes
+    // "139 681 milliseconds" 2,32801667 minutes
+    // "141 998 milliseconds" 2.3666 minutes
+    // "143 329 milliseconds"
+    // "132 359 milliseconds"
+    // "134 293 milliseconds" 2.2382 minutes
+    // "134 005 milliseconds"
+
+/*
+ * If you know that pos and len cannot be out of bounds,
+ * use sliced() instead in new code, because it is faster.
+ */
+
+    bool retVal = true;
+    qint64 bytesRead;
     try {
-        buffer = textStream.readAll();
-        if (buffer.isEmpty()) {
-            retVal = false;
-        }
+        bytesRead = m_file.read(m_buffer->data(), m_file.size());
     } catch (...) {
         retVal = false;
         m_errorString = QStringLiteral("Error reading file");
     }
     m_file.close();
 
-    if (retVal) {
-        prepareData(buffer);
+    if (bytesRead > 0) {
+        retVal = checkBOM(*m_buffer);
+        if (retVal) {
+            QString line;
+            bool isEOF = false;
+            qint64 prevPosition = 3;
+            qint64 nextPosition;
+            qint64 eolCharsLen = m_eolChars.length();
+            m_lineNumber = 0;
 
-        QStringList list;
-        list.append(buffer.split(m_eolChars));
-
-        QString line;
-        m_lineNumber = 1;
-        qsizetype firstDataColumn = (m_isHeaders)? 1 : 0;
-        qsizetype columnCount = list.size();
-        for (qsizetype i = firstDataColumn; i < columnCount; ++i) {
-            line = list.at(i);
-            retVal = convertData(line);
-            m_lineNumber++;
-            if (!retVal) {
-                break;
+            //If data has header
+            if (m_isHeaders) {
+                nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead);
+                if (nextPosition != -1) {
+                    line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
+                    prevPosition = nextPosition + eolCharsLen;
+                    m_lineNumber++;
+                } else {
+                    isEOF = true;
+                }
             }
-            line.clear();
+
+            while (!isEOF && retVal) {
+                nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead);
+                line.clear();
+                if (nextPosition != -1) {
+                    line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
+                    retVal = convertData(line);
+                    prevPosition = nextPosition + eolCharsLen;
+                } else {
+                    if (prevPosition < bytesRead) {
+                        // The line don't have the EOL
+                        line = m_buffer->sliced(prevPosition, bytesRead - prevPosition);
+                        retVal = convertData(line);
+                    }
+                    // prevPosition == bufferSize - The line is empty or/and the EOF
+                    isEOF = true;
+                }
+                m_lineNumber++;
+            } // internal while
         }
     }
 
@@ -64,80 +166,85 @@ CTextFileLoader::readSmallFile()
 }
 
 bool
-CTextFileLoader::readLargeFile()
+CTextFileReader::readLargeFile()
 {
+    // "288 154 milliseconds" 4.8026 minutes
+    // "137 051 milliseconds" 2.2842 minutes
+    // "133 530 milliseconds" 2.2255 minutes
+    // "137 403 milliseconds"
+    // "126 503 milliseconds" 2.1084 minutes
     QString line;
-    qint64 bufferPosition = 0;
-    qint64 prevPosition = 0;
-    qint64 nextPosition;
+    qint64 bufferOffset = 0;
     qint64 eolCharsLen = m_eolChars.length();
     bool isEOF = false;
     bool retVal = true;
-    qint64 bytesRead;
-    m_lineNumber = 1;
+    m_lineNumber = 0;
 
-    memset(m_buffer->data(), 0, m_buffer->size());
+    m_file.seek(bufferOffset);
 
-    m_file.seek(bufferPosition);
-    bytesRead = m_file.read(m_buffer->data(), m_bufferSize);
+    qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
     if (bytesRead > 0) {
-        //If data has header
-        if (m_isHeaders) {
-            nextPosition = m_buffer->indexOf(m_eolChars, prevPosition);
+        qint64 prevPosition = 3;
+        qint64 nextPosition;
+        retVal = checkBOM(*m_buffer);
+        if (retVal && m_isHeaders) {
+            nextPosition = indexOfEol(m_buffer, prevPosition, defMaxFileSize);
             if (nextPosition != -1) {
                 line.clear();
-                line.append(m_buffer->mid(prevPosition, nextPosition));
-                m_lineNumber++;
-
+                line = m_buffer->sliced(prevPosition, nextPosition - prevPosition); // prevPosition == 0
                 prevPosition = nextPosition + eolCharsLen;
-            }
-        }
-    } else {
-        isEOF = true;
-    }
-
-    while(!isEOF && retVal) {
-        while (!isEOF && retVal) {
-            nextPosition = m_buffer->indexOf(m_eolChars, prevPosition);
-            if (nextPosition == -1) {
-                if (bytesRead < m_bufferSize) {
-                    isEOF = true;
-                    nextPosition = bytesRead;
-                } else {
-                    break;
-                }
-            }
-            line.clear();
-            line.append(m_buffer->mid(prevPosition, nextPosition - prevPosition));
-            retVal = convertData(line);
-            m_lineNumber++;
-
-            prevPosition = nextPosition + eolCharsLen;
-        } // internal while
-
-        if (!isEOF) {
-            bufferPosition = bufferPosition + prevPosition;
-            m_file.seek(bufferPosition);
-            memset(m_buffer->data(), 0, m_buffer->size());
-            prevPosition = 0;
-            bytesRead = m_file.read(m_buffer->data(), m_bufferSize);
-            if (bytesRead <= 0) {
+                m_lineNumber++;
+            } else {
                 isEOF = true;
             }
-        }
-    } // external while
+        } //m_isHeaders
+
+        while (!isEOF && retVal) {
+            do {
+                nextPosition = indexOfEol(m_buffer, prevPosition, defMaxFileSize);
+                if (nextPosition != -1) {
+                    line.clear();
+                    line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
+                    prevPosition = nextPosition + eolCharsLen;
+                    retVal = convertData(line);
+                    m_lineNumber++;
+                }
+            } while ((nextPosition != -1) && retVal);
+
+            if (bytesRead == defMaxFileSize) {
+                bufferOffset += prevPosition;
+                prevPosition = 0;
+                m_file.seek(bufferOffset);
+                memset(m_buffer->data(), 0, m_buffer->size());
+                bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
+                if (bytesRead <= 0) {
+                    isEOF = true;
+                }
+            } else {
+                //This is last record in the file
+                if (prevPosition != bytesRead) {
+                    line.clear();
+                    line = m_buffer->sliced(prevPosition, bytesRead - prevPosition);
+                    retVal = convertData(line);
+                    m_lineNumber++;
+                }
+                isEOF = true;
+            }
+        } //while
+    } //bytesRead > 0
+
     m_file.close();
     return retVal;
 }
 
-CTextFileLoader::CTextFileLoader()
-    : m_buffer(nullptr), m_bufferSize(defBufferSize), m_fileName(""), m_isHeaders(false), m_errorString(""), m_lineNumber(0)
+CTextFileReader::CTextFileReader()
+    : m_delimiterChar(0), m_quoteChar(0), m_buffer(nullptr), m_fileName(""), m_isHeaders(false), m_errorString(""), m_lineNumber(0)
 {
     m_eolChars.clear();
     m_fileNames.clear();
 }
 
-CTextFileLoader::~CTextFileLoader()
+CTextFileReader::~CTextFileReader()
 {
     m_eolChars.clear();
 
@@ -152,31 +259,29 @@ CTextFileLoader::~CTextFileLoader()
 }
 
 bool
-CTextFileLoader::init(bool dataHasHeaders,
-                     const QByteArray &eolChars, qint64 bufferSize)
+CTextFileReader::init(bool dataHasHeaders, const mms::ffs_t &ffs)
 {
     m_isHeaders = dataHasHeaders;
-    m_eolChars = eolChars;
-    m_bufferSize = bufferSize;
+    m_delimiterChar = ffs.delimiterChar;
+    m_quoteChar = ffs.quoteChar;
+    m_eolChars = ffs.eolChars;
 
     bool retVal = true;
-    try {
-        if (m_bufferSize > 0) {
-            m_buffer = new QByteArray(m_bufferSize, 0);
+    delete m_buffer;
 
-        } else {
-            retVal = false;
-            m_errorString = QStringLiteral("Invalid buffer size");
-        }
+    try {
+        m_buffer = new QByteArray(defMaxFileSize, 0);
+        Q_CHECK_PTR(m_buffer);
     } catch (const std::bad_alloc &e) {
         m_errorString = e.what();
         retVal = false;
     }
+
     return retVal;
 }
 
 bool
-CTextFileLoader::read()
+CTextFileReader::read()
 {
     m_file.setFileName(m_fileName);
     qint64 size = m_file.size();
@@ -186,8 +291,11 @@ CTextFileLoader::read()
   #endif
 #endif
     bool retVal = m_file.open(QIODevice::ReadOnly);
+    memset(m_buffer->data(), 0, defMaxFileSize);
     if (retVal) {
         retVal = (size < defMaxFileSize)? readSmallFile() : readLargeFile();
+        //retVal = readSmallFile();
+        //retVal = readLargeFile();
     } else {
         m_errorString = m_file.errorString();
     }
@@ -197,23 +305,24 @@ CTextFileLoader::read()
 //--------------------------------------------------------------------------
 
 bool
-CEventLogLoader::initDB(const QString &dbFileName, pragmaList_t *pragmaList)
+CMmsLogsReader::initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList)
 {
-    bool retVal = m_db.init(QStringLiteral("QSQLITE"), dbFileName);
+    bool retVal = m_db.init(QLatin1String("QSQLITE"), dbFileName);
     if (retVal) {
         retVal = m_db.open();
         if (retVal) {
             QStringList dbCommandItems;
             dbCommandItems.append(pragmaUTF8);
-            dbCommandItems.append(pragmaSynchronous.arg(pragmaList->value(QStringLiteral("synchronous"))));
+            dbCommandItems.append(pragmaSynchronous.arg(pragmaList->value(QLatin1String("synchronous"))));
 
             int blockSize = elcUtils::getStorageBlockSize(dbFileName);
             dbCommandItems.append(pragmaPageSize.arg(blockSize));
 
-            dbCommandItems.append(pragmaJournalMode.arg(pragmaList->value(QStringLiteral("journal_mode"))));
-            dbCommandItems.append(pragmaTempStore.arg(pragmaList->value(QStringLiteral("temp_store"))));
-            dbCommandItems.append(pragmaLockingMode.arg(pragmaList->value(QStringLiteral("locking_mode"))));
-            dbCommandItems.append(createEventLogTable);
+            dbCommandItems.append(pragmaJournalMode.arg(pragmaList->value(QLatin1String("journal_mode"))));
+            dbCommandItems.append(pragmaTempStore.arg(pragmaList->value(QLatin1String("temp_store"))));
+            dbCommandItems.append(pragmaLockingMode.arg(pragmaList->value(QLatin1String("locking_mode"))));
+            const CParserManager &parserManager = CParserManager::instance();
+            dbCommandItems.append(parserManager.getCreateTableRequestList());
 
             for (qsizetype i = 0; i < dbCommandItems.size(); ++i) {
                 retVal = m_db.exec(dbCommandItems.at(i));
@@ -224,21 +333,21 @@ CEventLogLoader::initDB(const QString &dbFileName, pragmaList_t *pragmaList)
         }
     }
 #ifdef QT_DEBUG
-    /********************************************************
+/********************************************************
  *
  * this code only for diagnostic in the debug mode
  *
  *******************************************************/
     if (retVal) {
-        TDataList res = m_db.findInDB(QStringLiteral("PRAGMA journal_mode;"), false);
+        dataList_t res = m_db.findInDB(QLatin1String("PRAGMA journal_mode;"), false);
         QString value = "journal_mode: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
         res.clear();
-        res = m_db.findInDB(QStringLiteral("PRAGMA page_size;"), false);
+        res = m_db.findInDB(QLatin1String("PRAGMA page_size;"), false);
         value = "page_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
         res.clear();
-        res = m_db.findInDB(QStringLiteral("PRAGMA cache_size;"), false);
+        res = m_db.findInDB(QLatin1String("PRAGMA cache_size;"), false);
         value = "cache_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
     }
@@ -250,43 +359,42 @@ CEventLogLoader::initDB(const QString &dbFileName, pragmaList_t *pragmaList)
     return retVal;
 }
 
-CEventLogLoader::~CEventLogLoader()
+CMmsLogsReader::CMmsLogsReader()
+    : m_parser(nullptr)
+{}
+
+CMmsLogsReader::~CMmsLogsReader()
 {
     m_db.close();
-    m_data.clear();
 }
 
 bool
-CEventLogLoader::init(const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet, pragmaList_t *pragmaList,
-          const QByteArray &eolChars, qint64 bufferSize)
+CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet,
+                     mms::pragmaList_t *pragmaList)
 {
-    m_parser.init(internalIpFirstOctet);
-
-    bool retVal = CTextFileLoader::init(dataHasHeaders, eolChars, bufferSize);
+    CParserManager &parserManager = CParserManager::instance();
+    m_parser = nullptr;
+    bool retVal = parserManager.checkID(logId);
     if (retVal) {
-        retVal = initDB(dbFileName, pragmaList);
+        m_parser = parserManager.getInstance(logId);
+        Q_CHECK_PTR(m_parser);
+        m_parser->init(internalIpFirstOctet);
+        retVal = CTextFileReader::init(dataHasHeaders, m_parser->fileFieldsSeparationInfo());
+        if (retVal) {
+            retVal = initDB(dbFileName, pragmaList);
+        }
+    } else {
+        m_errorString = QStringLiteral("The parser not found");
     }
 
     return retVal;
 }
 
-bool CEventLogLoader::convertData(const QString &line)
+bool CMmsLogsReader::convertData(const QString &line)
 {
-    bool retVal = m_parser.parse(line);
+    bool retVal = m_parser->parse(line);
     if (retVal) {
-        m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
-                               m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
-
-        m_data[QStringLiteral(":username")] = m_username;
-        m_data[QStringLiteral(":timestampISO8601")] = m_timestampISO8601;
-        m_data[QStringLiteral(":timestamp")] = m_timestampTZ;
-        m_data[QStringLiteral(":requestid")] = m_requestID;
-        m_data[QStringLiteral(":type")] = m_type;
-        m_data[QStringLiteral(":details")] = m_details;
-        m_data[QStringLiteral(":username1")] = m_username1;
-        m_data[QStringLiteral(":authtype")] = m_authType;
-        m_data[QStringLiteral(":externalip")] = m_externalIP;
-        m_data[QStringLiteral(":internalip")] = m_internalIP;
+        m_parser->convertData(m_data);
         retVal = m_db.execRequest(&m_data);
         m_data.clear();
         if (!retVal) {
@@ -298,50 +406,46 @@ bool CEventLogLoader::convertData(const QString &line)
     return retVal;
 }
 
-void
-CEventLogLoader::prepareData(QString &data)
-{
-    data.replace(QLatin1String("\r\n"), QLatin1String("@RN@"), Qt::CaseInsensitive );
-    data.replace('\n', QLatin1String("@N@"), Qt::CaseInsensitive);
-    data.replace(QLatin1String("@RN@"), QLatin1String("\r\n"), Qt::CaseInsensitive );
-}
-
 //--------------------------------------------------------------------------
 
-CEventLogThreadLoader::CEventLogThreadLoader()
+CMmsLogsThreadReader::CMmsLogsThreadReader()
     : m_retVal(false)
 {}
 
 void
-CEventLogThreadLoader::run()
+CMmsLogsThreadReader::run()
 {
     m_errorString.clear();
+    QElapsedTimer timer;
+    timer.start();
     //-----------------------------------------------------
     if (m_fileNames.size() > 0 ) {
         emit sendMessage( tr("Preparing to read the file(s).") );
-        m_retVal = m_db.beginTransaction();
-        if (m_retVal) {
-            m_retVal = m_db.prepareRequest(insertOriginalData);
+        QString fileName;
+        qsizetype filesCount = m_fileNames.size();
+        for (qsizetype i = 0; i < filesCount; ++i) {
+            m_retVal = m_db.beginTransaction();
             if (m_retVal) {
-                QString fileName;
-                qsizetype filesCount = m_fileNames.size();
-                for (qsizetype i = 0; i < filesCount; ++i) {
+                m_retVal = m_db.prepareRequest(insertString());
+                if (m_retVal) {
                     fileName = m_fileNames.at(i);
                     emit sendMessage( tr("Reading of the file %1 has started.").arg(fileName) );
                     setFileName(fileName);
                     m_retVal = read();
                     if (m_retVal) {
                         m_retVal = m_db.commitTransaction();
-                        if (!m_retVal) {
-                            m_errorString = m_db.errorString();
-                            break;
-                        }
+                        QString msg = (m_retVal)? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
+                        emit sendMessage( msg );
                     }
-                    QString msg = (m_retVal)? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
-                    emit sendMessage( msg );
-                } //for
+                }
             }
-        }
-        m_db.close();
+            if (!m_retVal) {
+                m_errorString = m_db.errorString();
+                break;
+            }
+        } //for
+    m_db.close();
     } // m_fileNames.size()
+    QString msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
+    __DEBUG( msg )
 }

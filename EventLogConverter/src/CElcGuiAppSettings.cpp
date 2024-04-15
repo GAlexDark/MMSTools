@@ -17,9 +17,18 @@
 ****************************************************************************/
 
 #include "CElcGuiAppSettings.h"
-#include "elcUtils.h"
+#include <QVariant>
+#include <QDateTime>
 
 static CElcGuiAppSettings g_elcGuiSettings;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    inline const QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
+    inline const QVariant nullDateTimeValue = QVariant(QMetaType::fromType<QDateTime>());
+#else
+    const QVariant nullStringValue = QVariant(QVariant::String);
+    const QVariant nullDateTimeValue = QVariant(QVariant::DateTime);
+#endif
 
 CElcGuiAppSettings& CElcGuiAppSettings::instance()
 {
@@ -32,7 +41,7 @@ CElcGuiAppSettings::createDefault(const QString& iniPath)
     CElcCommonSettings::createDefault(iniPath);
 
     QSettings settings(iniPath, QSettings::IniFormat);
-    settings.beginGroup(QStringLiteral("HISTORY"));
-    settings.setValue(QStringLiteral("last_dir"), nullStringValue);
+    settings.beginGroup(QLatin1String("HISTORY"));
+    settings.setValue(QLatin1String("last_dir"), nullStringValue);
     settings.endGroup();
 }

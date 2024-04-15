@@ -30,10 +30,6 @@ public:
 
     bool parseCmdArgs(const QCoreApplication &app);
     QString path();
-    QStringList files();
-    QString reportName();
-    QStringList excludedUsernames();
-    QStringList includedUsernames();
     void showHelpAndExit();
     RunningMode getRunningMode();
 
@@ -44,6 +40,11 @@ public:
     QString errorString() const { return m_errorString; }
 
 private:
+    QStringList files();
+    QString reportName();
+    QStringList excludedUsernames();
+    QStringList includedUsernames();
+
     QCommandLineParser  m_parser;
 
     bool                m_isPath,

@@ -18,16 +18,20 @@
 #ifndef CEVENTLOGPARSER_H
 #define CEVENTLOGPARSER_H
 
-#include <QObject>
 #include <QDateTime>
 
-class CEventLogParser
-{
-public:
-    void init(const QString &internalIpFirstOctet);
-    bool parse(const QString& line);
-    QString errorString() const { return m_errorString; }
+#include "CBasicParser.h"
 
+class CEventLogParser: public CBasicParser
+{
+    Q_OBJECT
+    Q_CLASSINFO("tablename", "eventlog")
+    Q_CLASSINFO("ID", "1")
+public:
+    Q_INVOKABLE CEventLogParser();
+    bool parse(const QString& line) override;
+    void convertData(mms::dataItem_t &data) override;
+    QString insertString() const override;
     void getParsedData(QString &username,
                        QString &timestampISO8601,
                        QString &requestID,
@@ -39,10 +43,10 @@ public:
                        QString &internalIP,
                        QDateTime &timestampTZ);
 
-private:
-    QString     m_internalIpFirstOctet;
-    QString     m_errorString;
+    QString createTable() const override;
+    QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
 
+private:
     QDateTime   m_timestamp,
                 m_timestamptz;
     QString     m_header,
@@ -52,19 +56,16 @@ private:
     QString     m_username,
                 m_username1,
                 m_authType,
-                m_externalip,
-                m_internalip,
                 m_requestID,
                 m_type;
 
-    void removeQuote(QString &data, QChar quoteChar);
-    void parseHeaderString(QChar quoteChar);
-
-    void analizeIPAdresses(const QString &ipaddresses);
     bool parseUserSuccessLogonDetails();
     bool parseUserFailedLogonDetails();
     bool parseUserLogonDetails();
-
 };
+
+Q_DECLARE_METATYPE(CEventLogParser *);
+
+typedef CEventLogParser *pEventLogParser;
 
 #endif // CEVENTLOGPARSER_H

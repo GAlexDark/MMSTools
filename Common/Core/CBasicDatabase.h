@@ -26,8 +26,9 @@
 #include <QList>
 
 
-typedef QMap<QString, QVariant> TDataItem;
-typedef QList<QStringList> TDataList;
+typedef QMap<QString, QVariant> dataItem_t;
+typedef dataItem_t *pDataItem;
+typedef QList<QStringList> dataList_t;
 
 class CBasicDatabase
 {
@@ -56,11 +57,11 @@ public:
     bool truncateTable(const QString &tableName);
     // add info in the DB
     bool prepareRequest(const QString &query);
-    bool execRequest(TDataItem *data);
+    bool execRequest(pDataItem data);
 
-    bool insertToDB(const QString &query, TDataItem *data);
+    bool insertToDB(const QString &query, pDataItem data);
     // search info in the DB
-    TDataList findInDB(const QString &query, bool addColumnHeaders = true);
+    dataList_t findInDB(const QString &query, bool addColumnHeaders = true);
 
     bool exec(const QString &query);
 
@@ -85,5 +86,7 @@ private:
     bool _exec(const QString &query);
     bool _exec();
 };
+
+typedef CBasicDatabase *pBasicDatabase;
 
 #endif // CBASICDATABASE_H

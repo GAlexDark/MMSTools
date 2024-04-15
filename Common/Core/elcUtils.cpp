@@ -32,11 +32,12 @@
 #endif
 
 const int defaultStorageBlockSize = 32768;
+QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
 
 bool
 elcUtils::sanitizeValue(const QString &value)
 {
-    return elcUtils::sanitizeValue(QStringLiteral("^([a-zA-Z0-9_]+)$"), value);
+    return elcUtils::sanitizeValue(QLatin1String("^([a-zA-Z0-9_]+)$"), value);
 }
 
 bool
@@ -68,7 +69,7 @@ elcUtils::parseValuesList(QString data)
 {
     QStringList retVal;
     data = data.trimmed();
-    data.replace(" ", "");
+    data.replace(QLatin1String(" "), "");
     if ((data.indexOf(',') != -1) || (data.indexOf(';') != -1)) {
         if (data.indexOf(',') != -1) {
             data.replace(';', ',');
@@ -106,16 +107,26 @@ elcUtils::parseValuesList(QStringList &data)
 }
 
 bool
-elcUtils::trunvateDB(const QString &connectionString, QString &errorString)
+elcUtils::trunvateDB(const QString &connectionString, QString &errorString,
+                          qsizetype tablesCount, const QStringList &tablesNames,
+                          const QStringList &creationStrings)
 {
     CBasicDatabase db;
-    bool retVal = db.init(QStringLiteral("QSQLITE"), connectionString);
+    bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
     if (retVal) {
         retVal = db.open();
         if (retVal) {
-            retVal = db.truncateTable(QStringLiteral("eventlog"));
-            db.close();
+            for (qsizetype i = 0; i < tablesCount; ++i) {
+                retVal = db.truncateTable(tablesNames.at(i));
+                if (retVal) {
+                    retVal = db.exec(creationStrings.at(i));
+                    if (!retVal) {
+                        break;
+                    }
+                }
+            }
         }
+        db.close();
     }
 
     if (!retVal) {
@@ -139,7 +150,7 @@ QString
 elcUtils::getFormattedDateTime(const QString &dateTime)
 {
     QDateTime buildDate = QDateTime::fromString(dateTime);
-    return buildDate.toString(QStringLiteral("yyyyMMddhhmm"));
+    return buildDate.toString(QLatin1String("yyyyMMddhhmm"));
 }
 
 void
@@ -239,7 +250,6 @@ expandEnvStrings_windows(QString &path)
 void
 expandEnvStrings_linux(QString &path)
 {
-    QRegularExpression envVar(QStringLiteral("\\$([A-Za-z0-9_]+)"));
     QRegularExpressionMatchIterator i = envVar.globalMatch(path);
     QString word;
     QByteArray value;

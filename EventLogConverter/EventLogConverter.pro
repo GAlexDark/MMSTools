@@ -27,37 +27,23 @@ INCLUDEPATH += . src
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
+include(../commonmodules.pro)
 HEADERS += \
-    ../Common/Core/CBasicDatabase.h \
-    ../Common/Core/CElcCommonSettings.h \
-    ../Common/Core/CEventLogParser.h \
-    ../Common/Core/DBStrings.h \
-    ../Common/Core/CReportBuilder.h \
-    ../Common/Core/CSVLoader.h \
-    ../Common/Core/CSingleApplication.h \
-    ../Common/Core/CBasicSettings.h \
-    ../Common/Core/elcUtils.h \
-    ../Common/Core/stdafx.h \
     src/CElcGuiAppSettings.h \
-    src/OptionsDialog.h \
+    src/CLoadFilesOptionsDialog.h \
+    src/CReportOptionsDialog.h \
     src/mainwindow.h
 
 SOURCES += \
-    ../Common/Core/CBasicDatabase.cpp \
-    ../Common/Core/CElcCommonSettings.cpp \
-    ../Common/Core/CEventLogParser.cpp \
-    ../Common/Core/CReportBuilder.cpp \
-    ../Common/Core/CSVLoader.cpp \
-    ../Common/Core/CSingleApplication.cpp \
-    ../Common/Core/CBasicSettings.cpp \
-    ../Common/Core/elcUtils.cpp \
     src/CElcGuiAppSettings.cpp \
-    src/OptionsDialog.cpp \
+    src/CLoadFilesOptionsDialog.cpp \
+    src/CReportOptionsDialog.cpp \
     src/main.cpp \
     src/mainwindow.cpp
 
 FORMS += \
-    src/OptionsDialog.ui \
+    src/CLoadFilesOptionsDialog.ui \
+    src/CReportOptionsDialog.ui \
     src/mainwindow.ui
 
 TRANSLATIONS += \
@@ -76,8 +62,8 @@ RC_ICONS = img/elc.ico
 
 MAJOR_VER = 2
 MINOR_VER = 0
-PATCH_VER = 1
-BUILD_VER = 22
+PATCH_VER = 2
+BUILD_VER = 24
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}
