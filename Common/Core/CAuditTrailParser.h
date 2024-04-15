@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CAuditTrailParser.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The class for MMS Audit Trail logs parsing.
+*
+****************************************************************************/
+
 #ifndef CAUDITTRAILPARSER_H
 #define CAUDITTRAILPARSER_H
 

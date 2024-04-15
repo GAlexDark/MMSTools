@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CEventLogReport.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The class for build MMS Event logs report.
+*
+****************************************************************************/
+
 #ifndef CEVENTLOGREPORT_H
 #define CEVENTLOGREPORT_H
 

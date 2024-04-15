@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CAuditTrailReport.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The class for build MMS Audit Trail logs report.
+*
+****************************************************************************/
+
 #ifndef CAUDITTRAILREPORT_H
 #define CAUDITTRAILREPORT_H
 
