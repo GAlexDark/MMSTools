@@ -1,0 +1,30 @@
+#ifndef CBASICREPORT_H
+#define CBASICREPORT_H
+
+#include <QObject>
+#include "CBasicDatabase.h"
+
+class CBasicReport : public QObject
+{
+public:
+    CBasicReport();
+    virtual ~CBasicReport() = default;
+    void init(pBasicDatabase db, const QString &reportName);
+    virtual bool generateReport(const QString &arguments) = 0;
+    QString errorString() const { return m_errorString; }
+
+    virtual QString visibleReportName() = 0;
+    quint16 reportID() const;
+
+protected:
+    void setDateTimeFormat(QXlsx::Format &dateFormat);
+    QString checkDetails(const QString &data);
+
+    QString         m_errorString;
+    QString         m_reportFileName;
+    pBasicDatabase  m_db;
+};
+
+typedef CBasicReport *pBasicReport;
+
+#endif // CBASICREPORT_H
