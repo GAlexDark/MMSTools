@@ -44,6 +44,7 @@ private:
     QString         m_dbName;
     QStringList     m_fileList;
     QByteArray      m_fdState;
+    QString         m_errorString;
 
     bool            m_isButtonsDisabled;
     bool            m_hasHeaders;

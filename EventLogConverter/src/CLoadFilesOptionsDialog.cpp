@@ -19,6 +19,7 @@ CLoadFilesOptionsDialog::CLoadFilesOptionsDialog(const QStringList &logsList, QW
     ui->comboBox->setCurrentIndex(0);
 
     m_hasHeaders = false;
+    m_isOkClicked = false;
     m_logID = 0;
 }
 
@@ -27,11 +28,12 @@ CLoadFilesOptionsDialog::~CLoadFilesOptionsDialog()
     delete ui;
 }
 
-void
+bool
 CLoadFilesOptionsDialog::getOptions(quint16 &logID, bool &hasHeaders)
 {
     logID =  m_logID;
     hasHeaders = m_hasHeaders;
+    return m_isOkClicked;
 }
 
 void
@@ -55,6 +57,7 @@ CLoadFilesOptionsDialog::doOkClicked()
 
     if (!isError) {
         m_hasHeaders = yesChecked;
+        m_isOkClicked = true;
         close();
     }
 }

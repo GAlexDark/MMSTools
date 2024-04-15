@@ -96,14 +96,16 @@ bool
 MainWindow::showReadFilesOptionsDialog(const QStringList &logsList, quint16 &logID, bool &hasHeaders)
 {
     bool retVal = true;
+    m_errorString.clear();
     try {
         CLoadFilesOptionsDialog *wnd = new CLoadFilesOptionsDialog(logsList, this);
         wnd->exec();
-        wnd->getOptions(logID, hasHeaders);
+        retVal = wnd->getOptions(logID, hasHeaders);
         delete wnd;
     } catch (const std::bad_alloc &e) {
         retVal = false;
-        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Critical error: %1").arg(e.what()), QMessageBox::Ok);
+        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
 
     return retVal;
@@ -241,7 +243,6 @@ MainWindow::openFileClick()
         setStateText(tr("The file(s) was selected"));
         QCoreApplication::processEvents();
 
-        //QStringList logsList = {tr("Event Log"), tr("Audit Trail Log") };
         CParserManager &parserManager = CParserManager::instance();
         QStringList logsList = parserManager.getVisibleLogsNames();
         if (showReadFilesOptionsDialog(logsList, m_logId, m_hasHeaders)) {
@@ -257,8 +258,10 @@ MainWindow::openFileClick()
                 setStateText(tr("Error reading"));
             }
         } else {
-            setInfoText(tr("Error open options dialog."));
-            setStateText(tr("Error"));
+            if (!m_errorString.isEmpty()) {
+                setInfoText(tr("Error open options dialog."));
+                setStateText(tr("Error"));
+            }
         }
     } else {
         QString buf = tr("No files selected");

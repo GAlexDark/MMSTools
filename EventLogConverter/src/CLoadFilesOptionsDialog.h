@@ -15,7 +15,7 @@ public:
     explicit CLoadFilesOptionsDialog(const QStringList &logsList, QWidget *parent = nullptr);
     ~CLoadFilesOptionsDialog();
 
-    void getOptions(quint16 &logID, bool &hasHeaders);
+    bool getOptions(quint16 &logID, bool &hasHeaders);
 
 private slots:
     void doOkClicked();
@@ -24,6 +24,7 @@ private:
     Ui::CLoadFilesOptionsDialog *ui;
 
     bool    m_hasHeaders;
+    bool    m_isOkClicked;
     quint16 m_logID;
 };
 
