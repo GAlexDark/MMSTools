@@ -120,9 +120,8 @@ CBasicDatabase::open()
         retVal = m_db.open();
         if (retVal) {
             try {
-                m_SQLRes = new QSqlQuery(m_db); // <-- единое связывание всех запросов
+                m_SQLRes = new QSqlQuery(m_db);
                 Q_CHECK_PTR(m_SQLRes);
-
             } catch (const std::bad_alloc &e) {
                 m_errorString = QStringLiteral("Fatal SQL Query Error: %1").arg(e.what());
                 retVal = false;

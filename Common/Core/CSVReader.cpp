@@ -16,10 +16,10 @@
 ****************************************************************************/
 
 #include "CSVReader.h"
-#include <QElapsedTimer>
 
 #ifdef QT_DEBUG
-  #include "Debug.h"
+    #include <QElapsedTimer>
+    #include "Debug.h"
 #endif
 #include "DBStrings.h"
 #include "elcUtils.h"
@@ -35,7 +35,7 @@ CTextFileReader::checkBOM(const QByteArray &buffer)
     QByteArray bom = buffer.sliced(0, sizeof(utf8bomRaw));
     if (bom != utf8bom) {
         retVal = false;
-        m_errorString = QStringLiteral("Wrong BOM header. The file mush have UTF-8 BOM 0xef 0xbb 0xbf header");
+        m_errorString = QStringLiteral("Wrong BOM header. The file must have UTF-8 BOM 0xef 0xbb 0xbf header");
     }
 
     return retVal;
@@ -416,8 +416,10 @@ void
 CMmsLogsThreadReader::run()
 {
     m_errorString.clear();
+#ifdef QT_DEBUG
     QElapsedTimer timer;
     timer.start();
+#endif
     //-----------------------------------------------------
     if (m_fileNames.size() > 0 ) {
         emit sendMessage( tr("Preparing to read the file(s).") );
@@ -446,6 +448,8 @@ CMmsLogsThreadReader::run()
         } //for
     m_db.close();
     } // m_fileNames.size()
+#ifdef QT_DEBUG
     QString msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
     __DEBUG( msg )
+#endif
 }
