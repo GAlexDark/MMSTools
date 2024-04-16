@@ -29,7 +29,7 @@ public:
     explicit QCommandLineParserHelper();
 
     bool parseCmdArgs(const QCoreApplication &app);
-    QString path();
+
     void showHelpAndExit();
     RunningMode getRunningMode();
 
@@ -40,8 +40,6 @@ public:
     QString errorString() const { return m_errorString; }
 
 private:
-    QStringList files();
-    QString reportName();
     QStringList excludedUsernames();
     QStringList includedUsernames();
 

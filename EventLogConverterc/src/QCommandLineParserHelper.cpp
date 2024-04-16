@@ -115,34 +115,22 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
         if (comb1 || comb2 || comb3 || comb4) {
             m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
             retVal = false;
-        }
-        if (retVal && m_isExcluded && m_isIncluded) {
-            m_errorString = error1.arg("--exclude", "--include");
-            retVal = false;
+        } else {
+            if (m_isExcluded && m_isIncluded) {
+                m_errorString = error1.arg("--exclude", "--include");
+                retVal = false;
+            } else {
+                if (!m_isPath && !m_isFiles) {
+                    m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
+                    retVal = false;
+                }
+            }
         }
     } else {
         m_errorString = QStringLiteral("The fatal error has occurredd. The program will be closed.");
     }
 
     return retVal;
-}
-
-QString
-QCommandLineParserHelper::path()
-{
-    return (m_isPath)? m_parser.value("path") : QString();
-}
-
-QStringList
-QCommandLineParserHelper::files()
-{
-    return (m_isFiles)? m_parser.values("files") : QStringList();
-}
-
-QString
-QCommandLineParserHelper::reportName()
-{
-    return (m_isReportName)? m_parser.value("report") : QString();
 }
 
 QStringList
@@ -187,45 +175,37 @@ QCommandLineParserHelper::getRunningMode()
 bool
 QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 {
-    QString searchFolder(path());
-    fileList.append(files());
     bool retVal = true;
-    bool isSearchFolderEmpty = searchFolder.isEmpty();
-    bool isFileListEmpty = fileList.isEmpty();
-
-    if (isSearchFolderEmpty && isFileListEmpty) {
-        m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
-        retVal = false;
-    } else {
-        if (!isFileListEmpty) {
-            QFileInfo fi;
-            for (qsizetype i = 0; i < fileList.size(); ++i) {
-                fi.setFile(fileList.at(i));
-                if (fi.exists() && fi.isFile()) {
-                    fileList[i] = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
-                } else {
-                    m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
-                    retVal = false;
-                }
-            }
-        }
-
-        if (!isSearchFolderEmpty && retVal) {
-            QFileInfo sf(searchFolder);
-            QDir dir = sf.absoluteDir();
-            QString mask = sf.fileName().trimmed();
-            if (mask.isEmpty()) {
-                mask = QLatin1String("*.csv"); // default mask
-            }
-            if (dir.exists()) {
-                searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
-                fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
+    if (m_isFiles) {
+        fileList.append(m_parser.values("files"));
+        QFileInfo fi;
+        for (qsizetype i = 0; i < fileList.size(); ++i) {
+            fi.setFile(fileList.at(i));
+            if (fi.exists() && fi.isFile()) {
+                fileList[i] = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             } else {
-                m_errorString = QStringLiteral("Cannot find the directory %1.").arg(searchFolder);
+                m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
                 retVal = false;
             }
         }
     }
+    if (retVal && m_isPath) {
+        QString searchFolder(m_parser.value("path"));
+        QFileInfo sf(searchFolder);
+        QDir dir = sf.absoluteDir();
+        QString mask = sf.fileName().trimmed();
+        if (mask.isEmpty()) {
+            mask = QLatin1String("*.csv"); // default mask
+        }
+        if (dir.exists()) {
+            searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
+            fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
+        } else {
+            m_errorString = QStringLiteral("Cannot find the directory %1.").arg(searchFolder);
+            retVal = false;
+        }
+    }
+
     if (retVal) {
         fileList.removeDuplicates();
         m_filesList.clear();
@@ -238,11 +218,14 @@ QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 QString
 QCommandLineParserHelper::getReportName()
 {
-    QString retVal = reportName();
-    if (retVal.isEmpty()) {
+    QString retVal;
+    if (m_isReportName) {
+        retVal = m_parser.value("report");
+    } else {
         QDateTime now = QDateTime::currentDateTime();
-        retVal = QStringLiteral("%1_report.xlsx").arg(now.toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
+        retVal = QLatin1String("%1_report.xlsx").arg(now.toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
     }
+
     if (!retVal.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
         retVal = retVal + QLatin1String(".xlsx");
     }
