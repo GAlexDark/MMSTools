@@ -265,7 +265,7 @@ MainWindow::openFileClick()
                 setInfoText(m_errorString);
                 setStateText(tr("Error"));
             } else {
-                QString buf = tr("File selection canceled.");
+                buf = tr("File selection canceled.");
                 setInfoText(buf);
                 setStateText(buf);
                 m_fileList.clear();
