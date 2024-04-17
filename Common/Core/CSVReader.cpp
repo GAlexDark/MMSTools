@@ -18,8 +18,8 @@
 #include "CSVReader.h"
 
 #ifdef QT_DEBUG
-    #include <QElapsedTimer>
-    #include "Debug.h"
+  #include <QElapsedTimer>
+  #include "Debug.h"
 #endif
 #include "DBStrings.h"
 #include "elcUtils.h"
@@ -110,7 +110,7 @@ CTextFileReader::readSmallFile()
  */
 
     bool retVal = true;
-    qint64 bytesRead;
+    qint64 bytesRead = -1;
     try {
         bytesRead = m_file.read(m_buffer->data(), m_file.size());
     } catch (...) {
