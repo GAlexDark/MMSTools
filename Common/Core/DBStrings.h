@@ -42,9 +42,6 @@ inline const QString phRole(QLatin1String(":role"));
 inline const QString phCompanyname(QLatin1String(":companyname"));
 inline const QString phAttributes(QLatin1String(":attributes"));
 
-inline const QString person(QLatin1String("Person ["));
-inline const QString nullValue(QLatin1String("null"));
-
 //this query uses autotest
 namespace eventlog {
     inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, \

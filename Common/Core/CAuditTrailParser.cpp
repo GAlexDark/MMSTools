@@ -25,6 +25,9 @@ QRegularExpression reAuditTrailHeader("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))");
 QRegularExpression rePersonData("Person\\s\\[pk=\\d+,\\salias=(.*)\\]");
 QRegularExpression reLoadAuditTrail("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$");
 
+const QString person(QLatin1String("Person ["));
+const QString nullValue(QLatin1String("null"));
+
 bool
 CAuditTrailParser::parsePersonDataDetails()
 {
