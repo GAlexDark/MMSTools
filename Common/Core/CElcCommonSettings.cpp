@@ -22,20 +22,19 @@ void
 CElcCommonSettings::createDefault(const QString& iniPath)
 {
     QSettings settings(iniPath, QSettings::IniFormat);
-    QString filePath = QFileInfo(iniPath).absolutePath();
-    QString fileName = QFileInfo(iniPath).baseName();
-
     settings.beginGroup(QLatin1String("SETTINGS"));
 #ifdef QT_DEBUG
-    settings.setValue(QLatin1String("db_file_name"), QStringLiteral(TEST_SRCDIR"EventLogConverter.db"));
+    QString dbName = QStringLiteral(TEST_SRCDIR"EventLogConverter.db");
 #else
+    QString filePath = QFileInfo(iniPath).absolutePath();
+    QString fileName = QFileInfo(iniPath).baseName();
 #ifdef Q_OS_WIN
     QString dbName = (m_isRdsEnabled)? QStringLiteral("%1/%2.db").arg(filePath, fileName) : QStringLiteral("%1.db").arg(fileName);
 #else
     QString dbName = QStringLiteral("$HOME/.local/share/%1/%1.db").arg(fileName);
 #endif
-    settings.setValue(QLatin1String("db_file_name"), dbName);
 #endif
+    settings.setValue(QLatin1String("db_file_name"), dbName);
     settings.setValue(QLatin1String("clear_on_startup"), QLatin1String("yes")); // yes | no
     settings.setValue(QLatin1String("internal_ip_start_octet"), QLatin1String("10."));
     settings.endGroup();
