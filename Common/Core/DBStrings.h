@@ -24,6 +24,8 @@ inline const QString pragmaJournalMode(QLatin1String("PRAGMA journal_mode = %1;"
 inline const QString pragmaSynchronous(QLatin1String("PRAGMA synchronous = %1;"));
 inline const QString pragmaTempStore(QLatin1String("PRAGMA temp_store = %1;"));
 inline const QString pragmaLockingMode(QLatin1String("PRAGMA locking_mode = %1;"));
+inline const QString pragmaMmapSize(QLatin1String("PRAGMA mmap_size = 2147418112;"));
+inline const QString pragmaThreads(QLatin1String("PRAGMA threads = 8;"));
 
 inline const QString phUsername(QLatin1String(":username"));
 inline const QString phTimestampISO8601(QLatin1String(":timestampISO8601"));

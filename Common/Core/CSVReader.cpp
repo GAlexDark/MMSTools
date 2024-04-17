@@ -173,6 +173,8 @@ CTextFileReader::readLargeFile()
     // "133 530 milliseconds" 2.2255 minutes
     // "137 403 milliseconds"
     // "126 503 milliseconds" 2.1084 minutes
+    // "129 879 milliseconds"
+    // "123 998 milliseconds"
     QString line;
     qint64 bufferOffset = 0;
     qint64 eolCharsLen = m_eolChars.length();
@@ -293,7 +295,7 @@ CTextFileReader::read()
     bool retVal = m_file.open(QIODevice::ReadOnly);
     memset(m_buffer->data(), 0, defMaxFileSize);
     if (retVal) {
-        retVal = (size < defMaxFileSize)? readSmallFile() : readLargeFile();
+        retVal = (size <= defMaxFileSize)? readSmallFile() : readLargeFile();
         //retVal = readSmallFile();
         //retVal = readLargeFile();
     } else {
@@ -313,6 +315,8 @@ CMmsLogsReader::initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList)
         if (retVal) {
             QStringList dbCommandItems;
             dbCommandItems.append(pragmaUTF8);
+            dbCommandItems.append(pragmaMmapSize);
+            dbCommandItems.append(pragmaThreads);
             dbCommandItems.append(pragmaSynchronous.arg(pragmaList->value(QLatin1String("synchronous"))));
 
             int blockSize = elcUtils::getStorageBlockSize(dbFileName);
@@ -321,6 +325,7 @@ CMmsLogsReader::initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList)
             dbCommandItems.append(pragmaJournalMode.arg(pragmaList->value(QLatin1String("journal_mode"))));
             dbCommandItems.append(pragmaTempStore.arg(pragmaList->value(QLatin1String("temp_store"))));
             dbCommandItems.append(pragmaLockingMode.arg(pragmaList->value(QLatin1String("locking_mode"))));
+
             const CParserManager &parserManager = CParserManager::instance();
             dbCommandItems.append(parserManager.getCreateTableRequestList());
 
@@ -350,6 +355,15 @@ CMmsLogsReader::initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList)
         res = m_db.findInDB(QLatin1String("PRAGMA cache_size;"), false);
         value = "cache_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
         __DEBUG( value )
+        res.clear();
+        res = m_db.findInDB(QLatin1String("pragma mmap_size;"), false);
+        value = "mmap_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
+        __DEBUG( value )
+        res.clear();
+        res = m_db.findInDB(QLatin1String("pragma threads;"), false);
+        value = "threads: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
+        __DEBUG( value )
+        res.clear();
     }
 #endif
     if (!retVal) {
