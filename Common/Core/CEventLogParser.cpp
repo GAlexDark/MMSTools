@@ -43,8 +43,8 @@ CEventLogParser::parseUserSuccessLogonDetails()
         m_username1 = match.captured(1).trimmed();
         m_authType = match.captured(2).trimmed();
 
-        QString ipaddresses = match.captured(3).trimmed();
-        analizeIPAdresses(ipaddresses);
+        m_ipaddresses = match.captured(3).trimmed();
+        analizeIPAdresses();
     }
     return retVal;
 }
@@ -58,8 +58,8 @@ CEventLogParser::parseUserFailedLogonDetails()
     if (retVal) {
         m_authType = match.captured(1).trimmed();
 
-        QString ipaddresses = match.captured(2).trimmed();
-        analizeIPAdresses(ipaddresses);
+        m_ipaddresses = match.captured(2).trimmed();
+        analizeIPAdresses();
     } else {
         m_authType.clear();
         m_externalip.clear();

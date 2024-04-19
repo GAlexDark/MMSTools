@@ -27,6 +27,12 @@ CBasicParser::removeQuote(QString &data, char quoteChar)
     }
 }
 
+CBasicParser::CBasicParser()
+    : m_delimiterChar(0), m_quoteChar(0)
+{
+    m_eolChars.clear();
+}
+
 void
 CBasicParser::init(const QString &internalIpFirstOctet)
 {
@@ -34,18 +40,18 @@ CBasicParser::init(const QString &internalIpFirstOctet)
 }
 
 void
-CBasicParser::analizeIPAdresses(const QString &ipaddresses)
+CBasicParser::analizeIPAdresses()
 {
-    qsizetype pos = ipaddresses.indexOf(',');
+    qsizetype pos = m_ipaddresses.indexOf(',');
     if (pos != -1) {
-        QString firstip = ipaddresses.sliced(0, pos).trimmed();
-        QString secondip = ipaddresses.mid(pos + 1).trimmed();
+        QString firstip = m_ipaddresses.sliced(0, pos).trimmed();
+        QString secondip = m_ipaddresses.mid(pos + 1).trimmed();
         bool isPrivateFirstIP = firstip.startsWith(m_internalIpFirstOctet);
         bool isPrivateSecondIP = secondip.startsWith(m_internalIpFirstOctet);
 
         if (isPrivateFirstIP && isPrivateSecondIP) {
             m_externalip.clear();
-            m_internalip = ipaddresses;
+            m_internalip = m_ipaddresses;
         } else {
             if (isPrivateFirstIP) {
                 m_externalip = secondip;
@@ -56,11 +62,11 @@ CBasicParser::analizeIPAdresses(const QString &ipaddresses)
             }
         } // if &&
     } else {
-        if (ipaddresses.startsWith(m_internalIpFirstOctet)) {
+        if (m_ipaddresses.startsWith(m_internalIpFirstOctet)) {
             m_externalip.clear();
-            m_internalip = ipaddresses;
+            m_internalip = m_ipaddresses;
         } else {
-            m_externalip = ipaddresses;
+            m_externalip = m_ipaddresses;
             m_internalip.clear();
         }
     } // (pos != -1)

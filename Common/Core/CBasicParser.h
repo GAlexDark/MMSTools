@@ -25,6 +25,7 @@
 class CBasicParser : public QObject
 {
 public:
+    CBasicParser();
     virtual ~CBasicParser() = default;
     void init(const QString &internalIpFirstOctet);
     QString errorString() const { return m_errorString; }
@@ -40,10 +41,11 @@ public:
 
 protected:
     void removeQuote(QString &data, char quoteChar);
-    void analizeIPAdresses(const QString &ipaddresses);
+    void analizeIPAdresses();
 
     QString     m_internalIpFirstOctet;
-    QString     m_internalip,
+    QString     m_ipaddresses,
+                m_internalip,
                 m_externalip;
 
     char        m_delimiterChar;
