@@ -46,45 +46,38 @@ CTextFileReader::indexOfEol(const QByteArray *data, const qint64 startPos, const
 {
     qint64 retVal = -1;
     qint64 index = startPos;
-    qint64 eolCharLength = m_eolChars.length();
+    qint64 endPos = size - m_eolChars.length();
     bool isQuoted = false;
-    bool isFound = false;
 
-    while (!isFound && (index <= size - eolCharLength)) {
-        if (data->at(index) == m_quoteChar) {
+    char *d = const_cast<char *>(data->data());
+    d += index;
+
+    char *ch;
+    while (index <= endPos) {
+        if (*d == m_quoteChar) {
             isQuoted = !isQuoted;
-            index++;
         } else {
-            switch (eolCharLength) {
-            case 1:
-                if (data->at(index) == '\n') {
-                    if (isQuoted) {
-                        index++;
-                    } else {
-                        retVal = index;
-                        isFound = true;
-                    }
-                } else {
-                    index++;
+            if (*d == '\n') {
+                if (!isQuoted) {
+                    retVal = index;
+                    break;
                 }
-                break;
-            case 2:
-                if (data->at(index) == '\r') {
-                    if (data->at(index + 1) == '\n') {
-                        if (isQuoted) {
-                            index++;
-                        } else {
+            } else {
+                if (*d == '\r') {
+                    ch = d;
+                    ++ch;
+                    if (*ch == '\n') {
+                        if (!isQuoted) {
                             retVal = index;
-                            isFound = true;
+                            break;
                         }
                     }
-                } else {
-                    index++;
                 }
-                break;
             }
-        } // else
-    } //while
+        }
+        ++d;
+        ++index;
+    }
 
     return retVal;
 }
@@ -175,6 +168,7 @@ CTextFileReader::readLargeFile()
     // "126 503 milliseconds" 2.1084 minutes
     // "129 879 milliseconds"
     // "123 998 milliseconds"
+    // "114 631 milliseconds" 1,91051667 minutes
     QString line;
     qint64 bufferOffset = 0;
     qint64 eolCharsLen = m_eolChars.length();
@@ -190,7 +184,7 @@ CTextFileReader::readLargeFile()
         qint64 nextPosition;
         retVal = checkBOM(*m_buffer);
         if (retVal && m_isHeaders) {
-            nextPosition = indexOfEol(m_buffer, prevPosition, defMaxFileSize);
+            nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead); //defMaxFileSize);
             if (nextPosition != -1) {
                 line.clear();
                 line = m_buffer->sliced(prevPosition, nextPosition - prevPosition); // prevPosition == 0
@@ -203,7 +197,7 @@ CTextFileReader::readLargeFile()
 
         while (!isEOF && retVal) {
             do {
-                nextPosition = indexOfEol(m_buffer, prevPosition, defMaxFileSize);
+                nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead); //defMaxFileSize);
                 if (nextPosition != -1) {
                     line.clear();
                     line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
@@ -265,8 +259,10 @@ CTextFileReader::init(bool dataHasHeaders, const mms::ffs_t &ffs)
 {
     m_isHeaders = dataHasHeaders;
     m_delimiterChar = ffs.delimiterChar;
+    Q_ASSERT(m_delimiterChar != 0);
     m_quoteChar = ffs.quoteChar;
     m_eolChars = ffs.eolChars;
+    Q_ASSERT(!m_eolChars.isEmpty());
 
     bool retVal = true;
     delete m_buffer;
@@ -287,11 +283,6 @@ CTextFileReader::read()
 {
     m_file.setFileName(m_fileName);
     qint64 size = m_file.size();
-#ifdef QT_DEBUG
-  #ifdef TEST_LARGE
-    size = defMaxFileSize + 1;
-  #endif
-#endif
     bool retVal = m_file.open(QIODevice::ReadOnly);
     memset(m_buffer->data(), 0, defMaxFileSize);
     if (retVal) {
