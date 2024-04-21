@@ -70,7 +70,8 @@ CAuditTrailParser::parseAttributesDetails()
     return parsePersonDataDetails();
 }
 
-CAuditTrailParser::CAuditTrailParser()
+CAuditTrailParser::CAuditTrailParser(QObject *parent)
+    : CBasicParser(parent)
 {
     m_eolChars = "\n";
     m_delimiterChar = ';';

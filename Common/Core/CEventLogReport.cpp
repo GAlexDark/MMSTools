@@ -18,7 +18,8 @@
 #include "CEventLogReport.h"
 #include "DBStrings.h"
 
-CEventLogReport::CEventLogReport()
+CEventLogReport::CEventLogReport(QObject *parent)
+    : CBasicReport(parent)
 {
     m_errorString.clear();
 }

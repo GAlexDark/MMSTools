@@ -29,7 +29,8 @@ class CConsoleOutput : public QObject
 {
     Q_OBJECT
 public:
-    CConsoleOutput()
+    explicit CConsoleOutput(QObject *parent = nullptr)
+        : QObject(parent)
     {
 #ifdef Q_OS_WIN32
         // ref: https://github.com/tsnsoft/CppConsoleUnicode

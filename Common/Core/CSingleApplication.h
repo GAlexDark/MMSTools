@@ -16,6 +16,9 @@ public:
     bool isRunning();
 
 private:
+    CSingleApplication(const CSingleApplication&) = delete;
+    CSingleApplication& operator=(CSingleApplication&) = delete;
+
     QString              m_id;
     QSystemSemaphore    *m_semaphore;
     QSharedMemory       *m_sharedMemory;

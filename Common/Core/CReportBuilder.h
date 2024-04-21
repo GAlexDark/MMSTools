@@ -52,7 +52,7 @@ private:
 class CSVThreadReportBuilder: public QThread
 {
 public:
-    explicit CSVThreadReportBuilder();
+    explicit CSVThreadReportBuilder(QObject *parent = nullptr);
     bool init(quint16 logID, const QString &dbFileName, const QString &reportName,
               const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList);
     void run();

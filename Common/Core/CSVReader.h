@@ -50,14 +50,14 @@ private:
     QString     m_fileName;
     bool        m_isHeaders;
 
-    bool checkBOM(const QByteArray &buffer);
+    bool checkBOM();
     bool readLargeFile();
     bool readSmallFile();
 
     //std::function<void(const QString&)> m_callbackFunction;
 
 protected:
-    qint64 indexOfEol(const QByteArray *data, const qint64 startPos, const qint64 size);
+    qint64 indexOfEol(const qint64 startPos, const qint64 size);
     virtual bool convertData(const QString &line) = 0;
 
     QString     m_errorString;
@@ -94,7 +94,7 @@ class CMmsLogsThreadReader: public QThread, public CMmsLogsReader
 {
     Q_OBJECT
 public:
-    explicit CMmsLogsThreadReader();
+    explicit CMmsLogsThreadReader(QObject *parent = nullptr);
     void run();
     bool getStatus() const { return m_retVal; }
 

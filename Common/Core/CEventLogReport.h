@@ -25,7 +25,7 @@ class CEventLogReport : public CBasicReport
     Q_OBJECT
     Q_CLASSINFO("ID", "1")
 public:
-    Q_INVOKABLE CEventLogReport();
+    Q_INVOKABLE CEventLogReport(QObject *parent = nullptr);
     bool generateReport(const QString &arguments) override;
     QString visibleReportName() override { return QObject::tr("Event Log"); }
 };

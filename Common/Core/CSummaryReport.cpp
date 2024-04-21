@@ -18,7 +18,8 @@
 #include "CSummaryReport.h"
 #include "DBStrings.h"
 
-CSummaryReport::CSummaryReport()
+CSummaryReport::CSummaryReport(QObject *parent)
+    : CBasicReport(parent)
 {
     m_errorString.clear();
 }

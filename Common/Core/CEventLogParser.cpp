@@ -42,10 +42,10 @@ CEventLogParser::parseUserSuccessLogonDetails()
     if (retVal) {
         m_username1 = match.captured(1).trimmed();
         m_authType = match.captured(2).trimmed();
-
         m_ipaddresses = match.captured(3).trimmed();
         analizeIPAdresses();
     }
+
     return retVal;
 }
 
@@ -57,7 +57,6 @@ CEventLogParser::parseUserFailedLogonDetails()
     bool retVal = match.hasMatch();
     if (retVal) {
         m_authType = match.captured(1).trimmed();
-
         m_ipaddresses = match.captured(2).trimmed();
         analizeIPAdresses();
     } else {
@@ -74,17 +73,46 @@ CEventLogParser::parseUserLogonDetails()
     bool retVal = false;
     if ((QString::compare(m_type, authSuccessUk, Qt::CaseInsensitive) == 0) ||
         (QString::compare(m_type, authSuccessEn, Qt::CaseInsensitive) == 0)) {
-        retVal = parseUserSuccessLogonDetails();
+        if (QString::compare(m_prevValueUSLD.details, m_details, Qt::CaseInsensitive) == 0) {
+            m_username1 = m_prevValueUSLD.username;
+            m_authType = m_prevValueUSLD.authType;
+            m_internalip = m_prevValueUSLD.internalIp;
+            m_externalip = m_prevValueUSLD.externalIp;
+            retVal = true;
+        } else {
+            retVal = parseUserSuccessLogonDetails();
+            if (retVal) {
+                m_prevValueUSLD.details = m_details;
+                m_prevValueUSLD.username = m_username1;
+                m_prevValueUSLD.authType = m_authType;
+                m_prevValueUSLD.internalIp = m_internalip;
+                m_prevValueUSLD.externalIp = m_externalip;
+            }
+        }
     } else {
         if ((QString::compare(m_type, authFailedUk, Qt::CaseInsensitive) == 0) ||
             (QString::compare(m_type, authFailedEn, Qt::CaseInsensitive) == 0)) {
-            retVal = parseUserFailedLogonDetails();
+            if (QString::compare(m_prevValueUFLD.details, m_details, Qt::CaseInsensitive) == 0) {
+                m_authType = m_prevValueUFLD.authType;
+                m_internalip = m_prevValueUFLD.internalIp;
+                m_externalip = m_prevValueUFLD.externalIp;
+                retVal = true;
+            } else {
+                retVal = parseUserFailedLogonDetails();
+                if (retVal) {
+                    m_prevValueUFLD.details = m_details;
+                    m_prevValueUFLD.authType = m_authType;
+                    m_prevValueUFLD.internalIp = m_internalip;
+                    m_prevValueUFLD.externalIp = m_externalip;
+                }
+            }
         }
     }
     return retVal;
 }
 
-CEventLogParser::CEventLogParser()
+CEventLogParser::CEventLogParser(QObject *parent)
+    : CBasicParser(parent)
 {
     m_delimiterChar = ',';
     m_quoteChar = '"';

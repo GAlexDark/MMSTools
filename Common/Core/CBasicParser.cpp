@@ -27,8 +27,8 @@ CBasicParser::removeQuote(QString &data, char quoteChar)
     }
 }
 
-CBasicParser::CBasicParser()
-    : m_delimiterChar(0), m_quoteChar(0)
+CBasicParser::CBasicParser(QObject *parent)
+    : QObject(parent), m_delimiterChar(0), m_quoteChar(0)
 {
     m_eolChars.clear();
 }

@@ -30,8 +30,8 @@ const QString space(QLatin1String(" "));
 const QString doubleBackslash(QLatin1String("\"\""));
 const QString backslash(QLatin1String("\""));
 
-CBasicReport::CBasicReport()
-    : m_errorString(""), m_reportFileName(""), m_db(nullptr)
+CBasicReport::CBasicReport(QObject *parent)
+    : QObject(parent), m_errorString(""), m_reportFileName(""), m_db(nullptr)
 {}
 
 void

@@ -25,7 +25,7 @@ class CSummaryReport : public CBasicReport
     Q_OBJECT
     Q_CLASSINFO("ID", "3")
 public:
-    Q_INVOKABLE CSummaryReport();
+    Q_INVOKABLE CSummaryReport(QObject *parent = nullptr);
     bool generateReport(const QString &arguments) override;
     QString visibleReportName() override { return QObject::tr("(Experimental) Summary report"); }
 };

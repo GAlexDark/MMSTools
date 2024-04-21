@@ -19,7 +19,8 @@
 
 #include "DBStrings.h"
 
-CAuditTrailReport::CAuditTrailReport()
+CAuditTrailReport::CAuditTrailReport(QObject *parent)
+    : CBasicReport(parent)
 {
     m_errorString.clear();
 }

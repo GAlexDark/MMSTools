@@ -126,7 +126,8 @@ CReportBuilder::generateReport()
 
 //----------------------------------------------------------
 
-CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(false)
+CSVThreadReportBuilder::CSVThreadReportBuilder(QObject *parent)
+    : QThread(parent), m_errorString(""), m_retVal(false)
 {}
 
 bool

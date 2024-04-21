@@ -26,13 +26,13 @@
 #include "CParserManager.h"
 
 bool
-CTextFileReader::checkBOM(const QByteArray &buffer)
+CTextFileReader::checkBOM()
 {
     bool retVal = true;
     m_errorString.clear();
     static const char utf8bomRaw[] = {'\xef', '\xbb', '\xbf'};
     QByteArray utf8bom = QByteArray::fromRawData(utf8bomRaw, sizeof(utf8bomRaw));
-    QByteArray bom = buffer.sliced(0, sizeof(utf8bomRaw));
+    QByteArray bom = m_buffer->sliced(0, sizeof(utf8bomRaw));
     if (bom != utf8bom) {
         retVal = false;
         m_errorString = QStringLiteral("Wrong BOM header. The file must have UTF-8 BOM 0xef 0xbb 0xbf header");
@@ -42,14 +42,14 @@ CTextFileReader::checkBOM(const QByteArray &buffer)
 }
 
 qint64
-CTextFileReader::indexOfEol(const QByteArray *data, const qint64 startPos, const qint64 size)
+CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size)
 {
     qint64 retVal = -1;
     qint64 index = startPos;
     qint64 endPos = size - m_eolChars.length();
     bool isQuoted = false;
 
-    char *d = const_cast<char *>(data->data());
+    char *d = m_buffer->data();
     d += index;
 
     char *ch;
@@ -113,7 +113,7 @@ CTextFileReader::readSmallFile()
     m_file.close();
 
     if (bytesRead > 0) {
-        retVal = checkBOM(*m_buffer);
+        retVal = checkBOM();
         if (retVal) {
             QString line;
             bool isEOF = false;
@@ -124,7 +124,7 @@ CTextFileReader::readSmallFile()
 
             //If data has header
             if (m_isHeaders) {
-                nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead);
+                nextPosition = indexOfEol(prevPosition, bytesRead);
                 if (nextPosition != -1) {
                     line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
                     prevPosition = nextPosition + eolCharsLen;
@@ -135,7 +135,7 @@ CTextFileReader::readSmallFile()
             }
 
             while (!isEOF && retVal) {
-                nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead);
+                nextPosition = indexOfEol(prevPosition, bytesRead);
                 line.clear();
                 if (nextPosition != -1) {
                     line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
@@ -182,12 +182,12 @@ CTextFileReader::readLargeFile()
     if (bytesRead > 0) {
         qint64 prevPosition = 3;
         qint64 nextPosition;
-        retVal = checkBOM(*m_buffer);
+        retVal = checkBOM();
         if (retVal && m_isHeaders) {
-            nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead); //defMaxFileSize);
+            nextPosition = indexOfEol(prevPosition, bytesRead);
             if (nextPosition != -1) {
                 line.clear();
-                line = m_buffer->sliced(prevPosition, nextPosition - prevPosition); // prevPosition == 0
+                line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
                 prevPosition = nextPosition + eolCharsLen;
                 m_lineNumber++;
             } else {
@@ -197,7 +197,7 @@ CTextFileReader::readLargeFile()
 
         while (!isEOF && retVal) {
             do {
-                nextPosition = indexOfEol(m_buffer, prevPosition, bytesRead); //defMaxFileSize);
+                nextPosition = indexOfEol(prevPosition, bytesRead);
                 if (nextPosition != -1) {
                     line.clear();
                     line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
@@ -413,8 +413,8 @@ bool CMmsLogsReader::convertData(const QString &line)
 
 //--------------------------------------------------------------------------
 
-CMmsLogsThreadReader::CMmsLogsThreadReader()
-    : m_retVal(false)
+CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
+    : QThread(parent), m_retVal(false)
 {}
 
 void
