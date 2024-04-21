@@ -93,6 +93,7 @@ CEventLogParser::parseUserLogonDetails()
         if ((QString::compare(m_type, authFailedUk, Qt::CaseInsensitive) == 0) ||
             (QString::compare(m_type, authFailedEn, Qt::CaseInsensitive) == 0)) {
             if (QString::compare(m_prevValueUFLD.details, m_details, Qt::CaseInsensitive) == 0) {
+                m_username1.clear();
                 m_authType = m_prevValueUFLD.authType;
                 m_internalip = m_prevValueUFLD.internalIp;
                 m_externalip = m_prevValueUFLD.externalIp;
