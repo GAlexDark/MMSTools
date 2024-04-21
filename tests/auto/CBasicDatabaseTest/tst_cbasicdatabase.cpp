@@ -158,7 +158,7 @@ void CBasicDatabaseTest::test_getValues()
         QCOMPARE(m_fakeDB.geValue(1).toString(), QString("2023-05-09T11:19:57.36Z"));
         QCOMPARE(m_fakeDB.geValue(2).toString(), QString("edbfa4ea24038861"));
 
-        QCOMPARE(m_fakeDB.geValue(4).toString(), QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
+        QCOMPARE(m_fakeDB.geValue(4).toString(), QString("username: mr_data,\r\n  type: PASSWORD,\r\n  ip address: 192.0.2.211, 10.10.10.10"));
         QCOMPARE(m_fakeDB.geValue(5).toString(), QString("mr_data"));
         QCOMPARE(m_fakeDB.geValue(6).toString(), QString("PASSWORD"));
         QCOMPARE(m_fakeDB.geValue(7).toString(), QString("192.0.2.211"));
