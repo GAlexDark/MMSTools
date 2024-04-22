@@ -23,9 +23,9 @@
 
 //#include "Debug.h"
 
-QRegularExpression reEventLogHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
-QRegularExpression reSuccessLogon("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$");
-QRegularExpression reFailedLogon("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$");
+const QRegularExpression reEventLogHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
+const QRegularExpression reSuccessLogon("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$");
+const QRegularExpression reFailedLogon("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$");
 
 const QString authSuccessUk("Вхід користувача - успішно");
 const QString authSuccessEn("User login - successful");

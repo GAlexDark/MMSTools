@@ -21,9 +21,9 @@
 //#include "Debug.h"
 #include "DBStrings.h"
 
-QRegularExpression reAuditTrailHeader("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))");
-QRegularExpression rePersonData("Person\\s\\[pk=\\d+,\\salias=(.*)\\]");
-QRegularExpression reLoadAuditTrail("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$");
+const QRegularExpression reAuditTrailHeader("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))");
+const QRegularExpression rePersonData("Person\\s\\[pk=\\d+,\\salias=(.*)\\]");
+const QRegularExpression reLoadAuditTrail("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$");
 
 const QString person(QLatin1String("Person ["));
 const QString nullValue(QLatin1String("null"));
