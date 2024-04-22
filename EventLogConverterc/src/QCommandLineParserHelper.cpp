@@ -29,8 +29,7 @@ QCommandLineParserHelper::checkData(const QStringList &data)
     for (qsizetype i = 0; i < data.size(); ++i) {
         buf = data.at(i);
         if (!elcUtils::sanitizeValue(buf)) {
-            m_errorString =
-                QStringLiteral("Invalid character in the value %1").arg(buf);
+            m_errorString = QStringLiteral("Invalid character in the value %1").arg(buf);
             retVal = false;
         }
     }
@@ -39,7 +38,7 @@ QCommandLineParserHelper::checkData(const QStringList &data)
 
 QCommandLineParserHelper::QCommandLineParserHelper()
     : m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false), m_isIncluded(false),
-    m_isImportOnly(false), m_isReportOnly(false)
+    m_isImportOnly(false), m_isReportOnly(false), m_isCleanDbOnly(false)
 {
     m_filesList.clear();
 }
@@ -49,20 +48,20 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
 {
     m_parser.addHelpOption();
 
-    const QString importOnlyDescription = QStringLiteral("The utility starts in the import data-only mode without report generation. \
-In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored.");
-    const QString reportOnlyDescription = QStringLiteral("The utility starts in the generation report-only mode without importing data. \
+    const QString importOnlyDescription(QLatin1String("The utility starts in the import data-only mode without report generation. \
+In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored."));
+    const QString reportOnlyDescription(QLatin1String("The utility starts in the generation report-only mode without importing data. \
 In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\n \
-If these options are not specified, data will be imported and the report generated.");
-    const QString cleanDbOnlyDescription = QStringLiteral("The utility starts in the clean database-only mode without import data and report generation.");
-    const QString pathDescription = QStringLiteral("Path to the directory with the MMS Event Log files for the report.");
-    const QString filesDescription = QStringLiteral("MMS Event Log data file(s) for the report. Usage:\n-f file1 -f file2 ... -f fileN");
-    const QString reportNameDescription = QStringLiteral("Path to the directory and name of the report file.");
-    const QString excludeDescription = QStringLiteral("The list of usernames separated by ',' or ';' excluded from the report. \
-Usage:\n-e user1 -e user2 ... -e userN or\n -e user1,user2,..,userN or\n-e user1;user2;..;userN");
-    const QString includeDescription = QStringLiteral("The list of usernames separated by ',' or ';' only included from the report. \
+If these options are not specified, data will be imported and the report generated."));
+    const QString cleanDbOnlyDescription(QLatin1String("The utility starts in the clean database-only mode without import data and report generation."));
+    const QString pathDescription(QLatin1String("Path to the directory with the MMS Event Log files for the report."));
+    const QString filesDescription(QLatin1String("MMS Event Log data file(s) for the report. Usage:\n-f file1 -f file2 ... -f fileN"));
+    const QString reportNameDescription(QLatin1String("Path to the directory and name of the report file."));
+    const QString excludeDescription(QLatin1String("The list of usernames separated by ',' or ';' excluded from the report. \
+Usage:\n-e user1 -e user2 ... -e userN or\n -e user1,user2,..,userN or\n-e user1;user2;..;userN"));
+    const QString includeDescription(QLatin1String("The list of usernames separated by ',' or ';' only included from the report. \
 When using this option, the exclude option is ignored. \
-Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN");
+Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN"));
 
     QCommandLineOption importOnlyOption(QStringList() << "importonly", importOnlyDescription);
     bool retVal = m_parser.addOption(importOnlyOption);
@@ -107,7 +106,7 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
     }
 
     if (retVal) {
-        const QString error1 = QStringLiteral("The '%1' and '%2' options cannot be specified at the same time.");
+        const QString error1 = QLatin1String("The '%1' and '%2' options cannot be specified at the same time.");
         bool comb1 = m_isImportOnly && m_isReportOnly && m_isCleanDbOnly;
         bool comb2 = m_isImportOnly && m_isReportOnly;
         bool comb3 = m_isImportOnly && m_isCleanDbOnly;
@@ -116,34 +115,22 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
         if (comb1 || comb2 || comb3 || comb4) {
             m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
             retVal = false;
-        }
-        if (retVal && m_isExcluded && m_isIncluded) {
-            m_errorString = error1.arg("--exclude", "--include");
-            retVal = false;
+        } else {
+            if (m_isExcluded && m_isIncluded) {
+                m_errorString = error1.arg("--exclude", "--include");
+                retVal = false;
+            } else {
+                if (!m_isPath && !m_isFiles) {
+                    m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
+                    retVal = false;
+                }
+            }
         }
     } else {
         m_errorString = QStringLiteral("The fatal error has occurredd. The program will be closed.");
     }
 
     return retVal;
-}
-
-QString
-QCommandLineParserHelper::path()
-{
-    return (m_isPath)? m_parser.value("path") : QString();
-}
-
-QStringList
-QCommandLineParserHelper::files()
-{
-    return (m_isFiles)? m_parser.values("files") : QStringList();
-}
-
-QString
-QCommandLineParserHelper::reportName()
-{
-    return (m_isReportName)? m_parser.value("report") : QString();
 }
 
 QStringList
@@ -188,44 +175,37 @@ QCommandLineParserHelper::getRunningMode()
 bool
 QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 {
-    QString searchFolder(path());
-    fileList.append(files());
     bool retVal = true;
-    bool isSearchFolderEmpty = searchFolder.isEmpty();
-
-    if (isSearchFolderEmpty && fileList.isEmpty()) {
-        m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
-        retVal = false;
-    } else {
-        if (!fileList.isEmpty()) {
-            QFileInfo fi;
-            for (qsizetype i = 0; i < fileList.size(); ++i) {
-                fi.setFile(fileList.at(i));
-                if (fi.exists() && fi.isFile()) {
-                    fileList[i] = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
-                } else {
-                    m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
-                    retVal = false;
-                }
-            }
-        }
-
-        if (!isSearchFolderEmpty && retVal) {
-            QFileInfo sf(searchFolder);
-            QDir dir = sf.absoluteDir();
-            QString mask = sf.fileName().trimmed();
-            if (mask.isEmpty()) {
-                mask = QStringLiteral("*.csv"); // default mask
-            }
-            if (dir.exists()) {
-                searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
-                fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
+    if (m_isFiles) {
+        fileList.append(m_parser.values("files"));
+        QFileInfo fi;
+        for (qsizetype i = 0; i < fileList.size(); ++i) {
+            fi.setFile(fileList.at(i));
+            if (fi.exists() && fi.isFile()) {
+                fileList[i] = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             } else {
-                m_errorString = QStringLiteral("Cannot find the directory %1.").arg(searchFolder);
+                m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
                 retVal = false;
             }
         }
     }
+    if (retVal && m_isPath) {
+        QString searchFolder(m_parser.value("path"));
+        QFileInfo sf(searchFolder);
+        QDir dir = sf.absoluteDir();
+        QString mask = sf.fileName().trimmed();
+        if (mask.isEmpty()) {
+            mask = QLatin1String("*.csv"); // default mask
+        }
+        if (dir.exists()) {
+            searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
+            fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
+        } else {
+            m_errorString = QStringLiteral("Cannot find the directory %1.").arg(searchFolder);
+            retVal = false;
+        }
+    }
+
     if (retVal) {
         fileList.removeDuplicates();
         m_filesList.clear();
@@ -238,13 +218,16 @@ QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 QString
 QCommandLineParserHelper::getReportName()
 {
-    QString retVal = reportName();
-    if (retVal.isEmpty()) {
+    QString retVal;
+    if (m_isReportName) {
+        retVal = m_parser.value("report");
+    } else {
         QDateTime now = QDateTime::currentDateTime();
-        retVal = QStringLiteral("%1_report.xlsx").arg(now.toString(QStringLiteral("ddMMyyyy-hhmmsszzz")));
+        retVal = QLatin1String("%1_report.xlsx").arg(now.toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
     }
+
     if (!retVal.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
-        retVal = retVal + QStringLiteral(".xlsx");
+        retVal = retVal + QLatin1String(".xlsx");
     }
 
     if ((retVal.indexOf('/') == -1) || (retVal.indexOf('\\') == -1)) {

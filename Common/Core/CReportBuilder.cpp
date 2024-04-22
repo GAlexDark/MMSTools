@@ -19,9 +19,10 @@
 //#include "Debug.h"
 #include "DBStrings.h"
 #include "elcUtils.h"
+#include "CReportManager.h"
 
 CReportBuilder::CReportBuilder()
-    : m_db(nullptr), m_errorString(""), m_reportFileName("")
+    : m_db(nullptr), m_report(nullptr), m_errorString("")
 {}
 
 CReportBuilder::~CReportBuilder()
@@ -34,43 +35,56 @@ CReportBuilder::~CReportBuilder()
 }
 
 bool
-CReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
+CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &reportName,
+                    const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
 {
     Q_CHECK_PTR(excludedUsernamesList);
+    m_excludedUsernamesList = *excludedUsernamesList;
     Q_CHECK_PTR(includedUsernamesList);
-    bool retVal = true;
-    try {
-        m_db = new CBasicDatabase();
+    m_includedUsernamesList = *includedUsernamesList;
 
-        m_reportFileName = reportName;
-        m_excludedUsernamesList = *excludedUsernamesList;
-        m_includedUsernamesList = *includedUsernamesList;
+    CReportManager &reportManager = CReportManager::instance();
+    m_report = nullptr;
+    bool retVal = reportManager.checkID(logID);
+    if (retVal) {
+        m_report = reportManager.getInstance(logID);
+        Q_CHECK_PTR(m_report);
 
-        retVal = m_db->init(QStringLiteral("QSQLITE"), dbFileName);
+        try {
+            m_db = new CBasicDatabase();
+            Q_CHECK_PTR(m_db);
+        } catch (const std::bad_alloc &e) {
+            retVal = false;
+            m_errorString = e.what();
+        }
+
         if (retVal) {
-            retVal = m_db->open();
+            retVal = m_db->init(QLatin1String("QSQLITE"), dbFileName);
             if (retVal) {
-                int blockSize = elcUtils::getStorageBlockSize(dbFileName);
-                QStringList pragmaItems;
-                pragmaItems.append(pragmaUTF8);
-                pragmaItems.append(pragmaPageSize.arg(blockSize));
+                retVal = m_db->open();
+                if (retVal) {
+                    int blockSize = elcUtils::getStorageBlockSize(dbFileName);
+                    QStringList pragmaItems;
+                    pragmaItems.append(pragmaUTF8);
+                    pragmaItems.append(pragmaPageSize.arg(blockSize));
 
-                for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
-                    retVal = m_db->exec(pragmaItems.at(i));
-                    if (!retVal) {
-                        break;
+                    for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
+                        retVal = m_db->exec(pragmaItems.at(i));
+                        if (!retVal) {
+                            break;
+                        }
                     }
                 }
             }
+            if (retVal) {
+                m_report->init(m_db, reportName);
+            } else {
+                m_errorString = m_db->errorString();
+                m_db->close();
+            }
         }
-    } catch (const std::bad_alloc &e) {
-        retVal = false;
-        m_errorString = e.what();
-    }
-
-    if (!retVal) {
-        m_errorString = m_db->errorString();
-        m_db->close();
+    } else {
+        m_errorString = QStringLiteral("The parser not found");
     }
 
     return retVal;
@@ -79,42 +93,11 @@ CReportBuilder::init(const QString &dbFileName, const QString &reportName, const
 bool
 CReportBuilder::generateReport()
 {
-    int rowHeader = 1;
-    int colTimestampISO8601 = 1, colTimestamp = 2, colExternalIP = 3, colUsername = 4, colType = 5, colDetails = 6,
-            colAuthType = 7, colInternalIP = 8, colRequestid = 9;
-    QString buf;
-
-    QXlsx::Document xlsxReport;
-    // Add header
-    QVariant writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
-    xlsxReport.write(rowHeader, colTimestampISO8601, writeValue);
-    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-    xlsxReport.write(rowHeader, colTimestamp, writeValue);
-    writeValue = QStringLiteral("Зовнішній IP");
-    xlsxReport.write(rowHeader, colExternalIP, writeValue);
-    writeValue = QStringLiteral("Ім'я користувача");
-    xlsxReport.write(rowHeader, colUsername, writeValue);
-    writeValue = QStringLiteral("Тип");
-    xlsxReport.write(rowHeader, colType, writeValue);
-    writeValue = QStringLiteral("Деталі");
-    xlsxReport.write(rowHeader, colDetails, writeValue);
-    writeValue = QStringLiteral("Тип авторизації");
-    xlsxReport.write(rowHeader, colAuthType, writeValue);
-    writeValue = QStringLiteral("Внутрішній IP");
-    xlsxReport.write(rowHeader, colInternalIP, writeValue);
-    writeValue = QStringLiteral("ID запиту");
-    xlsxReport.write(rowHeader, colRequestid, writeValue);
-
-    // Set datetime format
-    QXlsx::Format dateFormat;
-    dateFormat.setHorizontalAlignment(QXlsx::Format::AlignRight);
-    dateFormat.setNumberFormat(QStringLiteral("dd.mm.yyyy hh:mm:ss"));
-
     QString args;
     args.clear();
     if (m_includedUsernamesList.isEmpty()) {
         if (!m_excludedUsernamesList.isEmpty()) {
-            args.append(QStringLiteral("WHERE "));
+            args.append(QLatin1String("WHERE "));
             qsizetype size = m_excludedUsernamesList.size() - 1;
             for (qsizetype i = 0; i < size; ++i) {
                 args.append(QStringLiteral("e.username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
@@ -122,7 +105,7 @@ CReportBuilder::generateReport()
             args.append(QStringLiteral("e.username<>'%1'").arg(m_excludedUsernamesList.at(size)));
         }
     } else {
-        args.append(QStringLiteral("WHERE "));
+        args.append(QLatin1String("WHERE "));
         qsizetype size = m_includedUsernamesList.size() - 1;
         for (qsizetype i = 0; i < size; ++i) {
             args.append(QStringLiteral("e.username='%1' OR ").arg(m_includedUsernamesList.at(i)));
@@ -130,71 +113,10 @@ CReportBuilder::generateReport()
         args.append(QStringLiteral("e.username='%1'").arg(m_includedUsernamesList.at(size)));
     }
 //    __DEBUG( getAllRecords.arg(args) )
-    const QString eolMaskCode = QStringLiteral("@N@");
-    const QString eolChar = QStringLiteral("\n");
-    const QString emptyChar = QStringLiteral("");
 
-    const QString vs_long = QStringLiteral("VALIDATE_SCHEDULES");
-    const QString vs_short = QStringLiteral("V_S");
-    const QString std_long = QStringLiteral("SEND_TO_DAM");
-    const QString std_short = QStringLiteral("S_T_D");
-    const QString doubleSpace = QStringLiteral("  ");
-    const QString space = QStringLiteral(" ");
-    const QString doubleBackslash = QStringLiteral("\"\"");
-    const QString backslash = QStringLiteral("\"");
-
-    bool retVal = m_db->exec(getAllRecords.arg(args));
-    if (retVal) {
-        int row = 2;
-        while (m_db->isNext()) {
-            writeValue = m_db->geValue(0).toString();
-            xlsxReport.write(row, colTimestampISO8601, writeValue);
-
-            writeValue = m_db->geValue(1).toDateTime();
-            xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
-
-            writeValue = m_db->geValue(2).toString();
-            xlsxReport.write(row, colExternalIP, writeValue);
-
-            writeValue = m_db->geValue(3).toString();
-            xlsxReport.write(row, colUsername, writeValue);
-
-            writeValue = m_db->geValue(4).toString();
-            xlsxReport.write(row, colType, writeValue);
-
-            buf = m_db->geValue(5).toString();
-            buf.replace(eolMaskCode, eolChar, Qt::CaseInsensitive);
-            buf.replace(doubleBackslash, backslash);
-            //ref: https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3
-            if (buf.length() > 32767) { //this line is too long
-                buf.replace(eolChar, emptyChar);
-                while (buf.indexOf(doubleSpace) != -1) {
-                    buf.replace(doubleSpace, space);
-                }
-                buf.replace(vs_long, vs_short);
-                buf.replace(std_long, std_short);
-            }
-            writeValue = buf;
-            xlsxReport.write(row, colDetails, writeValue);
-
-            writeValue = m_db->geValue(6).toString();
-            xlsxReport.write(row, colAuthType, writeValue);
-
-            writeValue = m_db->geValue(7).toString();
-            xlsxReport.write(row, colInternalIP, writeValue);
-
-            writeValue = m_db->geValue(8).toString();
-            xlsxReport.write(row, colRequestid, writeValue);
-
-            ++row;
-        } // while
-
-        retVal = xlsxReport.saveAs(m_reportFileName);
-        if (!retVal) {
-            m_errorString = QStringLiteral("Error save report file");
-        }
-    } else {
-        m_errorString = m_db->errorString();
+    bool retVal = m_report->generateReport(args);
+    if (!retVal) {
+        m_errorString = m_report->errorString();
     }
 
     m_db->close();
@@ -204,24 +126,26 @@ CReportBuilder::generateReport()
 
 //----------------------------------------------------------
 
-CSVThreadReportBuilder::CSVThreadReportBuilder(): m_errorString(""), m_retVal(false)
+CSVThreadReportBuilder::CSVThreadReportBuilder(QObject *parent)
+    : QThread(parent), m_errorString(""), m_retVal(false)
 {}
 
 bool
-CSVThreadReportBuilder::init(const QString &dbFileName, const QString &reportName, const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
+CSVThreadReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &reportName,
+                                  const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
 {
     Q_CHECK_PTR(excludedUsernamesList);
     Q_CHECK_PTR(includedUsernamesList);
-    return m_builser.init(dbFileName, reportName, excludedUsernamesList, includedUsernamesList);
+    return m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList);
 }
 
 void
 CSVThreadReportBuilder::run()
 {
     m_errorString.clear();
-    m_retVal = m_builser.generateReport();
+    m_retVal = m_builder.generateReport();
     if (!m_retVal) {
-        m_errorString = m_builser.errorString();
+        m_errorString = m_builder.errorString();
     }
 }
 

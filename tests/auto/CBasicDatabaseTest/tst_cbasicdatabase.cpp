@@ -9,8 +9,8 @@
 
 const int recordCount = 51;
 
-inline const QString selectCount = QStringLiteral("select count() from eventlog;");
-inline const QString selectAll = QStringLiteral("select * from eventlog;");
+const QString selectCount(QLatin1String("select count() from eventlog;"));
+const QString selectAll(QLatin1String("select * from eventlog;"));
 
 class CBasicDatabaseTest : public QObject
 {
@@ -79,7 +79,7 @@ void CBasicDatabaseTest::test_getDBinstance()
 
 void CBasicDatabaseTest::test_initDB()
 {
-    bool retVal = m_fakeDB.init(QStringLiteral("QSQLITE"), SRCDIR"data/fakedb.db");
+    bool retVal = m_fakeDB.init(QLatin1String("QSQLITE"), SRCDIR"data/fakedb.db");
     QVERIFY(retVal);
 }
 
@@ -91,7 +91,7 @@ void CBasicDatabaseTest::test_openDB()
 
 void CBasicDatabaseTest::test_createTable()
 {
-    bool retVal = m_fakeDB.exec(createEventLogTable);
+    bool retVal = m_fakeDB.exec(eventlog::createTable);
     QVERIFY(retVal);
 }
 
@@ -116,12 +116,12 @@ void CBasicDatabaseTest::test_importData()
 
 void CBasicDatabaseTest::test_findInDBvar1()
 {
-    TDataList res = m_fakeDB.findInDB(selectCount, false);
+    dataList_t res = m_fakeDB.findInDB(selectCount, false);
     int columnCount = res.at(0).at(0).toInt();
     qDebug() << columnCount;
     QCOMPARE(columnCount, recordCount);
 
-    TDataList res1 = m_fakeDB.findInDB(selectCount, true);
+    dataList_t res1 = m_fakeDB.findInDB(selectCount, true);
     columnCount = res1.at(1).at(0).toInt();
     qDebug() << columnCount;
     QCOMPARE(columnCount, recordCount);
@@ -129,10 +129,10 @@ void CBasicDatabaseTest::test_findInDBvar1()
 
 void CBasicDatabaseTest::test_findInDBvar2()
 {
-    TDataList retVal = m_fakeDB.findInDB(selectAll, false);
+    dataList_t retVal = m_fakeDB.findInDB(selectAll, false);
     QCOMPARE(retVal.count(), recordCount);
 
-    TDataList retVal1 = m_fakeDB.findInDB(selectAll, true);
+    dataList_t retVal1 = m_fakeDB.findInDB(selectAll, true);
     QCOMPARE(retVal1.count(), recordCount + 1);
 }
 
@@ -158,7 +158,7 @@ void CBasicDatabaseTest::test_getValues()
         QCOMPARE(m_fakeDB.geValue(1).toString(), QString("2023-05-09T11:19:57.36Z"));
         QCOMPARE(m_fakeDB.geValue(2).toString(), QString("edbfa4ea24038861"));
 
-        QCOMPARE(m_fakeDB.geValue(4).toString(), QString("username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10"));
+        QCOMPARE(m_fakeDB.geValue(4).toString(), QString("username: mr_data,\r\n  type: PASSWORD,\r\n  ip address: 192.0.2.211, 10.10.10.10"));
         QCOMPARE(m_fakeDB.geValue(5).toString(), QString("mr_data"));
         QCOMPARE(m_fakeDB.geValue(6).toString(), QString("PASSWORD"));
         QCOMPARE(m_fakeDB.geValue(7).toString(), QString("192.0.2.211"));
@@ -177,7 +177,7 @@ void CBasicDatabaseTest::test_truncateTable()
 
     bool retVal = m_fakeDB.truncateTable("eventlog");
     QVERIFY(retVal);
-    TDataList res = m_fakeDB.findInDB("SELECT name FROM sqlite_master WHERE type='table' AND name='eventlog';", false);
+    dataList_t res = m_fakeDB.findInDB("SELECT name FROM sqlite_master WHERE type='table' AND name='eventlog';", false);
     QVERIFY(res.isEmpty());
 
     qint64 newSize = file.size();
@@ -189,20 +189,20 @@ void CBasicDatabaseTest::test_truncateTable()
 void CBasicDatabaseTest::test_InsertBindedValues()
 {
     test_createTable();
-    bool retVal = m_fakeDB.prepareRequest(insertOriginalData);
+    bool retVal = m_fakeDB.prepareRequest(eventlog::insertData);
     QVERIFY(retVal);
 
-    TDataItem data;
-    data[QStringLiteral(":username")] = "mr_data";
-    data[QStringLiteral(":timestampISO8601")] = "2023-05-09T11:19:57.36Z";
-    data[QStringLiteral(":timestamp")] = "2023-05-09T14:19:57.360";
-    data[QStringLiteral(":requestid")] = "edbfa4ea24038861";
-    data[QStringLiteral(":type")] = "Вхід користувача - успішно";
-    data[QStringLiteral(":details")] = "username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10";
-    data[QStringLiteral(":username1")] = "mr_data";
-    data[QStringLiteral(":authtype")] = "PASSWORD";
-    data[QStringLiteral(":externalip")] = "192.0.2.211";
-    data[QStringLiteral(":internalip")] = "10.10.10.10";
+    dataItem_t data;
+    data[phUsername] = "mr_data";
+    data[phTimestampISO8601] = "2023-05-09T11:19:57.36Z";
+    data[phTimestamp] = "2023-05-09T14:19:57.360";
+    data[phRequestID] = "edbfa4ea24038861";
+    data[phType] = "Вхід користувача - успішно";
+    data[phDetails] = "username: mr_data,@N@  type: PASSWORD,@N@  ip address: 192.0.2.211, 10.10.10.10";
+    data[phUsername1] = "mr_data";
+    data[phAuthType] = "PASSWORD";
+    data[phExternalip] = "192.0.2.211";
+    data[phInternalip] = "10.10.10.10";
     retVal = m_fakeDB.execRequest(&data);
     QVERIFY(retVal);
 
@@ -214,16 +214,16 @@ void CBasicDatabaseTest::test_InsertBindedValues()
     }
     QCOMPARE(count, 1);
 
-    data[QStringLiteral(":username")] = "Ім'я користувача";
-    data[QStringLiteral(":timestampISO8601")] = "Відмітка часу";
-    data[QStringLiteral(":timestamp")] = QDateTime();
-    data[QStringLiteral(":requestid")] = "ID запиту";
-    data[QStringLiteral(":type")] = "Тип";
-    data[QStringLiteral(":details")] = "Деталі";
-    data[QStringLiteral(":username1")] = QString();
-    data[QStringLiteral(":authtype")] = QString();
-    data[QStringLiteral(":externalip")] = QString();
-    data[QStringLiteral(":internalip")] = QString();
+    data[phUsername] = "Ім'я користувача";
+    data[phTimestampISO8601] = "Відмітка часу";
+    data[phTimestamp] = QDateTime();
+    data[phRequestID] = "ID запиту";
+    data[phType] = "Тип";
+    data[phDetails] = "Деталі";
+    data[phUsername1] = QString();
+    data[phAuthType] = QString();
+    data[phExternalip] = QString();
+    data[phInternalip] = QString();
     retVal = m_fakeDB.execRequest(&data);
     QVERIFY(retVal);
 

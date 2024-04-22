@@ -19,16 +19,18 @@
 #include <QDir>
 #include <QMap>
 
+#include "MMSTypes.h"
 //#include "Debug.h"
-#include "CSVLoader.h"
+#include "CSVReader.h"
 #include "CReportBuilder.h"
 #include "CElcConsoleAppSettings.h"
 #include "CSingleApplication.h"
 #include "QCommandLineParserHelper.h"
 #include "CConsoleOutput.h"
 #include "elcUtils.h"
+#include "CParserManager.h"
+#include "CReportManager.h"
 
-using pragmaList_t = QMap<QString, QString>;
 
 int main(int argc, char *argv[])
 {
@@ -42,9 +44,9 @@ int main(int argc, char *argv[])
     description.append(QStringLiteral("This program uses Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
     consoleOut.outToConsole(description.arg(a.applicationVersion(), QT_VER, CONTACT));
 
-    CSingleApplication sa(QStringLiteral("elcc_instance"));
+    CSingleApplication sa(QLatin1String("elcc_instance"));
     if (sa.isRunning()) {
-        consoleOut.outToConsole(QStringLiteral("The another copy of the Utility is still running."));
+        consoleOut.outToConsole(QLatin1String("The another copy of the Utility is still running."));
         return 1;
     }
 
@@ -54,26 +56,31 @@ int main(int argc, char *argv[])
         return 1;
     }
     if (argc == 1) {
-        consoleOut.outToConsole(QStringLiteral("The arguments are missing."));
+        consoleOut.outToConsole(QLatin1String("The arguments are missing."));
         cmd.showHelpAndExit();
         return 0;
     }
 
-    consoleOut.outToConsole(QStringLiteral("MMS Event Log Conversion Utility starting..."));
+    consoleOut.outToConsole(QLatin1String("MMS Event Log Conversion Utility starting..."));
 
 /* INIT */
 
-    QString iniFile = QStringLiteral("%1.ini").arg(appName);
+#ifdef Q_OS_WIN
+    QString iniFile = QLatin1String("%1.ini").arg(appName);
+#else
+    QString fileName = QLatin1String("%1.conf").arg(appName);
+#endif
     if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false)) {
-        consoleOut.outToConsole(QStringLiteral("The settings class cannot be initialized."));
+        consoleOut.outToConsole(QLatin1String("The settings class cannot be initialized."));
         return 1;
     }
+    CParserManager::instance().init();
     CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
-    QString dbName =  QDir::fromNativeSeparators(settings.getMain(SettingsDbFileName).toString().trimmed());
+    QString dbName =  QDir::fromNativeSeparators(settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
-        settings.setMain(SettingsGroup, KeyDbFileName, dbName);
-        consoleOut.outToConsole(QStringLiteral("Unable to get database file name.\nThe database file will be created on the default path."));
+        settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
+        consoleOut.outToConsole(QLatin1String("Unable to get database file name.\nThe database file will be created on the default path."));
     }
     QString errorString;
     elcUtils::expandEnvironmentStrings(dbName);
@@ -86,42 +93,49 @@ int main(int argc, char *argv[])
 /* PREPARE */
 
     RunningMode runningMode = cmd.getRunningMode();
-
     if (runningMode == RUNNINGMODE_DEFAULT || runningMode == RUNNINGMODE_CLEAN_DB) {
-        QString cleardb = settings.getMain(SettingsClearOnStartup).toString().trimmed();
-        if (cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0)) {
-            consoleOut.outToConsole(QStringLiteral("Starting cleaning database..."));
-            if (!elcUtils::trunvateDB(dbName, errorString)) {
-                consoleOut.outToConsole(QStringLiteral("Cannot clean database: %1").arg(errorString));
+        QString cleardb = settings.getMain(QLatin1String("SETTINGS/clear_on_startup")).toString().trimmed();
+        bool comb1 = cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0);
+        if (runningMode == RUNNINGMODE_CLEAN_DB) { //ignoring settings
+            comb1 = true;
+        }
+        if (comb1) {
+            consoleOut.outToConsole(QLatin1String("Starting cleaning database..."));
+            const CParserManager &parserManager = CParserManager::instance();
+            qsizetype count = parserManager.getItemCount();
+            QStringList tables = parserManager.getTablesList();
+            QStringList creationStrings = parserManager.getCreateTableRequestList();
+            if (!elcUtils::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
+                consoleOut.outToConsole(QLatin1String("Cannot clean database: %1").arg(errorString));
                 return 1;
             }
-            consoleOut.outToConsole(QStringLiteral("The database was clean."));
+            consoleOut.outToConsole(QLatin1String("The database was clean."));
         }
     }
 
 /* IMPORT */
 
     if (runningMode != RUNNINGMODE_REPORT_ONLY && runningMode != RUNNINGMODE_CLEAN_DB) {
-        QString internalIpFirstOctet = settings.getMain(SettingsInternalIpStartOctet).toString().trimmed();
-        if (internalIpFirstOctet.isEmpty() || !elcUtils::sanitizeValue(QStringLiteral("^([0-9.]+)$"), internalIpFirstOctet)) {
-            consoleOut.outToConsole(QStringLiteral("Error in internal IP address mask. Please check it in the config file."));
+        QString internalIpFirstOctet = settings.getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();
+        if (internalIpFirstOctet.isEmpty() || !elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), internalIpFirstOctet)) {
+            consoleOut.outToConsole(QLatin1String("Error in internal IP address mask. Please check it in the config file."));
             return 1;
         }
 
-        QString value = settings.getMain(SettingsDataHasHeaders).toString().trimmed();
+        QString value = settings.getMain(QLatin1String("SETTINGS/data_has_headers")).toString().trimmed();
         bool hasHeaders = (value.isEmpty() || QString::compare(value, QLatin1String("yes"), Qt::CaseInsensitive) == 0)? true : false;
 
-        pragmaList_t pragmaList;
-        value = settings.getMain(DatabaseSynchronous).toString().trimmed();
+        mms::pragmaList_t pragmaList;
+        value = settings.getMain(QLatin1String("DATABASE/synchronous")).toString().trimmed();
         pragmaList["synchronous"] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
 
-        value = settings.getMain(DatabaseJournalMode).toString().trimmed();
+        value = settings.getMain(QLatin1String("DATABASE/journal_mode")).toString().trimmed();
         pragmaList["journal_mode"] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
 
-        value = settings.getMain(DatabaseTempStore).toString().trimmed();
+        value = settings.getMain(QLatin1String("DATABASE/temp_store")).toString().trimmed();
         pragmaList["temp_store"] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
 
-        value = settings.getMain(DatabaseLockingMode).toString().trimmed();
+        value = settings.getMain(QLatin1String("DATABASE/locking_mode")).toString().trimmed();
         pragmaList["locking_mode"] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
 
         QStringList files;
@@ -130,18 +144,19 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        consoleOut.outToConsole("Start reading and converting files...");
-
-        CEventLogThreadLoader loader;
+        consoleOut.outToConsole(QLatin1String("Start reading and converting files..."));
+        
+        CMmsLogsThreadReader loader;
         bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), &consoleOut, SLOT(printToConsole(QString)));
         Q_ASSERT_X(retVal, "connect", "connection is not established");
 
-        retVal = loader.init(dbName, hasHeaders, internalIpFirstOctet, &pragmaList, "\r\n");
+        quint16 logID = 1;
+        retVal = loader.init(logID, dbName, hasHeaders, internalIpFirstOctet, &pragmaList);
         if (retVal) {
             loader.setFileName(files);
             loader.start();
 
-            consoleOut.outToConsole(QStringLiteral("wait..."));
+            consoleOut.outToConsole(QLatin1String("wait..."));
             elcUtils::waitForEndThread(&loader, 100);
             retVal = loader.getStatus();
         }
@@ -150,7 +165,7 @@ int main(int argc, char *argv[])
         pragmaList.clear();
 
         if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("Reading file(s) completed"));
+            consoleOut.outToConsole(QLatin1String("Reading file(s) completed"));
         } else {
             consoleOut.outToConsole(QStringLiteral("Error reading file(s): %1").arg(loader.errorString()));
             return 1;
@@ -172,14 +187,16 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        consoleOut.outToConsole(QStringLiteral("Start generating the report..."));
+        CReportManager::instance().init();
+        consoleOut.outToConsole(QLatin1String("Start generating the report..."));
 
         CSVThreadReportBuilder report;
-        bool retVal = report.init(dbName, reportName, &excludedUsers, &includedUsers);
+        quint16 logID = 1;
+        bool retVal = report.init(logID, dbName, reportName, &excludedUsers, &includedUsers);
         if (retVal) {
             report.start();
 
-            consoleOut.outToConsole(QStringLiteral("wait..."));
+            consoleOut.outToConsole(QLatin1String("wait..."));
             elcUtils::waitForEndThread(&report, 100);
             retVal = report.getStatus();
         }

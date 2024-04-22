@@ -23,13 +23,15 @@
 #include <QMap>
 
 #include "CElcGuiAppSettings.h"
+#include "MMSTypes.h"
 //#include "Debug.h"
-#include "OptionsDialog.h"
-#include "CSVLoader.h"
+#include "CReportOptionsDialog.h"
+#include "CLoadFilesOptionsDialog.h"
+#include "CSVReader.h"
 #include "CReportBuilder.h"
 #include "elcUtils.h"
-
-using pragmaList_t = QMap<QString, QString>;
+#include "CParserManager.h"
+#include "CReportManager.h"
 
 void
 MainWindow::setStateText(const QString &state)
@@ -74,22 +76,40 @@ MainWindow::enableButtons()
 }
 
 bool
-MainWindow::showOptionsDialog( QStringList &includeUsersList, QStringList &excludeUsersList)
+MainWindow::showReportOptionsDialog(const QStringList &logsList, quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList)
 {
     bool retVal = true;
-    OptionsDialog *wnd;
+    m_errorString.clear();
     try {
-        wnd = new OptionsDialog(this);
+        CReportOptionsDialog *wnd = new CReportOptionsDialog(logID, logsList, this);
         wnd->exec();
-
-        includeUsersList = wnd->getIncludeUsersList();
-        excludeUsersList = wnd->getExcludeUsersList();
-
+        retVal = wnd->getOptions(logID, includeUsersList, excludeUsersList);
+        delete wnd;
     } catch (const std::bad_alloc &e) {
         retVal = false;
-        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Critical error: %1").arg(e.what()), QMessageBox::Ok);
+        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
-    delete wnd;
+
+    return retVal;
+}
+
+bool
+MainWindow::showReadFilesOptionsDialog(const QStringList &logsList, quint16 &logID, bool &hasHeaders)
+{
+    bool retVal = true;
+    m_errorString.clear();
+    try {
+        CLoadFilesOptionsDialog *wnd = new CLoadFilesOptionsDialog(logsList, this);
+        wnd->exec();
+        retVal = wnd->getOptions(logID, hasHeaders);
+        delete wnd;
+    } catch (const std::bad_alloc &e) {
+        retVal = false;
+        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
+    }
+
     return retVal;
 }
 
@@ -126,33 +146,34 @@ MainWindow::MainWindow(QWidget *parent)
     Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
     
     const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    m_dbName =  QDir::fromNativeSeparators(settings.getMain(SettingsDbFileName).toString().trimmed());
+    m_dbName =  QDir::fromNativeSeparators(settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
     elcUtils::expandEnvironmentStrings(m_dbName);
-    m_lastDir = settings.getMain(HistoryLastDir).toString().trimmed();
+    m_lastDir = settings.getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
 
     setStateText(tr("Ready"));
 
     m_fileList.clear();
     m_hasHeaders = true;
 #ifdef Q_OS_WIN
-    QString modeInfo = QStringLiteral("%1 | %2");
-    QString rds = (settings.isRdsEnabled())? QStringLiteral("RDP mode") : QStringLiteral("Single mode");
-    QString rdp = QStringLiteral("%SESSIONNAME%");
+    QString rds = (settings.isRdsEnabled())? QLatin1String("RDP mode") : QLatin1String("Single mode");
+    QString rdp = QLatin1String("%SESSIONNAME%");
     elcUtils::expandEnvironmentStrings(rdp);
     if (rdp.startsWith('%')) {
-        rdp = QStringLiteral("WinAPI error");
+        rdp = QLatin1String("WinAPI error");
     }
-    setModeText(modeInfo.arg(rds, rdp));
+    setModeText(QLatin1String("%1 | %2").arg(rds, rdp));
 #else
-    setModeText(QStringLiteral("Linux Console"));
+    setModeText(QLatin1String("Linux Console"));
 #endif
+
+    CReportManager::instance().init();
 }
 
 MainWindow::~MainWindow()
 {
     if (!m_lastDir.isEmpty() && QDir(m_lastDir).exists()) {
         CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-        settings.setMain(HistoryGroup, KeyLastDir, m_lastDir);
+        settings.setMain(QLatin1String("HISTORY"), QLatin1String("last_dir"), m_lastDir);
     }
 
     delete m_state;
@@ -189,46 +210,73 @@ MainWindow::onContact()
 void
 MainWindow::openFileClick()
 {
+    disableButtons();
+
     m_fileList.clear();
 
     if (m_lastDir.isEmpty() || !QDir(m_lastDir).exists()) {
         m_lastDir.clear();
     }
 
-    m_fileList = QFileDialog::getOpenFileNames(this, tr("Open MMS Event Log file"), m_lastDir, tr("MMS Eventlog (*.csv)"));
+    m_fileList = QFileDialog::getOpenFileNames(
+                    this,
+                    tr("Open MMS Event Log file"),
+                    m_lastDir,
+                    tr("MMS log files (*.csv)"));
     // The inferior stopped because it triggered an eaxception.
     // ref: https://forum.qt.io/topic/142647/the-inferior-stopped-because-it-triggered-an-eaxception/2
 
     if (!m_fileList.isEmpty()) {
         m_lastDir = QFileInfo(m_fileList.at(0)).absolutePath();
         setInfoText(tr("The selected file(s): "));
-        for (int i = 0; i < m_fileList.size(); ++i) {
-            setInfoText(m_fileList.at(i));
+        int i = 0; QString buf;
+        while (i < m_fileList.size()) {
+            buf = m_fileList.at(i);
+            if (QFileInfo(buf).size() == 0) {
+                QString msg = tr("%1 - this file have zero size and will be removed from the list.").arg(buf);
+                setInfoText(msg);
+                m_fileList.removeAt(i);
+            } else {
+                setInfoText(buf);
+                i++;
+            }
         }
+
         setStateText(tr("The file(s) was selected"));
         QCoreApplication::processEvents();
 
-        // ref: https://github.com/mu-editor/mu/issues/832
-        QMessageBox messageBox(this);
-        messageBox.setText(tr("Do the data file(s) have headers?"));
-        messageBox.setWindowTitle(tr("MMS Event Log Conversion Utility"));
-        messageBox.setInformativeText(tr("Yes - The data file(s) has headers,\nNo - Otherwise."));
-        messageBox.setIcon(QMessageBox::Question);
-        messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        messageBox.setDefaultButton(QMessageBox::Yes);
-        messageBox.button(QMessageBox::Yes)->setText(tr("Yes"));
-        messageBox.button(QMessageBox::No)->setText(tr("No"));
-        m_hasHeaders = (messageBox.exec() == QMessageBox::Yes);
-        if (m_hasHeaders) {
-            setInfoText(tr("The data file(s) has headers"));
+        CParserManager &parserManager = CParserManager::instance();
+        QStringList logsList = parserManager.getVisibleLogsNames();
+        if (showReadFilesOptionsDialog(logsList, m_logId, m_hasHeaders)) {
+            if (m_hasHeaders) {
+                setInfoText(tr("The data file(s) has headers"));
+            } else {
+                setInfoText(tr("The data file(s) has no headers"));
+            }
+            setInfoText(tr("Selected Log type: %1").arg(logsList.at(m_logId - 1)));
+            if (!parserManager.checkID(m_logId)) {
+                m_fileList.clear();
+                setInfoText(tr("Unknown MMS Log type."));
+                setStateText(tr("Error reading"));
+            }
         } else {
-            setInfoText(tr("The data file(s) has no headers"));
+            if (!m_errorString.isEmpty()) {
+                setInfoText(tr("Error open options dialog."));
+                setInfoText(m_errorString);
+                setStateText(tr("Error"));
+            } else {
+                buf = tr("File selection canceled.");
+                setInfoText(buf);
+                setStateText(buf);
+                m_fileList.clear();
+            }
         }
     } else {
         QString buf = tr("No files selected");
         setInfoText(buf);
         setStateText(buf);
     }
+    enableButtons();
 }
 
 void
@@ -237,47 +285,47 @@ MainWindow::convertEventLogClick()
     disableButtons();
 
     if (!m_fileList.isEmpty()) {
-        CEventLogThreadLoader loader;
-        bool retVal = QObject::connect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
+        CMmsLogsThreadReader logReader;
+        bool retVal = QObject::connect(&logReader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
         Q_ASSERT_X(retVal, "connect", "connection is not established");
         
         const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-        QString internalIpFirstOctet = settings.getMain(SettingsInternalIpStartOctet).toString().trimmed();
-        if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue(QStringLiteral("^([0-9.]+)$"), internalIpFirstOctet)) {
-            pragmaList_t pragmaList;
-            QString value = settings.getMain(DatabaseSynchronous).toString().trimmed();
-            pragmaList[QStringLiteral("synchronous")] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
+        QString internalIpFirstOctet = settings.getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();
+        if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), internalIpFirstOctet)) {
+            mms::pragmaList_t pragmaList;
+            QString value = settings.getMain(QLatin1String("DATABASE/synchronous")).toString().trimmed();
+            pragmaList[QLatin1String("synchronous")] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
 
-            value = settings.getMain(DatabaseJournalMode).toString().trimmed();
-            pragmaList[QStringLiteral("journal_mode")] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
+            value = settings.getMain(QLatin1String("DATABASE/journal_mode")).toString().trimmed();
+            pragmaList[QLatin1String("journal_mode")] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
 
-            value = settings.getMain(DatabaseTempStore).toString().trimmed();
-            pragmaList[QStringLiteral("temp_store")] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
+            value = settings.getMain(QLatin1String("DATABASE/temp_store")).toString().trimmed();
+            pragmaList[QLatin1String("temp_store")] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
 
-            value = settings.getMain(DatabaseLockingMode).toString().trimmed();
-            pragmaList[QStringLiteral("locking_mode")] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
+            value = settings.getMain(QLatin1String("DATABASE/locking_mode")).toString().trimmed();
+            pragmaList[QLatin1String("locking_mode")] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
 
             setInfoText(tr("Start reading and converting file(s)..."));
             setStateText(tr("Read and converting"));
             QCoreApplication::processEvents();
 
-            retVal = loader.init(m_dbName, m_hasHeaders, internalIpFirstOctet, &pragmaList, "\r\n");
+            retVal = logReader.init(m_logId, m_dbName, m_hasHeaders, internalIpFirstOctet, &pragmaList);
             if (retVal) {
-                loader.setFileName(m_fileList);
-                loader.start();
+                logReader.setFileName(m_fileList);
+                logReader.start();
 
                 setInfoText(tr("wait..."));
-                elcUtils::waitForEndThread(&loader, 100);
-                retVal = loader.getStatus();
+                elcUtils::waitForEndThread(&logReader, 100);
+                retVal = logReader.getStatus();
             }
             QCoreApplication::processEvents();
-            QObject::disconnect(&loader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
+            QObject::disconnect(&logReader, SIGNAL(sendMessage(QString)), this, SLOT(setInfoText(QString)));
 
             if (retVal) {
                 setInfoText(tr("Reading file(s) completed"));
                 setStateText(tr("Reading complete"));
             } else {
-                setInfoText(tr("Error reading file(s): %1").arg(loader.errorString()));
+                setInfoText(tr("Error reading file(s): %1").arg(logReader.errorString()));
                 setStateText(tr("Error reading"));
             }
         } else {
@@ -301,7 +349,11 @@ MainWindow::clearDBclick()
     QCoreApplication::processEvents();
 
     QString errorString;
-    if (elcUtils::trunvateDB(m_dbName, errorString)) {
+    const CParserManager &parserManager = CParserManager::instance();
+    qsizetype count = parserManager.getItemCount();
+    QStringList tables = parserManager.getTablesList();
+    QStringList creationStrings = parserManager.getCreateTableRequestList();
+    if (elcUtils::trunvateDB(m_dbName, errorString, count, tables, creationStrings)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {
@@ -322,7 +374,11 @@ MainWindow::generateReportClick()
     QCoreApplication::processEvents();
 
     QStringList includedUsers, excludedUsers;
-    if (showOptionsDialog(includedUsers, excludedUsers)) {
+    CReportManager &reportManager = CReportManager::instance();
+    //QStringList logsList = {tr("Event Log"), tr("Audit Trail Log"), tr("(Experimental) Summary report") };
+    QStringList reportsList = reportManager.getVisibleReportsNames();
+    quint16 logId = reportManager.prettySelector(m_logId);
+    if (showReportOptionsDialog(reportsList, logId, includedUsers, excludedUsers)) {
         setInfoText(tr("Additional report filtering settings:"));
         if (includedUsers.isEmpty()) {
             setInfoText(tr("\tThe included users list is empty."));
@@ -334,6 +390,7 @@ MainWindow::generateReportClick()
         } else {
             setInfoText(tr("\tThe excluded users: %1").arg(excludedUsers.join(',')));
         }
+        setInfoText(tr("Selected report type: %1").arg(reportsList.at(logId - 1)));
         QCoreApplication::processEvents();
 
         QString reportName = QFileDialog::getSaveFileName(this, tr("Save MMS Event Log report"),
@@ -348,7 +405,7 @@ MainWindow::generateReportClick()
             QCoreApplication::processEvents();
 
             CSVThreadReportBuilder report;
-            if (report.init(m_dbName, reportName, &excludedUsers, &includedUsers)) {
+            if (report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers)) {
                 report.start();
 
                 setInfoText(tr("wait..."));
@@ -369,6 +426,14 @@ MainWindow::generateReportClick()
         } else {
             setInfoText(tr("Report name is empty"));
             setStateText(tr("Ready"));
+        }
+    } else {
+        if (!m_errorString.isEmpty()) {
+            setInfoText(tr("Error open options dialog."));
+            setInfoText(m_errorString);
+            setStateText(tr("Error"));
+        } else {
+            setInfoText(tr("Report generation canceled."));
         }
     }
 

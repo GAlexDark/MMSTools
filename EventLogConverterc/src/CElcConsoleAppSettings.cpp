@@ -31,7 +31,7 @@ CElcConsoleAppSettings::createDefault(const QString& iniPath)
     CElcCommonSettings::createDefault(iniPath);
 
     QSettings settings(iniPath, QSettings::IniFormat);
-    settings.beginGroup(QStringLiteral("SETTINGS"));
-    settings.setValue(QStringLiteral("data_has_headers"), QStringLiteral("yes"));
+    settings.beginGroup(QLatin1String("SETTINGS"));
+    settings.setValue(QLatin1String("data_has_headers"), QLatin1String("yes"));
     settings.endGroup();
 }
