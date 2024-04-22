@@ -169,10 +169,8 @@ CTextFileReader::readLargeFile()
     // "129 879 milliseconds"
     // "123 998 milliseconds"
     // "114 631 milliseconds" 1,91051667 minutes
-    QString line;
     qint64 bufferOffset = 0;
     qint64 eolCharsLen = m_eolChars.length();
-    bool isEOF = false;
     bool retVal = true;
     m_lineNumber = 0;
 
@@ -182,6 +180,8 @@ CTextFileReader::readLargeFile()
     if (bytesRead > 0) {
         qint64 prevPosition = 3;
         qint64 nextPosition;
+        bool isEOF = false;
+        QString line;
         retVal = checkBOM();
         if (retVal && m_isHeaders) {
             nextPosition = indexOfEol(prevPosition, bytesRead);
