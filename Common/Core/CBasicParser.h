@@ -54,6 +54,8 @@ protected:
     QString     m_errorString;
 
 private:
+    bool getMetaClassValueInfo(const QString &name, QString &value) const;
+
     QString     m_internalIpFirstOctet;
 };
 

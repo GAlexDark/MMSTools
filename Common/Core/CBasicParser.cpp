@@ -19,6 +19,22 @@
 #include <QMetaObject>
 #include <QMetaClassInfo>
 
+bool
+CBasicParser::getMetaClassValueInfo(const QString &name, QString &value) const
+{
+    bool retVal = false;
+    const QMetaObject* mObj = this->metaObject();
+    for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
+        QMetaClassInfo classInfo = mObj->classInfo(j);
+        if (QString::compare(classInfo.name(), name, Qt::CaseInsensitive) == 0) {
+            value = classInfo.value();
+            retVal = true;
+            break;
+        }
+    }
+    return retVal;
+}
+
 void
 CBasicParser::removeQuote(QString &data)
 {
@@ -76,30 +92,14 @@ QString
 CBasicParser::tableName() const
 {
     QString retVal;
-    const QMetaObject* mObj = this->metaObject();
-    for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
-        QMetaClassInfo classInfo = mObj->classInfo(j);
-        if (QString(classInfo.name()) == QLatin1String("tablename")) {
-            retVal = classInfo.value();
-            break;
-        }
-    }
-    return retVal;
+    return getMetaClassValueInfo(QLatin1String("tablename"), retVal) ? retVal : QString();
 }
 
 quint16
 CBasicParser::parserID() const
 {
-    quint16 retVal = 0;
-    const QMetaObject* mObj = this->metaObject();
-    for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
-        QMetaClassInfo classInfo = mObj->classInfo(j);
-        if (QString(classInfo.name()) == QLatin1String("ID")) {
-            retVal = QString(classInfo.value()).toUInt();
-            break;
-        }
-    }
-    return retVal;
+    QString retVal;
+    return getMetaClassValueInfo(QLatin1String("ID"), retVal) ? retVal.toUInt() : 0;
 }
 
 mms::ffs_t
