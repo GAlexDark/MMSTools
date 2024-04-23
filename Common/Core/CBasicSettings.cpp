@@ -20,7 +20,7 @@
 #include <QFileInfo>
 
 CBasicSettings::CBasicSettings()
-    : m_isRdsEnabled(false), m_settings(nullptr)
+    : m_settings(nullptr), m_isRdsEnabled(false)
 {}
 
 CBasicSettings::~CBasicSettings()

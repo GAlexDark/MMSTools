@@ -36,11 +36,10 @@ public:
 
 protected:
     virtual void createDefault(const QString& iniPath) =0;
-    bool        m_isRdsEnabled;
 
 private:
     QSettings*  m_settings;
-
+    bool        m_isRdsEnabled;
 };
 
 #endif // CBASICSETTINGS_H
