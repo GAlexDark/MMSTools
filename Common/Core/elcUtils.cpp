@@ -32,7 +32,7 @@
 #endif
 
 const int defaultStorageBlockSize = 32768;
-QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
+const QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
 
 bool
 elcUtils::sanitizeValue(const QString &value)
