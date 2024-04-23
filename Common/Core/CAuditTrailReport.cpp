@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include "CAuditTrailReport.h"
-
 #include "DBStrings.h"
 
 CAuditTrailReport::CAuditTrailReport(QObject *parent)

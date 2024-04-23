@@ -20,11 +20,9 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QMap>
 
 #include "CElcGuiAppSettings.h"
 #include "MMSTypes.h"
-//#include "Debug.h"
 #include "CReportOptionsDialog.h"
 #include "CLoadFilesOptionsDialog.h"
 #include "CSVReader.h"
@@ -245,7 +243,7 @@ MainWindow::openFileClick()
         setStateText(tr("The file(s) was selected"));
         QCoreApplication::processEvents();
 
-        CParserManager &parserManager = CParserManager::instance();
+        const CParserManager &parserManager = CParserManager::instance();
         QStringList logsList = parserManager.getVisibleLogsNames();
         if (showReadFilesOptionsDialog(logsList, m_logId, m_hasHeaders)) {
             if (m_hasHeaders) {

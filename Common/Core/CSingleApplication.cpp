@@ -1,7 +1,8 @@
 #include "CSingleApplication.h"
 #include <QCoreApplication>
-
-//#include "Debug.h"
+#ifdef QT_DEBUG
+  #include "Debug.h"
+#endif
 
 const QString sharedMemory_prefix = QLatin1String("_m");
 const QString semaphore_prefix = QLatin1String("_s");
@@ -48,7 +49,9 @@ CSingleApplication::isRunning()
     // false - master process
 
     if (!m_semaphore->acquire()) {
-//        __DEBUG( QStringLiteral("CSingleApplication: Acquisition error, %1").arg(m_semaphore->errorString()) )
+#ifdef QT_DEBUG
+        __DEBUG( QStringLiteral("CSingleApplication: Acquisition error, %1").arg(m_semaphore->errorString()) )
+#endif
         return true;
     }
     bool isRun = false;
@@ -76,9 +79,9 @@ CSingleApplication::isRunning()
 #ifdef QT_DEBUG
         // Analyze error
         if (m_sharedMemory->error() != QSharedMemory::NotFound) {
-//            __DEBUG( QStringLiteral("CSingleApplication: Attach error, %1").arg(m_sharedMemory->errorString()) )
+            __DEBUG( QStringLiteral("CSingleApplication: Attach error, %1").arg(m_sharedMemory->errorString()) )
         } else {
-//            __DEBUG( QStringLiteral("CSingleApplication: Create shared memory segment") )
+            __DEBUG( QStringLiteral("CSingleApplication: Create shared memory segment") )
         }
 #endif
     // Create shared memory segment
@@ -88,7 +91,9 @@ CSingleApplication::isRunning()
     }
 
     if (!m_semaphore->release()) {
-//        __DEBUG( QStringLiteral("CSingleApplication: release error, %1").arg(m_semaphore->errorString()) )
+#ifdef QT_DEBUG
+        __DEBUG( QStringLiteral("CSingleApplication: release error, %1").arg(m_semaphore->errorString()) )
+#endif
         return true;
     }
 

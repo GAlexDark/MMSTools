@@ -287,8 +287,6 @@ CTextFileReader::read()
     memset(m_buffer->data(), 0, defMaxFileSize);
     if (retVal) {
         retVal = size <= defMaxFileSize ? readSmallFile() : readLargeFile();
-        //retVal = readSmallFile();
-        //retVal = readLargeFile();
     } else {
         m_errorString = m_file.errorString();
     }

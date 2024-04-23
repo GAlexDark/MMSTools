@@ -18,12 +18,11 @@
 #include "CAuditTrailParser.h"
 #include <QRegularExpression>
 
-//#include "Debug.h"
 #include "DBStrings.h"
 
-const QRegularExpression reAuditTrailHeader("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))");
-const QRegularExpression rePersonData("Person\\s\\[pk=\\d+,\\salias=(.*)\\]");
-const QRegularExpression reLoadAuditTrail("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$");
+const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
+const QRegularExpression rePersonData(QLatin1String("Person\\s\\[pk=\\d+,\\salias=(.*)\\]"));
+const QRegularExpression reLoadAuditTrail(QLatin1String("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$"));
 
 const QString person(QLatin1String("Person ["));
 const QString nullValue(QLatin1String("null"));
@@ -32,7 +31,6 @@ bool
 CAuditTrailParser::parsePersonDataDetails()
 {
     bool retVal = false;
-    //__DEBUG( m_attributes )
     qsizetype firstPos = m_attributes.indexOf(person, 0);
     if (firstPos != -1) {
         qsizetype lastPos = m_attributes.indexOf(QLatin1Char(']'), firstPos);
@@ -49,9 +47,7 @@ CAuditTrailParser::parsePersonDataDetails()
 bool
 CAuditTrailParser::parseLoadAuditTrail()
 {
-    // m_method == "loadAuditTrail"
     bool retVal = false;
-    //__DEBUG( m_attributes )
     QRegularExpressionMatch match = reLoadAuditTrail.match(m_attributes);
     if (match.hasMatch()) {
         m_username1 = match.captured(1);

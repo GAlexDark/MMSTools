@@ -17,7 +17,7 @@
 
 #include "CBasicParser.h"
 #include <QMetaObject>
-#include <elcUtils.h>
+#include "elcUtils.h"
 
 void
 CBasicParser::removeQuote(QString &data)

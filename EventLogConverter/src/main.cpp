@@ -22,7 +22,6 @@
 #include <QMessageBox>
 #include <QDir>
 
-//#include "Debug.h"
 #include "CSingleApplication.h"
 #include "CElcGuiAppSettings.h"
 #include "elcUtils.h"

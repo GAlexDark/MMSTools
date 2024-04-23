@@ -21,11 +21,9 @@
 
 #include "DBStrings.h"
 
-//#include "Debug.h"
-
-const QRegularExpression reEventLogHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
-const QRegularExpression reSuccessLogon("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$");
-const QRegularExpression reFailedLogon("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$");
+const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
+const QRegularExpression reSuccessLogon(QLatin1String("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$"));
+const QRegularExpression reFailedLogon(QLatin1String("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$"));
 
 const QString authSuccessUk("Вхід користувача - успішно");
 const QString authSuccessEn("User login - successful");
