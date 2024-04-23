@@ -54,7 +54,8 @@ private:
         QString authType;
         QString internalIp;
         QString externalIp;
-    } m_prevValueUSLD;
+    };
+    userSuccessLogonDetails_t m_prevValueUSLD;
 
     struct userFailedLogonDetails_t
     {
@@ -62,7 +63,8 @@ private:
         QString authType;
         QString internalIp;
         QString externalIp;
-    } m_prevValueUFLD;
+    };
+    userFailedLogonDetails_t m_prevValueUFLD;
 
     QDateTime   m_timestamp,
                 m_timestamptz;
