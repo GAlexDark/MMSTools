@@ -103,7 +103,7 @@ CBasicParser::parserID() const
 }
 
 mms::ffs_t
-CBasicParser::fileFieldsSeparationInfo()
+CBasicParser::fileFieldsSeparationInfo() const
 {
     mms::ffs_t retVal{ m_delimiterChar, m_quoteChar, m_eolChars };
     return retVal;

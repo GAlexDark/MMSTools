@@ -37,7 +37,7 @@ public:
     virtual QString visibleLogName() =0;
     QString tableName() const;
     quint16 parserID() const;
-    mms::ffs_t fileFieldsSeparationInfo();
+    mms::ffs_t fileFieldsSeparationInfo() const;
 
 protected:
     void removeQuote(QString &data);
