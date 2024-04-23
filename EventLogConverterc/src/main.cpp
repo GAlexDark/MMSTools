@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         }
 
         QString value = settings.getMain(QLatin1String("SETTINGS/data_has_headers")).toString().trimmed();
-        bool hasHeaders = (value.isEmpty() || QString::compare(value, QLatin1String("yes"), Qt::CaseInsensitive) == 0)? true : false;
+        bool hasHeaders = (value.isEmpty() || QString::compare(value, QLatin1String("yes"), Qt::CaseInsensitive) == 0) ? true : false;
 
         mms::pragmaList_t pragmaList;
         value = settings.getMain(QLatin1String("DATABASE/synchronous")).toString().trimmed();

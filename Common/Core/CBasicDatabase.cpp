@@ -297,7 +297,7 @@ CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
         }
         m_SQLRes->finish();
     }
-    return (hasResult)? retVal : dataList_t();
+    return hasResult ? retVal : dataList_t();
 }
 
 bool

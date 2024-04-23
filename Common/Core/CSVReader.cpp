@@ -286,7 +286,7 @@ CTextFileReader::read()
     bool retVal = m_file.open(QIODevice::ReadOnly);
     memset(m_buffer->data(), 0, defMaxFileSize);
     if (retVal) {
-        retVal = (size <= defMaxFileSize)? readSmallFile() : readLargeFile();
+        retVal = size <= defMaxFileSize ? readSmallFile() : readLargeFile();
         //retVal = readSmallFile();
         //retVal = readLargeFile();
     } else {
@@ -441,7 +441,7 @@ CMmsLogsThreadReader::run()
                     m_retVal = read();
                     if (m_retVal) {
                         m_retVal = m_db.commitTransaction();
-                        QString msg = (m_retVal)? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
+                        QString msg = m_retVal ? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
                         emit sendMessage( msg );
                     }
                 }

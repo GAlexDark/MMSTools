@@ -136,14 +136,14 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
 QStringList
 QCommandLineParserHelper::excludedUsernames()
 {
-    QStringList retVal = (m_isExcluded)? m_parser.values("exclude") : QStringList();
+    QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
 
 QStringList QCommandLineParserHelper::includedUsernames()
 {
-    QStringList retVal = (m_isIncluded)? m_parser.values("include") : QStringList();
+    QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
@@ -233,7 +233,7 @@ QCommandLineParserHelper::getReportName()
     if ((retVal.indexOf('/') == -1) || (retVal.indexOf('\\') == -1)) {
         // if m_filesList.isEmpty() == true, we returns utility directory as path for the report file
         // otherwise - returns path to the first data file
-        QString filePath = (m_filesList.isEmpty())? QFileInfo(retVal).absolutePath() : QFileInfo(m_filesList.at(0)).absolutePath();
+        QString filePath = m_filesList.isEmpty() ? QFileInfo(retVal).absolutePath() : QFileInfo(m_filesList.at(0)).absolutePath();
         retVal = QDir(filePath).filePath(retVal);
     }
     retVal = QDir::fromNativeSeparators(retVal);

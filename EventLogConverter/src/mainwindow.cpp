@@ -155,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_fileList.clear();
     m_hasHeaders = true;
 #ifdef Q_OS_WIN
-    QString rds = (settings.isRdsEnabled())? QLatin1String("RDP mode") : QLatin1String("Single mode");
+    QString rds = settings.isRdsEnabled() ? QLatin1String("RDP mode") : QLatin1String("Single mode");
     QString rdp = QLatin1String("%SESSIONNAME%");
     elcUtils::expandEnvironmentStrings(rdp);
     if (rdp.startsWith('%')) {

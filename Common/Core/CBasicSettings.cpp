@@ -58,7 +58,7 @@ CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTer
 QVariant
 CBasicSettings::getMain(const QString& keyName) const
 {
-    return (m_settings) ? m_settings->value(keyName) : QVariant();
+    return m_settings ? m_settings->value(keyName) : QVariant();
 }
 
 void
