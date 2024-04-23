@@ -298,7 +298,7 @@ CTextFileReader::read()
 //--------------------------------------------------------------------------
 
 bool
-CMmsLogsReader::initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList)
+CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList)
 {
     bool retVal = m_db.init(QLatin1String("QSQLITE"), dbFileName);
     if (retVal) {
@@ -375,7 +375,7 @@ CMmsLogsReader::~CMmsLogsReader()
 
 bool
 CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet,
-                     mms::pragmaList_t *pragmaList)
+                     const mms::pragmaList_t *pragmaList)
 {
     CParserManager &parserManager = CParserManager::instance();
     m_parser = nullptr;
