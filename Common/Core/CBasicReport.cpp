@@ -18,6 +18,7 @@
 #include "CBasicReport.h"
 #include <QMetaObject>
 #include <QMetaClassInfo>
+#include "elcUtils.h"
 
 const QString eolChar(QLatin1String("\n"));
 const QString emptyChar("");
@@ -69,6 +70,7 @@ CBasicReport::checkDetails(const QString &data)
 quint16
 CBasicReport::reportID() const
 {
+/*
     quint16 retVal = 0;
     const QMetaObject* mObj = this->metaObject();
     for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
@@ -79,4 +81,7 @@ CBasicReport::reportID() const
         }
     }
     return retVal;
+*/
+    QString value;
+    return elcUtils::getMetaClassInfo(this, QLatin1String("ID"), value) ? value.toUInt() : 0;
 }

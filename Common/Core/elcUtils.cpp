@@ -305,3 +305,4 @@ elcUtils::getDataSourceList(const QString &path, const QStringList &mask)
     }
     return retVal;
 }
+

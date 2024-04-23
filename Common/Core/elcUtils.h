@@ -21,7 +21,7 @@
 #include <QString>
 #include <QStringList>
 #include <QThread>
-
+#include <QMetaClassInfo>
 
 namespace elcUtils
 {
@@ -68,5 +68,21 @@ namespace elcUtils
     void expandEnvironmentStrings(QString &path);
     bool mkPath(const QString &dirPath, QString &errorString);
     QStringList getDataSourceList(const QString &path, const QStringList &mask);
+
+    template <typename T>
+    bool getMetaClassInfo(T *object, const QString &name, QString &value)
+    {
+        bool retVal = false;
+        const QMetaObject* mObj = object->metaObject();
+        for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
+            QMetaClassInfo classInfo = mObj->classInfo(j);
+            if (QString::compare(classInfo.name(), name, Qt::CaseInsensitive) == 0) {
+                value = classInfo.value();
+                retVal = true;
+                break;
+            }
+        }
+        return retVal;
+    }
 }
 #endif // ELCUTILS_H

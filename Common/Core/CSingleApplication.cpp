@@ -1,10 +1,6 @@
 #include "CSingleApplication.h"
 #include <QCoreApplication>
 
-#ifdef __MSG_EXCHANGE
-  #include <QByteArray>
-#endif
-
 //#include "Debug.h"
 
 const QString sharedMemory_prefix = QLatin1String("_m");
