@@ -135,7 +135,7 @@ CEventLogParser::parse(const QString &line)
         m_type = match.captured(5);
 
         m_details = m_details.mid(m_header.length() + 1);
-        removeQuote(m_details, m_quoteChar);
+        removeQuote(m_details);
 
         m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
         if (m_timestamp.isValid()) {

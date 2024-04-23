@@ -20,9 +20,9 @@
 #include <QMetaClassInfo>
 
 void
-CBasicParser::removeQuote(QString &data, char quoteChar)
+CBasicParser::removeQuote(QString &data)
 {
-    if (!data.isEmpty() && data.startsWith(quoteChar) && data.endsWith(quoteChar)) {
+    if (!data.isEmpty() && data.startsWith(m_quoteChar) && data.endsWith(m_quoteChar)) {
         data = data.sliced(1, data.length() - 2);
     }
 }

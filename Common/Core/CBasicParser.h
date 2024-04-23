@@ -40,7 +40,7 @@ public:
     mms::ffs_t fileFieldsSeparationInfo();
 
 protected:
-    void removeQuote(QString &data, char quoteChar);
+    void removeQuote(QString &data);
     void analizeIPAdresses();
 
     QString     m_internalIpFirstOctet;

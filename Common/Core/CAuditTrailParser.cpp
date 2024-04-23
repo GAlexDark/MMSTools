@@ -109,7 +109,7 @@ CAuditTrailParser::parse(const QString& line)
         m_ipaddresses = m_attributes.mid(posStart + 1);
         analizeIPAdresses();
         m_attributes.resize(posStart);
-        removeQuote(m_attributes, m_quoteChar);
+        removeQuote(m_attributes);
 
         // parse m_attributes
         if (!parseAttributesDetails()) {
