@@ -61,22 +61,22 @@
 <context>
     <name>CMmsLogsThreadReader</name>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="423"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="430"/>
         <source>Preparing to read the file(s).</source>
         <translation>Подготовка к чтению файла(-ов).</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="432"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="439"/>
         <source>Reading of the file %1 has started.</source>
         <translation>Чтение файла %1 началось.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="437"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="444"/>
         <source>The file %1 was read</source>
         <translation>Файл %1 прочитан</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="437"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="444"/>
         <source>The file %1 was not read</source>
         <translation>Файл %1 не прочитан</translation>
     </message>
@@ -713,9 +713,13 @@ Copyright (C) 2023 Алексей Гаенко
     </message>
     <message>
         <location filename="../src/CLoadFilesOptionsDialog.cpp" line="53"/>
-        <location filename="../src/CReportOptionsDialog.cpp" line="57"/>
         <source>The MMS log type is not selected.</source>
         <translation>Тип журнала MMS не выбран.</translation>
+    </message>
+    <message>
+        <location filename="../src/CReportOptionsDialog.cpp" line="57"/>
+        <source>The MMS report type is not selected.</source>
+        <translation>Тип отчета MMS не выбран.</translation>
     </message>
     <message>
         <location filename="../src/CReportOptionsDialog.cpp" line="68"/>
@@ -736,8 +740,8 @@ Copyright (C) 2023 Алексей Гаенко
     <message>
         <location filename="../src/main.cpp" line="122"/>
         <location filename="../src/main.cpp" line="126"/>
-        <location filename="../src/main.cpp" line="142"/>
-        <location filename="../src/main.cpp" line="153"/>
+        <location filename="../src/main.cpp" line="141"/>
+        <location filename="../src/main.cpp" line="152"/>
         <location filename="../src/mainwindow.cpp" line="91"/>
         <location filename="../src/mainwindow.cpp" line="110"/>
         <source>Error</source>
@@ -745,7 +749,7 @@ Copyright (C) 2023 Алексей Гаенко
     </message>
     <message>
         <location filename="../src/main.cpp" line="122"/>
-        <location filename="../src/main.cpp" line="142"/>
+        <location filename="../src/main.cpp" line="141"/>
         <source>Cannot create folder: %1
 Details: %2</source>
         <translation>Невозможно создать папку: %1
@@ -759,12 +763,18 @@ Details: %2</source>
     <message>
         <location filename="../src/main.cpp" line="136"/>
         <source>Unable to get database file name.
- The database file will be created on the default path.</source>
+The database file will be created on the default path.</source>
         <translation>Невозможно получить имя файла базы данных.
+Файл базы данных будет создан по пути по умолчанию.</translation>
+    </message>
+    <message>
+        <source>Unable to get database file name.
+ The database file will be created on the default path.</source>
+        <translation type="vanished">Невозможно получить имя файла базы данных.
   Файл базы данных будет создан по пути по умолчанию.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="153"/>
+        <location filename="../src/main.cpp" line="152"/>
         <source>Cannot open database: %1
 Details: %2</source>
         <translation>Невозможно открыть базу данных: %1
@@ -789,19 +799,19 @@ Details: %2</source>
         <translation>Критическая ошибка: %1</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CAuditTrailParser.h" line="31"/>
-        <location filename="../../Common/Core/CAuditTrailReport.h" line="13"/>
+        <location filename="../../Common/Core/CAuditTrailParser.h" line="48"/>
+        <location filename="../../Common/Core/CAuditTrailReport.h" line="30"/>
         <source>Audit Trail Log</source>
         <translation>Журнал аудита</translation>
     </message>
     <message>
         <location filename="../../Common/Core/CEventLogParser.h" line="47"/>
-        <location filename="../../Common/Core/CEventLogReport.h" line="13"/>
+        <location filename="../../Common/Core/CEventLogReport.h" line="30"/>
         <source>Event Log</source>
         <translation>Журнал событий</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSummaryReport.h" line="13"/>
+        <location filename="../../Common/Core/CSummaryReport.h" line="30"/>
         <source>(Experimental) Summary report</source>
         <translation>(Экспериментальный) Сводный отчет</translation>
     </message>

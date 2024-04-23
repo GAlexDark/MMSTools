@@ -33,6 +33,8 @@
 
 const int defaultStorageBlockSize = 32768;
 const QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
+const QChar comma = QLatin1Char(',');
+const QChar dotComma = QLatin1Char(';');
 
 bool
 elcUtils::sanitizeValue(const QString &value)
@@ -70,14 +72,14 @@ elcUtils::parseValuesList(QString data)
     QStringList retVal;
     data = data.trimmed();
     data.replace(QLatin1String(" "), "");
-    if ((data.indexOf(',') != -1) || (data.indexOf(';') != -1)) {
-        if (data.indexOf(',') != -1) {
-            data.replace(';', ',');
-            retVal.append(data.split(','));
+    if ((data.indexOf(comma) != -1) || (data.indexOf(dotComma) != -1)) {
+        if (data.indexOf(comma) != -1) {
+            data.replace(dotComma, comma);
+            retVal.append(data.split(comma));
         }
-        if (data.indexOf(';') != -1) {
-            data.replace(',', ';');
-            retVal.append(data.split(';'));
+        if (data.indexOf(dotComma) != -1) {
+            data.replace(comma, dotComma);
+            retVal.append(data.split(dotComma));
         }
         retVal.removeAll(QString(""));
         retVal.removeDuplicates();
@@ -95,11 +97,11 @@ elcUtils::parseValuesList(QStringList &data)
     if (!data.isEmpty()) {
         QString buf;
         if (data.size() > 1) {
-            buf = data.join(';');
+            buf = data.join(dotComma);
         } else {
             buf = data.at(0).trimmed();
         }
-        if ((buf.indexOf(',') != -1) || (buf.indexOf(';') != -1)) {
+        if ((buf.indexOf(comma) != -1) || (buf.indexOf(dotComma) != -1)) {
             data.clear();
             data.append(parseValuesList(buf));
         }

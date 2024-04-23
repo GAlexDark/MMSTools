@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include "CReportBuilder.h"
-//#include "Debug.h"
 #include "DBStrings.h"
 #include "elcUtils.h"
 #include "CReportManager.h"
@@ -112,8 +111,6 @@ CReportBuilder::generateReport()
         } //for
         args.append(QStringLiteral("e.username='%1'").arg(m_includedUsernamesList.at(size)));
     }
-//    __DEBUG( getAllRecords.arg(args) )
-
     bool retVal = m_report->generateReport(args);
     if (!retVal) {
         m_errorString = m_report->errorString();

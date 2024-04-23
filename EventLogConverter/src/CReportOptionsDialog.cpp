@@ -54,7 +54,7 @@ CReportOptionsDialog::doOkClicked()
     int logID = ui->comboBox->currentIndex();
     m_logID = logID >= 0 ? logID : 0;
     if (m_logID == 0) {
-        QMessageBox::warning(nullptr, QObject::tr("Warning"), QObject::tr("The MMS log type is not selected."), QMessageBox::Ok);
+        QMessageBox::warning(nullptr, QObject::tr("Warning"), QObject::tr("The MMS report type is not selected."), QMessageBox::Ok);
         isError = true;
     } else {
         QString buf = ui->edIncludedUsers->text().trimmed();

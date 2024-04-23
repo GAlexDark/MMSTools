@@ -26,6 +26,10 @@ template <class T>
 class CBasicManager
 {
 public:
+    CBasicManager()
+    {
+        m_instancePtr = nullptr;
+    }
     ~CBasicManager()
     {
         destroyInstance();

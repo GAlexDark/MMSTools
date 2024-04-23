@@ -20,8 +20,6 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlRecord>
 
-//#include "Debug.h"
-
 void
 CBasicDatabase::_Deinit()
 {

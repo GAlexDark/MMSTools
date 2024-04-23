@@ -70,18 +70,6 @@ CBasicReport::checkDetails(const QString &data)
 quint16
 CBasicReport::reportID() const
 {
-/*
-    quint16 retVal = 0;
-    const QMetaObject* mObj = this->metaObject();
-    for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
-        QMetaClassInfo classInfo = mObj->classInfo(j);
-        if (QString(classInfo.name()) == QLatin1String("ID")) {
-            retVal = QString(classInfo.value()).toUInt();
-            break;
-        }
-    }
-    return retVal;
-*/
     QString value;
     return elcUtils::getMetaClassInfo(this, QLatin1String("ID"), value) ? value.toUInt() : 0;
 }
