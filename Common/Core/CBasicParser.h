@@ -43,7 +43,6 @@ protected:
     void removeQuote(QString &data);
     void analizeIPAdresses();
 
-    QString     m_internalIpFirstOctet;
     QString     m_ipaddresses,
                 m_internalip,
                 m_externalip;
@@ -53,6 +52,9 @@ protected:
     QByteArray  m_eolChars;
 
     QString     m_errorString;
+
+private:
+    QString     m_internalIpFirstOctet;
 };
 
 typedef CBasicParser *pBasicParser;
