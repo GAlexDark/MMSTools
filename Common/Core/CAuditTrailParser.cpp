@@ -35,7 +35,7 @@ CAuditTrailParser::parsePersonDataDetails()
     //__DEBUG( m_attributes )
     qsizetype firstPos = m_attributes.indexOf(person, 0);
     if (firstPos != -1) {
-        qsizetype lastPos = m_attributes.indexOf(']', firstPos);
+        qsizetype lastPos = m_attributes.indexOf(QLatin1Char(']'), firstPos);
         QString alias = m_attributes.sliced(firstPos, lastPos - firstPos + 1).trimmed();
         QRegularExpressionMatch match = rePersonData.match(alias);
         if (match.hasMatch()) {
@@ -98,8 +98,8 @@ CAuditTrailParser::parse(const QString& line)
             m_timestamp = QDateTime();
             m_errorString = QStringLiteral("Error converting Timestamp value: %1").arg(timestamp);
         }
-        qsizetype posStart = m_username.indexOf('(');
-        qsizetype posEnd = m_username.indexOf(')', posStart + 1) - posStart - 1;
+        qsizetype posStart = m_username.indexOf(QLatin1Char('('));
+        qsizetype posEnd = m_username.indexOf(QLatin1Char(')'), posStart + 1) - posStart - 1;
         m_role = m_username.sliced(posStart + 1, posEnd).trimmed();
         m_username.resize(posStart -1);
 
