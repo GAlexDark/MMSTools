@@ -133,8 +133,7 @@ int main(int argc, char *argv[])
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
         settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
-        QMessageBox::warning(nullptr, QObject::tr("Warning") ,QObject::tr("Unable to get database file name.\n \
-The database file will be created on the default path."), QMessageBox::Ok);
+        QMessageBox::warning(nullptr, QObject::tr("Warning") ,QObject::tr("Unable to get database file name.\nThe database file will be created on the default path."), QMessageBox::Ok);
     }
     elcUtils::expandEnvironmentStrings(dbName);
     QString dbPath = QFileInfo(dbName).absolutePath();
