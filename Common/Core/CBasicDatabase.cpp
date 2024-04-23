@@ -192,8 +192,7 @@ CBasicDatabase::rollbackTransaction()
     bool retVal = true;
     if (m_isBeginTransaction) {
         retVal = m_db.rollback();
-        if (retVal) {
-        } else {
+        if (!retVal) {
             QSqlError error = m_db.lastError();
             m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(error.text());
         }
