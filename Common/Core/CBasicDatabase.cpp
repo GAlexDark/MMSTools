@@ -192,8 +192,7 @@ CBasicDatabase::rollbackTransaction()
     bool retVal = true;
     if (m_isBeginTransaction) {
         retVal = m_db.rollback();
-        if (retVal) {
-        } else {
+        if (!retVal) {
             QSqlError error = m_db.lastError();
             m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(error.text());
         }
@@ -240,8 +239,8 @@ bool
 CBasicDatabase::execRequest(pDataItem data)
 {
     Q_CHECK_PTR(data);
-    dataItem_t::iterator itStart = data->begin();
-    dataItem_t::iterator itEnd = data->end();
+    auto itStart = data->begin();
+    auto itEnd = data->end();
 
     while (itStart != itEnd) {
         m_SQLRes->bindValue (itStart.key(), itStart.value());
@@ -258,8 +257,8 @@ CBasicDatabase::insertToDB(const QString &query, pDataItem data)
     Q_CHECK_PTR(data);
     bool retVal = prepareRequest(query);
     if (retVal) {
-        dataItem_t::iterator itStart = data->begin();
-        dataItem_t::iterator itEnd = data->end();
+        auto itStart = data->begin();
+        auto itEnd = data->end();
 
         while (itStart != itEnd) {
             m_SQLRes->bindValue (itStart.key(), itStart.value());
@@ -298,7 +297,7 @@ CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
         }
         m_SQLRes->finish();
     }
-    return (hasResult)? retVal : dataList_t();
+    return hasResult ? retVal : dataList_t();
 }
 
 bool

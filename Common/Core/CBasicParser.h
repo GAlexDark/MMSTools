@@ -25,7 +25,7 @@
 class CBasicParser : public QObject
 {
 public:
-    CBasicParser(QObject *parent = nullptr);
+    explicit CBasicParser(QObject *parent = nullptr);
     virtual ~CBasicParser() = default;
     void init(const QString &internalIpFirstOctet);
     QString errorString() const { return m_errorString; }
@@ -37,13 +37,12 @@ public:
     virtual QString visibleLogName() =0;
     QString tableName() const;
     quint16 parserID() const;
-    mms::ffs_t fileFieldsSeparationInfo();
+    mms::ffs_t fileFieldsSeparationInfo() const;
 
 protected:
-    void removeQuote(QString &data, char quoteChar);
+    void removeQuote(QString &data);
     void analizeIPAdresses();
 
-    QString     m_internalIpFirstOctet;
     QString     m_ipaddresses,
                 m_internalip,
                 m_externalip;
@@ -53,6 +52,9 @@ protected:
     QByteArray  m_eolChars;
 
     QString     m_errorString;
+
+private:
+    QString     m_internalIpFirstOctet;
 };
 
 typedef CBasicParser *pBasicParser;

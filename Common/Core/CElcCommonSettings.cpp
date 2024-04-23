@@ -29,7 +29,7 @@ CElcCommonSettings::createDefault(const QString& iniPath)
     QString filePath = QFileInfo(iniPath).absolutePath();
     QString fileName = QFileInfo(iniPath).baseName();
 #ifdef Q_OS_WIN
-    QString dbName = (m_isRdsEnabled)? QStringLiteral("%1/%2.db").arg(filePath, fileName) : QStringLiteral("%1.db").arg(fileName);
+    QString dbName = m_isRdsEnabled ? QStringLiteral("%1/%2.db").arg(filePath, fileName) : QStringLiteral("%1.db").arg(fileName);
 #else
     QString dbName = QStringLiteral("$HOME/.local/share/%1/%1.db").arg(fileName);
 #endif

@@ -75,7 +75,7 @@ public:
     CMmsLogsReader();
     ~CMmsLogsReader();
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
-              const QString &internalIpFirstOctet, mms::pragmaList_t *pragmaList);
+              const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
 
     bool convertData(const QString &line) override;
     QString insertString() const { return m_parser->insertString(); }
@@ -83,7 +83,7 @@ public:
 private:
     pBasicParser    m_parser; // don't use the 'detele' operator, the ParserManager manage resources
     dataItem_t      m_data;
-    bool initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList);
+    bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
 
 protected:
     CBasicDatabase  m_db;

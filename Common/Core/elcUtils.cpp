@@ -32,7 +32,7 @@
 #endif
 
 const int defaultStorageBlockSize = 32768;
-QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
+const QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
 
 bool
 elcUtils::sanitizeValue(const QString &value)
@@ -59,7 +59,7 @@ elcUtils::sanitizeValue(const QString &value, const QStringList &allowedValues, 
     if (value.isEmpty()) {
         retVal = defaultValue;
     } else {
-        retVal = (allowedValues.contains(value, Qt::CaseInsensitive))? value : defaultValue;
+        retVal = allowedValues.contains(value, Qt::CaseInsensitive) ? value : defaultValue;
     }
     return retVal;
 }
@@ -143,7 +143,7 @@ elcUtils::getStorageBlockSize(const QString &file)
     if (storage.isValid()) {
         blockSize = storage.blockSize();
     }
-    return (blockSize == -1)? defaultStorageBlockSize : blockSize;
+    return blockSize == -1 ? defaultStorageBlockSize : blockSize;
 }
 
 QString
@@ -305,3 +305,4 @@ elcUtils::getDataSourceList(const QString &path, const QStringList &mask)
     }
     return retVal;
 }
+

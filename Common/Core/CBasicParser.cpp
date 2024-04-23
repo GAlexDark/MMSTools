@@ -17,12 +17,12 @@
 
 #include "CBasicParser.h"
 #include <QMetaObject>
-#include <QMetaClassInfo>
+#include <elcUtils.h>
 
 void
-CBasicParser::removeQuote(QString &data, char quoteChar)
+CBasicParser::removeQuote(QString &data)
 {
-    if (!data.isEmpty() && data.startsWith(quoteChar) && data.endsWith(quoteChar)) {
+    if (!data.isEmpty() && data.startsWith(m_quoteChar) && data.endsWith(m_quoteChar)) {
         data = data.sliced(1, data.length() - 2);
     }
 }
@@ -76,34 +76,18 @@ QString
 CBasicParser::tableName() const
 {
     QString retVal;
-    const QMetaObject* mObj = this->metaObject();
-    for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
-        QMetaClassInfo classInfo = mObj->classInfo(j);
-        if (QString(classInfo.name()) == QLatin1String("tablename")) {
-            retVal = classInfo.value();
-            break;
-        }
-    }
-    return retVal;
+    return elcUtils::getMetaClassInfo(this, QLatin1String("tablename"), retVal) ? retVal : QString();
 }
 
 quint16
 CBasicParser::parserID() const
 {
-    quint16 retVal = 0;
-    const QMetaObject* mObj = this->metaObject();
-    for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
-        QMetaClassInfo classInfo = mObj->classInfo(j);
-        if (QString(classInfo.name()) == QLatin1String("ID")) {
-            retVal = QString(classInfo.value()).toUInt();
-            break;
-        }
-    }
-    return retVal;
+    QString retVal;
+    return elcUtils::getMetaClassInfo(this, QLatin1String("ID"), retVal) ? retVal.toUInt() : 0;
 }
 
 mms::ffs_t
-CBasicParser::fileFieldsSeparationInfo()
+CBasicParser::fileFieldsSeparationInfo() const
 {
     mms::ffs_t retVal{ m_delimiterChar, m_quoteChar, m_eolChars };
     return retVal;

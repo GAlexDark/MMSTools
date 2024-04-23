@@ -23,9 +23,9 @@
 
 //#include "Debug.h"
 
-QRegularExpression reEventLogHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
-QRegularExpression reSuccessLogon("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$");
-QRegularExpression reFailedLogon("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$");
+const QRegularExpression reEventLogHeader("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")");
+const QRegularExpression reSuccessLogon("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$");
+const QRegularExpression reFailedLogon("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$");
 
 const QString authSuccessUk("Вхід користувача - успішно");
 const QString authSuccessEn("User login - successful");
@@ -135,7 +135,7 @@ CEventLogParser::parse(const QString &line)
         m_type = match.captured(5);
 
         m_details = m_details.mid(m_header.length() + 1);
-        removeQuote(m_details, m_quoteChar);
+        removeQuote(m_details);
 
         m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
         if (m_timestamp.isValid()) {
@@ -189,7 +189,7 @@ CEventLogParser::getParsedData(QString &username,
                    QString &authType,
                    QString &externalIP,
                    QString &internalIP,
-                   QDateTime &timestampTZ)
+                   QDateTime &timestampTZ) const
 {
     username = m_username;
     timestampISO8601 = m_timestampISO8601;

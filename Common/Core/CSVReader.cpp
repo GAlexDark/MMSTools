@@ -286,7 +286,7 @@ CTextFileReader::read()
     bool retVal = m_file.open(QIODevice::ReadOnly);
     memset(m_buffer->data(), 0, defMaxFileSize);
     if (retVal) {
-        retVal = (size <= defMaxFileSize)? readSmallFile() : readLargeFile();
+        retVal = size <= defMaxFileSize ? readSmallFile() : readLargeFile();
         //retVal = readSmallFile();
         //retVal = readLargeFile();
     } else {
@@ -298,7 +298,7 @@ CTextFileReader::read()
 //--------------------------------------------------------------------------
 
 bool
-CMmsLogsReader::initDB(const QString &dbFileName, mms::pragmaList_t *pragmaList)
+CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList)
 {
     bool retVal = m_db.init(QLatin1String("QSQLITE"), dbFileName);
     if (retVal) {
@@ -375,7 +375,7 @@ CMmsLogsReader::~CMmsLogsReader()
 
 bool
 CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet,
-                     mms::pragmaList_t *pragmaList)
+                     const mms::pragmaList_t *pragmaList)
 {
     CParserManager &parserManager = CParserManager::instance();
     m_parser = nullptr;
@@ -441,7 +441,7 @@ CMmsLogsThreadReader::run()
                     m_retVal = read();
                     if (m_retVal) {
                         m_retVal = m_db.commitTransaction();
-                        QString msg = (m_retVal)? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
+                        QString msg = m_retVal ? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
                         emit sendMessage( msg );
                     }
                 }

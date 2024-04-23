@@ -28,7 +28,7 @@ class CEventLogParser: public CBasicParser
     Q_CLASSINFO("tablename", "eventlog")
     Q_CLASSINFO("ID", "1")
 public:
-    Q_INVOKABLE CEventLogParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CEventLogParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
     QString insertString() const override;
@@ -41,7 +41,7 @@ public:
                        QString &authType,
                        QString &externalIP,
                        QString &internalIP,
-                       QDateTime &timestampTZ);
+                       QDateTime &timestampTZ) const;
 
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
@@ -54,7 +54,8 @@ private:
         QString authType;
         QString internalIp;
         QString externalIp;
-    } m_prevValueUSLD;
+    };
+    userSuccessLogonDetails_t m_prevValueUSLD;
 
     struct userFailedLogonDetails_t
     {
@@ -62,7 +63,8 @@ private:
         QString authType;
         QString internalIp;
         QString externalIp;
-    } m_prevValueUFLD;
+    };
+    userFailedLogonDetails_t m_prevValueUFLD;
 
     QDateTime   m_timestamp,
                 m_timestamptz;

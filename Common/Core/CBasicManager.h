@@ -57,7 +57,7 @@ public:
 
     QStringList getClassList() const { return m_classList; }
     qsizetype getItemCount() const { return m_classList.size(); }
-    bool checkID(const quint16 id) { return (m_ids.indexOf(id) != -1)? true : false; }
+    bool checkID(const quint16 id) const { return m_ids.indexOf(id) != -1 ? true : false; }
 
 protected:
     void destroyInstance()
@@ -68,10 +68,13 @@ protected:
         }
     }
 
-    QMetaType           m_type;
     QStringList         m_classList;
-    T                   m_instancePtr;
     QVector<quint16>    m_ids;
+
+private:
+    QMetaType           m_type;
+    T                   m_instancePtr;
+
 };
 
 #endif // CBASICMANAGER_H

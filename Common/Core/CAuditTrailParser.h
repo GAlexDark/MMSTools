@@ -29,7 +29,7 @@ class CAuditTrailParser: public CBasicParser
     Q_CLASSINFO("tablename", "audittraillog")
     Q_CLASSINFO("ID", "2")
 public:
-    Q_INVOKABLE CAuditTrailParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
     QString insertString() const override;
@@ -42,7 +42,7 @@ public:
                        QString &attributes,
                        QString &username1,
                        QString &internalip,
-                       QString &externalip);
+                       QString &externalip) const;
 
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
