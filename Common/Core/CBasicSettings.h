@@ -27,8 +27,6 @@ class CBasicSettings
 public:
     explicit CBasicSettings();
     ~CBasicSettings();
-
-public:
     bool init(const QString& appPath, const QString &fileName, bool isTerminalMode);
     QVariant getMain(const QString& keyName) const;
     void setMain(const QString& group, const QString& keyName, const QVariant& value);
