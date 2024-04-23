@@ -28,7 +28,7 @@ class CEventLogParser: public CBasicParser
     Q_CLASSINFO("tablename", "eventlog")
     Q_CLASSINFO("ID", "1")
 public:
-    Q_INVOKABLE CEventLogParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CEventLogParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
     QString insertString() const override;

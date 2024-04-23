@@ -29,7 +29,7 @@ class CAuditTrailParser: public CBasicParser
     Q_CLASSINFO("tablename", "audittraillog")
     Q_CLASSINFO("ID", "2")
 public:
-    Q_INVOKABLE CAuditTrailParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
     QString insertString() const override;
