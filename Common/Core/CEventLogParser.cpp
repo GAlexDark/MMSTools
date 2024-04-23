@@ -189,7 +189,7 @@ CEventLogParser::getParsedData(QString &username,
                    QString &authType,
                    QString &externalIP,
                    QString &internalIP,
-                   QDateTime &timestampTZ)
+                   QDateTime &timestampTZ) const
 {
     username = m_username;
     timestampISO8601 = m_timestampISO8601;

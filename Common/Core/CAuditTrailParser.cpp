@@ -150,7 +150,7 @@ CAuditTrailParser::getParsedData(QString &status,
                                 QString &attributes,
                                 QString &username1,
                                 QString &internalip,
-                                QString &externalip)
+                                QString &externalip) const
 {
     status = m_status;
     timestamp = m_timestamp;

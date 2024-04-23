@@ -42,7 +42,7 @@ public:
                        QString &attributes,
                        QString &username1,
                        QString &internalip,
-                       QString &externalip);
+                       QString &externalip) const;
 
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.

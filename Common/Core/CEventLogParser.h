@@ -41,7 +41,7 @@ public:
                        QString &authType,
                        QString &externalIP,
                        QString &internalIP,
-                       QDateTime &timestampTZ);
+                       QDateTime &timestampTZ) const;
 
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
