@@ -68,10 +68,13 @@ protected:
         }
     }
 
-    QMetaType           m_type;
     QStringList         m_classList;
-    T                   m_instancePtr;
     QVector<quint16>    m_ids;
+
+private:
+    QMetaType           m_type;
+    T                   m_instancePtr;
+
 };
 
 #endif // CBASICMANAGER_H
