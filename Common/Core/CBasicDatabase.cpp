@@ -239,8 +239,8 @@ bool
 CBasicDatabase::execRequest(pDataItem data)
 {
     Q_CHECK_PTR(data);
-    dataItem_t::iterator itStart = data->begin();
-    dataItem_t::iterator itEnd = data->end();
+    auto itStart = data->begin();
+    auto itEnd = data->end();
 
     while (itStart != itEnd) {
         m_SQLRes->bindValue (itStart.key(), itStart.value());
@@ -257,8 +257,8 @@ CBasicDatabase::insertToDB(const QString &query, pDataItem data)
     Q_CHECK_PTR(data);
     bool retVal = prepareRequest(query);
     if (retVal) {
-        dataItem_t::iterator itStart = data->begin();
-        dataItem_t::iterator itEnd = data->end();
+        auto itStart = data->begin();
+        auto itEnd = data->end();
 
         while (itStart != itEnd) {
             m_SQLRes->bindValue (itStart.key(), itStart.value());
