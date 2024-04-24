@@ -318,9 +318,8 @@ CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragm
 
             const CParserManager &parserManager = CParserManager::instance();
             dbCommandItems.append(parserManager.getCreateTableRequestList());
-
-            for (qsizetype i = 0; i < dbCommandItems.size(); ++i) {
-                retVal = m_db.exec(dbCommandItems.at(i));
+            for (const QString &item : dbCommandItems) {
+                retVal = m_db.exec(item);
                 if (!retVal) {
                     break;
                 }
