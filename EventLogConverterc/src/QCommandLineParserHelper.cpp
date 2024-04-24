@@ -46,20 +46,14 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
 {
     m_parser.addHelpOption();
 
-    const QString importOnlyDescription(QLatin1String("The utility starts in the import data-only mode without report generation. \
-In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored."));
-    const QString reportOnlyDescription(QLatin1String("The utility starts in the generation report-only mode without importing data. \
-In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\n \
-If these options are not specified, data will be imported and the report generated."));
+    const QString importOnlyDescription(QLatin1String("The utility starts in the import data-only mode without report generation. In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored."));
+    const QString reportOnlyDescription(QLatin1String("The utility starts in the generation report-only mode without importing data. In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\nIf these options are not specified, data will be imported and the report generated."));
     const QString cleanDbOnlyDescription(QLatin1String("The utility starts in the clean database-only mode without import data and report generation."));
     const QString pathDescription(QLatin1String("Path to the directory with the MMS Event Log files for the report."));
     const QString filesDescription(QLatin1String("MMS Event Log data file(s) for the report. Usage:\n-f file1 -f file2 ... -f fileN"));
     const QString reportNameDescription(QLatin1String("Path to the directory and name of the report file."));
-    const QString excludeDescription(QLatin1String("The list of usernames separated by ',' or ';' excluded from the report. \
-Usage:\n-e user1 -e user2 ... -e userN or\n -e user1,user2,..,userN or\n-e user1;user2;..;userN"));
-    const QString includeDescription(QLatin1String("The list of usernames separated by ',' or ';' only included from the report. \
-When using this option, the exclude option is ignored. \
-Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN"));
+    const QString excludeDescription(QLatin1String("The list of usernames separated by ',' or ';' excluded from the report. Usage:\n-e user1 -e user2 ... -e userN or\n -e user1,user2,..,userN or\n-e user1;user2;..;userN"));
+    const QString includeDescription(QLatin1String("The list of usernames separated by ',' or ';' only included from the report. When using this option, the exclude option is ignored. Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1;user2;..;userN"));
 
     QCommandLineOption importOnlyOption(QStringList() << "importonly", importOnlyDescription);
     bool retVal = m_parser.addOption(importOnlyOption);
@@ -132,14 +126,14 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
 }
 
 QStringList
-QCommandLineParserHelper::excludedUsernames()
+QCommandLineParserHelper::excludedUsernames() const
 {
     QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
 
-QStringList QCommandLineParserHelper::includedUsernames()
+QStringList QCommandLineParserHelper::includedUsernames() const
 {
     QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
     elcUtils::parseValuesList(retVal);
@@ -153,7 +147,7 @@ QCommandLineParserHelper::showHelpAndExit()
 }
 
 RunningMode
-QCommandLineParserHelper::getRunningMode()
+QCommandLineParserHelper::getRunningMode() const
 {
     RunningMode retVal = RUNNINGMODE_DEFAULT;
     if (m_isCleanDbOnly) {
@@ -214,7 +208,7 @@ QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 }
 
 QString
-QCommandLineParserHelper::getReportName()
+QCommandLineParserHelper::getReportName() const
 {
     QString retVal;
     if (m_isReportName) {

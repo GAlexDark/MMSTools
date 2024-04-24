@@ -40,12 +40,12 @@ public:
     mms::ffs_t fileFieldsSeparationInfo() const;
 
 protected:
-    void removeQuote(QString &data);
+    void removeQuote(QString &data) const;
     void analizeIPAdresses();
 
-    QString     m_ipaddresses,
-                m_internalip,
-                m_externalip;
+    QString     m_ipaddresses;
+    QString     m_internalip;
+    QString     m_externalip;
 
     char        m_delimiterChar = 0;
     char        m_quoteChar = 0;

@@ -49,7 +49,7 @@ private:
     bool            m_isButtonsDisabled = false;
     bool            m_hasHeaders = true;
 
-    quint16         m_logId;
+    quint16         m_logId = 0;
     mms::ffs_t      m_ffs;
 
     void disableButtons();

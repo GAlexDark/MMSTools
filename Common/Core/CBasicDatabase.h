@@ -73,14 +73,14 @@ private:
     CBasicDatabase& operator=(CBasicDatabase&) = delete;
 
     QSqlDatabase    m_db;
-    QSqlQuery       *m_SQLRes;
+    QSqlQuery       *m_SQLRes = nullptr;
 
-    bool            m_isInited;         //флаг подключения к БД. True - connected, false - not connected
+    bool            m_isInited = false;         //флаг подключения к БД. True - connected, false - not connected
     QString         m_connectionName;   //Уникальное имя соединения
-    int             m_ErrorCode;        //Код ошибки
+    int             m_ErrorCode = 0;        //Код ошибки
     QString         m_errorString;
 
-    bool            m_isBeginTransaction;
+    bool            m_isBeginTransaction = false;
 
     void _Deinit();
     bool _exec(const QString &query);

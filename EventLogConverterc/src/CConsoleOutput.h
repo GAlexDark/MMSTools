@@ -40,7 +40,7 @@ public:
     }
     virtual ~CConsoleOutput() {}
     void
-    outToConsole(const QString &msg)
+    outToConsole(const QString &msg) const
     {
         if (!msg.isEmpty()) {
             QTextStream cout(stdout);
@@ -49,7 +49,7 @@ public:
         }
     }
 public slots:
-    void printToConsole(const QString &msg)
+    void printToConsole(const QString &msg) const
     {
         outToConsole(msg);
     }

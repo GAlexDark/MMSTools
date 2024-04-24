@@ -67,7 +67,7 @@ CBasicDatabase::_exec()
  ********************************************************************/
 
 CBasicDatabase::CBasicDatabase(const QString &connectionName)
-    : m_SQLRes(nullptr), m_isInited(false), m_connectionName(connectionName), m_ErrorCode(0), m_isBeginTransaction(false)
+    : m_connectionName(connectionName)
 {
     if (m_connectionName.isEmpty()) {
         QUuid guid = QUuid::createUuid();
@@ -76,7 +76,6 @@ CBasicDatabase::CBasicDatabase(const QString &connectionName)
 }
 
 CBasicDatabase::CBasicDatabase()
-    : m_SQLRes(nullptr), m_isInited(false), m_connectionName(""), m_ErrorCode(0), m_isBeginTransaction(false)
 {
     QUuid guid = QUuid::createUuid();
     m_connectionName = guid.toString();

@@ -121,8 +121,8 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1\nDetails: %2").arg(appPath, errorString), QMessageBox::Ok);
         return 1;
     }
-    if (!CElcGuiAppSettings::instance().init(appPath, iniFile, isRdsMode)) {
-        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("The settings Class cannot be initialized."), QMessageBox::Ok);
+    if (!CElcGuiAppSettings::instance().init(appPath, iniFile, isRdsMode, errorString)) {
+        QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("The settings Class cannot be initialized: %1.").arg(errorString), QMessageBox::Ok);
         return 1;
     }
     CParserManager::instance().init();

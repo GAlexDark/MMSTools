@@ -20,7 +20,7 @@
 #include "elcUtils.h"
 
 void
-CBasicParser::removeQuote(QString &data)
+CBasicParser::removeQuote(QString &data) const
 {
     if (!data.isEmpty() && data.startsWith(m_quoteChar) && data.endsWith(m_quoteChar)) {
         data = data.sliced(1, data.length() - 2);

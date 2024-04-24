@@ -26,7 +26,7 @@ class CBasicSettings
 {
 public:
     ~CBasicSettings();
-    bool init(const QString& appPath, const QString &fileName, bool isTerminalMode);
+    bool init(const QString& appPath, const QString &fileName, bool isTerminalMode, QString &errorString);
     QVariant getMain(const QString& keyName) const;
     void setMain(const QString& group, const QString& keyName, const QVariant& value);
     bool isRdsEnabled() const { return m_isRdsEnabled; }

@@ -28,7 +28,7 @@ CBasicSettings::~CBasicSettings()
 }
 
 bool
-CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTerminalMode)
+CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTerminalMode, QString &errorString)
 {
     m_isRdsEnabled = isTerminalMode;
     QString iniFileName = QDir(appPath).filePath(fileName);
@@ -41,11 +41,13 @@ CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTer
     delete m_settings;
 
     bool retVal = true;
+    errorString.clear();
     try {
         m_settings = new QSettings(iniFileName, QSettings::IniFormat);
         Q_CHECK_PTR(m_settings);
-    } catch (const std::bad_alloc& ex) {
+    } catch (const std::bad_alloc &e) {
         retVal = false;
+        errorString = e.what();
     }
 
     return retVal;

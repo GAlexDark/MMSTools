@@ -103,13 +103,7 @@ CTextFileReader::readSmallFile()
  */
 
     bool retVal = true;
-    qint64 bytesRead = -1;
-    try {
-        bytesRead = m_file.read(m_buffer->data(), m_file.size());
-    } catch (...) {
-        retVal = false;
-        m_errorString = QStringLiteral("Error reading file");
-    }
+    qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
     m_file.close();
 
     if (bytesRead > 0) {
@@ -153,6 +147,9 @@ CTextFileReader::readSmallFile()
                 m_lineNumber++;
             } // internal while
         }
+    } else {
+        retVal = false;
+        m_errorString = QStringLiteral("Error reading file");
     }
 
     return retVal;
