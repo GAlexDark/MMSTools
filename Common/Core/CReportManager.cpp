@@ -43,11 +43,9 @@ CReportManager::init(bool usePrettySelector)
 
     m_visibleReportsNames.resize(m_classList.size());
 
-    QString name;
     pBasicReport ptr = nullptr;
     QMetaType type;
-    for (qsizetype i = 0; i < m_classList.size(); i++) {
-        name = m_classList.at(i).trimmed();
+    for (const QString &name : m_classList) {
         type = QMetaType::fromName(name.toUtf8());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicReport>(type.metaObject()->newInstance());
@@ -61,7 +59,8 @@ CReportManager::init(bool usePrettySelector)
                 ptr = nullptr;
             }
         }
-    } //for
+    }
+
 }
 
 /***************************************************************************

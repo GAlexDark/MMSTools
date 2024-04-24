@@ -43,11 +43,9 @@ CParserManager::init()
     m_tablesList.resize(m_classList.size());
     m_createTableRequestList.resize(m_classList.size());
 
-    QString name;
     pBasicParser ptr = nullptr;
     QMetaType type;
-    for (qsizetype i = 0; i < m_classList.size(); i++) {
-        name = m_classList.at(i).trimmed();
+    for (const QString &name : m_classList) {
         type = QMetaType::fromName(name.toUtf8());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicParser>(type.metaObject()->newInstance());
@@ -63,5 +61,5 @@ CParserManager::init()
                 ptr = nullptr;
             }
         }
-    } //for
+    }
 }

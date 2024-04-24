@@ -24,13 +24,12 @@
 bool
 QCommandLineParserHelper::checkData(const QStringList &data)
 {
-    QString buf;
     bool retVal = true;
-    for (qsizetype i = 0; i < data.size(); ++i) {
-        buf = data.at(i);
-        if (!elcUtils::sanitizeValue(buf)) {
-            m_errorString = QStringLiteral("Invalid character in the value %1").arg(buf);
+    for (const QString &item : data) {
+        if (!elcUtils::sanitizeValue(item)) {
+            m_errorString = QStringLiteral("Invalid character in the value %1").arg(item);
             retVal = false;
+            break;
         }
     }
     return retVal;

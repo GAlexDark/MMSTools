@@ -69,9 +69,8 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
                     QStringList pragmaItems;
                     pragmaItems.append(pragmaUTF8);
                     pragmaItems.append(pragmaPageSize.arg(blockSize));
-
-                    for (qsizetype i = 0; i < pragmaItems.size(); ++i) {
-                        retVal = m_db->exec(pragmaItems.at(i));
+                    for (const QString &item : pragmaItems) {
+                        retVal = m_db->exec(item);
                         if (!retVal) {
                             break;
                         }

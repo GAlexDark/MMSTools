@@ -35,9 +35,7 @@ public:
     {
         destroyInstance();
 
-        QString name;
-        for (qsizetype i = 0; i < m_classList.size(); i++) {
-            name = m_classList.at(i).trimmed();
+        for (const QString &name : m_classList) {
             m_type = QMetaType::fromName(name.toUtf8());
             if (m_type.isValid()) {
                 const QMetaObject* mObj = m_type.metaObject();
@@ -50,8 +48,7 @@ public:
                     }
                 }
             }
-        } //for
-
+        }
         return m_instancePtr;
     }
 
