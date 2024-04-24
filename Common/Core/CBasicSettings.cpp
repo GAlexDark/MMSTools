@@ -18,10 +18,7 @@
 #include "CBasicSettings.h"
 #include <QDir>
 #include <QFileInfo>
-/*
-CBasicSettings::CBasicSettings()
-{}
-*/
+
 CBasicSettings::~CBasicSettings()
 {
     if (m_settings) {
