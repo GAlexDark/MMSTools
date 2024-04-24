@@ -46,8 +46,8 @@ private:
     QByteArray      m_fdState;
     QString         m_errorString;
 
-    bool            m_isButtonsDisabled;
-    bool            m_hasHeaders;
+    bool            m_isButtonsDisabled = false;
+    bool            m_hasHeaders = true;
 
     quint16         m_logId;
     mms::ffs_t      m_ffs;

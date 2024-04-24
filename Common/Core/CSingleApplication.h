@@ -20,8 +20,8 @@ private:
     CSingleApplication& operator=(CSingleApplication&) = delete;
 
     QString              m_id;
-    QSystemSemaphore    *m_semaphore;
-    QSharedMemory       *m_sharedMemory;
+    QSystemSemaphore    *m_semaphore = nullptr;
+    QSharedMemory       *m_sharedMemory = nullptr;
 };
 
 #endif // CSingleApplication_H

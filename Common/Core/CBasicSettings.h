@@ -25,7 +25,6 @@
 class CBasicSettings
 {
 public:
-    explicit CBasicSettings();
     ~CBasicSettings();
     bool init(const QString& appPath, const QString &fileName, bool isTerminalMode);
     QVariant getMain(const QString& keyName) const;
@@ -33,11 +32,11 @@ public:
     bool isRdsEnabled() const { return m_isRdsEnabled; }
 
 protected:
-    virtual void createDefault(const QString& iniPath) =0;
+    virtual void createDefault(const QString& iniPath) = 0;
 
 private:
-    QSettings*  m_settings;
-    bool        m_isRdsEnabled;
+    QSettings*  m_settings = nullptr;
+    bool        m_isRdsEnabled = false;
 };
 
 #endif // CBASICSETTINGS_H

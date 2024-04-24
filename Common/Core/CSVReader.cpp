@@ -234,9 +234,10 @@ CTextFileReader::readLargeFile()
 }
 
 CTextFileReader::CTextFileReader()
-    : m_delimiterChar(0), m_quoteChar(0), m_buffer(nullptr), m_fileName(""), m_isHeaders(false), m_errorString(""), m_lineNumber(0)
 {
     m_eolChars.clear();
+    m_fileName.clear();
+    m_errorString.clear();
     m_fileNames.clear();
 }
 
@@ -362,10 +363,6 @@ CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragm
     return retVal;
 }
 
-CMmsLogsReader::CMmsLogsReader()
-    : m_parser(nullptr)
-{}
-
 CMmsLogsReader::~CMmsLogsReader()
 {
     m_db.close();
@@ -412,7 +409,7 @@ bool CMmsLogsReader::convertData(const QString &line)
 //--------------------------------------------------------------------------
 
 CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
-    : QThread(parent), m_retVal(false)
+    : QThread(parent)
 {}
 
 void

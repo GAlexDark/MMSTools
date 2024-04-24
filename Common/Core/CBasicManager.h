@@ -26,10 +26,6 @@ template <class T>
 class CBasicManager
 {
 public:
-    CBasicManager()
-    {
-        m_instancePtr = nullptr;
-    }
     ~CBasicManager()
     {
         destroyInstance();
@@ -77,7 +73,7 @@ protected:
 
 private:
     QMetaType           m_type;
-    T                   m_instancePtr;
+    T                   m_instancePtr = nullptr;
 
 };
 

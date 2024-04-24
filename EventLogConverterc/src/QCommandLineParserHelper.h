@@ -45,14 +45,14 @@ private:
 
     QCommandLineParser  m_parser;
 
-    bool                m_isPath,
-                        m_isFiles,
-                        m_isReportName,
-                        m_isExcluded,
-                        m_isIncluded;
-    bool                m_isImportOnly,
-                        m_isReportOnly,
-                        m_isCleanDbOnly;
+    bool                m_isPath = false,
+                        m_isFiles = false,
+                        m_isReportName = false,
+                        m_isExcluded = false,
+                        m_isIncluded = false;
+    bool                m_isImportOnly = false,
+                        m_isReportOnly = false,
+                        m_isCleanDbOnly = false;
 
     QStringList         m_filesList;
     QString             m_errorString;

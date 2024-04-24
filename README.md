@@ -9,6 +9,7 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=reliability_rating)][Reliability Rating]
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=security_rating)][Security Rating]
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=sqale_rating)][Maintainability Rating]
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=ncloc)][Lines of Code]
 
 [Codacy Badge]: https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
 [Quality Gate Status]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
@@ -19,3 +20,4 @@
 [Reliability Rating]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 [Security Rating]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 [Maintainability Rating]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
+[Lines of Code]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools

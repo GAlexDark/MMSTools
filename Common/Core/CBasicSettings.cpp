@@ -19,10 +19,6 @@
 #include <QDir>
 #include <QFileInfo>
 
-CBasicSettings::CBasicSettings()
-    : m_settings(nullptr), m_isRdsEnabled(false)
-{}
-
 CBasicSettings::~CBasicSettings()
 {
     if (m_settings) {

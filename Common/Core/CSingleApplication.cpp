@@ -14,7 +14,7 @@ http://berenger.eu/blog/c-qt-singleapplication-single-app-instance/
 */
 
 CSingleApplication::CSingleApplication(const QString &id)
-    : m_id(id), m_semaphore(nullptr), m_sharedMemory(nullptr)
+    : m_id(id)
 {
     m_semaphore = new QSystemSemaphore(m_id + semaphore_prefix, 1);
     Q_CHECK_PTR(m_semaphore);

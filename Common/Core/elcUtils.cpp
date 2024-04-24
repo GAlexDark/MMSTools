@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QCoreApplication>
+#include <QPointer>
 
 #include "CBasicDatabase.h"
 

@@ -117,7 +117,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(":/img/data-transformation.png"));
-    m_isButtonsDisabled = false;
 
     m_state = new QLabel(this);
     m_state->setMinimumWidth(250);
@@ -151,7 +150,6 @@ MainWindow::MainWindow(QWidget *parent)
     setStateText(tr("Ready"));
 
     m_fileList.clear();
-    m_hasHeaders = true;
 #ifdef Q_OS_WIN
     QString rds = settings.isRdsEnabled() ? QLatin1String("RDP mode") : QLatin1String("Single mode");
     QString rdp = QLatin1String("%SESSIONNAME%");
@@ -373,7 +371,6 @@ MainWindow::generateReportClick()
 
     QStringList includedUsers, excludedUsers;
     CReportManager &reportManager = CReportManager::instance();
-    //QStringList logsList = {tr("Event Log"), tr("Audit Trail Log"), tr("(Experimental) Summary report") };
     QStringList reportsList = reportManager.getVisibleReportsNames();
     quint16 logId = reportManager.prettySelector(m_logId);
     if (showReportOptionsDialog(reportsList, logId, includedUsers, excludedUsers)) {
