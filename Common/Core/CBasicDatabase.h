@@ -24,7 +24,7 @@
 #include <QString>
 #include <QMap>
 #include <QList>
-
+#include <QScopedPointer>
 
 typedef QMap<QString, QVariant> dataItem_t;
 typedef dataItem_t *pDataItem;
@@ -73,7 +73,7 @@ private:
     CBasicDatabase& operator=(CBasicDatabase&) = delete;
 
     QSqlDatabase    m_db;
-    QSqlQuery       *m_SQLRes = nullptr;
+    QScopedPointer<QSqlQuery> m_SQLRes;
 
     bool            m_isInited = false;         //флаг подключения к БД. True - connected, false - not connected
     QString         m_connectionName;   //Уникальное имя соединения

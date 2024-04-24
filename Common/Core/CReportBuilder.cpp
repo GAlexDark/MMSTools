@@ -29,9 +29,6 @@ CReportBuilder::CReportBuilder()
 
 CReportBuilder::~CReportBuilder()
 {
-    delete m_db;
-    m_db = nullptr;
-
     m_includedUsernamesList.clear();
     m_excludedUsernamesList.clear();
 }
@@ -51,38 +48,27 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
     if (retVal) {
         m_report = reportManager.getInstance(logID);
         Q_CHECK_PTR(m_report);
-
-        try {
-            m_db = new CBasicDatabase();
-            Q_CHECK_PTR(m_db);
-        } catch (const std::bad_alloc &e) {
-            retVal = false;
-            m_errorString = e.what();
-        }
-
+        retVal = m_db.init(QLatin1String("QSQLITE"), dbFileName);
         if (retVal) {
-            retVal = m_db->init(QLatin1String("QSQLITE"), dbFileName);
+            retVal = m_db.open();
             if (retVal) {
-                retVal = m_db->open();
-                if (retVal) {
-                    int blockSize = elcUtils::getStorageBlockSize(dbFileName);
-                    QStringList pragmaItems;
-                    pragmaItems.append(pragmaUTF8);
-                    pragmaItems.append(pragmaPageSize.arg(blockSize));
-                    for (const QString &item : pragmaItems) {
-                        retVal = m_db->exec(item);
-                        if (!retVal) {
-                            break;
-                        }
+                int blockSize = elcUtils::getStorageBlockSize(dbFileName);
+                QStringList pragmaItems;
+                pragmaItems.append(pragmaUTF8);
+                pragmaItems.append(pragmaPageSize.arg(blockSize));
+                for (const QString &item : pragmaItems) {
+                    retVal = m_db.exec(item);
+                    if (!retVal) {
+                        break;
                     }
                 }
             }
-            if (retVal) {
-                m_report->init(m_db, reportName);
-            } else {
-                m_errorString = m_db->errorString();
-                m_db->close();
-            }
+        }
+        if (retVal) {
+            m_report->init(&m_db, reportName);
+        } else {
+            m_errorString = m_db.errorString();
+            m_db.close();
         }
     } else {
         m_errorString = QStringLiteral("The parser not found");
@@ -118,7 +104,7 @@ CReportBuilder::generateReport()
         m_errorString = m_report->errorString();
     }
 
-    m_db->close();
+    m_db.close();
 
     return retVal;
 }

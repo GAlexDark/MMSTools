@@ -57,11 +57,7 @@ CElcConsoleAppSettingsTest::test_init()
 {
     qDebug() << filePath;
     qDebug() << fileName;
-    QString errorString;
-    bool retVal = CElcConsoleAppSettings::instance().init(filePath, fileName, false, errorString);
-    if (!retVal) {
-        qDebug() << errorString;
-    }
+    bool retVal = CElcConsoleAppSettings::instance().init(filePath, fileName, false);
     QVERIFY(retVal);
 }
 

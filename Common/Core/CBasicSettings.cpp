@@ -19,16 +19,8 @@
 #include <QDir>
 #include <QFileInfo>
 
-CBasicSettings::~CBasicSettings()
-{
-    if (m_settings) {
-        delete m_settings;
-        m_settings = nullptr;
-    }
-}
-
 bool
-CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTerminalMode, QString &errorString)
+CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTerminalMode)
 {
     m_isRdsEnabled = isTerminalMode;
     QString iniFileName = QDir(appPath).filePath(fileName);
@@ -38,18 +30,12 @@ CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTer
         createDefault(iniFileName);
     }
 
-    delete m_settings;
-
     bool retVal = true;
-    errorString.clear();
-    try {
-        m_settings = new QSettings(iniFileName, QSettings::IniFormat);
-        Q_CHECK_PTR(m_settings);
-    } catch (const std::bad_alloc &e) {
+    m_settings.reset(new QSettings(iniFileName, QSettings::IniFormat));
+    Q_CHECK_PTR(m_settings);
+    if (!m_settings) {
         retVal = false;
-        errorString = e.what();
     }
-
     return retVal;
 }
 
