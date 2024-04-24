@@ -103,7 +103,7 @@ CTextFileReader::readSmallFile()
  */
 
     bool retVal = true;
-    qint64 bytesRead = m_file.read(m_buffer->data(), m_file.size());
+    qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
     m_file.close();
 
     if (bytesRead > 0) {

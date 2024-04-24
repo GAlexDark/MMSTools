@@ -44,7 +44,7 @@ CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTer
     try {
         m_settings = new QSettings(iniFileName, QSettings::IniFormat);
         Q_CHECK_PTR(m_settings);
-    } catch (const std::bad_alloc& ex) {
+    } catch (...) {
         retVal = false;
     }
 
