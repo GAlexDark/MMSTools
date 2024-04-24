@@ -69,8 +69,9 @@ int main(int argc, char *argv[])
 #else
     QString fileName = QLatin1String("%1.conf").arg(appName);
 #endif
-    if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false)) {
-        consoleOut.outToConsole(QLatin1String("The settings class cannot be initialized."));
+    QString errorString;
+    if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false, errorString)) {
+        consoleOut.outToConsole(QLatin1String("The settings class cannot be initialized: %1."));
         return 1;
     }
     CParserManager::instance().init();
@@ -81,7 +82,6 @@ int main(int argc, char *argv[])
         settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
         consoleOut.outToConsole(QLatin1String("Unable to get database file name.\nThe database file will be created on the default path."));
     }
-    QString errorString;
     elcUtils::expandEnvironmentStrings(dbName);
     QString dbPath = QFileInfo(dbName).absolutePath();
     if (!elcUtils::mkPath(dbPath, errorString)) {

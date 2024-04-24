@@ -51,7 +51,11 @@ void CElcGuiAppSettingsTest::cleanupTestCase()
 
 void CElcGuiAppSettingsTest::test_init()
 {
-    bool retVal = CElcGuiAppSettings::instance().init(filePath, fileName, false);
+    QString errorString;
+    bool retVal = CElcGuiAppSettings::instance().init(filePath, fileName, false, errorString);
+    if (!retVal) {
+        qDebug() << errorString;
+    }
     QVERIFY(retVal);
 }
 

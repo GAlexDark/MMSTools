@@ -49,7 +49,7 @@ public:
         }
     }
 public slots:
-    void printToConsole(const QString &msg)
+    void printToConsole(const QString &msg) const
     {
         outToConsole(msg);
     }
