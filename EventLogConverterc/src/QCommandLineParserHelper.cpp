@@ -132,14 +132,14 @@ Usage:\n-i user1 -i user2 ... -i userN or\n -i user1,user2,..,userN or\n-i user1
 }
 
 QStringList
-QCommandLineParserHelper::excludedUsernames()
+QCommandLineParserHelper::excludedUsernames() const
 {
     QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
 
-QStringList QCommandLineParserHelper::includedUsernames()
+QStringList QCommandLineParserHelper::includedUsernames() const
 {
     QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
     elcUtils::parseValuesList(retVal);
@@ -153,7 +153,7 @@ QCommandLineParserHelper::showHelpAndExit()
 }
 
 RunningMode
-QCommandLineParserHelper::getRunningMode()
+QCommandLineParserHelper::getRunningMode() const
 {
     RunningMode retVal = RUNNINGMODE_DEFAULT;
     if (m_isCleanDbOnly) {
@@ -214,7 +214,7 @@ QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 }
 
 QString
-QCommandLineParserHelper::getReportName()
+QCommandLineParserHelper::getReportName() const
 {
     QString retVal;
     if (m_isReportName) {

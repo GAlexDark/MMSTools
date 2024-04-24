@@ -40,7 +40,7 @@ public:
     mms::ffs_t fileFieldsSeparationInfo() const;
 
 protected:
-    void removeQuote(QString &data);
+    void removeQuote(QString &data) const;
     void analizeIPAdresses();
 
     QString     m_ipaddresses;

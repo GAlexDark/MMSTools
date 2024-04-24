@@ -31,17 +31,17 @@ public:
     bool parseCmdArgs(const QCoreApplication &app);
 
     void showHelpAndExit();
-    RunningMode getRunningMode();
+    RunningMode getRunningMode() const;
 
     bool getDataFilesList(QStringList &fileList);
-    QString getReportName();
+    QString getReportName() const;
     bool getExcludedUserNames(QStringList &excludedUsersList);
     bool getIncludedUserNames(QStringList &includedUsersList);
     QString errorString() const { return m_errorString; }
 
 private:
-    QStringList excludedUsernames();
-    QStringList includedUsernames();
+    QStringList excludedUsernames() const;
+    QStringList includedUsernames() const;
 
     QCommandLineParser  m_parser;
 

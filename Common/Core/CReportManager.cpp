@@ -72,7 +72,7 @@ CReportManager::init(bool usePrettySelector)
  * ID=3: Other Log parser        | ID=4: Other report            |  id++
  **************************************************************************/
 quint16
-CReportManager::prettySelector(const quint16 id)
+CReportManager::prettySelector(const quint16 id) const
 {
     quint16 retVal = id;
     if (m_usePrettySelector) {
