@@ -92,7 +92,7 @@ class CMmsLogsThreadReader: public QThread, public CMmsLogsReader
     Q_OBJECT
 public:
     explicit CMmsLogsThreadReader(QObject *parent = nullptr);
-    void run();
+    void run() override;
     bool getStatus() const { return m_retVal; }
 
 signals:

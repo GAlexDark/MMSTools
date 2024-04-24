@@ -92,10 +92,10 @@ int main(int argc, char *argv[])
 /* PREPARE */
 
     RunningMode runningMode = cmd.getRunningMode();
-    if (runningMode == RUNNINGMODE_DEFAULT || runningMode == RUNNINGMODE_CLEAN_DB) {
+    if (runningMode == RunningMode::RUNNINGMODE_DEFAULT || runningMode == RunningMode::RUNNINGMODE_CLEAN_DB) {
         QString cleardb = settings.getMain(QLatin1String("SETTINGS/clear_on_startup")).toString().trimmed();
         bool comb1 = cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0);
-        if (runningMode == RUNNINGMODE_CLEAN_DB) { //ignoring settings
+        if (runningMode == RunningMode::RUNNINGMODE_CLEAN_DB) { //ignoring settings
             comb1 = true;
         }
         if (comb1) {
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 
 /* IMPORT */
 
-    if (runningMode != RUNNINGMODE_REPORT_ONLY && runningMode != RUNNINGMODE_CLEAN_DB) {
+    if (runningMode != RunningMode::RUNNINGMODE_REPORT_ONLY && runningMode != RunningMode::RUNNINGMODE_CLEAN_DB) {
         QString internalIpFirstOctet = settings.getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();
         if (internalIpFirstOctet.isEmpty() || !elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), internalIpFirstOctet)) {
             consoleOut.outToConsole(QLatin1String("Error in internal IP address mask. Please check it in the config file."));
@@ -172,10 +172,11 @@ int main(int argc, char *argv[])
     }
 /* REPORTING */
 
-    if (runningMode != RUNNINGMODE_IMPORT_ONLY && runningMode != RUNNINGMODE_CLEAN_DB) {
+    if (runningMode != RunningMode::RUNNINGMODE_IMPORT_ONLY && runningMode != RunningMode::RUNNINGMODE_CLEAN_DB) {
         QString reportName = cmd.getReportName();
 
-        QStringList excludedUsers, includedUsers;
+        QStringList excludedUsers;
+        QStringList includedUsers;
         if (!cmd.getExcludedUserNames(excludedUsers)) {
             consoleOut.outToConsole(cmd.errorString());
             return 1;
