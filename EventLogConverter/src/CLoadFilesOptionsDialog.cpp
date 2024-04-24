@@ -17,10 +17,6 @@ CLoadFilesOptionsDialog::CLoadFilesOptionsDialog(const QStringList &logsList, QW
 
     ui->comboBox->addItems(logsList);
     ui->comboBox->setCurrentIndex(0);
-
-    m_hasHeaders = false;
-    m_isOkClicked = false;
-    m_logID = 0;
 }
 
 CLoadFilesOptionsDialog::~CLoadFilesOptionsDialog()

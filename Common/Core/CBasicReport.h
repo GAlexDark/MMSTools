@@ -39,7 +39,7 @@ protected:
 
     QString         m_errorString;
     QString         m_reportFileName;
-    pBasicDatabase  m_db;
+    pBasicDatabase  m_db = nullptr;
 };
 
 typedef CBasicReport *pBasicReport;

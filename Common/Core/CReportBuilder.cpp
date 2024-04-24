@@ -21,8 +21,11 @@
 #include "CReportManager.h"
 
 CReportBuilder::CReportBuilder()
-    : m_db(nullptr), m_report(nullptr), m_errorString("")
-{}
+{
+    m_errorString.clear();
+    m_excludedUsernamesList.clear();
+    m_includedUsernamesList.clear();
+}
 
 CReportBuilder::~CReportBuilder()
 {
@@ -124,8 +127,10 @@ CReportBuilder::generateReport()
 //----------------------------------------------------------
 
 CSVThreadReportBuilder::CSVThreadReportBuilder(QObject *parent)
-    : QThread(parent), m_errorString(""), m_retVal(false)
-{}
+    : QThread(parent)
+{
+    m_errorString.clear();
+}
 
 bool
 CSVThreadReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &reportName,

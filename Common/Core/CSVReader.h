@@ -42,19 +42,17 @@ public:
 private:
     QFile       m_file;
 
-    char        m_delimiterChar;
-    char        m_quoteChar;
+    char        m_delimiterChar = 0;
+    char        m_quoteChar = 0;
     QByteArray  m_eolChars;
 
-    QByteArray  *m_buffer;
+    QByteArray  *m_buffer = nullptr;
     QString     m_fileName;
-    bool        m_isHeaders;
+    bool        m_isHeaders = false;
 
     bool checkBOM();
     bool readLargeFile();
     bool readSmallFile();
-
-    //std::function<void(const QString&)> m_callbackFunction;
 
 protected:
     qint64 indexOfEol(const qint64 startPos, const qint64 size);
@@ -62,7 +60,7 @@ protected:
 
     QString     m_errorString;
     QStringList m_fileNames;
-    quint64     m_lineNumber;
+    quint64     m_lineNumber = 0;
 
     void setFileName(const QString &fileName) { m_fileName = fileName; }
 };
@@ -72,7 +70,6 @@ protected:
 class CMmsLogsReader: public CTextFileReader
 {
 public:
-    CMmsLogsReader();
     ~CMmsLogsReader();
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
               const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
@@ -81,7 +78,7 @@ public:
     QString insertString() const { return m_parser->insertString(); }
 
 private:
-    pBasicParser    m_parser; // don't use the 'detele' operator, the ParserManager manage resources
+    pBasicParser    m_parser = nullptr; // don't use the 'detele' operator, the ParserManager manage resources
     dataItem_t      m_data;
     bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
 
@@ -102,7 +99,7 @@ signals:
     void sendMessage(const QString &msg);
 
 private:
-    bool m_retVal;
+    bool m_retVal = false;
 
 };
 

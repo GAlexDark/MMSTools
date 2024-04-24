@@ -32,8 +32,11 @@ const QString doubleBackslash(QLatin1String("\"\""));
 const QString backslash(QLatin1String("\""));
 
 CBasicReport::CBasicReport(QObject *parent)
-    : QObject(parent), m_errorString(""), m_reportFileName(""), m_db(nullptr)
-{}
+    : QObject(parent)
+{
+    m_errorString.clear();
+    m_reportFileName.clear();
+}
 
 void
 CBasicReport::init(pBasicDatabase db, const QString &reportName)

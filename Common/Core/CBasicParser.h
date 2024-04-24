@@ -47,8 +47,8 @@ protected:
                 m_internalip,
                 m_externalip;
 
-    char        m_delimiterChar;
-    char        m_quoteChar;
+    char        m_delimiterChar = 0;
+    char        m_quoteChar = 0;
     QByteArray  m_eolChars;
 
     QString     m_errorString;

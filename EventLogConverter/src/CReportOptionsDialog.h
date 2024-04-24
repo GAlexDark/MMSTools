@@ -22,8 +22,8 @@ private slots:
 
 private:
     Ui::CReportOptionsDialog *ui;
-    quint16 m_logID;
-    bool    m_isOkClicked;
+    quint16 m_logID = 0;
+    bool    m_isOkClicked = false;
 
     QStringList m_includeUsersList;
     QStringList m_excludeUsersList;

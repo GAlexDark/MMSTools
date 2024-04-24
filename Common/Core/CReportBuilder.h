@@ -40,8 +40,8 @@ private:
     CReportBuilder(const CReportBuilder&) = delete;
     CReportBuilder& operator=(CReportBuilder&) = delete;
 
-    pBasicDatabase   m_db;
-    pBasicReport     m_report; // don't use the 'detele' operator, the ReportManager manage resources
+    pBasicDatabase   m_db = nullptr;
+    pBasicReport     m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources
     QString         m_errorString;
     QStringList     m_excludedUsernamesList,
                     m_includedUsernamesList;
@@ -65,7 +65,7 @@ signals:
 private:
     CReportBuilder  m_builder;
     QString         m_errorString;
-    bool            m_retVal;
+    bool            m_retVal = false;
 
 };
 

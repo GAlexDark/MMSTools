@@ -23,9 +23,9 @@ private slots:
 private:
     Ui::CLoadFilesOptionsDialog *ui;
 
-    bool    m_hasHeaders;
-    bool    m_isOkClicked;
-    quint16 m_logID;
+    bool    m_hasHeaders = false;
+    bool    m_isOkClicked = false;
+    quint16 m_logID = 0;
 };
 
 #endif // CLOADFILESOPTIONSDIALOG_H

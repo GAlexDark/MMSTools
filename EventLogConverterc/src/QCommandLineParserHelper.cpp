@@ -37,10 +37,9 @@ QCommandLineParserHelper::checkData(const QStringList &data)
 }
 
 QCommandLineParserHelper::QCommandLineParserHelper()
-    : m_isPath(false), m_isFiles(false), m_isReportName(false), m_isExcluded(false), m_isIncluded(false),
-    m_isImportOnly(false), m_isReportOnly(false), m_isCleanDbOnly(false)
 {
     m_filesList.clear();
+    m_errorString.clear();
 }
 
 bool

@@ -14,7 +14,7 @@ CReportOptionsDialog::clearLists()
 
 CReportOptionsDialog::CReportOptionsDialog(const quint16 logID, const QStringList &logsList, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::CReportOptionsDialog)
+    , ui(new Ui::CReportOptionsDialog), m_logID(logID)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(":/img/data-transformation.png"));
@@ -25,10 +25,8 @@ CReportOptionsDialog::CReportOptionsDialog(const quint16 logID, const QStringLis
     Q_ASSERT_X (retVal, "OptionsDialog::OptionsDialog", "doOkClicked() connection is not established");
 
     ui->comboBox->addItems(logsList);
-    ui->comboBox->setCurrentIndex(logID);
+    ui->comboBox->setCurrentIndex(m_logID);
 
-    m_logID = logID;
-    m_isOkClicked = false;
     clearLists();
 }
 
