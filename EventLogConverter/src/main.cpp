@@ -31,7 +31,7 @@ void
 initTranslation(QTranslator *translator, QApplication *qa, const QStringList &list, const QString &fileName)
 {
 #ifdef Q_OS_LINUX
-    QString locales = setlocale(LC_ALL, NULL);
+    QString locales = setlocale(LC_ALL, nullptr);
     if (locales.contains(QLatin1String("ru_RU"))) {
         QLocale::setDefault(QLocale::Russian);
     } else {

@@ -43,8 +43,8 @@ private:
     pBasicDatabase   m_db = nullptr;
     pBasicReport     m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources
     QString         m_errorString;
-    QStringList     m_excludedUsernamesList,
-                    m_includedUsernamesList;
+    QStringList     m_excludedUsernamesList;
+    QStringList     m_includedUsernamesList;
 };
 
 //-----------------------------------------------------------------

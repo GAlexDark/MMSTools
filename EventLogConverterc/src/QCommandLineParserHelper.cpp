@@ -149,15 +149,15 @@ QCommandLineParserHelper::showHelpAndExit()
 RunningMode
 QCommandLineParserHelper::getRunningMode() const
 {
-    RunningMode retVal = RUNNINGMODE_DEFAULT;
+    RunningMode retVal = RunningMode::RUNNINGMODE_DEFAULT;
     if (m_isCleanDbOnly) {
-        retVal = RUNNINGMODE_CLEAN_DB;
+        retVal = RunningMode::RUNNINGMODE_CLEAN_DB;
     } else {
         if (m_isImportOnly) {
-            retVal = RUNNINGMODE_IMPORT_ONLY;
+            retVal = RunningMode::RUNNINGMODE_IMPORT_ONLY;
         } else {
             if (m_isReportOnly) {
-                retVal = RUNNINGMODE_REPORT_ONLY;
+                retVal = RunningMode::RUNNINGMODE_REPORT_ONLY;
             }
         }
     }
@@ -171,10 +171,10 @@ QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
     if (m_isFiles) {
         fileList.append(m_parser.values("files"));
         QFileInfo fi;
-        for (qsizetype i = 0; i < fileList.size(); ++i) {
-            fi.setFile(fileList.at(i));
+        for (QString &item : fileList) {
+            fi.setFile(item);
             if (fi.exists() && fi.isFile()) {
-                fileList[i] = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
+                item = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             } else {
                 m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
                 retVal = false;
