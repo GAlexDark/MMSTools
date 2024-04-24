@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
-    QString appName = QCoreApplication::applicationName();
-    QString appPath = a.applicationDirPath();
+    QString appName(QCoreApplication::applicationName());
+    QString appPath(a.applicationDirPath());
 
     CConsoleOutput consoleOut;
     QString description = QStringLiteral("MMS Event Log Conversion Utility Version %1\nCopyright (C) 2023 Oleksii Gaienko, %3\n\n");
@@ -69,9 +69,8 @@ int main(int argc, char *argv[])
 #else
     QString fileName = QLatin1String("%1.conf").arg(appName);
 #endif
-    QString errorString;
-    if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false, errorString)) {
-        consoleOut.outToConsole(QLatin1String("The settings class cannot be initialized: %1."));
+    if (!CElcConsoleAppSettings::instance().init(appPath, iniFile, false)) {
+        consoleOut.outToConsole(QLatin1String("The settings class cannot be initialized."));
         return 1;
     }
     CParserManager::instance().init();
@@ -84,6 +83,7 @@ int main(int argc, char *argv[])
     }
     elcUtils::expandEnvironmentStrings(dbName);
     QString dbPath = QFileInfo(dbName).absolutePath();
+    QString errorString;
     if (!elcUtils::mkPath(dbPath, errorString)) {
         consoleOut.outToConsole(QStringLiteral("Cannot create folder: %1\nDetails: %2").arg(dbPath, errorString));
         return 1;

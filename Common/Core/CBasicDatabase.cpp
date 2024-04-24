@@ -116,11 +116,10 @@ CBasicDatabase::open()
     if (!m_db.isOpen()) {
         retVal = m_db.open();
         if (retVal) {
-            try {
-                m_SQLRes = new QSqlQuery(m_db);
-                Q_CHECK_PTR(m_SQLRes);
-            } catch (const std::bad_alloc &e) {
-                m_errorString = QStringLiteral("Fatal SQL Query Error: %1").arg(e.what());
+            m_SQLRes.reset(new QSqlQuery(m_db));
+            Q_CHECK_PTR(m_SQLRes);
+            if (!m_SQLRes) {
+                m_errorString = QStringLiteral("Fatal SQL Query Error.");
                 retVal = false;
             }
         } else {
@@ -137,8 +136,6 @@ CBasicDatabase::close()
     if (m_db.isValid() && m_db.isOpen()) {
         if (m_SQLRes && m_SQLRes->isActive()) {
             m_SQLRes->finish();
-            delete m_SQLRes;
-            m_SQLRes = nullptr;
         }
         commitTransaction();
         m_db.close();

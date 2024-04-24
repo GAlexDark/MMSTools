@@ -15,14 +15,12 @@
 *
 ****************************************************************************/
 
-
 #ifndef CREPORTBUILDER_H
 #define CREPORTBUILDER_H
 
 #include <QThread>
 #include <QString>
 #include <QStringList>
-
 #include "CBasicDatabase.h"
 #include "CBasicReport.h"
 
@@ -40,8 +38,8 @@ private:
     CReportBuilder(const CReportBuilder&) = delete;
     CReportBuilder& operator=(CReportBuilder&) = delete;
 
-    pBasicDatabase   m_db = nullptr;
-    pBasicReport     m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources
+    CBasicDatabase  m_db;
+    pBasicReport    m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources
     QString         m_errorString;
     QStringList     m_excludedUsernamesList;
     QStringList     m_includedUsernamesList;
@@ -55,7 +53,7 @@ public:
     explicit CSVThreadReportBuilder(QObject *parent = nullptr);
     bool init(quint16 logID, const QString &dbFileName, const QString &reportName,
               const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList);
-    void run();
+    void run() override;
     QString errorString() const { return m_errorString; }
     bool getStatus() const { return m_retVal; }
 

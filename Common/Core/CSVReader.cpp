@@ -16,7 +16,7 @@
 ****************************************************************************/
 
 #include "CSVReader.h"
-
+#include <QScopedPointer>
 #ifdef QT_DEBUG
   #include <QElapsedTimer>
   #include "Debug.h"
@@ -241,15 +241,10 @@ CTextFileReader::CTextFileReader()
 CTextFileReader::~CTextFileReader()
 {
     m_eolChars.clear();
-
-    delete m_buffer;
-    m_buffer = nullptr;
-
+    m_fileNames.clear();
     if (m_file.isOpen()) {
         m_file.close();
     }
-
-    m_fileNames.clear();
 }
 
 bool
@@ -263,16 +258,11 @@ CTextFileReader::init(bool dataHasHeaders, const mms::ffs_t &ffs)
     Q_ASSERT(!m_eolChars.isEmpty());
 
     bool retVal = true;
-    delete m_buffer;
-
-    try {
-        m_buffer = new QByteArray(defMaxFileSize, 0);
-        Q_CHECK_PTR(m_buffer);
-    } catch (const std::bad_alloc &e) {
-        m_errorString = e.what();
+    m_buffer.reset(new QByteArray(defMaxFileSize, 0));
+    Q_CHECK_PTR(m_buffer);
+    if (!m_buffer) {
         retVal = false;
     }
-
     return retVal;
 }
 

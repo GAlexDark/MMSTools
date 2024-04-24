@@ -46,7 +46,7 @@ private:
     char        m_quoteChar = 0;
     QByteArray  m_eolChars;
 
-    QByteArray  *m_buffer = nullptr;
+    QScopedPointer<QByteArray> m_buffer;
     QString     m_fileName;
     bool        m_isHeaders = false;
 

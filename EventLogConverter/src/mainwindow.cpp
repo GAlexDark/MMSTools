@@ -370,7 +370,7 @@ MainWindow::generateReportClick()
     QCoreApplication::processEvents();
 
     QStringList includedUsers, excludedUsers;
-    CReportManager &reportManager = CReportManager::instance();
+    const CReportManager &reportManager = CReportManager::instance();
     QStringList reportsList = reportManager.getVisibleReportsNames();
     quint16 logId = reportManager.prettySelector(m_logId);
     if (showReportOptionsDialog(reportsList, logId, includedUsers, excludedUsers)) {
