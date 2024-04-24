@@ -66,17 +66,17 @@ private:
     };
     userFailedLogonDetails_t m_prevValueUFLD;
 
-    QDateTime   m_timestamp,
-                m_timestamptz;
-    QString     m_header,
-                m_details,
-                m_timestampISO8601,
-                m_format;
-    QString     m_username,
-                m_username1,
-                m_authType,
-                m_requestID,
-                m_type;
+    QDateTime   m_timestamp;
+    QDateTime   m_timestamptz;
+    QString     m_header;
+    QString     m_details;
+    QString     m_timestampISO8601;
+    QString     m_format;
+    QString     m_username;
+    QString     m_username1;
+    QString     m_authType;
+    QString     m_requestID;
+    QString     m_type;
 
     bool parseUserSuccessLogonDetails();
     bool parseUserFailedLogonDetails();

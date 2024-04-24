@@ -54,14 +54,14 @@ private:
 
     QDateTime   m_timestamp;
 
-    QString     m_header,
-                m_status,
-                m_method,
-                m_username,
-                m_role,
-                m_companyname,
-                m_attributes,
-                m_username1;
+    QString     m_header;
+    QString     m_status;
+    QString     m_method;
+    QString     m_username;
+    QString     m_role;
+    QString     m_companyname;
+    QString     m_attributes;
+    QString     m_username1;
 
 };
 
