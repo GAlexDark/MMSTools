@@ -21,6 +21,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QFile>
+#include <QScopedPointer>
 
 #include "MMSTypes.h"
 
@@ -38,8 +39,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QLabel         *m_state;
-    QLabel         *m_mode; // RDS | endpoint (single user)
+    QScopedPointer<QLabel> m_state;
+    QScopedPointer<QLabel> m_mode; // RDS | endpoint (single user)
     QString         m_lastDir;
     QString         m_dbName;
     QStringList     m_fileList;

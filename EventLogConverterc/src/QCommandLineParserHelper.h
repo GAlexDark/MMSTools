@@ -30,7 +30,7 @@ public:
 
     bool parseCmdArgs(const QCoreApplication &app);
 
-    void showHelpAndExit();
+    [[noreturn]] void showHelpAndExit();
     RunningMode getRunningMode() const;
 
     bool getDataFilesList(QStringList &fileList);

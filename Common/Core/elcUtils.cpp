@@ -82,7 +82,7 @@ elcUtils::parseValuesList(QString data)
             data.replace(comma, dotComma);
             retVal.append(data.split(dotComma));
         }
-        retVal.removeAll(QString(""));
+        retVal.removeAll(QString());
         retVal.removeDuplicates();
     } else {
         if (!data.isEmpty()) {

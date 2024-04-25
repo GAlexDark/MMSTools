@@ -17,9 +17,9 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScopedPointer>
 
 #include "CElcGuiAppSettings.h"
 #include "MMSTypes.h"
@@ -78,17 +78,16 @@ MainWindow::showReportOptionsDialog(const QStringList &logsList, quint16 &logID,
 {
     bool retVal = true;
     m_errorString.clear();
-    try {
-        CReportOptionsDialog *wnd = new CReportOptionsDialog(logID, logsList, this);
+
+    QScopedPointer<CReportOptionsDialog> wnd(new CReportOptionsDialog(logID, logsList, this));
+    if (wnd) {
         wnd->exec();
         retVal = wnd->getOptions(logID, includeUsersList, excludeUsersList);
-        delete wnd;
-    } catch (const std::bad_alloc &e) {
+    } else {
         retVal = false;
-        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        m_errorString = QObject::tr("Unable to open advanced report filtering settings window.");
         QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
-
     return retVal;
 }
 
@@ -97,17 +96,16 @@ MainWindow::showReadFilesOptionsDialog(const QStringList &logsList, quint16 &log
 {
     bool retVal = true;
     m_errorString.clear();
-    try {
-        CLoadFilesOptionsDialog *wnd = new CLoadFilesOptionsDialog(logsList, this);
+
+    QScopedPointer<CLoadFilesOptionsDialog> wnd(new CLoadFilesOptionsDialog(logsList, this));
+    if (wnd) {
         wnd->exec();
         retVal = wnd->getOptions(logID, hasHeaders);
-        delete wnd;
-    } catch (const std::bad_alloc &e) {
+    } else {
         retVal = false;
-        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        m_errorString = QObject::tr("Unable to open the advanced file reading settings window.");
         QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
-
     return retVal;
 }
 
@@ -118,13 +116,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(":/img/data-transformation.png"));
 
-    m_state = new QLabel(this);
+    m_state.reset(new QLabel(this));
     m_state->setMinimumWidth(250);
-    ui->statusbar->addWidget(m_state);
+    ui->statusbar->addWidget(m_state.data());
 
-    m_mode = new QLabel(this);
+    m_mode.reset(new QLabel(this));
     m_mode->setMinimumWidth(250);
-    ui->statusbar->addWidget(m_mode);
+    ui->statusbar->addWidget(m_mode.data());
 
     bool retVal = connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
     Q_ASSERT_X(retVal, "connect", "actionAbout_program connection is not established");
@@ -172,7 +170,6 @@ MainWindow::~MainWindow()
         settings.setMain(QLatin1String("HISTORY"), QLatin1String("last_dir"), m_lastDir);
     }
 
-    delete m_state;
     delete ui;
 }
 

@@ -140,7 +140,7 @@ QStringList QCommandLineParserHelper::includedUsernames() const
     return retVal;
 }
 
-void
+[[noreturn]] void
 QCommandLineParserHelper::showHelpAndExit()
 {
     m_parser.showHelp(0);

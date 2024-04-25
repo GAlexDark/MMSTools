@@ -4,6 +4,7 @@
 #include <QSystemSemaphore>
 #include <QSharedMemory>
 #include <QString>
+#include <QScopedPointer>
 
 const int segSize = 128;
 
@@ -20,8 +21,8 @@ private:
     CSingleApplication& operator=(CSingleApplication&) = delete;
 
     QString              m_id;
-    QSystemSemaphore    *m_semaphore = nullptr;
-    QSharedMemory       *m_sharedMemory = nullptr;
+    QScopedPointer<QSystemSemaphore> m_semaphore;
+    QScopedPointer<QSharedMemory> m_sharedMemory;
 };
 
 #endif // CSingleApplication_H

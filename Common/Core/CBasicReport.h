@@ -25,7 +25,6 @@ class CBasicReport : public QObject
 {
 public:
     explicit CBasicReport(QObject *parent = nullptr);
-    virtual ~CBasicReport() = default;
     void init(pBasicDatabase db, const QString &reportName);
     virtual bool generateReport(const QString &arguments) = 0;
     QString errorString() const { return m_errorString; }

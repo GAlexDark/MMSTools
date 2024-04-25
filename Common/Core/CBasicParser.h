@@ -26,7 +26,6 @@ class CBasicParser : public QObject
 {
 public:
     explicit CBasicParser(QObject *parent = nullptr);
-    virtual ~CBasicParser() = default;
     void init(const QString &internalIpFirstOctet);
     QString errorString() const { return m_errorString; }
     virtual QString insertString() const = 0;

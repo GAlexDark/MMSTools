@@ -16,23 +16,14 @@ http://berenger.eu/blog/c-qt-singleapplication-single-app-instance/
 CSingleApplication::CSingleApplication(const QString &id)
     : m_id(id)
 {
-    m_semaphore = new QSystemSemaphore(m_id + semaphore_prefix, 1);
+    m_semaphore.reset(new QSystemSemaphore(m_id + semaphore_prefix, 1));
     Q_CHECK_PTR(m_semaphore);
 }
 
 CSingleApplication::~CSingleApplication()
 {
-    if (m_sharedMemory != nullptr) {
-        if (m_sharedMemory->isAttached()) {
-            m_sharedMemory->detach();
-        }
-        delete m_sharedMemory;
-        m_sharedMemory = nullptr;
-    }
-
-    if (m_semaphore != nullptr) {
-        delete m_semaphore;
-        m_semaphore = nullptr;
+    if (m_sharedMemory && m_sharedMemory->isAttached()) {
+        m_sharedMemory->detach();
     }
 }
 
@@ -66,9 +57,9 @@ CSingleApplication::isRunning()
     }
 #endif
 
-    if (m_sharedMemory == nullptr) {
-        m_sharedMemory = new QSharedMemory(m_id + sharedMemory_prefix);
-        Q_CHECK_PTR(m_semaphore);
+    if (!m_sharedMemory) {
+        m_sharedMemory.reset(new QSharedMemory(m_id + sharedMemory_prefix));
+        Q_CHECK_PTR(m_sharedMemory);
     }
 
     if(m_sharedMemory->attach()) {
