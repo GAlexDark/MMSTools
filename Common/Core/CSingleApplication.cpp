@@ -22,10 +22,8 @@ CSingleApplication::CSingleApplication(const QString &id)
 
 CSingleApplication::~CSingleApplication()
 {
-    if (m_sharedMemory != nullptr) {
-        if (m_sharedMemory->isAttached()) {
-            m_sharedMemory->detach();
-        }
+    if (m_sharedMemory && m_sharedMemory->isAttached()) {
+        m_sharedMemory->detach();
     }
 }
 
