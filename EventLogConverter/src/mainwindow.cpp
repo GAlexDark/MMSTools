@@ -17,9 +17,9 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScopedPointer>
 
 #include "CElcGuiAppSettings.h"
 #include "MMSTypes.h"
@@ -78,17 +78,16 @@ MainWindow::showReportOptionsDialog(const QStringList &logsList, quint16 &logID,
 {
     bool retVal = true;
     m_errorString.clear();
-    try {
-        CReportOptionsDialog *wnd = new CReportOptionsDialog(logID, logsList, this);
+
+    QScopedPointer<CReportOptionsDialog> wnd(new CReportOptionsDialog(logID, logsList, this));
+    if (wnd) {
         wnd->exec();
         retVal = wnd->getOptions(logID, includeUsersList, excludeUsersList);
-        delete wnd;
-    } catch (const std::bad_alloc &e) {
+    } else {
         retVal = false;
-        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        m_errorString = QObject::tr("Unable to open advanced report filtering settings window.");
         QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
-
     return retVal;
 }
 
@@ -97,17 +96,16 @@ MainWindow::showReadFilesOptionsDialog(const QStringList &logsList, quint16 &log
 {
     bool retVal = true;
     m_errorString.clear();
-    try {
-        CLoadFilesOptionsDialog *wnd = new CLoadFilesOptionsDialog(logsList, this);
+
+    QScopedPointer<CLoadFilesOptionsDialog> wnd(new CLoadFilesOptionsDialog(logsList, this));
+    if (wnd) {
         wnd->exec();
         retVal = wnd->getOptions(logID, hasHeaders);
-        delete wnd;
-    } catch (const std::bad_alloc &e) {
+    } else {
         retVal = false;
-        m_errorString = QObject::tr("Critical error: %1").arg(e.what());
+        m_errorString = QObject::tr("Unable to open the advanced file reading settings window.");
         QMessageBox::critical(nullptr, QObject::tr("Error"), m_errorString, QMessageBox::Ok);
     }
-
     return retVal;
 }
 
