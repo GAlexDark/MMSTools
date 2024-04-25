@@ -34,8 +34,15 @@ CEventLogReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
-        int colTimestampISO8601 = 1, colTimestamp = 2, colExternalIP = 3, colUsername = 4, colType = 5, colDetails = 6,
-            colAuthType = 7, colInternalIP = 8, colRequestid = 9;
+        int colTimestampISO8601 = 1;
+        int colTimestamp = 2;
+        int colExternalIP = 3;
+        int colUsername = 4;
+        int colType = 5;
+        int colDetails = 6;
+        int colAuthType = 7;
+        int colInternalIP = 8;
+        int colRequestid = 9;
 
         QXlsx::Document xlsxReport;
         // Add header
