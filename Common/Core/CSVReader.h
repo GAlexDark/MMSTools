@@ -44,10 +44,10 @@ private:
 
     char        m_delimiterChar = 0;
     char        m_quoteChar = 0;
-    QByteArray  m_eolChars;
+    qint64      m_eolCharsCount = 0;
 
     QScopedPointer<QByteArray> m_buffer;
-    QString     m_fileName;
+    //QString     m_fileName;
     bool        m_isHeaders = false;
 
     bool checkBOM();
@@ -59,6 +59,7 @@ protected:
     virtual bool convertData(const QString &line) = 0;
 
     QString     m_errorString;
+    QString     m_fileName;
     QStringList m_fileNames;
     quint64     m_lineNumber = 0;
 
