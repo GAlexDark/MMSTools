@@ -35,7 +35,7 @@ class CBasicDatabase
 public:
     explicit CBasicDatabase(const QString &connectionName);
     CBasicDatabase();
-    virtual ~CBasicDatabase();
+    ~CBasicDatabase();
 
     QString getConnectionName() const { return m_connectionName; }
     CBasicDatabase *getDBinstance() { return this; }
