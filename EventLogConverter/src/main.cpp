@@ -28,7 +28,7 @@
 #include "CParserManager.h"
 
 void
-initTranslation(QTranslator *translator, QApplication *qa, const QStringList &list, const QString &fileName)
+initTranslation(QTranslator *translator, const QApplication *qa, const QStringList &list, const QString &fileName)
 {
 #ifdef Q_OS_LINUX
     QString locales = setlocale(LC_ALL, nullptr);
