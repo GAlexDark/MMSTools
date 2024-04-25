@@ -50,14 +50,12 @@ CReportManager::init(bool usePrettySelector)
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicReport>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
-            if (ptr != nullptr) {
-                quint16 id = ptr->reportID();
-                m_ids.append(id);
-                m_visibleReportsNames[id - 1] = ptr->visibleReportName();
+            quint16 id = ptr->reportID();
+            m_ids.append(id);
+            m_visibleReportsNames[id - 1] = ptr->visibleReportName();
 
-                type.destroy(ptr);
-                ptr = nullptr;
-            }
+            type.destroy(ptr);
+            ptr = nullptr;
         }
     }
 

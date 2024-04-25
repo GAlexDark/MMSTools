@@ -50,16 +50,14 @@ CParserManager::init()
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicParser>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
-            if (ptr != nullptr) {
-                quint16 id = ptr->parserID();
-                m_ids.append(id);
-                m_visibleLogsNames[id - 1] = ptr->visibleLogName();
-                m_tablesList[id - 1] = ptr->tableName();
-                m_createTableRequestList[id - 1] = ptr->createTable();
+            quint16 id = ptr->parserID();
+            m_ids.append(id);
+            m_visibleLogsNames[id - 1] = ptr->visibleLogName();
+            m_tablesList[id - 1] = ptr->tableName();
+            m_createTableRequestList[id - 1] = ptr->createTable();
 
-                type.destroy(ptr);
-                ptr = nullptr;
-            }
+            type.destroy(ptr);
+            ptr = nullptr;
         }
     }
 }
