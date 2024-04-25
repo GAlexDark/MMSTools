@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include "elcUtils.h"
-
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
@@ -24,7 +23,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QCoreApplication>
-#include <QPointer>
+#include <QScopedPointer>
 
 #include "CBasicDatabase.h"
 
@@ -169,7 +168,7 @@ elcUtils::waitForEndThread(QThread *obj, unsigned long time)
 QString
 elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
 {
-    LPWSTR buf = nullptr;
+    wchar_t *buf = nullptr;
     QString retVal;
     quint32 messageFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER |
                            FORMAT_MESSAGE_FROM_SYSTEM |
@@ -178,7 +177,7 @@ elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
                                 NULL,
                                 errorCode,
                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                reinterpret_cast<LPWSTR>(&buf),
+                                reinterpret_cast<wchar_t*>(&buf),
                                 0, NULL);
     if (len > 0) {
         retVal = QString::fromWCharArray(buf);
@@ -236,16 +235,14 @@ expandEnvStrings_windows(QString &path)
     SetLastErrorEx(ERROR_SUCCESS, 0);
     DWORD bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), NULL, 0);
     if (bufSize != 0) {
-        wchar_t *fullPath = new wchar_t [bufSize];
+        QScopedPointer<wchar_t> fullPath(new wchar_t [bufSize]);
         Q_CHECK_PTR(fullPath);
 
-        bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), fullPath, bufSize);
+        bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), fullPath.data(), bufSize);
         if (bufSize != 0) {
-            path = QString::fromWCharArray(fullPath).trimmed();
+            path = QString::fromWCharArray(fullPath.data()).trimmed();
             path = QDir::fromNativeSeparators(path);
         }
-        delete[] fullPath;
-        fullPath = nullptr;
     }
 }
 #endif

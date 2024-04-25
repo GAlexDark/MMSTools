@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     QString appPath(a.applicationDirPath());
 
     CConsoleOutput consoleOut;
-    QString description = QStringLiteral("MMS Event Log Conversion Utility Version %1\nCopyright (C) 2023 Oleksii Gaienko, %3\n\n");
+    QString description(QStringLiteral("MMS Event Log Conversion Utility Version %1\nCopyright (C) 2023 Oleksii Gaienko, %3\n\n"));
     description.append(QStringLiteral("This program uses Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
     consoleOut.outToConsole(description.arg(a.applicationVersion(), QT_VER, CONTACT));
 
