@@ -46,33 +46,23 @@ CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size)
 {
     qint64 retVal = -1;
     qint64 index = startPos;
-    qint64 endPos = size - m_eolChars.length();
+    qint64 eolCharsCount = m_eolChars.length();
+    qint64 endPos = size - eolCharsCount;
     bool isQuoted = false;
+    bool isSecondPart = false;
 
     char *d = m_buffer->data();
     d += index;
 
-    char *ch;
     while (index <= endPos) {
         if (*d == m_quoteChar) {
             isQuoted = !isQuoted;
         } else {
-            if (*d == '\n') {
-                if (!isQuoted) {
-                    retVal = index;
-                    break;
-                }
+            if ((*d == '\n') && !isQuoted) {
+                retVal = isSecondPart ? index - 1 : index;
+                break;
             } else {
-                if (*d == '\r') {
-                    ch = d;
-                    ++ch;
-                    if (*ch == '\n') {
-                        if (!isQuoted) {
-                            retVal = index;
-                            break;
-                        }
-                    }
-                }
+                isSecondPart = (eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
             }
         }
         ++d;

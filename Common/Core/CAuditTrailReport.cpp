@@ -34,9 +34,14 @@ CAuditTrailReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
-        int colTimestamp = 1,
-            colUsername = 2, colRole = 3, colCompanyname = 4,
-            colMethod = 5, colStatus = 6, colAttributes = 7, colInternalIP = 8;
+        int colTimestamp = 1;
+        int colUsername = 2;
+        int colRole = 3;
+        int colCompanyname = 4;
+        int colMethod = 5;
+        int colStatus = 6;
+        int colAttributes = 7;
+        int colInternalIP = 8;
 
         QXlsx::Document xlsxReport;
         // Add header
