@@ -116,13 +116,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(":/img/data-transformation.png"));
 
-    m_state = new QLabel(this);
+    m_state.reset(new QLabel(this));
     m_state->setMinimumWidth(250);
-    ui->statusbar->addWidget(m_state);
+    ui->statusbar->addWidget(m_state.data());
 
-    m_mode = new QLabel(this);
+    m_mode.reset(new QLabel(this));
     m_mode->setMinimumWidth(250);
-    ui->statusbar->addWidget(m_mode);
+    ui->statusbar->addWidget(m_mode.data());
 
     bool retVal = connect(ui->actionAbout_program, SIGNAL(triggered(bool)), this, SLOT(onAboutProgram()));
     Q_ASSERT_X(retVal, "connect", "actionAbout_program connection is not established");
@@ -170,7 +170,6 @@ MainWindow::~MainWindow()
         settings.setMain(QLatin1String("HISTORY"), QLatin1String("last_dir"), m_lastDir);
     }
 
-    delete m_state;
     delete ui;
 }
 
