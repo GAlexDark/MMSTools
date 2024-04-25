@@ -38,7 +38,6 @@ public:
         SetConsoleOutputCP(65001);
 #endif
     }
-    virtual ~CConsoleOutput() = default;
     void
     outToConsole(const QString &msg) const
     {
