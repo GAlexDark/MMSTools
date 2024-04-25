@@ -111,6 +111,8 @@ CAuditTrailParser::parse(const QString& line)
         if (!parseAttributesDetails()) {
             m_username1.clear();
         }
+    } else {
+        m_errorString = QStringLiteral("Wrong header.\nDetails: %1").arg(line);
     }
     return retVal;
 }
