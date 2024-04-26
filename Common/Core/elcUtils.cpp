@@ -169,8 +169,8 @@ QString
 elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
 {
     wchar_t *buf = nullptr;
-    QString retVal;
-    quint32 messageFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    QString retVal(QStringLiteral("Unknown Windows API error: %1").arg(errorCode));
+    const quint32 messageFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER |
                            FORMAT_MESSAGE_FROM_SYSTEM |
                            FORMAT_MESSAGE_IGNORE_INSERTS;
     quint32 len = FormatMessage(messageFlags,
@@ -182,8 +182,6 @@ elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
     if (len > 0) {
         retVal = QString::fromWCharArray(buf);
         LocalFree(buf);
-    } else {
-        retVal = QStringLiteral("Unknown Windows API error: %1").arg(errorCode);
     }
     return retVal;
 }

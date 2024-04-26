@@ -36,7 +36,7 @@ protected:
 
 private:
     QScopedPointer<QSettings> m_settings;
-    bool        m_isRdsEnabled = false;
+    bool                      m_isRdsEnabled = false;
 };
 
 #endif // CBASICSETTINGS_H
