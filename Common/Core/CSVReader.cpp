@@ -72,8 +72,24 @@ CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size)
 }
 
 bool
-CTextFileReader::readSmallFile()
+CTextFileReader::readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &prevPosition)
 {
+    bool retVal = true;
+    qint64 nextPosition = indexOfEol(prevPosition, bytesRead);
+    if (nextPosition != -1) {
+        QString line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
+        retVal = checkHeader(line);
+        if (!retVal) {
+            m_errorString = QStringLiteral("Error in column names: %1").arg(line);
+        }
+        prevPosition = nextPosition + m_eolCharsCount;
+        m_lineNumber++;
+    } else {
+        isEOF = true;
+    }
+    return retVal;
+}
+bool CTextFileReader::readSmallFile() {
     // "284 590 milliseconds" 4,74316667 minutes
     // "317 529 milliseconds" 5,29215 minutes
     // "292 992 milliseconds" 4,8832 minutes
@@ -86,10 +102,10 @@ CTextFileReader::readSmallFile()
     // "134 293 milliseconds" 2.2382 minutes
     // "120 903 milliseconds" 2,01505 minutes
 
-/*
- * If you know that pos and len cannot be out of bounds,
- * use sliced() instead in new code, because it is faster.
- */
+    /*
+   * If you know that pos and len cannot be out of bounds,
+   * use sliced() instead in new code, because it is faster.
+   */
 
     bool retVal = true;
     qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
@@ -104,16 +120,9 @@ CTextFileReader::readSmallFile()
             qint64 nextPosition;
             m_lineNumber = 0;
 
-            //If data has header
+            // If data has header
             if (m_isHeaders) {
-                nextPosition = indexOfEol(prevPosition, bytesRead);
-                if (nextPosition != -1) {
-                    line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
-                    prevPosition = nextPosition + m_eolCharsCount;
-                    m_lineNumber++;
-                } else {
-                    isEOF = true;
-                }
+                retVal = readColumnNames(bytesRead, isEOF, prevPosition);
             }
 
             while (!isEOF && retVal) {
@@ -169,16 +178,8 @@ CTextFileReader::readLargeFile()
             m_lineNumber = 0;
 
             if (m_isHeaders) {
-                nextPosition = indexOfEol(prevPosition, bytesRead);
-                if (nextPosition != -1) {
-                    line.clear();
-                    line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
-                    prevPosition = nextPosition + m_eolCharsCount;
-                    m_lineNumber++;
-                } else {
-                    isEOF = true;
-                }
-            } //m_isHeaders
+                retVal = readColumnNames(bytesRead, isEOF, prevPosition);
+            }
 
             while (!isEOF && retVal) {
                 do {
@@ -355,14 +356,23 @@ CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHa
             retVal = initDB(dbFileName, pragmaList);
         }
     } else {
-        m_errorString = QStringLiteral("The parser not found");
+        m_errorString = QStringLiteral("The parser with same ID not found.");
     }
 
     return retVal;
 }
 
-bool CMmsLogsReader::convertData(const QString &line)
+bool
+CMmsLogsReader::checkHeader(const QString &line)
 {
+    Q_CHECK_PTR(m_parser);
+    return m_parser->checkHeader(line);
+}
+
+bool
+CMmsLogsReader::convertData(const QString &line)
+{
+    Q_CHECK_PTR(m_parser);
     bool retVal = m_parser->parse(line);
     if (retVal) {
         m_parser->convertData(m_data);
