@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
         quint16 logID = 1;
         retVal = loader.init(logID, dbName, hasHeaders, internalIpFirstOctet, &pragmaList);
         if (retVal) {
-            loader.setFileName(files);
+            loader.setFileNames(files);
             loader.start();
 
             consoleOut.outToConsole(QLatin1String("wait..."));

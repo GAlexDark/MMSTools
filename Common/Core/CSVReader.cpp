@@ -120,7 +120,6 @@ bool CTextFileReader::readSmallFile() {
             qint64 nextPosition;
             m_lineNumber = 0;
 
-            // If data has header
             if (m_isHeaders) {
                 retVal = readColumnNames(bytesRead, isEOF, prevPosition);
             }
@@ -224,12 +223,10 @@ CTextFileReader::CTextFileReader()
 {
     m_fileName.clear();
     m_errorString.clear();
-    m_fileNames.clear();
 }
 
 CTextFileReader::~CTextFileReader()
 {
-    m_fileNames.clear();
     if (m_file.isOpen()) {
         m_file.close();
     }
@@ -329,7 +326,7 @@ CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragm
     }
 #endif
     if (!retVal) {
-        m_errorString = m_db.errorString();
+        setErrorString(m_db.errorString());
         m_db.close();
     }
     return retVal;
@@ -356,7 +353,7 @@ CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHa
             retVal = initDB(dbFileName, pragmaList);
         }
     } else {
-        m_errorString = QStringLiteral("The parser with same ID not found.");
+        setErrorString(QStringLiteral("The parser with same ID not found."));
     }
 
     return retVal;
@@ -379,10 +376,10 @@ CMmsLogsReader::convertData(const QString &line)
         retVal = m_db.execRequest(&m_data);
         m_data.clear();
         if (!retVal) {
-            m_errorString = m_db.errorString();
+            setErrorString(m_db.errorString());
         }
     } else {
-        m_errorString = QStringLiteral("Parsing error at line number %1: %2").arg(m_lineNumber).arg(line);
+        setErrorString(QStringLiteral("Parsing error at line number %1: %2").arg(getLineNumber()).arg(line));
     }
     return retVal;
 }
@@ -391,12 +388,14 @@ CMmsLogsReader::convertData(const QString &line)
 
 CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
     : QThread(parent)
-{}
+{
+    m_fileNames.clear();
+}
 
 void
 CMmsLogsThreadReader::run()
 {
-    m_errorString.clear();
+    clearErrorString();
 #ifdef QT_DEBUG
     QElapsedTimer timer;
     timer.start();
@@ -414,7 +413,7 @@ CMmsLogsThreadReader::run()
                 m_retVal = m_db.prepareRequest(insertString());
             }
             if (!m_retVal) {
-                m_errorString = m_db.errorString();
+                setErrorString(m_db.errorString());
             } else {
                 fileName = m_fileNames.at(i);
                 emit sendMessage( tr("Reading of the file %1 has started.").arg(fileName) );
@@ -423,7 +422,7 @@ CMmsLogsThreadReader::run()
                 if (m_retVal) {
                     m_retVal = m_db.commitTransaction();
                     if (!m_retVal) {
-                        m_errorString = m_db.errorString();
+                        setErrorString(m_db.errorString());
                     }
                 }
             }
