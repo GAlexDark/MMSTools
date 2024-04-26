@@ -33,8 +33,6 @@ class CTextFileReader
 public:
     explicit CTextFileReader();
     virtual ~CTextFileReader();
-
-    void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
     bool read();
     QString errorString() const { return m_errorString; }
 
@@ -49,6 +47,7 @@ private:
     QString     m_fileName;
     bool        m_isHeaders = false;
     QString     m_errorString;
+    quint64     m_lineNumber = 0;
 
     bool checkBOM();
     bool readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &prevPosition);
@@ -63,9 +62,7 @@ protected:
     void setFileName(const QString &fileName) { m_fileName = fileName; }
     void setErrorString(const QString &errorString) { m_errorString = errorString; }
     void clearErrorString() { m_errorString.clear(); }
-
-    QStringList m_fileNames;
-    quint64     m_lineNumber = 0;
+    quint64 getLineNumber() const { return m_lineNumber; }
 
 };
 
@@ -97,6 +94,7 @@ class CMmsLogsThreadReader: public QThread, public CMmsLogsReader
     Q_OBJECT
 public:
     explicit CMmsLogsThreadReader(QObject *parent = nullptr);
+    void setFileNames(const QStringList &fileNames) { m_fileNames = fileNames; }
     void run() override;
     bool getStatus() const { return m_retVal; }
 
@@ -105,6 +103,7 @@ signals:
 
 private:
     bool m_retVal = false;
+    QStringList m_fileNames;
 
 };
 

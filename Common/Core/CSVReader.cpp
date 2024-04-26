@@ -120,7 +120,6 @@ bool CTextFileReader::readSmallFile() {
             qint64 nextPosition;
             m_lineNumber = 0;
 
-            // If data has header
             if (m_isHeaders) {
                 retVal = readColumnNames(bytesRead, isEOF, prevPosition);
             }
@@ -224,12 +223,10 @@ CTextFileReader::CTextFileReader()
 {
     m_fileName.clear();
     m_errorString.clear();
-    m_fileNames.clear();
 }
 
 CTextFileReader::~CTextFileReader()
 {
-    m_fileNames.clear();
     if (m_file.isOpen()) {
         m_file.close();
     }
@@ -382,7 +379,7 @@ CMmsLogsReader::convertData(const QString &line)
             setErrorString(m_db.errorString());
         }
     } else {
-        setErrorString(QStringLiteral("Parsing error at line number %1: %2").arg(m_lineNumber).arg(line));
+        setErrorString(QStringLiteral("Parsing error at line number %1: %2").arg(getLineNumber()).arg(line));
     }
     return retVal;
 }
@@ -391,7 +388,9 @@ CMmsLogsReader::convertData(const QString &line)
 
 CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
     : QThread(parent)
-{}
+{
+    m_fileNames.clear();
+}
 
 void
 CMmsLogsThreadReader::run()

@@ -304,7 +304,7 @@ MainWindow::convertEventLogClick()
 
             retVal = logReader.init(m_logId, m_dbName, m_hasHeaders, internalIpFirstOctet, &pragmaList);
             if (retVal) {
-                logReader.setFileName(m_fileList);
+                logReader.setFileNames(m_fileList);
                 logReader.start();
 
                 setInfoText(tr("wait..."));
