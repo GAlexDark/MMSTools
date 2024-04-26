@@ -35,7 +35,6 @@ public:
     virtual ~CTextFileReader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    //bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
     bool read();
     QString errorString() const { return m_errorString; }
 
@@ -49,6 +48,7 @@ private:
     QScopedPointer<QByteArray> m_buffer;
     QString     m_fileName;
     bool        m_isHeaders = false;
+    QString     m_errorString;
 
     bool checkBOM();
     bool readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &prevPosition);
@@ -61,8 +61,9 @@ protected:
     virtual bool checkHeader(const QString &line) = 0;
     virtual bool convertData(const QString &line) = 0;
     void setFileName(const QString &fileName) { m_fileName = fileName; }
+    void setErrorString(const QString &errorString) { m_errorString = errorString; }
+    void clearErrorString() { m_errorString.clear(); }
 
-    QString     m_errorString;
     QStringList m_fileNames;
     quint64     m_lineNumber = 0;
 
