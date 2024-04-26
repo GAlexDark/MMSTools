@@ -35,7 +35,7 @@ public:
     virtual ~CTextFileReader();
 
     void setFileName(const QStringList &fileNames) { m_fileNames = fileNames; }
-    bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
+    //bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
     bool read();
     QString errorString() const { return m_errorString; }
 
@@ -56,6 +56,7 @@ private:
     bool readSmallFile();
 
 protected:
+    bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
     qint64 indexOfEol(const qint64 startPos, const qint64 size);
     virtual bool checkHeader(const QString &line) = 0;
     virtual bool convertData(const QString &line) = 0;
