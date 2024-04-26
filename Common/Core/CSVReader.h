@@ -44,25 +44,27 @@ private:
 
     char        m_delimiterChar = 0;
     char        m_quoteChar = 0;
-    QByteArray  m_eolChars;
+    qint64      m_eolCharsCount = 0;
 
     QScopedPointer<QByteArray> m_buffer;
     QString     m_fileName;
     bool        m_isHeaders = false;
 
     bool checkBOM();
+    bool readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &prevPosition);
     bool readLargeFile();
     bool readSmallFile();
 
 protected:
     qint64 indexOfEol(const qint64 startPos, const qint64 size);
+    virtual bool checkHeader(const QString &line) = 0;
     virtual bool convertData(const QString &line) = 0;
+    void setFileName(const QString &fileName) { m_fileName = fileName; }
 
     QString     m_errorString;
     QStringList m_fileNames;
     quint64     m_lineNumber = 0;
 
-    void setFileName(const QString &fileName) { m_fileName = fileName; }
 };
 
 //-------------------------------------------------------------------------
@@ -74,6 +76,7 @@ public:
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
               const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
 
+    bool checkHeader(const QString &line) override;
     bool convertData(const QString &line) override;
     QString insertString() const { return m_parser->insertString(); }
 

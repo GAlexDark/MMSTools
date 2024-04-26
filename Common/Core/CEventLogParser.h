@@ -26,11 +26,13 @@ class CEventLogParser: public CBasicParser
 {
     Q_OBJECT
     Q_CLASSINFO("tablename", "eventlog")
+    Q_CLASSINFO("columns", "\"Ім'я користувача\",\"Відмітка часу\",\"ID запиту\",\"Тип\",\"Деталі\"|\"Username\",\"Timestamp\",\"Request ID\",\"Type\",\"Details\"")
     Q_CLASSINFO("ID", "1")
 public:
     Q_INVOKABLE explicit CEventLogParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
+    bool checkHeader(const QString &line) override;
     QString insertString() const override;
     void getParsedData(QString &username,
                        QString &timestampISO8601,

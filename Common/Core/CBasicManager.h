@@ -57,6 +57,10 @@ public:
     bool checkID(const quint16 id) const { return m_ids.indexOf(id) != -1 ? true : false; }
 
 protected:
+    QStringList         m_classList;
+    QVector<quint16>    m_ids;
+
+private:
     void destroyInstance()
     {
         if (m_type.isValid() && (m_instancePtr != nullptr)) {
@@ -65,10 +69,6 @@ protected:
         }
     }
 
-    QStringList         m_classList;
-    QVector<quint16>    m_ids;
-
-private:
     QMetaType           m_type;
     T                   m_instancePtr = nullptr;
 

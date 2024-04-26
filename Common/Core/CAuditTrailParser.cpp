@@ -19,6 +19,7 @@
 #include <QRegularExpression>
 
 #include "DBStrings.h"
+#include "elcUtils.h"
 
 const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
 const QRegularExpression rePersonData(QLatin1String("Person\\s\\[pk=\\d+,\\salias=(.*)\\]"));
@@ -111,6 +112,8 @@ CAuditTrailParser::parse(const QString& line)
         if (!parseAttributesDetails()) {
             m_username1.clear();
         }
+    } else {
+        m_errorString = QStringLiteral("Wrong header.\nDetails: %1").arg(line);
     }
     return retVal;
 }
@@ -128,6 +131,14 @@ CAuditTrailParser::convertData(mms::dataItem_t &data)
     data[phUsername1] = m_username1;
     data[phInternalip] = m_internalip;
     data[phExternalip] = m_externalip;
+}
+
+bool
+CAuditTrailParser::checkHeader(const QString &line)
+{
+    QString columns;
+    elcUtils::getMetaClassInfo(this, "columns", columns);
+    return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0 ? true : false;
 }
 
 QString

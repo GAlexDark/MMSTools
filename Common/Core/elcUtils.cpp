@@ -237,7 +237,6 @@ expandEnvStrings_windows(QString &path)
     if (bufSize != 0) {
         QScopedPointer<wchar_t> fullPath(new wchar_t [bufSize]);
         Q_CHECK_PTR(fullPath);
-
         bufSize = ExpandEnvironmentStrings(path.toStdWString().c_str(), fullPath.data(), bufSize);
         if (bufSize != 0) {
             path = QString::fromWCharArray(fullPath.data()).trimmed();
@@ -255,7 +254,7 @@ expandEnvStrings_linux(QString &path)
     QByteArray value;
     while (i.hasNext()) {
         QRegularExpressionMatch match1 = i.next();
-        word = '$' + match1.captured(1);
+        word = QLatin1Char('$') + match1.captured(1);
         value = qgetenv(match1.captured(1).toLatin1().data());
         path.replace(word, value, Qt::CaseInsensitive);
         path = QDir::fromNativeSeparators(path);

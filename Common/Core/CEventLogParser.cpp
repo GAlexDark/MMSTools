@@ -20,6 +20,7 @@
 #include <QRegularExpression>
 
 #include "DBStrings.h"
+#include "elcUtils.h"
 
 const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
 const QRegularExpression reSuccessLogon(QLatin1String("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$"));
@@ -169,6 +170,15 @@ CEventLogParser::convertData(mms::dataItem_t &data)
     data[phAuthType] = m_authType;
     data[phExternalip] = m_externalip;
     data[phInternalip] = m_internalip;
+}
+
+bool
+CEventLogParser::checkHeader(const QString &line)
+{
+    QString columns;
+    elcUtils::getMetaClassInfo(this, "columns", columns);
+    QStringList columnsList = columns.split('|');
+    return columnsList.indexOf(line) != -1 ? true : false;
 }
 
 QString

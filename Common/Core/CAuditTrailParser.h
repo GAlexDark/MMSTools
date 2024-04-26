@@ -27,11 +27,13 @@ class CAuditTrailParser: public CBasicParser
 {
     Q_OBJECT
     Q_CLASSINFO("tablename", "audittraillog")
+    Q_CLASSINFO("columns", "Succeeded;Date;Method;Username;Companyname;Attributes;IpAddress")
     Q_CLASSINFO("ID", "2")
 public:
     Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
+    bool checkHeader(const QString &line) override;
     QString insertString() const override;
     void getParsedData(QString &status,
                        QDateTime &timestamp,
