@@ -33,11 +33,10 @@ public:
 
 protected:
     virtual void createDefault(const QString& iniPath) = 0;
-    bool        m_isRdsEnabled = false;
 
 private:
     QScopedPointer<QSettings> m_settings;
-
+    bool                      m_isRdsEnabled = false;
 };
 
 #endif // CBASICSETTINGS_H
