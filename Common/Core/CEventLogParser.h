@@ -47,8 +47,13 @@ public:
 
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
+    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 private:
+    bool parseUserSuccessLogonDetails();
+    bool parseUserFailedLogonDetails();
+    bool parseUserLogonDetails();
+
     struct userSuccessLogonDetails_t
     {
         QString details;
@@ -80,9 +85,9 @@ private:
     QString     m_requestID;
     QString     m_type;
 
-    bool parseUserSuccessLogonDetails();
-    bool parseUserFailedLogonDetails();
-    bool parseUserLogonDetails();
+    char        m_delimiterChar;
+    char        m_quoteChar;
+    QByteArray  m_eolChars;
 };
 
 Q_DECLARE_METATYPE(CEventLogParser *);

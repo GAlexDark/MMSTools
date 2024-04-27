@@ -114,9 +114,12 @@ CEventLogParser::parseUserLogonDetails()
 CEventLogParser::CEventLogParser(QObject *parent)
     : CBasicParser(parent)
 {
-    m_delimiterChar = ',';
+    clearErrorString();
     m_quoteChar = '"';
-    m_eolChars = "\r\n";
+    m_delimiterChar = ',';
+    m_eolChars = "\r\n" ;
+    setEolChars(m_eolChars);
+    setQuoteChar(m_quoteChar);
 }
 
 bool
@@ -143,7 +146,7 @@ CEventLogParser::parse(const QString &line)
             retVal = true;
         } else {
             m_timestamptz = QDateTime();
-            m_errorString = QStringLiteral("Error converting Timestamp value: %1").arg(m_timestampISO8601);
+            setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(m_timestampISO8601));
         }
         if (!parseUserLogonDetails()) {
             m_username1.clear();
@@ -152,7 +155,7 @@ CEventLogParser::parse(const QString &line)
             m_internalip.clear();
         }
     } else {
-        m_errorString = QStringLiteral("Wrong header.\nDetails: %1").arg(m_details);
+        setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(m_details));
     }
     return retVal;
 }
@@ -216,3 +219,4 @@ CEventLogParser::createTable() const
 {
     return eventlog::createTable;
 }
+
