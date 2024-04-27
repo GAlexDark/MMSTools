@@ -70,9 +70,9 @@ CAuditTrailParser::parseAttributesDetails()
 CAuditTrailParser::CAuditTrailParser(QObject *parent)
     : CBasicParser(parent)
 {
-    m_eolChars = "\n";
-    m_delimiterChar = ';';
-    m_quoteChar = '"';
+    clearErrorString();
+    setEolChars(m_eolChars);
+    setQuoteChar(m_quoteChar);
 }
 
 bool
@@ -93,7 +93,7 @@ CAuditTrailParser::parse(const QString& line)
             retVal = true;
         } else {
             m_timestamp = QDateTime();
-            m_errorString = QStringLiteral("Error converting Timestamp value: %1").arg(timestamp);
+            setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
         }
         qsizetype posStart = m_username.indexOf(QLatin1Char('('));
         qsizetype posEnd = m_username.indexOf(QLatin1Char(')'), posStart + 1) - posStart - 1;
@@ -113,7 +113,7 @@ CAuditTrailParser::parse(const QString& line)
             m_username1.clear();
         }
     } else {
-        m_errorString = QStringLiteral("Wrong header.\nDetails: %1").arg(line);
+        setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(line));
     }
     return retVal;
 }
@@ -176,3 +176,4 @@ CAuditTrailParser::createTable() const
 {
     return audittrail::createTable;
 }
+

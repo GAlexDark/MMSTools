@@ -86,9 +86,3 @@ CBasicParser::parserID() const
     return elcUtils::getMetaClassInfo(this, QLatin1String("ID"), retVal) ? retVal.toUInt() : 0;
 }
 
-mms::ffs_t
-CBasicParser::fileFieldsSeparationInfo() const
-{
-    mms::ffs_t retVal{ m_delimiterChar, m_quoteChar, m_eolChars };
-    return retVal;
-}

@@ -48,6 +48,7 @@ public:
 
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
+    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 private:
     bool parsePersonDataDetails();
@@ -65,6 +66,9 @@ private:
     QString     m_attributes;
     QString     m_username1;
 
+    char        m_delimiterChar = ';';
+    char        m_quoteChar = '"';
+    QByteArray  m_eolChars = "\n";
 };
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);

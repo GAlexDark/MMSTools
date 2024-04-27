@@ -38,24 +38,25 @@ public:
 
     QString tableName() const;
     quint16 parserID() const;
-    mms::ffs_t fileFieldsSeparationInfo() const;
+    virtual mms::ffs_t fileFieldsSeparationInfo() const = 0;
 
 protected:
     void removeQuote(QString &data) const;
     void analizeIPAdresses();
+    void setErrorString(const QString &errorString) { m_errorString = errorString; }
+    void clearErrorString() { m_errorString.clear(); }
+    void setEolChars(const QByteArray &eolChars) { m_eolChars = eolChars; }
+    void setQuoteChar(const char quoteChar) { m_quoteChar = quoteChar; }
 
     QString     m_ipaddresses;
     QString     m_internalip;
     QString     m_externalip;
 
-    char        m_delimiterChar = 0;
-    char        m_quoteChar = 0;
-    QByteArray  m_eolChars;
-
-    QString     m_errorString;
-
 private:
     QString     m_internalIpFirstOctet;
+    QString     m_errorString;
+    char        m_quoteChar;
+    QByteArray  m_eolChars;
 };
 
 typedef CBasicParser *pBasicParser;
