@@ -71,9 +71,6 @@ CAuditTrailParser::CAuditTrailParser(QObject *parent)
     : CBasicParser(parent)
 {
     clearErrorString();
-    m_quoteChar = '"';
-    m_delimiterChar = ';';
-    m_eolChars = "\n" ;
     setEolChars(m_eolChars);
     setQuoteChar(m_quoteChar);
 }

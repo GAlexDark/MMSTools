@@ -85,9 +85,9 @@ private:
     QString     m_requestID;
     QString     m_type;
 
-    char        m_delimiterChar;
-    char        m_quoteChar;
-    QByteArray  m_eolChars;
+    char        m_delimiterChar = ',';
+    char        m_quoteChar = '"';
+    QByteArray  m_eolChars = "\r\n";
 };
 
 Q_DECLARE_METATYPE(CEventLogParser *);

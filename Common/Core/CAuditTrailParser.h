@@ -66,9 +66,9 @@ private:
     QString     m_attributes;
     QString     m_username1;
 
-    char        m_delimiterChar;
-    char        m_quoteChar;
-    QByteArray  m_eolChars;
+    char        m_delimiterChar = ';';
+    char        m_quoteChar = '"';
+    QByteArray  m_eolChars = "\n";
 };
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);
