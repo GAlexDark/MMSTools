@@ -72,6 +72,18 @@ CBasicParser::analizeIPAdresses()
     } // (pos != -1)
 }
 
+void
+CBasicParser::initFfs(QByteArray &eolChars, char &quoteChar, char &delimiterChar)
+{
+    QString buf;
+    elcUtils::getMetaClassInfo(this, "eolChars", buf);
+    eolChars = buf.toUtf8();
+    elcUtils::getMetaClassInfo(this, "quoteChar", buf);
+    quoteChar = buf.at(0).toLatin1();
+    elcUtils::getMetaClassInfo(this, "delimiterChar", buf);
+    delimiterChar = buf.at(0).toLatin1();
+}
+
 QString
 CBasicParser::tableName() const
 {

@@ -28,6 +28,10 @@ class CEventLogParser: public CBasicParser
     Q_CLASSINFO("tablename", "eventlog")
     Q_CLASSINFO("columns", "\"Ім'я користувача\",\"Відмітка часу\",\"ID запиту\",\"Тип\",\"Деталі\"|\"Username\",\"Timestamp\",\"Request ID\",\"Type\",\"Details\"")
     Q_CLASSINFO("ID", "1")
+    Q_CLASSINFO("quoteChar", "\"")
+    Q_CLASSINFO("delimiterChar", ",")
+    Q_CLASSINFO("m_eolChars", "\r\n")
+
 public:
     Q_INVOKABLE explicit CEventLogParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
@@ -85,9 +89,7 @@ private:
     QString     m_requestID;
     QString     m_type;
 
-    char        m_delimiterChar = ',';
-    char        m_quoteChar = '"';
-    QByteArray  m_eolChars = "\r\n";
+    char        m_delimiterChar;
 };
 
 Q_DECLARE_METATYPE(CEventLogParser *);

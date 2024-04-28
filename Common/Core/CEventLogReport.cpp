@@ -21,7 +21,7 @@
 CEventLogReport::CEventLogReport(QObject *parent)
     : CBasicReport(parent)
 {
-    m_errorString.clear();
+    clearErrorString();
 }
 
 bool
@@ -67,43 +67,35 @@ CEventLogReport::generateReport(const QString &arguments)
         ++row;
 
         while (m_db->isNext()) {
-            writeValue = m_db->geValue(0).toString();
-            xlsxReport.write(row, colTimestampISO8601, writeValue);
+            setReportDataItem(&xlsxReport, 0, colTimestampISO8601, row);
 
             writeValue = m_db->geValue(1).toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 
-            writeValue = m_db->geValue(2).toString();
-            xlsxReport.write(row, colExternalIP, writeValue);
-
-            writeValue = m_db->geValue(3).toString();
-            xlsxReport.write(row, colUsername, writeValue);
-
-            writeValue = m_db->geValue(4).toString();
-            xlsxReport.write(row, colType, writeValue);
-
-            writeValue = checkDetails(m_db->geValue(5).toString());
-            xlsxReport.write(row, colDetails, writeValue);
-
-            writeValue = m_db->geValue(6).toString();
-            xlsxReport.write(row, colAuthType, writeValue);
-
-            writeValue = m_db->geValue(7).toString();
-            xlsxReport.write(row, colInternalIP, writeValue);
-
-            writeValue = m_db->geValue(8).toString();
-            xlsxReport.write(row, colRequestid, writeValue);
+            setReportDataItem(&xlsxReport, 2, colExternalIP, row);
+            setReportDataItem(&xlsxReport, 3, colUsername, row);
+            setReportDataItem(&xlsxReport, 4, colType, row);
+            setReportDataItem(&xlsxReport, 5, colDetails, row);
+            setReportDataItem(&xlsxReport, 6, colAuthType, row);
+            setReportDataItem(&xlsxReport, 7, colInternalIP, row);
+            setReportDataItem(&xlsxReport, 8, colRequestid, row);
 
             ++row;
         } // while
 
         retVal = xlsxReport.saveAs(m_reportFileName);
         if (!retVal) {
-            m_errorString = QStringLiteral("Error save report file");
+            setErrorString(QStringLiteral("Error save report file"));
         }
     } else {
-        m_errorString = m_db->errorString();
+        setErrorString(m_db->errorString());
     }
 
     return retVal;
+}
+
+void
+CEventLogReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
+{
+    CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
 }
