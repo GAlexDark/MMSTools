@@ -29,6 +29,10 @@ class CAuditTrailParser: public CBasicParser
     Q_CLASSINFO("tablename", "audittraillog")
     Q_CLASSINFO("columns", "Succeeded;Date;Method;Username;Companyname;Attributes;IpAddress")
     Q_CLASSINFO("ID", "2")
+    Q_CLASSINFO("quoteChar", "\"")
+    Q_CLASSINFO("delimiterChar", ";")
+    Q_CLASSINFO("m_eolChars", "\n")
+
 public:
     Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
@@ -66,9 +70,7 @@ private:
     QString     m_attributes;
     QString     m_username1;
 
-    char        m_delimiterChar = ';';
-    char        m_quoteChar = '"';
-    QByteArray  m_eolChars = "\n";
+    char        m_delimiterChar;
 };
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);

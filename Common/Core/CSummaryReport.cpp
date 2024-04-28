@@ -21,7 +21,7 @@
 CSummaryReport::CSummaryReport(QObject *parent)
     : CBasicReport(parent)
 {
-    m_errorString.clear();
+    clearErrorString();
 }
 
 bool
@@ -66,43 +66,32 @@ CSummaryReport::generateReport(const QString &arguments)
             writeValue = m_db->geValue(0).toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 
-            writeValue = m_db->geValue(1).toString();
-            xlsxReport.write(row, colUsername, writeValue);
-
-            writeValue = m_db->geValue(2).toString();
-            xlsxReport.write(row, colCompanyRole, writeValue);
-
-            writeValue = m_db->geValue(3).toString();
-            xlsxReport.write(row, colTypeOrMethod, writeValue);
-
-            writeValue = m_db->geValue(4).toString();
-            xlsxReport.write(row, colStatus, writeValue);
-
-            writeValue = checkDetails(m_db->geValue(5).toString());
-            xlsxReport.write(row, colDetailsOrAttributes, writeValue);
-
-            writeValue = m_db->geValue(6).toString();
-            xlsxReport.write(row, colAuthType, writeValue);
-
-            writeValue = m_db->geValue(7).toString();
-            xlsxReport.write(row, colExternalIP, writeValue);
-
-            writeValue = m_db->geValue(8).toString();
-            xlsxReport.write(row, colInternalIP, writeValue);
-
-            writeValue = m_db->geValue(9).toString();
-            xlsxReport.write(row, colRequestid, writeValue);
+            setReportDataItem(&xlsxReport, 1, colUsername, row);
+            setReportDataItem(&xlsxReport, 2, colCompanyRole, row);
+            setReportDataItem(&xlsxReport, 3, colTypeOrMethod, row);
+            setReportDataItem(&xlsxReport, 4, colStatus, row);
+            setReportDataItem(&xlsxReport, 5, colDetailsOrAttributes, row);
+            setReportDataItem(&xlsxReport, 6, colAuthType, row);
+            setReportDataItem(&xlsxReport, 7, colExternalIP, row);
+            setReportDataItem(&xlsxReport, 8, colInternalIP, row);
+            setReportDataItem(&xlsxReport, 9, colRequestid, row);
 
             ++row;
         } // while
 
         retVal = xlsxReport.saveAs(m_reportFileName);
         if (!retVal) {
-            m_errorString = QStringLiteral("Error save report file");
+            setErrorString(QStringLiteral("Error save report file"));
         }
     } else {
-        m_errorString = m_db->errorString();
+        setErrorString(m_db->errorString());
     }
 
     return retVal;
+}
+
+void
+CSummaryReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
+{
+    CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
 }

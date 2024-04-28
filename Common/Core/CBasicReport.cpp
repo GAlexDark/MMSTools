@@ -70,6 +70,13 @@ CBasicReport::checkDetails(const QString &data)
     return buf;
 }
 
+void
+CBasicReport::setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const int dbFieldIndex, const int reportFieldIndex, const int row)
+{
+    QVariant writeValue = db->geValue(dbFieldIndex).toString();
+    report->write(row, reportFieldIndex, writeValue);
+}
+
 quint16
 CBasicReport::reportID() const
 {

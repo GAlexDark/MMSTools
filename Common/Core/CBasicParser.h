@@ -45,18 +45,18 @@ protected:
     void analizeIPAdresses();
     void setErrorString(const QString &errorString) { m_errorString = errorString; }
     void clearErrorString() { m_errorString.clear(); }
-    void setEolChars(const QByteArray &eolChars) { m_eolChars = eolChars; }
-    void setQuoteChar(const char quoteChar) { m_quoteChar = quoteChar; }
+    void initFfs(QByteArray &eolChars, char &quoteChar, char &delimiterChar);
 
     QString     m_ipaddresses;
     QString     m_internalip;
     QString     m_externalip;
+    char        m_quoteChar = 0;
+    QByteArray  m_eolChars;
 
 private:
     QString     m_internalIpFirstOctet;
     QString     m_errorString;
-    char        m_quoteChar;
-    QByteArray  m_eolChars;
+
 };
 
 typedef CBasicParser *pBasicParser;

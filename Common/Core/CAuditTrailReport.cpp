@@ -21,7 +21,7 @@
 CAuditTrailReport::CAuditTrailReport(QObject *parent)
     : CBasicReport(parent)
 {
-    m_errorString.clear();
+    clearErrorString();
 }
 
 bool
@@ -67,37 +67,30 @@ CAuditTrailReport::generateReport(const QString &arguments)
             writeValue = m_db->geValue(0).toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 
-            writeValue = m_db->geValue(1).toString();
-            xlsxReport.write(row, colUsername, writeValue);
-
-            writeValue = m_db->geValue(2).toString();
-            xlsxReport.write(row, colRole, writeValue);
-
-            writeValue = m_db->geValue(3).toString();
-            xlsxReport.write(row, colCompanyname, writeValue);
-
-            writeValue = m_db->geValue(4).toString();
-            xlsxReport.write(row, colMethod, writeValue);
-
-            writeValue = m_db->geValue(5).toString();
-            xlsxReport.write(row, colStatus, writeValue);
-
-            writeValue = m_db->geValue(6).toString();
-            xlsxReport.write(row, colAttributes, writeValue);
-
-            writeValue = m_db->geValue(7).toString();
-            xlsxReport.write(row, colInternalIP, writeValue);
+            setReportDataItem(&xlsxReport, 1, colUsername, row);
+            setReportDataItem(&xlsxReport, 2, colRole, row);
+            setReportDataItem(&xlsxReport, 3, colCompanyname, row);
+            setReportDataItem(&xlsxReport, 4, colMethod, row);
+            setReportDataItem(&xlsxReport, 5, colStatus, row);
+            setReportDataItem(&xlsxReport, 6, colAttributes, row);
+            setReportDataItem(&xlsxReport, 7, colInternalIP, row);
 
             ++row;
         } // while
 
         retVal = xlsxReport.saveAs(m_reportFileName);
         if (!retVal) {
-            m_errorString = QStringLiteral("Error save report file");
+            setErrorString(QStringLiteral("Error save report file"));
         }
     } else {
-        m_errorString = m_db->errorString();
+        setErrorString(m_db->errorString());
     }
 
     return retVal;
+}
+
+void
+CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
+{
+    CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
 }

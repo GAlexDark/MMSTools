@@ -71,7 +71,7 @@ protected:
 class CMmsLogsReader: public CTextFileReader
 {
 public:
-    ~CMmsLogsReader();
+    virtual ~CMmsLogsReader();
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
               const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
 
