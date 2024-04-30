@@ -84,18 +84,5 @@ namespace elcUtils
         }
         return retVal;
     }
-/*
-    template <typename T>
-    void initFfs(T *object, QByteArray &eolChars, char &quoteChar, char &delimiterChar)
-    {
-        QString buf;
-        elcUtils::getMetaClassInfo(object, "eolChars", buf);
-        eolChars = buf.toUtf8();
-        elcUtils::getMetaClassInfo(object, "quoteChar", buf);
-        quoteChar = buf.at(0).toLatin1();
-        elcUtils::getMetaClassInfo(object, "delimiterChar", buf);
-        delimiterChar = buf.at(0).toLatin1();
-    }
-*/
 }
 #endif // ELCUTILS_H
