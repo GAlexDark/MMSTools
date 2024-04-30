@@ -78,7 +78,7 @@ CReportManager::prettySelector(const quint16 id) const
             retVal++;
         }
 /*************************************************
-        // Other verifications must be here
+        Other verifications must be here
         // if (conditions(retVal)) {
             ...
         }

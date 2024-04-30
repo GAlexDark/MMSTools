@@ -34,9 +34,16 @@ CSummaryReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
-        int colTimestamp = 1, colUsername = 2, colCompanyRole = 3,
-            colTypeOrMethod = 4, colStatus = 5, colDetailsOrAttributes = 6,
-            colAuthType = 7, colExternalIP = 8, colInternalIP = 9, colRequestid = 10;
+        int colTimestamp = 1;
+        int colUsername = 2;
+        int colCompanyRole = 3;
+        int colTypeOrMethod = 4;
+        int colStatus = 5;
+        int colDetailsOrAttributes = 6;
+        int colAuthType = 7;
+        int colExternalIP = 8;
+        int colInternalIP = 9;
+        int colRequestid = 10;
 
         QXlsx::Document xlsxReport;
         // Add header

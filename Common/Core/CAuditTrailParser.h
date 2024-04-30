@@ -31,7 +31,7 @@ class CAuditTrailParser: public CBasicParser
     Q_CLASSINFO("ID", "2")
     Q_CLASSINFO("quoteChar", "\"")
     Q_CLASSINFO("delimiterChar", ";")
-    Q_CLASSINFO("m_eolChars", "\n")
+    Q_CLASSINFO("eolChars", "\n")
 
 public:
     Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
