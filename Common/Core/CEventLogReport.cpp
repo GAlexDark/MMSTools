@@ -71,7 +71,7 @@ CEventLogReport::generateReport(const QString &arguments)
         ++row;
 
         while (m_db->isNext()) {
-            //xlsxReport.write(row, colRowNumber, row - 1);
+            xlsxReport.write(row, colRowNumber, row - 1);
 
             setReportDataItem(&xlsxReport, 0, colTimestampISO8601, row);
 
