@@ -75,7 +75,7 @@ void
 CElcConsoleAppSettingsTest::test_getDBName()
 {
     CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
-    QString retVal = settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed();
+    QString retVal = settings.getDbFileName();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 

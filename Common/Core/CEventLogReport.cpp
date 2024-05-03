@@ -34,6 +34,7 @@ CEventLogReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
+        //int colRowNumber = 1;
         int colTimestampISO8601 = 1;
         int colTimestamp = 2;
         int colExternalIP = 3;
@@ -46,6 +47,9 @@ CEventLogReport::generateReport(const QString &arguments)
 
         QXlsx::Document xlsxReport;
         // Add header
+        //QVariant writeValue = QStringLiteral("№");
+        //xlsxReport.write(row, colRowNumber, writeValue);
+
         QVariant writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
         xlsxReport.write(row, colTimestampISO8601, writeValue);
         writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
@@ -67,6 +71,8 @@ CEventLogReport::generateReport(const QString &arguments)
         ++row;
 
         while (m_db->isNext()) {
+            //xlsxReport.write(row, colRowNumber, row - 1);
+
             setReportDataItem(&xlsxReport, 0, colTimestampISO8601, row);
 
             writeValue = m_db->geValue(1).toDateTime();

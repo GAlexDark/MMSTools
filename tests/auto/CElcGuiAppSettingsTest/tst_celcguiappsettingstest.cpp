@@ -69,7 +69,7 @@ void
 CElcGuiAppSettingsTest::test_getDBName()
 {
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    QString retVal = settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed();
+    QString retVal = settings.getDbFileName();
     QCOMPARE(retVal, QString(TEST_SRCDIR"EventLogConverter.db"));
 }
 
@@ -78,7 +78,7 @@ CElcGuiAppSettingsTest::test_checkLastDir()
 {
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
     settings.setMain(QLatin1String("HISTORY"), QLatin1String("last_dir"), filePath);
-    QString lastDir = settings.getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
+    QString lastDir = settings.getLastDir();
     QCOMPARE(lastDir, filePath);
 }
 

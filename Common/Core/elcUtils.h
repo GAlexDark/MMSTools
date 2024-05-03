@@ -25,6 +25,7 @@
 
 namespace elcUtils
 {
+/*
     inline const QString pvOff("OFF");
     inline const QString pvNormal("NORMAL");
     inline const QString pvFull("FULL");
@@ -41,14 +42,14 @@ namespace elcUtils
     inline const QStringList plJournalMode = { pvDelete, pvTruncate, pvPersist, pvMemory, pvWal, pvOff };
     inline const QStringList plTempStore = { pvDefault, pvFile, pvMemory };
     inline const QStringList plLockingMode = { pvNormal, pvExclusive };
-
-
+*/
 /*!
  * bool elcUtils::sanitizeValue(const QString &value).
  * Checks the \a value for invalid characters.
  * Only a-z, A-Z, 0-9, and '_' characters are allowed.
  * If the \a value contains only these characters the function returns \a true and \a false otherwise
  */
+
     bool sanitizeValue(const QString &value);
     bool sanitizeValue(const QString &pattern, const QString &value);
     QString sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue);

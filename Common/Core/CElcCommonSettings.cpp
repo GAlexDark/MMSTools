@@ -17,6 +17,25 @@
 
 #include "CElcCommonSettings.h"
 #include <QFileInfo>
+#include <QDir>
+#include "elcUtils.h"
+
+const QString pvOff("OFF");
+const QString pvNormal("NORMAL");
+const QString pvFull("FULL");
+const QString pvDelete("DELETE");
+const QString pvTruncate("TRUNCATE");
+const QString pvPersist("PERSIST");
+const QString pvMemory("MEMORY");
+const QString pvWal("WAL");
+const QString pvDefault("DEFAULT");
+const QString pvFile("FILE");
+const QString pvExclusive("EXCLUSIVE");
+
+const QStringList plSynchronous = { pvOff, pvNormal, pvFull };
+const QStringList plJournalMode = { pvDelete, pvTruncate, pvPersist, pvMemory, pvWal, pvOff };
+const QStringList plTempStore = { pvDefault, pvFile, pvMemory };
+const QStringList plLockingMode = { pvNormal, pvExclusive };
 
 void
 CElcCommonSettings::createDefault(const QString& iniPath)
@@ -45,4 +64,69 @@ CElcCommonSettings::createDefault(const QString& iniPath)
     settings.setValue(QLatin1String("temp_store"), QLatin1String("MEMORY")); // DEFAULT | FILE | MEMORY
     settings.setValue(QLatin1String("locking_mode"), QLatin1String("EXCLUSIVE")); // NORMAL | EXCLUSIVE
     settings.endGroup();
+
+    settings.beginGroup(QLatin1String("REPORT"));
+    settings.setValue(QLatin1String("show_milliseconds"), QLatin1String("no")); // yes | no
+    settings.endGroup();
+}
+
+QString
+CElcCommonSettings::getDbFileName() const
+{
+    return QDir::fromNativeSeparators(getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
+}
+
+bool
+CElcCommonSettings::isClearDbOnStartup() const
+{
+    QString buf = getMain(QLatin1String("SETTINGS/clear_on_startup")).toString().trimmed();
+    return buf.isEmpty() || (QString::compare(buf, QLatin1String("yes"), Qt::CaseInsensitive) == 0);
+}
+
+QString
+CElcCommonSettings::getLastDir() const
+{
+    return getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
+}
+
+QString
+CElcCommonSettings::getInternalIpStartOctet() const
+{
+    QString buf = getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();
+    return !buf.isEmpty() && elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), buf) ? buf : QString();
+}
+
+QString
+CElcCommonSettings::getSynchronousType() const
+{
+    QString buf = getMain(QLatin1String("DATABASE/synchronous")).toString().trimmed();
+    return elcUtils::sanitizeValue(buf, plSynchronous, pvNormal);
+}
+
+QString
+CElcCommonSettings::getJournalModeType() const
+{
+    QString buf = getMain(QLatin1String("DATABASE/journal_mode")).toString().trimmed();
+    return elcUtils::sanitizeValue(buf, plJournalMode, pvMemory);
+}
+
+QString
+CElcCommonSettings::getTempStore() const
+{
+    QString buf = getMain(QLatin1String("DATABASE/temp_store")).toString().trimmed();
+    return elcUtils::sanitizeValue(buf, plTempStore, pvMemory);
+}
+
+QString
+CElcCommonSettings::getLockingMode() const
+{
+    QString buf = getMain(QLatin1String("DATABASE/locking_mode")).toString().trimmed();
+    return elcUtils::sanitizeValue(buf, plLockingMode, pvExclusive);
+}
+
+bool
+CElcCommonSettings::getShowMilliseconds() const
+{
+    QString buf = getMain(QLatin1String("REPORT/show_milliseconds")).toString().trimmed();
+    return buf.isEmpty() || (QString::compare(buf, QLatin1String("no"), Qt::CaseInsensitive) == 0) ? false : true;
 }

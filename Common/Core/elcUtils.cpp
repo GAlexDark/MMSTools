@@ -39,7 +39,7 @@ const QChar dotComma = QLatin1Char(';');
 bool
 elcUtils::sanitizeValue(const QString &value)
 {
-    return elcUtils::sanitizeValue(QLatin1String("^([a-zA-Z0-9_]+)$"), value);
+    return sanitizeValue(QLatin1String("^([a-zA-Z0-9_]+)$"), value);
 }
 
 bool
