@@ -35,7 +35,7 @@ CReportBuilder::~CReportBuilder()
 
 bool
 CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &reportName,
-                    const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
+                     const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList, const bool showMilliseconds)
 {
     Q_CHECK_PTR(excludedUsernamesList);
     m_excludedUsernamesList = *excludedUsernamesList;
@@ -43,7 +43,6 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
     m_includedUsernamesList = *includedUsernamesList;
 
     CReportManager &reportManager = CReportManager::instance();
-    m_report = nullptr;
     bool retVal = reportManager.checkID(logID);
     if (retVal) {
         m_report = reportManager.getInstance(logID);
@@ -65,7 +64,7 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
             }
         }
         if (retVal) {
-            m_report->init(&m_db, reportName);
+            m_report->init(&m_db, reportName, showMilliseconds);
         } else {
             m_errorString = m_db.errorString();
             m_db.close();
@@ -87,17 +86,17 @@ CReportBuilder::generateReport()
             args.append(QLatin1String("WHERE "));
             qsizetype size = m_excludedUsernamesList.size() - 1;
             for (qsizetype i = 0; i < size; ++i) {
-                args.append(QStringLiteral("e.username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
+                args.append(QStringLiteral("username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
             } //for
-            args.append(QStringLiteral("e.username<>'%1'").arg(m_excludedUsernamesList.at(size)));
+            args.append(QStringLiteral("username<>'%1'").arg(m_excludedUsernamesList.at(size)));
         }
     } else {
         args.append(QLatin1String("WHERE "));
         qsizetype size = m_includedUsernamesList.size() - 1;
         for (qsizetype i = 0; i < size; ++i) {
-            args.append(QStringLiteral("e.username='%1' OR ").arg(m_includedUsernamesList.at(i)));
+            args.append(QStringLiteral("username='%1' OR ").arg(m_includedUsernamesList.at(i)));
         } //for
-        args.append(QStringLiteral("e.username='%1'").arg(m_includedUsernamesList.at(size)));
+        args.append(QStringLiteral("username='%1'").arg(m_includedUsernamesList.at(size)));
     }
     bool retVal = m_report->generateReport(args);
     if (!retVal) {
@@ -119,11 +118,11 @@ CSVThreadReportBuilder::CSVThreadReportBuilder(QObject *parent)
 
 bool
 CSVThreadReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &reportName,
-                                  const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList)
+                             const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList, const bool showMilliseconds)
 {
     Q_CHECK_PTR(excludedUsernamesList);
     Q_CHECK_PTR(includedUsernamesList);
-    return m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList);
+    return m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList, showMilliseconds);
 }
 
 void

@@ -34,18 +34,22 @@ CAuditTrailReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
-        int colTimestamp = 1;
-        int colUsername = 2;
-        int colRole = 3;
-        int colCompanyname = 4;
-        int colMethod = 5;
-        int colStatus = 6;
-        int colAttributes = 7;
-        int colInternalIP = 8;
+        int colRowNumber = 1;
+        int colTimestamp = 2;
+        int colUsername = 3;
+        int colRole = 4;
+        int colCompanyname = 5;
+        int colMethod = 6;
+        int colStatus = 7;
+        int colAttributes = 8;
+        int colInternalIP = 9;
 
         QXlsx::Document xlsxReport;
         // Add header
-        QVariant writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
+        QVariant writeValue = QStringLiteral("№");
+        xlsxReport.write(row, colRowNumber, writeValue);
+
+        writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
         xlsxReport.write(row, colTimestamp, writeValue);
         writeValue = QStringLiteral("Ім'я користувача");
         xlsxReport.write(row, colUsername, writeValue);
@@ -64,6 +68,8 @@ CAuditTrailReport::generateReport(const QString &arguments)
         ++row;
 
         while (m_db->isNext()) {
+            xlsxReport.write(row, colRowNumber, row - 1);
+
             writeValue = m_db->geValue(0).toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 

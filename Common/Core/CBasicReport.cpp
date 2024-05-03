@@ -39,18 +39,20 @@ CBasicReport::CBasicReport(QObject *parent)
 }
 
 void
-CBasicReport::init(pBasicDatabase db, const QString &reportName)
+CBasicReport::init(pBasicDatabase db, const QString &reportName, bool showMilliseconds)
 {
     m_db = db;
     Q_CHECK_PTR(m_db);
     m_reportFileName = reportName;
+    m_showMilliseconds = showMilliseconds;
 }
 
 void
 CBasicReport::setDateTimeFormat(QXlsx::Format &dateFormat)
 {
     dateFormat.setHorizontalAlignment(QXlsx::Format::AlignRight);
-    dateFormat.setNumberFormat(QLatin1String("dd.mm.yyyy hh:mm:ss"));
+    QString dateTimeFormat = m_showMilliseconds ? QLatin1String("dd.mm.yyyy hh:mm:ss.000") : QLatin1String("dd.mm.yyyy hh:mm:ss");
+    dateFormat.setNumberFormat(dateTimeFormat);
 }
 
 QString

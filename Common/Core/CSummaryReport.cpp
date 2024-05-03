@@ -34,20 +34,24 @@ CSummaryReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
-        int colTimestamp = 1;
-        int colUsername = 2;
-        int colCompanyRole = 3;
-        int colTypeOrMethod = 4;
-        int colStatus = 5;
-        int colDetailsOrAttributes = 6;
-        int colAuthType = 7;
-        int colExternalIP = 8;
-        int colInternalIP = 9;
-        int colRequestid = 10;
+        int colRowNumber = 1;
+        int colTimestamp = 2;
+        int colUsername = 3;
+        int colCompanyRole = 4;
+        int colTypeOrMethod = 5;
+        int colStatus = 6;
+        int colDetailsOrAttributes = 7;
+        int colAuthType = 8;
+        int colExternalIP = 9;
+        int colInternalIP = 10;
+        int colRequestid = 11;
 
         QXlsx::Document xlsxReport;
         // Add header
-        QVariant writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
+        QVariant writeValue = QStringLiteral("№");
+        xlsxReport.write(row, colRowNumber, writeValue);
+
+        writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
         xlsxReport.write(row, colTimestamp, writeValue);
         writeValue = QStringLiteral("Ім'я користувача");
         xlsxReport.write(row, colUsername, writeValue);
@@ -70,6 +74,8 @@ CSummaryReport::generateReport(const QString &arguments)
         ++row;
 
         while (m_db->isNext()) {
+            xlsxReport.write(row, colRowNumber, row - 1);
+
             writeValue = m_db->geValue(0).toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 

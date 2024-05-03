@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     }
     CParserManager::instance().init();
     CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
-    QString dbName =  QDir::fromNativeSeparators(settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
+    QString dbName =  settings.getDbFileName();
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
         settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
@@ -93,8 +93,7 @@ int main(int argc, char *argv[])
 
     RunningMode runningMode = cmd.getRunningMode();
     if (runningMode == RunningMode::RUNNINGMODE_DEFAULT || runningMode == RunningMode::RUNNINGMODE_CLEAN_DB) {
-        QString cleardb = settings.getMain(QLatin1String("SETTINGS/clear_on_startup")).toString().trimmed();
-        bool comb1 = cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0);
+        bool comb1 = settings.isClearDbOnStartup();
         if (runningMode == RunningMode::RUNNINGMODE_CLEAN_DB) { //ignoring settings
             comb1 = true;
         }
@@ -115,33 +114,23 @@ int main(int argc, char *argv[])
 /* IMPORT */
 
     if (runningMode != RunningMode::RUNNINGMODE_REPORT_ONLY && runningMode != RunningMode::RUNNINGMODE_CLEAN_DB) {
-        QString internalIpFirstOctet = settings.getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();
-        if (internalIpFirstOctet.isEmpty() || !elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), internalIpFirstOctet)) {
+        QString internalIpFirstOctet = settings.getInternalIpStartOctet();
+        if (internalIpFirstOctet.isEmpty()) {
             consoleOut.outToConsole(QLatin1String("Error in internal IP address mask. Please check it in the config file."));
             return 1;
         }
-
-        QString value = settings.getMain(QLatin1String("SETTINGS/data_has_headers")).toString().trimmed();
-        bool hasHeaders = (value.isEmpty() || QString::compare(value, QLatin1String("yes"), Qt::CaseInsensitive) == 0) ? true : false;
-
-        mms::pragmaList_t pragmaList;
-        value = settings.getMain(QLatin1String("DATABASE/synchronous")).toString().trimmed();
-        pragmaList["synchronous"] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
-
-        value = settings.getMain(QLatin1String("DATABASE/journal_mode")).toString().trimmed();
-        pragmaList["journal_mode"] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
-
-        value = settings.getMain(QLatin1String("DATABASE/temp_store")).toString().trimmed();
-        pragmaList["temp_store"] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
-
-        value = settings.getMain(QLatin1String("DATABASE/locking_mode")).toString().trimmed();
-        pragmaList["locking_mode"] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
 
         QStringList files;
         if (!cmd.getDataFilesList(files)) {
             consoleOut.outToConsole(cmd.errorString());
             return 1;
         }
+
+        mms::pragmaList_t pragmaList;
+        pragmaList["synchronous"] = settings.getSynchronousType();
+        pragmaList["journal_mode"] = settings.getJournalModeType();
+        pragmaList["temp_store"] = settings.getTempStore();
+        pragmaList["locking_mode"] = settings.getLockingMode();
 
         consoleOut.outToConsole(QLatin1String("Start reading and converting files..."));
         
@@ -150,6 +139,7 @@ int main(int argc, char *argv[])
         Q_ASSERT_X(retVal, "connect", "connection is not established");
 
         quint16 logID = 1;
+        bool hasHeaders = settings.isDataHasHeaders();
         retVal = loader.init(logID, dbName, hasHeaders, internalIpFirstOctet, &pragmaList);
         if (retVal) {
             loader.setFileNames(files);
@@ -190,9 +180,10 @@ int main(int argc, char *argv[])
         CReportManager::instance().init();
         consoleOut.outToConsole(QLatin1String("Start generating the report..."));
 
+        bool showMilliseconds = settings.getShowMilliseconds();
         CSVThreadReportBuilder report;
         quint16 logID = 1;
-        bool retVal = report.init(logID, dbName, reportName, &excludedUsers, &includedUsers);
+        bool retVal = report.init(logID, dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
         if (retVal) {
             report.start();
 
@@ -211,6 +202,5 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
-
     return 0;
 }

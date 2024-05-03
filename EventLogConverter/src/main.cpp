@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     CParserManager::instance().init();
     //get path to the DB
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    QString dbName =  QDir::fromNativeSeparators(settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
+    QString dbName =  settings.getDbFileName();
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
         settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
@@ -140,8 +140,7 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1\nDetails: %2").arg(dbPath, errorString), QMessageBox::Ok);
         return 1;
     }
-    QString cleardb = settings.getMain(QLatin1String("SETTINGS/clear_on_startup")).toString().trimmed();
-    if (cleardb.isEmpty() || (QString::compare(cleardb, QLatin1String("yes"), Qt::CaseInsensitive) == 0)) {
+    if (settings.isClearDbOnStartup()) {
         elcUtils::expandEnvironmentStrings(dbName);
         const CParserManager &parserManager = CParserManager::instance();
         qsizetype count = parserManager.getItemCount();

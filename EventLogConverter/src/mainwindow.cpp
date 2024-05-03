@@ -141,9 +141,9 @@ MainWindow::MainWindow(QWidget *parent)
     Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
     
     const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    m_dbName =  QDir::fromNativeSeparators(settings.getMain(QLatin1String("SETTINGS/db_file_name")).toString().trimmed());
+    m_dbName =  settings.getDbFileName();
     elcUtils::expandEnvironmentStrings(m_dbName);
-    m_lastDir = settings.getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
+    m_lastDir = settings.getLastDir();
 
     setStateText(tr("Ready"));
 
@@ -283,20 +283,13 @@ MainWindow::convertEventLogClick()
         Q_ASSERT_X(retVal, "connect", "connection is not established");
         
         const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-        QString internalIpFirstOctet = settings.getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();
-        if (!internalIpFirstOctet.isEmpty() && elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), internalIpFirstOctet)) {
+        QString internalIpFirstOctet = settings.getInternalIpStartOctet();
+        if (!internalIpFirstOctet.isEmpty()) {
             mms::pragmaList_t pragmaList;
-            QString value = settings.getMain(QLatin1String("DATABASE/synchronous")).toString().trimmed();
-            pragmaList[QLatin1String("synchronous")] = elcUtils::sanitizeValue(value, elcUtils::plSynchronous, elcUtils::pvNormal);
-
-            value = settings.getMain(QLatin1String("DATABASE/journal_mode")).toString().trimmed();
-            pragmaList[QLatin1String("journal_mode")] = elcUtils::sanitizeValue(value, elcUtils::plJournalMode, elcUtils::pvMemory);
-
-            value = settings.getMain(QLatin1String("DATABASE/temp_store")).toString().trimmed();
-            pragmaList[QLatin1String("temp_store")] = elcUtils::sanitizeValue(value, elcUtils::plTempStore, elcUtils::pvMemory);
-
-            value = settings.getMain(QLatin1String("DATABASE/locking_mode")).toString().trimmed();
-            pragmaList[QLatin1String("locking_mode")] = elcUtils::sanitizeValue(value, elcUtils::plLockingMode, elcUtils::pvExclusive);
+            pragmaList[QLatin1String("synchronous")] = settings.getSynchronousType();
+            pragmaList[QLatin1String("journal_mode")] = settings.getJournalModeType();
+            pragmaList[QLatin1String("temp_store")] = settings.getTempStore();
+            pragmaList[QLatin1String("locking_mode")] = settings.getLockingMode();
 
             setInfoText(tr("Start reading and converting file(s)..."));
             setStateText(tr("Read and converting"));
@@ -396,8 +389,10 @@ MainWindow::generateReportClick()
             setStateText(tr("Generating report"));
             QCoreApplication::processEvents();
 
+            const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+            bool showMilliseconds = settings.getShowMilliseconds();
             CSVThreadReportBuilder report;
-            if (report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers)) {
+            if (report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds)) {
                 report.start();
 
                 setInfoText(tr("wait..."));

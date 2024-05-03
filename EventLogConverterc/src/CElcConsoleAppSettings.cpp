@@ -35,3 +35,10 @@ CElcConsoleAppSettings::createDefault(const QString& iniPath)
     settings.setValue(QLatin1String("data_has_headers"), QLatin1String("yes"));
     settings.endGroup();
 }
+
+bool
+CElcConsoleAppSettings::isDataHasHeaders() const
+{
+    QString buf = getMain(QLatin1String("SETTINGS/data_has_headers")).toString().trimmed();
+    return buf.isEmpty() || QString::compare(buf, QLatin1String("yes"), Qt::CaseInsensitive) == 0 ? true : false;
+}

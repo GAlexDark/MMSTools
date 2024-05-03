@@ -24,6 +24,7 @@ class CElcConsoleAppSettings : public CElcCommonSettings
 {
 public:
     static CElcConsoleAppSettings& instance();
+    bool isDataHasHeaders() const;
 
 private:
     void createDefault(const QString& iniPath) override;

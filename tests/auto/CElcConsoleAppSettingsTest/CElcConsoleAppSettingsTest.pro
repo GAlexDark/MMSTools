@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += testlib
+QT += testlib sql
 QT -= gui
 
 include(../../../MMSTools.pri)
@@ -13,11 +13,15 @@ INCLUDEPATH += \
     $${PROJECT_ROOT_DIRECTORY}/EventLogConverterc/src
 
 HEADERS += \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.h \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.h \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicSettings.h \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CElcCommonSettings.h \
     $${PROJECT_ROOT_DIRECTORY}/EventLogConverterc/src/CElcConsoleAppSettings.h
 
 SOURCES += \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.cpp \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicSettings.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CElcCommonSettings.cpp \
     $${PROJECT_ROOT_DIRECTORY}/EventLogConverterc/src/CElcConsoleAppSettings.cpp \

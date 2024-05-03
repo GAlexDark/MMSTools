@@ -25,7 +25,7 @@ class CBasicReport : public QObject
 {
 public:
     explicit CBasicReport(QObject *parent = nullptr);
-    void init(pBasicDatabase db, const QString &reportName);
+    void init(pBasicDatabase db, const QString &reportName, bool showMilliseconds);
     virtual bool generateReport(const QString &arguments) = 0;
     QString errorString() const { return m_errorString; }
 
@@ -41,6 +41,7 @@ protected:
 
     QString         m_reportFileName;
     pBasicDatabase  m_db = nullptr;
+    bool            m_showMilliseconds = false;
 
 private:
     QString         m_errorString;

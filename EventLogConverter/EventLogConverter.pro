@@ -84,3 +84,4 @@ DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
 DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""
 DEFINES += QT_VER=\\\"$${QT_VERSION}\\\"
 DEFINES += CONTACT=\\\"support@galexsoftware.info\\\"
+DEFINES += GUI
