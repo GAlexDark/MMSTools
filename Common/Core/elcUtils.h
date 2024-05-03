@@ -25,24 +25,6 @@
 
 namespace elcUtils
 {
-/*
-    inline const QString pvOff("OFF");
-    inline const QString pvNormal("NORMAL");
-    inline const QString pvFull("FULL");
-    inline const QString pvDelete("DELETE");
-    inline const QString pvTruncate("TRUNCATE");
-    inline const QString pvPersist("PERSIST");
-    inline const QString pvMemory("MEMORY");
-    inline const QString pvWal("WAL");
-    inline const QString pvDefault("DEFAULT");
-    inline const QString pvFile("FILE");
-    inline const QString pvExclusive("EXCLUSIVE");
-
-    inline const QStringList plSynchronous = { pvOff, pvNormal, pvFull };
-    inline const QStringList plJournalMode = { pvDelete, pvTruncate, pvPersist, pvMemory, pvWal, pvOff };
-    inline const QStringList plTempStore = { pvDefault, pvFile, pvMemory };
-    inline const QStringList plLockingMode = { pvNormal, pvExclusive };
-*/
 /*!
  * bool elcUtils::sanitizeValue(const QString &value).
  * Checks the \a value for invalid characters.

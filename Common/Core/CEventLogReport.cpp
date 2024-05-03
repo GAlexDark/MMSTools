@@ -34,23 +34,23 @@ CEventLogReport::generateReport(const QString &arguments)
         setDateTimeFormat(dateFormat);
 
         int row = 1;
-        //int colRowNumber = 1;
-        int colTimestampISO8601 = 1;
-        int colTimestamp = 2;
-        int colExternalIP = 3;
-        int colUsername = 4;
-        int colType = 5;
-        int colDetails = 6;
-        int colAuthType = 7;
-        int colInternalIP = 8;
-        int colRequestid = 9;
+        int colRowNumber = 1;
+        int colTimestampISO8601 = 2;
+        int colTimestamp = 3;
+        int colExternalIP = 4;
+        int colUsername = 5;
+        int colType = 6;
+        int colDetails = 7;
+        int colAuthType = 8;
+        int colInternalIP = 9;
+        int colRequestid = 10;
 
         QXlsx::Document xlsxReport;
         // Add header
-        //QVariant writeValue = QStringLiteral("№");
-        //xlsxReport.write(row, colRowNumber, writeValue);
+        QVariant writeValue = QStringLiteral("№");
+        xlsxReport.write(row, colRowNumber, writeValue);
 
-        QVariant writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
+        writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
         xlsxReport.write(row, colTimestampISO8601, writeValue);
         writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
         xlsxReport.write(row, colTimestamp, writeValue);

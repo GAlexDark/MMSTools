@@ -21,7 +21,6 @@
 #include <QObject>
 #include <QString>
 #include "MMSTypes.h"
-#include "elcUtils.h"
 
 class CBasicParser : public QObject
 {
