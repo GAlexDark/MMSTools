@@ -24,7 +24,6 @@ class CElcCommonSettings : public CBasicSettings
 public:
     QString getDbFileName() const;
     bool isClearDbOnStartup() const;
-    QString getLastDir() const;
     QString getInternalIpStartOctet() const;
     QString getSynchronousType() const;
     QString getJournalModeType() const;

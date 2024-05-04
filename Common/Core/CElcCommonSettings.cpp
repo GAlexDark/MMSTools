@@ -84,12 +84,6 @@ CElcCommonSettings::isClearDbOnStartup() const
 }
 
 QString
-CElcCommonSettings::getLastDir() const
-{
-    return getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
-}
-
-QString
 CElcCommonSettings::getInternalIpStartOctet() const
 {
     QString buf = getMain(QLatin1String("SETTINGS/internal_ip_start_octet")).toString().trimmed();

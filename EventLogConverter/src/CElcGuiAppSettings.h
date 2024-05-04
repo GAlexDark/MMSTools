@@ -25,7 +25,7 @@ class CElcGuiAppSettings : public CElcCommonSettings
 {
 public:
     static CElcGuiAppSettings& instance();
-
+    QString getLastDir() const;
 private:
     void createDefault(const QString& iniPath) override;
 };
