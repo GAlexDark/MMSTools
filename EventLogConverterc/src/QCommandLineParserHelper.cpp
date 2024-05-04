@@ -125,6 +125,21 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
     return retVal;
 }
 
+QStringList
+QCommandLineParserHelper::excludedUsernames() const
+{
+    QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
+    elcUtils::parseValuesList(retVal);
+    return retVal;
+}
+
+QStringList QCommandLineParserHelper::includedUsernames() const
+{
+    QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
+    elcUtils::parseValuesList(retVal);
+    return retVal;
+}
+
 [[noreturn]] void
 QCommandLineParserHelper::showHelpAndExit()
 {
@@ -222,13 +237,13 @@ QCommandLineParserHelper::getReportName() const
 bool
 QCommandLineParserHelper::getExcludedUserNames(QStringList &excludedUsersList)
 {
-    excludedUsersList = m_isExcluded ? m_parser.values("exclude") : QStringList();
+    excludedUsersList = excludedUsernames();
     return checkData(excludedUsersList);
 }
 
 bool
 QCommandLineParserHelper::getIncludedUserNames(QStringList &includedUsersList)
 {
-    includedUsersList = m_isIncluded ? m_parser.values("include") : QStringList();
+    includedUsersList = includedUsernames();
     return checkData(includedUsersList);
 }

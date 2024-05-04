@@ -40,6 +40,9 @@ public:
     QString errorString() const { return m_errorString; }
 
 private:
+    QStringList excludedUsernames() const;
+    QStringList includedUsernames() const;
+
     QCommandLineParser  m_parser;
 
     bool                m_isPath = false;
