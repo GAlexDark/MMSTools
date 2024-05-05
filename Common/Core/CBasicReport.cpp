@@ -75,7 +75,14 @@ CBasicReport::checkDetails(const QString &data)
 void
 CBasicReport::setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const int dbFieldIndex, const int reportFieldIndex, const int row)
 {
-    QVariant writeValue = db->geValue(dbFieldIndex).toString();
+    QVariant writeValue = db->geValue(dbFieldIndex);
+    report->write(row, reportFieldIndex, writeValue);
+}
+
+void
+CBasicReport::setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const QString dbFieldName, const int reportFieldIndex, const int row)
+{
+    QVariant writeValue = db->geValue(dbFieldName);
     report->write(row, reportFieldIndex, writeValue);
 }
 
