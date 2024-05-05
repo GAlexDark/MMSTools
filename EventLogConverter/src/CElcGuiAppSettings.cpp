@@ -45,3 +45,9 @@ CElcGuiAppSettings::createDefault(const QString& iniPath)
     settings.setValue(QLatin1String("last_dir"), nullStringValue);
     settings.endGroup();
 }
+
+QString
+CElcGuiAppSettings::getLastDir() const
+{
+    return getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
+}

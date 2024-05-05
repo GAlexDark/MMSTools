@@ -18,20 +18,25 @@
 #include "QCommandLineParserHelper.h"
 #include <QFileInfo>
 #include <QDir>
-
+#include <QRegularExpressionValidator>
 #include "elcUtils.h"
+#include "CElcConsoleAppSettings.h"
 
 bool
 QCommandLineParserHelper::checkData(const QStringList &data)
 {
     bool retVal = true;
-    for (const QString &item : data) {
-        if (!elcUtils::sanitizeValue(item)) {
-            m_errorString = QStringLiteral("Invalid character in the value %1").arg(item);
-            retVal = false;
-            break;
-        }
+    const CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
+    QString defChars = settings.getAllowedChars();
+    QRegularExpression mask(QStringLiteral("^([%1,;]+)$").arg(defChars));
+    QRegularExpressionValidator v(mask, 0);
+    int pos = 0;
+    QString buf = data.join(';');
+    if (v.validate(buf, pos) == QValidator::Invalid) {
+        m_errorString = QStringLiteral("Invalid character(s) in the usernames: %1\nDefault allowed characters in the usernames: a..z, A..Z, 0..9 and _ (underscore).").arg(buf);
+        retVal = false;
     }
+
     return retVal;
 }
 

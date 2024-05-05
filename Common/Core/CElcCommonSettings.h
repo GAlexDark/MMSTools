@@ -24,13 +24,13 @@ class CElcCommonSettings : public CBasicSettings
 public:
     QString getDbFileName() const;
     bool isClearDbOnStartup() const;
-    QString getLastDir() const;
     QString getInternalIpStartOctet() const;
     QString getSynchronousType() const;
     QString getJournalModeType() const;
     QString getTempStore() const;
     QString getLockingMode() const;
     bool getShowMilliseconds() const;
+    QString getAllowedChars() const;
 
 protected:
     void createDefault(const QString& iniPath) override;

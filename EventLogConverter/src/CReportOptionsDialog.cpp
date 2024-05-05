@@ -4,6 +4,7 @@
 #include <QMessageBox>
 
 #include "elcUtils.h"
+#include "CElcGuiAppSettings.h"
 
 void
 CReportOptionsDialog::clearLists()
@@ -27,6 +28,12 @@ CReportOptionsDialog::CReportOptionsDialog(const quint16 logID, const QStringLis
     ui->comboBox->addItems(logsList);
     ui->comboBox->setCurrentIndex(m_logID);
 
+    const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+    QString defChars = settings.getAllowedChars();
+    QRegularExpression mask(QStringLiteral("^([%1,;]+)$").arg(defChars));
+    m_rev.reset(new QRegularExpressionValidator(mask, this));
+    ui->edIncludedUsers->setValidator(m_rev.data());
+    ui->edExcludedUsers->setValidator(m_rev.data());
     clearLists();
 }
 
@@ -55,36 +62,23 @@ CReportOptionsDialog::doOkClicked()
         QMessageBox::warning(nullptr, QObject::tr("Warning"), QObject::tr("The MMS report type is not selected."), QMessageBox::Ok);
         isError = true;
     } else {
-        QString buf = ui->edIncludedUsers->text().trimmed();
-        if (!buf.isEmpty()) { //parse only the include users list, the exclude users list is ignored
-            m_includeUsersList = elcUtils::parseValuesList(buf);
-            buf.clear();
-            for (qsizetype i = 0; i < m_includeUsersList.size(); ++i) {
-                buf = m_includeUsersList.at(i);
-                if (!elcUtils::sanitizeValue(buf)) {
-                    QMessageBox::warning(nullptr, QObject::tr("Warning"),
-                                         QObject::tr("Invalid character in the value %1").arg(buf),
-                                         QMessageBox::Ok);
-                    m_includeUsersList.clear();
-                    isError = true;
-                    break;
-                }
+        QString buf1 = ui->edIncludedUsers->text().trimmed();
+        QString buf2 = ui->edExcludedUsers->text().trimmed();
+        bool isIncluded = !buf1.isEmpty();
+        bool isExcluded = !buf2.isEmpty();
+        if (isIncluded && isExcluded) {
+            QMessageBox::warning(nullptr, QObject::tr("Warning"),
+                                 QObject::tr("Exclusion and inclusion lists cannot be specified at the same time."),
+                                 QMessageBox::Ok);
+            isError = true;
+        } else {
+            if (isIncluded) {
+                m_includeUsersList = elcUtils::parseValuesList(buf1);
+                m_excludeUsersList.clear();
             }
-        } else { // parse the exclude users list
-            buf.clear();
-            buf = ui->edExcludedUsers->text().trimmed();
-            m_excludeUsersList = elcUtils::parseValuesList(buf);
-            buf.clear();
-            for (qsizetype i = 0; i < m_excludeUsersList.size(); ++i) {
-                buf = m_excludeUsersList.at(i);
-                if (!elcUtils::sanitizeValue(buf)) {
-                    QMessageBox::warning(nullptr, QObject::tr("Warning"),
-                                         QObject::tr("Invalid character in the value %1").arg(buf),
-                                         QMessageBox::Ok);
-                    m_excludeUsersList.clear();
-                    isError = true;
-                    break;
-                }
+            if (isExcluded) {
+                m_excludeUsersList = elcUtils::parseValuesList(buf2);
+                m_includeUsersList.clear();
             }
         }
     }

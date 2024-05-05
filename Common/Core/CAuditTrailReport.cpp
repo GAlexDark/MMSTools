@@ -70,16 +70,16 @@ CAuditTrailReport::generateReport(const QString &arguments)
         while (m_db->isNext()) {
             xlsxReport.write(row, colRowNumber, row - 1);
 
-            writeValue = m_db->geValue(0).toDateTime();
+            writeValue = m_db->geValue("timestamp").toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 
-            setReportDataItem(&xlsxReport, 1, colUsername, row);
-            setReportDataItem(&xlsxReport, 2, colRole, row);
-            setReportDataItem(&xlsxReport, 3, colCompanyname, row);
-            setReportDataItem(&xlsxReport, 4, colMethod, row);
-            setReportDataItem(&xlsxReport, 5, colStatus, row);
-            setReportDataItem(&xlsxReport, 6, colAttributes, row);
-            setReportDataItem(&xlsxReport, 7, colInternalIP, row);
+            setReportDataItem(&xlsxReport, "username", colUsername, row);
+            setReportDataItem(&xlsxReport, "role", colRole, row);
+            setReportDataItem(&xlsxReport, "companyname", colCompanyname, row);
+            setReportDataItem(&xlsxReport, "method", colMethod, row);
+            setReportDataItem(&xlsxReport, "status", colStatus, row);
+            setReportDataItem(&xlsxReport, "attributes", colAttributes, row);
+            setReportDataItem(&xlsxReport, "internalip", colInternalIP, row);
 
             ++row;
         } // while
@@ -99,4 +99,10 @@ void
 CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
 {
     CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
+}
+
+void
+CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row)
+{
+    CBasicReport::setReportDataItem(report, m_db, dbFieldName, reportFieldIndex, row);
 }
