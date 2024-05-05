@@ -29,7 +29,7 @@ QCommandLineParserHelper::checkData(const QStringList &data)
     const CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
     QString defChars = settings.getAllowedChars();
     QRegularExpression mask(QStringLiteral("^([%1,;]+)$").arg(defChars));
-    QRegularExpressionValidator v(mask, 0);
+    QRegularExpressionValidator v(mask, nullptr);
     int pos = 0;
     QString buf = data.join(';');
     if (v.validate(buf, pos) == QValidator::Invalid) {
