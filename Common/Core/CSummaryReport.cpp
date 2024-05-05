@@ -76,18 +76,18 @@ CSummaryReport::generateReport(const QString &arguments)
         while (m_db->isNext()) {
             xlsxReport.write(row, colRowNumber, row - 1);
 
-            writeValue = m_db->geValue(0).toDateTime();
+            writeValue = m_db->geValue("timestamp").toDateTime();
             xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
 
-            setReportDataItem(&xlsxReport, 1, colUsername, row);
-            setReportDataItem(&xlsxReport, 2, colCompanyRole, row);
-            setReportDataItem(&xlsxReport, 3, colTypeOrMethod, row);
-            setReportDataItem(&xlsxReport, 4, colStatus, row);
-            setReportDataItem(&xlsxReport, 5, colDetailsOrAttributes, row);
-            setReportDataItem(&xlsxReport, 6, colAuthType, row);
-            setReportDataItem(&xlsxReport, 7, colExternalIP, row);
-            setReportDataItem(&xlsxReport, 8, colInternalIP, row);
-            setReportDataItem(&xlsxReport, 9, colRequestid, row);
+            setReportDataItem(&xlsxReport, "username", colUsername, row);
+            setReportDataItem(&xlsxReport, "company_role", colCompanyRole, row);
+            setReportDataItem(&xlsxReport, "type_or_method", colTypeOrMethod, row);
+            setReportDataItem(&xlsxReport, "status", colStatus, row);
+            setReportDataItem(&xlsxReport, "details_or_attributes", colDetailsOrAttributes, row);
+            setReportDataItem(&xlsxReport, "authtype", colAuthType, row);
+            setReportDataItem(&xlsxReport, "externalip", colExternalIP, row);
+            setReportDataItem(&xlsxReport, "internalip", colInternalIP, row);
+            setReportDataItem(&xlsxReport, "requestid", colRequestid, row);
 
             ++row;
         } // while
@@ -107,4 +107,10 @@ void
 CSummaryReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
 {
     CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
+}
+
+void
+CSummaryReport::setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row)
+{
+    CBasicReport::setReportDataItem(report, m_db, dbFieldName, reportFieldIndex, row);
 }

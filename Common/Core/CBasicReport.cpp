@@ -80,7 +80,7 @@ CBasicReport::setReportDataItem(QXlsx::Document *report, const pBasicDatabase db
 }
 
 void
-CBasicReport::setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const QString dbFieldName, const int reportFieldIndex, const int row)
+CBasicReport::setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const QString &dbFieldName, const int reportFieldIndex, const int row)
 {
     QVariant writeValue = db->geValue(dbFieldName);
     report->write(row, reportFieldIndex, writeValue);
