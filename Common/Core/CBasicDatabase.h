@@ -66,6 +66,7 @@ public:
     bool exec(const QString &query);
 
     QVariant geValue(int index) const { return m_SQLRes->value(index); }
+    QVariant geValue(const QString name) const { return m_SQLRes->value(name); }
     bool isNext() { return m_SQLRes->next(); }
 
 private:
