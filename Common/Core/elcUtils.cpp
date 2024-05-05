@@ -45,13 +45,9 @@ elcUtils::sanitizeValue(const QString &value)
 bool
 elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 {
-    bool retVal = false;
     QRegularExpression mask(pattern);
     QRegularExpressionMatch match = mask.match(value);
-    if (match.hasMatch()) {
-        retVal = true;
-    }
-    return retVal;
+    return match.hasMatch() ? true : false;
 }
 
 QString

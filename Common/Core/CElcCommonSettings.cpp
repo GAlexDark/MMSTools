@@ -31,6 +31,7 @@ const QString pvWal("WAL");
 const QString pvDefault("DEFAULT");
 const QString pvFile("FILE");
 const QString pvExclusive("EXCLUSIVE");
+const QString defaultAllowedChars("a-zA-Z0-9_");
 
 const QStringList plSynchronous = { pvOff, pvNormal, pvFull };
 const QStringList plJournalMode = { pvDelete, pvTruncate, pvPersist, pvMemory, pvWal, pvOff };
@@ -59,14 +60,18 @@ CElcCommonSettings::createDefault(const QString& iniPath)
     settings.endGroup();
 
     settings.beginGroup(QLatin1String("DATABASE"));
-    settings.setValue(QLatin1String("journal_mode"), QLatin1String("MEMORY")); // DELETE | TRUNCATE | PERSIST | MEMORY | WAL | OFF
-    settings.setValue(QLatin1String("synchronous"), QLatin1String("NORMAL")); // OFF | NORMAL | FULL
-    settings.setValue(QLatin1String("temp_store"), QLatin1String("MEMORY")); // DEFAULT | FILE | MEMORY
-    settings.setValue(QLatin1String("locking_mode"), QLatin1String("EXCLUSIVE")); // NORMAL | EXCLUSIVE
+    settings.setValue(QLatin1String("journal_mode"), pvMemory); // DELETE | TRUNCATE | PERSIST | MEMORY | WAL | OFF
+    settings.setValue(QLatin1String("synchronous"), pvNormal); // OFF | NORMAL | FULL
+    settings.setValue(QLatin1String("temp_store"), pvMemory); // DEFAULT | FILE | MEMORY
+    settings.setValue(QLatin1String("locking_mode"), pvExclusive); // NORMAL | EXCLUSIVE
     settings.endGroup();
 
     settings.beginGroup(QLatin1String("REPORT"));
     settings.setValue(QLatin1String("show_milliseconds"), QLatin1String("no")); // yes | no
+    settings.endGroup();
+
+    settings.beginGroup(QLatin1String("BASIC_FILTER"));
+    settings.setValue(QLatin1String("allowed_chars"), defaultAllowedChars);
     settings.endGroup();
 }
 
@@ -123,4 +128,11 @@ CElcCommonSettings::getShowMilliseconds() const
 {
     QString buf = getMain(QLatin1String("REPORT/show_milliseconds")).toString().trimmed();
     return buf.isEmpty() || (QString::compare(buf, QLatin1String("no"), Qt::CaseInsensitive) == 0) ? false : true;
+}
+
+QString
+CElcCommonSettings::getAllowedChars() const
+{
+    QString buf = getMain(QLatin1String("BASIC_FILTER/allowed_chars")).toString().trimmed();
+    return buf.isEmpty() ? defaultAllowedChars : buf;
 }

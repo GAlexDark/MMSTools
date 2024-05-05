@@ -30,6 +30,7 @@ public:
     QString getTempStore() const;
     QString getLockingMode() const;
     bool getShowMilliseconds() const;
+    QString getAllowedChars() const;
 
 protected:
     void createDefault(const QString& iniPath) override;

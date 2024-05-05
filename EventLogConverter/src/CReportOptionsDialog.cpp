@@ -2,9 +2,9 @@
 #include "qpushbutton.h"
 #include "ui_CReportOptionsDialog.h"
 #include <QMessageBox>
-#include <QRegularExpressionValidator>
 
 #include "elcUtils.h"
+#include "CElcGuiAppSettings.h"
 
 void
 CReportOptionsDialog::clearLists()
@@ -28,9 +28,12 @@ CReportOptionsDialog::CReportOptionsDialog(const quint16 logID, const QStringLis
     ui->comboBox->addItems(logsList);
     ui->comboBox->setCurrentIndex(m_logID);
 
-    QRegularExpression mask("^([a-zA-Z0-9_,;]+)$"); // ToDo: add the str to the config
-    ui->edIncludedUsers->setValidator(new QRegularExpressionValidator(mask, this));
-    ui->edExcludedUsers->setValidator(new QRegularExpressionValidator(mask, this));
+    const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+    QString defChars = settings.getAllowedChars();
+    QRegularExpression mask(QStringLiteral("^([%1,;]+)$").arg(defChars));
+    m_rev.reset(new QRegularExpressionValidator(mask, this));
+    ui->edIncludedUsers->setValidator(m_rev.data());
+    ui->edExcludedUsers->setValidator(m_rev.data());
     clearLists();
 }
 

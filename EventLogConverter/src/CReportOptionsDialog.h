@@ -2,6 +2,8 @@
 #define CREPORTOPTIONSDIALOG_H
 
 #include <QDialog>
+#include <QRegularExpressionValidator>
+#include <QScopedPointer>
 
 namespace Ui {
 class CReportOptionsDialog;
@@ -22,6 +24,7 @@ private slots:
 
 private:
     Ui::CReportOptionsDialog *ui;
+    QScopedPointer<QRegularExpressionValidator> m_rev;
     quint16 m_logID = 0;
     bool    m_isOkClicked = false;
 
