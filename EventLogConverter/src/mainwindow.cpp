@@ -339,7 +339,7 @@ MainWindow::clearDBclick()
     qsizetype count = parserManager.getItemCount();
     QStringList tables = parserManager.getTablesList();
     QStringList creationStrings = parserManager.getCreateTableRequestList();
-    if (elcUtils::trunvateDB(m_dbName, errorString, count, tables, creationStrings)) {
+    if (CBasicDatabase::trunvateDB(m_dbName, errorString, count, tables, creationStrings)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {
