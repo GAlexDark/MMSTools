@@ -702,8 +702,12 @@ Copyright (C) 2023 Олексій Гаєнко
     </message>
     <message>
         <location filename="../src/CReportOptionsDialog.cpp" line="71"/>
-        <source>Exclusion and inclusion lists cannot be specified at the same time.</source>
+        <source>User exclusion and inclusion lists cannot be specified at the same time.</source>
         <translation>Списки виключення та включення користувачів не можуть бути вказані одночасно.</translation>
+    </message>
+    <message>
+        <source>Exclusion and inclusion lists cannot be specified at the same time.</source>
+        <translation type="vanished">Списки виключення та включення користувачів не можуть бути вказані одночасно.</translation>
     </message>
     <message>
         <source>Invalid character in the value %1</source>
