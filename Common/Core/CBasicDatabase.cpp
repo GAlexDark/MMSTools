@@ -88,6 +88,38 @@ CBasicDatabase::~CBasicDatabase()
 }
 
 bool
+CBasicDatabase::trunvateDB(const QString &connectionString, QString &errorString,
+                       qsizetype tablesCount, const QStringList &tablesNames,
+                       const QStringList &creationStrings)
+{
+    CBasicDatabase db;
+    bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
+    if (retVal) {
+        retVal = db.open();
+        if (retVal) {
+            for (qsizetype i = 0; i < tablesCount; ++i) {
+                retVal = db.truncateTable(tablesNames.at(i));
+                if (retVal) {
+                    retVal = db.optimizeDatabaseSize();
+                    if (retVal) {
+                        retVal = db.exec(creationStrings.at(i));
+                        if (!retVal) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        db.close();
+    }
+
+    if (!retVal) {
+        errorString = db.errorString();
+    }
+    return retVal;
+}
+
+bool
 CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
 {
     if (!m_isInited) {

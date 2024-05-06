@@ -29,9 +29,6 @@ namespace elcUtils
     QString sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue);
     QStringList parseValuesList(QString data);
     void parseValuesList(QStringList &data);
-    bool trunvateDB(const QString &connectionString, QString &errorString,
-                    qsizetype tablesCount, const QStringList &tablesNames,
-                    const QStringList &creationStrings);
     int getStorageBlockSize(const QString &file);
     QString getFormattedDateTime(const QString &dateTime);
     void waitForEndThread(QThread *obj, unsigned long time);

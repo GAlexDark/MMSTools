@@ -29,7 +29,7 @@
 #include "elcUtils.h"
 #include "CParserManager.h"
 #include "CReportManager.h"
-
+#include "CBasicDatabase.h"
 
 int main(int argc, char *argv[])
 {
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
             qsizetype count = parserManager.getItemCount();
             QStringList tables = parserManager.getTablesList();
             QStringList creationStrings = parserManager.getCreateTableRequestList();
-            if (!elcUtils::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
+            if (!CBasicDatabase::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
                 consoleOut.outToConsole(QLatin1String("Cannot clean database: %1").arg(errorString));
                 return 1;
             }

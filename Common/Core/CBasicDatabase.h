@@ -37,6 +37,10 @@ public:
     CBasicDatabase();
     ~CBasicDatabase();
 
+    static bool trunvateDB(const QString &connectionString, QString &errorString,
+                    qsizetype tablesCount, const QStringList &tablesNames,
+                    const QStringList &creationStrings);
+
     QString getConnectionName() const { return m_connectionName; }
     CBasicDatabase *getDBinstance() { return this; }
     QString errorString() const { return m_errorString; }
