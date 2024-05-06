@@ -32,7 +32,7 @@ namespace elcUtils
  * If the \a value contains only these characters the function returns \a true and \a false otherwise
  */
 
-    bool sanitizeValue(const QString &value);
+    //bool sanitizeValue(const QString &value);
     bool sanitizeValue(const QString &pattern, const QString &value);
     QString sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue);
     QStringList parseValuesList(QString data);

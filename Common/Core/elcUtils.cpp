@@ -37,12 +37,6 @@ const QChar comma = QLatin1Char(',');
 const QChar dotComma = QLatin1Char(';');
 
 bool
-elcUtils::sanitizeValue(const QString &value)
-{
-    return sanitizeValue(QLatin1String("^([a-zA-Z0-9_]+)$"), value);
-}
-
-bool
 elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 {
     QRegularExpression mask(pattern);
