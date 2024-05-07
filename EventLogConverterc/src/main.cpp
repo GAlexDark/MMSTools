@@ -16,8 +16,7 @@
 ****************************************************************************/
 
 #include <QCoreApplication>
-#include <QDir>
-#include <QMap>
+#include <QFileInfo>
 
 #include "MMSTypes.h"
 #include "CSVReader.h"

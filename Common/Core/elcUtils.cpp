@@ -25,8 +25,6 @@
 #include <QCoreApplication>
 #include <QScopedPointer>
 
-#include "CBasicDatabase.h"
-
 #ifdef Q_OS_WIN
 #include "windows.h"
 #endif
