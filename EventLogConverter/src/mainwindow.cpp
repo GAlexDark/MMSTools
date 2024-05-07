@@ -114,6 +114,17 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+#ifdef Q_OS_WIN
+    QList<QScreen *> monitorList = QGuiApplication::screens();
+    quint32 monitorNumber = settings.getDefaultMonitor();
+    if (monitorNumber > monitorList.size()) {
+        monitorNumber = 0;
+    }
+    if (monitorNumber > 0) {
+        move(monitorList[monitorNumber - 1]->geometry().center() - frameGeometry().center());
+    }
+#endif
     setWindowIcon(QIcon(":/img/data-transformation.png"));
 
     m_state.reset(new QLabel(this));
@@ -140,7 +151,6 @@ MainWindow::MainWindow(QWidget *parent)
     retVal = connect(ui->pbGenerateReport, SIGNAL(clicked(bool)), this, SLOT(generateReportClick()));
     Q_ASSERT_X(retVal, "connect", "pbGenerateReport connection is not established");
     
-    const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
     m_dbName =  settings.getDbFileName();
     elcUtils::expandEnvironmentStrings(m_dbName);
     m_lastDir = settings.getLastDir();
@@ -339,7 +349,7 @@ MainWindow::clearDBclick()
     qsizetype count = parserManager.getItemCount();
     QStringList tables = parserManager.getTablesList();
     QStringList creationStrings = parserManager.getCreateTableRequestList();
-    if (elcUtils::trunvateDB(m_dbName, errorString, count, tables, creationStrings)) {
+    if (CBasicDatabase::trunvateDB(m_dbName, errorString, count, tables, creationStrings)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {

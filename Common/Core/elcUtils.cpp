@@ -37,12 +37,6 @@ const QChar comma = QLatin1Char(',');
 const QChar dotComma = QLatin1Char(';');
 
 bool
-elcUtils::sanitizeValue(const QString &value)
-{
-    return sanitizeValue(QLatin1String("^([a-zA-Z0-9_]+)$"), value);
-}
-
-bool
 elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 {
     QRegularExpression mask(pattern);
@@ -102,35 +96,6 @@ elcUtils::parseValuesList(QStringList &data)
             data.append(parseValuesList(buf));
         }
     }
-}
-
-bool
-elcUtils::trunvateDB(const QString &connectionString, QString &errorString,
-                          qsizetype tablesCount, const QStringList &tablesNames,
-                          const QStringList &creationStrings)
-{
-    CBasicDatabase db;
-    bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
-    if (retVal) {
-        retVal = db.open();
-        if (retVal) {
-            for (qsizetype i = 0; i < tablesCount; ++i) {
-                retVal = db.truncateTable(tablesNames.at(i));
-                if (retVal) {
-                    retVal = db.exec(creationStrings.at(i));
-                    if (!retVal) {
-                        break;
-                    }
-                }
-            }
-        }
-        db.close();
-    }
-
-    if (!retVal) {
-        errorString = db.errorString();
-    }
-    return retVal;
 }
 
 int

@@ -26,6 +26,9 @@ class CElcGuiAppSettings : public CElcCommonSettings
 public:
     static CElcGuiAppSettings& instance();
     QString getLastDir() const;
+#ifdef Q_OS_WIN
+    quint32 getDefaultMonitor() const;
+#endif
 private:
     void createDefault(const QString& iniPath) override;
 };

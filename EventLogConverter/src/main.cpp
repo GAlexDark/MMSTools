@@ -21,11 +21,13 @@
 #include <QTranslator>
 #include <QMessageBox>
 #include <QDir>
+#include <QScreen>
 
 #include "CSingleApplication.h"
 #include "CElcGuiAppSettings.h"
 #include "elcUtils.h"
 #include "CParserManager.h"
+#include "CBasicDatabase.h"
 
 void
 initTranslation(QTranslator *translator, const QApplication *qa, const QStringList &list, const QString &fileName)
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
         qsizetype count = parserManager.getItemCount();
         QStringList tables = parserManager.getTablesList();
         QStringList creationStrings = parserManager.getCreateTableRequestList();
-        if (!elcUtils::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
+        if (!CBasicDatabase::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
             QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\nDetails: %2").arg(dbName, errorString), QMessageBox::Ok);
             return 1;
         }

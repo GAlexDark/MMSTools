@@ -25,21 +25,10 @@
 
 namespace elcUtils
 {
-/*!
- * bool elcUtils::sanitizeValue(const QString &value).
- * Checks the \a value for invalid characters.
- * Only a-z, A-Z, 0-9, and '_' characters are allowed.
- * If the \a value contains only these characters the function returns \a true and \a false otherwise
- */
-
-    bool sanitizeValue(const QString &value);
     bool sanitizeValue(const QString &pattern, const QString &value);
     QString sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue);
     QStringList parseValuesList(QString data);
     void parseValuesList(QStringList &data);
-    bool trunvateDB(const QString &connectionString, QString &errorString,
-                    qsizetype tablesCount, const QStringList &tablesNames,
-                    const QStringList &creationStrings);
     int getStorageBlockSize(const QString &file);
     QString getFormattedDateTime(const QString &dateTime);
     void waitForEndThread(QThread *obj, unsigned long time);

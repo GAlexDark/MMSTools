@@ -36,7 +36,6 @@ private:
 private slots:
     void test_parseValuesList1();
     void test_parseValuesList2();
-    void test_sanitizeValue();
     void test_expandEnvironmentStrings();
 #ifdef Q_OS_WIN
     void test_getWindowsApiErrorMessage();
@@ -154,16 +153,6 @@ UtilsTest::test_parseValuesList2()
     data << "user1";
     elcUtils::parseValuesList(data);
     QCOMPARE(data.size(), 1);
-}
-
-void
-UtilsTest::test_sanitizeValue()
-{
-    bool retVal = elcUtils::sanitizeValue("Mr_data01");
-    QCOMPARE(retVal, true);
-
-    retVal = elcUtils::sanitizeValue("Mr-data01");
-    QCOMPARE(retVal, false);
 }
 
 void

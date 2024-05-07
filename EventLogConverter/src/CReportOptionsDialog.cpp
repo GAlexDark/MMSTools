@@ -68,7 +68,7 @@ CReportOptionsDialog::doOkClicked()
         bool isExcluded = !buf2.isEmpty();
         if (isIncluded && isExcluded) {
             QMessageBox::warning(nullptr, QObject::tr("Warning"),
-                                 QObject::tr("Exclusion and inclusion lists cannot be specified at the same time."),
+                                 QObject::tr("User exclusion and inclusion lists cannot be specified at the same time."),
                                  QMessageBox::Ok);
             isError = true;
         } else {
