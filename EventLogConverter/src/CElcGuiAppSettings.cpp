@@ -44,6 +44,15 @@ CElcGuiAppSettings::createDefault(const QString& iniPath)
     settings.beginGroup(QLatin1String("HISTORY"));
     settings.setValue(QLatin1String("last_dir"), nullStringValue);
     settings.endGroup();
+#ifdef Q_OS_WIN
+    settings.beginGroup(QLatin1String("SETTINGS"));
+#ifdef QT_DEBUG
+    settings.setValue(QLatin1String("default_monitor"), 1); // "\\.\DISPLAY1" in the my hardware config
+#else
+    settings.setValue(QLatin1String("default_monitor"), 0); // 0-auto, 1-first, 2-second, etc.
+#endif
+    settings.endGroup();
+#endif
 }
 
 QString
@@ -51,3 +60,10 @@ CElcGuiAppSettings::getLastDir() const
 {
     return getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
 }
+#ifdef Q_OS_WIN
+quint32
+CElcGuiAppSettings::getDefaultMonitor() const
+{
+    return getMain(QLatin1String("SETTINGS/default_monitor")).toUInt();
+}
+#endif

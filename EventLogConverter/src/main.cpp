@@ -21,6 +21,7 @@
 #include <QTranslator>
 #include <QMessageBox>
 #include <QDir>
+#include <QScreen>
 
 #include "CSingleApplication.h"
 #include "CElcGuiAppSettings.h"
