@@ -81,28 +81,37 @@ CReportBuilder::generateReport()
 {
     QString args;
     args.clear();
-    if (m_includedUsernamesList.isEmpty()) {
-        if (!m_excludedUsernamesList.isEmpty()) {
-            args.append(QLatin1String("WHERE "));
-            qsizetype size = m_excludedUsernamesList.size() - 1;
-            for (qsizetype i = 0; i < size; ++i) {
-                args.append(QStringLiteral("username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
-            } //for
-            args.append(QStringLiteral("username<>'%1'").arg(m_excludedUsernamesList.at(size)));
-        }
-    } else {
-        args.append(QLatin1String("WHERE "));
-        qsizetype size = m_includedUsernamesList.size() - 1;
-        for (qsizetype i = 0; i < size; ++i) {
-            args.append(QStringLiteral("username='%1' OR ").arg(m_includedUsernamesList.at(i)));
-        } //for
-        args.append(QStringLiteral("username='%1'").arg(m_includedUsernamesList.at(size)));
-    }
-    bool retVal = m_report->generateReport(args);
-    if (!retVal) {
-        m_errorString = m_report->errorString();
-    }
 
+    bool retVal = true;
+    bool isIncluded = !m_includedUsernamesList.isEmpty();
+    bool isExcluded = !m_excludedUsernamesList.isEmpty();
+    if (isIncluded && isExcluded) {
+        m_errorString = QStringLiteral("User exclusion and inclusion lists cannot be specified at the same time.");
+        retVal = false;
+    } else {
+        if (isIncluded || isExcluded) {
+            args.append(QLatin1String("WHERE "));
+            if (isIncluded) {
+                qsizetype size = m_includedUsernamesList.size() - 1;
+                for (qsizetype i = 0; i < size; ++i) {
+                    args.append(QStringLiteral("username='%1' OR ").arg(m_includedUsernamesList.at(i)));
+                } //for
+                args.append(QStringLiteral("username='%1'").arg(m_includedUsernamesList.at(size)));
+            }
+            if (isExcluded) {
+                qsizetype size = m_excludedUsernamesList.size() - 1;
+                for (qsizetype i = 0; i < size; ++i) {
+                    args.append(QStringLiteral("username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
+                } //for
+                args.append(QStringLiteral("username<>'%1'").arg(m_excludedUsernamesList.at(size)));
+            }
+        } // (isIncluded || isExcluded)
+
+        retVal = m_report->generateReport(args);
+        if (!retVal) {
+            m_errorString = m_report->errorString();
+        }
+    } // isIncluded && isExcluded
     m_db.close();
 
     return retVal;
