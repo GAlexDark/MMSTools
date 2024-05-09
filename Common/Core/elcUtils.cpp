@@ -25,8 +25,6 @@
 #include <QCoreApplication>
 #include <QScopedPointer>
 
-#include "CBasicDatabase.h"
-
 #ifdef Q_OS_WIN
 #include "windows.h"
 #endif
@@ -85,12 +83,7 @@ void
 elcUtils::parseValuesList(QStringList &data)
 {
     if (!data.isEmpty()) {
-        QString buf;
-        if (data.size() > 1) {
-            buf = data.join(dotComma);
-        } else {
-            buf = data.at(0).trimmed();
-        }
+        QString buf = data.size() > 1 ? data.join(dotComma) : data.at(0).trimmed();
         if ((buf.indexOf(comma) != -1) || (buf.indexOf(dotComma) != -1)) {
             data.clear();
             data.append(parseValuesList(buf));

@@ -16,12 +16,10 @@
 ****************************************************************************/
 
 #include "mainwindow.h"
-
 #include <QApplication>
 #include <QTranslator>
 #include <QMessageBox>
-#include <QDir>
-#include <QScreen>
+#include <QFileInfo>
 
 #include "CSingleApplication.h"
 #include "CElcGuiAppSettings.h"
