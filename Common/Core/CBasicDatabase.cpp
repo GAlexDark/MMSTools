@@ -124,7 +124,6 @@ CBasicDatabase::init(const QString &dbDriverName, const QString &connectionStrin
 {
     if (!m_isInited) {
         if (connectionString.isEmpty() || dbDriverName.isEmpty()) {
-            m_isInited = false;
             m_errorString = QStringLiteral("Empty connection string");
         } else {
             // соединяемся с базой данных
