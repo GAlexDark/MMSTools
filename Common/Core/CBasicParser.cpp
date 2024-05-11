@@ -28,7 +28,7 @@ CBasicParser::removeQuote(QString &data) const
 }
 
 CBasicParser::CBasicParser(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {
     m_eolChars.clear();
 }

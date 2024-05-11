@@ -32,7 +32,7 @@ const QString doubleBackslash(QLatin1String("\"\""));
 const QString backslash(QLatin1String("\""));
 
 CBasicReport::CBasicReport(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {
     m_errorString.clear();
     m_reportFileName.clear();

@@ -387,7 +387,7 @@ CMmsLogsReader::convertData(const QString &line)
 //--------------------------------------------------------------------------
 
 CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
-    : QThread(parent)
+    : QThread{parent}
 {
     m_fileNames.clear();
 }

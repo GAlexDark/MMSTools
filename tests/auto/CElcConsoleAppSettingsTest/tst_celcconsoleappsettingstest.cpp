@@ -26,7 +26,7 @@ private slots:
 };
 
 CElcConsoleAppSettingsTest::CElcConsoleAppSettingsTest(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {}
 
 CElcConsoleAppSettingsTest::~CElcConsoleAppSettingsTest() {}

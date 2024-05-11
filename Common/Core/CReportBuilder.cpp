@@ -120,7 +120,7 @@ CReportBuilder::generateReport()
 //----------------------------------------------------------
 
 CSVThreadReportBuilder::CSVThreadReportBuilder(QObject *parent)
-    : QThread(parent)
+    : QThread{parent}
 {
     m_errorString.clear();
 }

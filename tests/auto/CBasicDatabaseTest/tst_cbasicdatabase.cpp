@@ -54,7 +54,7 @@ void CBasicDatabaseTest::initTestCase()
 
 
 CBasicDatabaseTest::CBasicDatabaseTest(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {}
 
 CBasicDatabaseTest::~CBasicDatabaseTest()

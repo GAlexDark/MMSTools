@@ -19,7 +19,7 @@ private slots:
 };
 
 CSingleApplicationTest::CSingleApplicationTest(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {}
 
 CSingleApplicationTest::~CSingleApplicationTest() {}

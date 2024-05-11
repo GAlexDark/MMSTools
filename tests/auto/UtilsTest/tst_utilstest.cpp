@@ -50,7 +50,7 @@ private slots:
 };
 
 UtilsTest::UtilsTest(QObject *parent)
-    : QObject(parent), m_basePath(SRCDIR"data"), m_newDir("source")
+    : QObject{parent}, m_basePath(SRCDIR"data"), m_newDir("source")
 {}
 
 UtilsTest::~UtilsTest() {}
