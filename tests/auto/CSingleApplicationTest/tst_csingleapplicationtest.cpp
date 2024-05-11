@@ -10,7 +10,7 @@ class CSingleApplicationTest : public QObject
     Q_OBJECT
 
 public:
-    CSingleApplicationTest();
+    CSingleApplicationTest(QObject *parent = nullptr);
     ~CSingleApplicationTest();
 
 private slots:
@@ -18,7 +18,9 @@ private slots:
     void test_applicationPid();
 };
 
-CSingleApplicationTest::CSingleApplicationTest() {}
+CSingleApplicationTest::CSingleApplicationTest(QObject *parent)
+    : QObject(parent)
+{}
 
 CSingleApplicationTest::~CSingleApplicationTest() {}
 

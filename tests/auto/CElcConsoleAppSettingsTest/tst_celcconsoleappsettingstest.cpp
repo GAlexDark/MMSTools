@@ -13,7 +13,7 @@ class CElcConsoleAppSettingsTest : public QObject
 {
     Q_OBJECT
 public:
-    CElcConsoleAppSettingsTest();
+    CElcConsoleAppSettingsTest(QObject *parent = nullptr);
     ~CElcConsoleAppSettingsTest();
 
 private slots:
@@ -25,7 +25,9 @@ private slots:
     //void test_getMode();
 };
 
-CElcConsoleAppSettingsTest::CElcConsoleAppSettingsTest() {}
+CElcConsoleAppSettingsTest::CElcConsoleAppSettingsTest(QObject *parent)
+    : QObject(parent)
+{}
 
 CElcConsoleAppSettingsTest::~CElcConsoleAppSettingsTest() {}
 

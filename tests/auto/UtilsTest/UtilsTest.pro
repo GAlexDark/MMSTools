@@ -12,11 +12,13 @@ INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.h \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.h
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.h \
+    CTestClass.h
 
 SOURCES +=  \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.cpp \
+    CTestClass.cpp \
     tst_utilstest.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
