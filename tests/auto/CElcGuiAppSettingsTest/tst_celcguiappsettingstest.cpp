@@ -13,7 +13,7 @@ class CElcGuiAppSettingsTest : public QObject
     Q_OBJECT
 
 public:
-    CElcGuiAppSettingsTest();
+    CElcGuiAppSettingsTest(QObject *parent = nullptr);
     ~CElcGuiAppSettingsTest();
 
 private slots:
@@ -25,7 +25,9 @@ private slots:
     void test_checkLastDir();
 };
 
-CElcGuiAppSettingsTest::CElcGuiAppSettingsTest() {}
+CElcGuiAppSettingsTest::CElcGuiAppSettingsTest(QObject *parent)
+    : QObject(parent)
+{}
 
 CElcGuiAppSettingsTest::~CElcGuiAppSettingsTest() {}
 

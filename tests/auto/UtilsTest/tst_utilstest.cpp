@@ -3,6 +3,7 @@
 #include <QFile>
 
 #include "elcUtils.h"
+#include "CTestClass.h"
 // add necessary includes here
 
 const int filesCount = 16;
@@ -27,7 +28,7 @@ class UtilsTest : public QObject
     Q_OBJECT
 
 public:
-    UtilsTest();
+    UtilsTest(QObject *parent = nullptr);
     ~UtilsTest();
 
 private:
@@ -44,10 +45,12 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void test_dataSourceListCount();
+    void test_sanitizeValue();
+    void test_getMetaClassInfo();
 };
 
-UtilsTest::UtilsTest()
-    : m_basePath(SRCDIR"data"), m_newDir("source")
+UtilsTest::UtilsTest(QObject *parent)
+    : QObject(parent), m_basePath(SRCDIR"data"), m_newDir("source")
 {}
 
 UtilsTest::~UtilsTest() {}
@@ -190,9 +193,9 @@ UtilsTest::initTestCase()
     QDir dir(m_basePath);
     bool retVal = dir.mkdir(m_newDir);
     if (retVal) {
-        QString tstPath = m_basePath + '/' + m_newDir + "/file";
+        QString tstPath = m_basePath + QStringLiteral("/") + m_newDir + QStringLiteral("/file");
         tstPath = QDir::fromNativeSeparators(tstPath);
-        QString fileTempl = "%1%2.csv";
+        QString fileTempl = QStringLiteral("%1%2.csv");
         for (int i = 0; i < filesCount; ++i) {
             createTestFile(fileTempl.arg(tstPath).arg(i));
         }
@@ -203,7 +206,7 @@ UtilsTest::initTestCase()
 void
 UtilsTest::cleanupTestCase()
 {
-    QString tstPath = m_basePath + '/' + m_newDir;
+    QString tstPath = m_basePath + QStringLiteral("/") + m_newDir;
     QDir dir(tstPath);
     dir.removeRecursively();
 }
@@ -211,9 +214,33 @@ UtilsTest::cleanupTestCase()
 void
 UtilsTest::test_dataSourceListCount()
 {
-    QString tstPath = m_basePath + '/' + m_newDir;
+    QString tstPath = m_basePath + QStringLiteral("/") + m_newDir;
     QStringList retVal = elcUtils::getDataSourceList(tstPath, QStringList() << "*.csv");
     QCOMPARE(retVal.size(), filesCount);
+}
+
+void
+UtilsTest::test_sanitizeValue()
+{
+    QVERIFY(elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), "10.10.10.10"));
+    QVERIFY(!elcUtils::sanitizeValue(QLatin1String("^([0-9.]+)$"), "l0.10.10.10"));
+
+    const QStringList allowedValues = { "value1", "value2", "value3" };
+    QString retVal = elcUtils::sanitizeValue("value2", allowedValues, "value1");
+    QCOMPARE(retVal, "value2");
+
+    retVal = elcUtils::sanitizeValue("va1ue2", allowedValues, "value1");
+    QCOMPARE(retVal, "value1");
+}
+
+void
+UtilsTest::test_getMetaClassInfo()
+{
+    CTestClass testClass;
+    QString value;
+    bool retVal = elcUtils::getMetaClassInfo(&testClass, "prorerty", value);
+    QCOMPARE(value, "propertyvalue");
+    QVERIFY(retVal);
 }
 
 QTEST_APPLESS_MAIN(UtilsTest)

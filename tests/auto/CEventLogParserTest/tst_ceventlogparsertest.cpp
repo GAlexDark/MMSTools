@@ -11,9 +11,9 @@ class CEventLogParserTest : public QObject
 {
     Q_OBJECT
 
-//public:
-    //    CEventLogParserTest();
-    //    ~CEventLogParserTest();
+public:
+    CEventLogParserTest(QObject *parent = nullptr);
+    ~CEventLogParserTest();
 
 private:
     CEventLogParser m_parser;
@@ -44,9 +44,11 @@ private slots:
     void test_DateTimeFormats();
 };
 
-//CSVParserTest::CSVParserTest() {}
+CEventLogParserTest::CEventLogParserTest(QObject *parent)
+    : QObject(parent)
+{}
 
-//CEventLogParserTest::~CEventLogParserTest() {}
+CEventLogParserTest::~CEventLogParserTest() {}
 
 void CEventLogParserTest::initTestCase()
 {

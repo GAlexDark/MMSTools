@@ -17,7 +17,7 @@ class CBasicDatabaseTest : public QObject
     Q_OBJECT
 
 public:
-    CBasicDatabaseTest();
+    CBasicDatabaseTest(QObject *parent = nullptr);
     ~CBasicDatabaseTest();
 
 private:
@@ -53,7 +53,9 @@ void CBasicDatabaseTest::initTestCase()
 }
 
 
-CBasicDatabaseTest::CBasicDatabaseTest() {}
+CBasicDatabaseTest::CBasicDatabaseTest(QObject *parent)
+    : QObject(parent)
+{}
 
 CBasicDatabaseTest::~CBasicDatabaseTest()
 {
@@ -92,6 +94,8 @@ void CBasicDatabaseTest::test_openDB()
 void CBasicDatabaseTest::test_createTable()
 {
     bool retVal = m_fakeDB.exec(eventlog::createTable);
+    QVERIFY(retVal);
+    retVal = m_fakeDB.exec(audittrail::createTable);
     QVERIFY(retVal);
 }
 
