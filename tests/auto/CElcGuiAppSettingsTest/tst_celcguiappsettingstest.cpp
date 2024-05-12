@@ -13,7 +13,6 @@ class CElcGuiAppSettingsTest : public QObject {
 
 public:
   CElcGuiAppSettingsTest(QObject *parent = nullptr);
-  ~CElcGuiAppSettingsTest();
 
 private slots:
   void initTestCase();
@@ -26,8 +25,6 @@ private slots:
 
 CElcGuiAppSettingsTest::CElcGuiAppSettingsTest(QObject *parent)
     : QObject{parent} {}
-
-CElcGuiAppSettingsTest::~CElcGuiAppSettingsTest() {}
 
 void removeIniFile() {
   QString fp = QDir(filePath).filePath(fileName);
