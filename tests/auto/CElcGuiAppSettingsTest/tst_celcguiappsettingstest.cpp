@@ -52,7 +52,7 @@ void CElcGuiAppSettingsTest::test_fileExists() {
 }
 
 void CElcGuiAppSettingsTest::test_getDBName() {
-  CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+  const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
   QString retVal = settings.getDbFileName();
   QCOMPARE(retVal, QString(TEST_SRCDIR "EventLogConverter.db"));
 }

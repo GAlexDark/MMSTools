@@ -55,7 +55,7 @@ void CElcConsoleAppSettingsTest::test_fileExists() {
 }
 
 void CElcConsoleAppSettingsTest::test_getDBName() {
-  CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
+  const CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
   QString retVal = settings.getDbFileName();
   QCOMPARE(retVal, QString(TEST_SRCDIR "EventLogConverter.db"));
 }
