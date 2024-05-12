@@ -26,11 +26,11 @@ class UtilsTest : public QObject {
 
 public:
   UtilsTest(QObject *parent = nullptr);
-  ~UtilsTest();
 
 private:
   QString m_basePath;
   QString m_newDir;
+
 private slots:
   void test_parseValuesList1();
   void test_parseValuesList2();
@@ -46,10 +46,10 @@ private slots:
   void test_getMetaClassInfo();
 };
 
-UtilsTest::UtilsTest(QObject *parent)
-    : QObject{parent}, m_basePath(SRCDIR "data"), m_newDir("source") {}
-
-UtilsTest::~UtilsTest() {}
+UtilsTest::UtilsTest(QObject *parent) : QObject{parent} {
+  m_basePath = SRCDIR "data";
+  m_newDir = "source";
+}
 
 void UtilsTest::test_parseValuesList1() {
   qDebug() << "elcUtils::parseValuesList(QString data)";
