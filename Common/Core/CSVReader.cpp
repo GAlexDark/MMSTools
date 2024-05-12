@@ -42,7 +42,7 @@ CTextFileReader::checkBOM()
 }
 
 qint64
-CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size)
+CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size) const
 {
     qint64 retVal = -1;
     if (startPos >= 0) {
