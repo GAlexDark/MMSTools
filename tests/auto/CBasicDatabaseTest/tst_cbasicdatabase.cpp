@@ -188,7 +188,7 @@ void CBasicDatabaseTest::test_InsertBindedValues() {
   data[phTimestamp] = "2023-05-09T14:19:57.360";
   data[phRequestID] = "edbfa4ea24038861";
   data[phType] = "Вхід користувача - успішно";
-  data[phDetails] = "username: mr_data,@N@  type: PASSWORD,@N@  ip address: "
+  data[phDetails] = "username: mr_data,\r\n  type: PASSWORD,\r\n  ip address: "
                     "192.0.2.211, 10.10.10.10";
   data[phUsername1] = "mr_data";
   data[phAuthType] = "PASSWORD";

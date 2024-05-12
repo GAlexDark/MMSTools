@@ -17,8 +17,15 @@ public:
 private:
   CEventLogParser m_parser;
 
-  QString m_username, m_timestampISO8601, m_requestID, m_type, m_details,
-      m_username1, m_authType, m_externalIP, m_internalIP;
+  QString m_username;
+  QString m_timestampISO8601;
+  QString m_requestID;
+  QString m_type;
+  QString m_details;
+  QString m_username1;
+  QString m_authType;
+  QString m_externalIP;
+  QString m_internalIP;
   QDateTime m_timestampTZ;
 
 private slots:
