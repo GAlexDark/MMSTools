@@ -90,13 +90,18 @@ bool CBasicDatabase::trunvateDB(const QString &connectionString,
     if (retVal) {
       for (qsizetype i = 0; i < tablesCount; ++i) {
         retVal = db.truncateTable(tablesNames.at(i));
-        if (retVal) {
-          retVal = db.optimizeDatabaseSize();
-          if (retVal) {
-            retVal = db.exec(creationStrings.at(i));
-            if (!retVal) {
-              break;
-            }
+        if (!retVal) {
+          break;
+        }
+      }
+      if (retVal) {
+        retVal = db.optimizeDatabaseSize();
+      }
+      if (retVal) {
+        for (qsizetype i = 0; i < tablesCount; ++i) {
+          retVal = db.exec(creationStrings.at(i));
+          if (!retVal) {
+            break;
           }
         }
       }
