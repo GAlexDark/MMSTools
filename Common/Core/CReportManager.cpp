@@ -58,7 +58,6 @@ CReportManager::init(bool usePrettySelector)
             ptr = nullptr;
         }
     }
-
 }
 
 /***************************************************************************
@@ -83,7 +82,6 @@ CReportManager::prettySelector(const quint16 id) const
             ...
         }
 *************************************************/
-
     } // m_usePrettySelector
 
     return retVal;

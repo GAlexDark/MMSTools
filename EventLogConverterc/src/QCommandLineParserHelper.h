@@ -60,7 +60,6 @@ private:
     bool checkData(const QStringList &data);
     bool addElcOption(const QCoreApplication &app);
     bool checkElcOption();
-
 };
 
 #endif // QCOMMANDLINEPARSERHELPER_H

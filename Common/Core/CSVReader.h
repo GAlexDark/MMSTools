@@ -63,7 +63,6 @@ protected:
     void setErrorString(const QString &errorString) { m_errorString = errorString; }
     void clearErrorString() { m_errorString.clear(); }
     quint64 getLineNumber() const { return m_lineNumber; }
-
 };
 
 //-------------------------------------------------------------------------
@@ -104,7 +103,6 @@ signals:
 private:
     bool m_retVal = false;
     QStringList m_fileNames;
-
 };
 
 #endif // CSVREADER_H
