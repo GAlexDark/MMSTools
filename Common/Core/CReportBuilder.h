@@ -66,7 +66,6 @@ private:
     CReportBuilder  m_builder;
     QString         m_errorString;
     bool            m_retVal = false;
-
 };
 
 

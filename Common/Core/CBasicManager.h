@@ -71,7 +71,6 @@ private:
 
     QMetaType           m_type;
     T                   m_instancePtr = nullptr;
-
 };
 
 #endif // CBASICMANAGER_H
