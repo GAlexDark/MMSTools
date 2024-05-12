@@ -15,27 +15,26 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-class CellPrivate
-{
-    Q_DECLARE_PUBLIC(Cell)
+class CellPrivate {
+  Q_DECLARE_PUBLIC(Cell)
 public:
-    CellPrivate(Cell *p);
-    CellPrivate(const CellPrivate *const cp);
-
-public:
-    Worksheet *parent;
-    Cell *q_ptr;
+  CellPrivate(Cell *p);
+  CellPrivate(const CellPrivate *const cp);
 
 public:
-    Cell::CellType cellType;
-    QVariant value;
+  Worksheet *parent;
+  Cell *q_ptr;
 
-    CellFormula formula;
-    Format format;
+public:
+  Cell::CellType cellType;
+  QVariant value;
 
-    RichString richString;
+  CellFormula formula;
+  Format format;
 
-    qint32 styleNumber;
+  RichString richString;
+
+  qint32 styleNumber;
 };
 
 QT_END_NAMESPACE_XLSX

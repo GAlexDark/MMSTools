@@ -3,10 +3,10 @@
 
 #undef __DEBUG
 #ifdef QT_DEBUG
-  #include <QDebug>
-  #define __DEBUG(A) qDebug() << (A);
+#include <QDebug>
+#define __DEBUG(A) qDebug() << (A);
 #else
-  #define __DEBUG(A)
+#define __DEBUG(A)
 #endif
 
 #endif // DEBUG_H

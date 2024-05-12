@@ -24,56 +24,55 @@ class CellFormula;
 class CellPrivate;
 class WorksheetPrivate;
 
-class QXLSX_EXPORT Cell
-{
-    Q_DECLARE_PRIVATE(Cell)
+class QXLSX_EXPORT Cell {
+  Q_DECLARE_PRIVATE(Cell)
 
 private:
-    friend class Worksheet;
-    friend class WorksheetPrivate;
+  friend class Worksheet;
+  friend class WorksheetPrivate;
 
 public:
-    enum CellType // See ECMA 376, 18.18.11. ST_CellType (Cell Type) for more information.
-    {
-        BooleanType,
-        DateType,
-        ErrorType,
-        InlineStringType,
-        NumberType,
-        SharedStringType,
-        StringType,
-        CustomType, // custom or un-defined cell type
-    };
+  enum CellType // See ECMA 376, 18.18.11. ST_CellType (Cell Type) for more
+                // information.
+  {
+    BooleanType,
+    DateType,
+    ErrorType,
+    InlineStringType,
+    NumberType,
+    SharedStringType,
+    StringType,
+    CustomType, // custom or un-defined cell type
+  };
 
 public:
-    Cell(const QVariant &data = QVariant(),
-         CellType type        = NumberType,
-         const Format &format = Format(),
-         Worksheet *parent    = nullptr,
-         qint32 styleIndex    = (-1));
-    Cell(const Cell *const cell);
-    ~Cell();
+  Cell(const QVariant &data = QVariant(), CellType type = NumberType,
+       const Format &format = Format(), Worksheet *parent = nullptr,
+       qint32 styleIndex = (-1));
+  Cell(const Cell *const cell);
+  ~Cell();
 
 public:
-    CellPrivate *const d_ptr; // See D-pointer and Q-pointer of Qt, for more information.
+  CellPrivate
+      *const d_ptr; // See D-pointer and Q-pointer of Qt, for more information.
 
 public:
-    CellType cellType() const;
-    QVariant value() const;
-    QVariant readValue() const;
-    Format format() const;
+  CellType cellType() const;
+  QVariant value() const;
+  QVariant readValue() const;
+  Format format() const;
 
-    bool hasFormula() const;
-    CellFormula formula() const;
+  bool hasFormula() const;
+  CellFormula formula() const;
 
-    bool isDateTime() const;
-    QVariant dateTime() const; // QDateTime, QDate, QTime
+  bool isDateTime() const;
+  QVariant dateTime() const; // QDateTime, QDate, QTime
 
-    bool isRichString() const;
+  bool isRichString() const;
 
-    qint32 styleNumber() const;
+  qint32 styleNumber() const;
 
-    static bool isDateType(CellType cellType, const Format &format);
+  static bool isDateType(CellType cellType, const Format &format);
 };
 
 QT_END_NAMESPACE_XLSX

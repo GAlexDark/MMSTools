@@ -2,23 +2,20 @@
 
 // add necessary includes here
 
-class CSVLoaderTest : public QObject
-{
-    Q_OBJECT
+class CSVLoaderTest : public QObject {
+  Q_OBJECT
 
 public:
-    CSVLoaderTest(QObject *parent = nullptr);
-    ~CSVLoaderTest();
+  CSVLoaderTest(QObject *parent = nullptr);
+  ~CSVLoaderTest();
 
 private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void test_case1();
+  void initTestCase();
+  void cleanupTestCase();
+  void test_case1();
 };
 
-CSVLoaderTest::CSVLoaderTest(QObject *parent)
-    : QObject{parent}
-{}
+CSVLoaderTest::CSVLoaderTest(QObject *parent) : QObject{parent} {}
 
 CSVLoaderTest::~CSVLoaderTest() {}
 
