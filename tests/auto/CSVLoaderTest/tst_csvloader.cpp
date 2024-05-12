@@ -6,7 +6,7 @@ class CSVLoaderTest : public QObject {
   Q_OBJECT
 
 public:
-  CSVLoaderTest(QObject *parent = nullptr);
+  explicit CSVLoaderTest(QObject *parent = nullptr);
   ~CSVLoaderTest();
 
 private slots:

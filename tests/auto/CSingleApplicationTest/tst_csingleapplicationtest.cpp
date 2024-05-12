@@ -9,7 +9,7 @@ class CSingleApplicationTest : public QObject {
   Q_OBJECT
 
 public:
-  CSingleApplicationTest(QObject *parent = nullptr);
+  explicit CSingleApplicationTest(QObject *parent = nullptr);
 
 private slots:
   void test_checkSecondStart();

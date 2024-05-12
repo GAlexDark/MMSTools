@@ -16,7 +16,7 @@ class CBasicDatabaseTest : public QObject {
   Q_OBJECT
 
 public:
-  CBasicDatabaseTest(QObject *parent = nullptr);
+  explicit CBasicDatabaseTest(QObject *parent = nullptr);
   ~CBasicDatabaseTest();
 
 private:

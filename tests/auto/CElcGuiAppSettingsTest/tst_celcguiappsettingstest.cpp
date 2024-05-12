@@ -12,7 +12,7 @@ class CElcGuiAppSettingsTest : public QObject {
   Q_OBJECT
 
 public:
-  CElcGuiAppSettingsTest(QObject *parent = nullptr);
+  explicit CElcGuiAppSettingsTest(QObject *parent = nullptr);
 
 private slots:
   void initTestCase();

@@ -25,7 +25,7 @@ class UtilsTest : public QObject {
   Q_OBJECT
 
 public:
-  UtilsTest(QObject *parent = nullptr);
+  explicit UtilsTest(QObject *parent = nullptr);
 
 private:
   QString m_basePath;

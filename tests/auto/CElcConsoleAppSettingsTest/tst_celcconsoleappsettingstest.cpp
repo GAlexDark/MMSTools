@@ -12,7 +12,7 @@ inline const QString filePath = QStringLiteral(SRCDIR "data");
 class CElcConsoleAppSettingsTest : public QObject {
   Q_OBJECT
 public:
-  CElcConsoleAppSettingsTest(QObject *parent = nullptr);
+  explicit CElcConsoleAppSettingsTest(QObject *parent = nullptr);
 
 private slots:
   void initTestCase();

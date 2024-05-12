@@ -11,7 +11,7 @@ class CEventLogParserTest : public QObject {
   Q_OBJECT
 
 public:
-  CEventLogParserTest(QObject *parent = nullptr);
+  explicit CEventLogParserTest(QObject *parent = nullptr);
 
 private:
   CEventLogParser m_parser;
