@@ -28,8 +28,8 @@ public:
   explicit UtilsTest(QObject *parent = nullptr);
 
 private:
-  QString m_basePath;
-  QString m_newDir;
+  QString m_basePath = SRCDIR "data";
+  QString m_newDir = "source";
 
 private slots:
   void test_parseValuesList1();
@@ -46,10 +46,7 @@ private slots:
   void test_getMetaClassInfo();
 };
 
-UtilsTest::UtilsTest(QObject *parent) : QObject{parent} {
-  m_basePath = SRCDIR "data";
-  m_newDir = "source";
-}
+UtilsTest::UtilsTest(QObject *parent) : QObject{parent} {}
 
 void UtilsTest::test_parseValuesList1() {
   qDebug() << "elcUtils::parseValuesList(QString data)";

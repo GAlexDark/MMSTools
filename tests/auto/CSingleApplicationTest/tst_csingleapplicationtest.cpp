@@ -12,14 +12,14 @@ public:
   explicit CSingleApplicationTest(QObject *parent = nullptr);
 
 private slots:
-  void test_checkSecondStart();
-  void test_applicationPid();
+  void test_checkSecondStart() const;
+  void test_applicationPid() const;
 };
 
 CSingleApplicationTest::CSingleApplicationTest(QObject *parent)
     : QObject{parent} {}
 
-void CSingleApplicationTest::test_checkSecondStart() {
+void CSingleApplicationTest::test_checkSecondStart() const {
   qDebug() << "Start first app";
   CSingleApplication sa1("elc_tst_instance");
   bool retVal = sa1.isRunning();
@@ -31,7 +31,7 @@ void CSingleApplicationTest::test_checkSecondStart() {
   QVERIFY(retVal);
 }
 
-void CSingleApplicationTest::test_applicationPid() {
+void CSingleApplicationTest::test_applicationPid() const {
   QVERIFY(CSingleApplication::applicationPid() > 0);
 }
 
