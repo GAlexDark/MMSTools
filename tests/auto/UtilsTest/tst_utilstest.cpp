@@ -180,7 +180,6 @@ UtilsTest::test_expandEnvironmentStrings()
 void
 UtilsTest::test_getWindowsApiErrorMessage()
 {
-
     QString retVal = elcUtils::getWindowsApiErrorMessage(0);
     qDebug() << retVal;
     QCOMPARE(retVal.length(), 29);
