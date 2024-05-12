@@ -1,0 +1,10 @@
+The MMS Tools sources include third party code:
+
+============================================================
+
+QXlsx
+
+QXlsx is excel file(*.xlsx) reader/writer library.
+https://github.com/QtExcel/QXlsx
+
+The library is released under the MIT license.
