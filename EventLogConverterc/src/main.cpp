@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
       QStringLiteral("This program use Qt version %2 and QXlsx library: "
                      "https://github.com/QtExcel/QXlsx.\n"));
   consoleOut.outToConsole(
-      description.arg(a.applicationVersion(), QT_VER, CONTACT));
+      description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
 
   CSingleApplication sa(QLatin1String("elcc_instance"));
   if (sa.isRunning()) {
