@@ -10,7 +10,6 @@ class CSingleApplicationTest : public QObject {
 
 public:
   CSingleApplicationTest(QObject *parent = nullptr);
-  ~CSingleApplicationTest();
 
 private slots:
   void test_checkSecondStart();
@@ -19,8 +18,6 @@ private slots:
 
 CSingleApplicationTest::CSingleApplicationTest(QObject *parent)
     : QObject{parent} {}
-
-CSingleApplicationTest::~CSingleApplicationTest() {}
 
 void CSingleApplicationTest::test_checkSecondStart() {
   qDebug() << "Start first app";
