@@ -1,6 +1,6 @@
 # MMSTools
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e26cc8d025c641119bc96da0c236cefd)][Codacy Badge]
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e26cc8d025c641119bc96da0c236cefd)][Codacy Badge]  
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=alert_status)][Quality Gate Status]
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=bugs)][Bugs]
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=vulnerabilities)][Vulnerabilities]

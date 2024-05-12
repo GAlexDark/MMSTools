@@ -17,6 +17,8 @@
 
 #ifndef MMSTYPES_H
 #define MMSTYPES_H
+#include <QByteArray>
+#include <QMap>
 
 namespace mms {
 struct fileFieldsSeparation_t {
