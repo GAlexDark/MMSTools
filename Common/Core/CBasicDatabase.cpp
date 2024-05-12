@@ -22,11 +22,11 @@
 
 void CBasicDatabase::_Deinit() {
   if (m_isInited) {
-    /***************************
+    /************************************************************************
      * This sourse code fixed a standard QSqlDatabase bug:
      *   QSqlDatabasePrivate::removeDatabase connection is still in use, all
      *queries will cease to work.
-     **************************/
+     ***********************************************************************/
     const QString connectionName = m_db.connectionName();
     m_db = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
@@ -87,28 +87,21 @@ bool CBasicDatabase::trunvateDB(const QString &connectionString,
   bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
   if (retVal) {
     retVal = db.open();
+    qsizetype i = 0;
+    while ((i < tablesCount) && retVal) {
+      retVal = db.truncateTable(tablesNames.at(i));
+      ++i;
+    }
     if (retVal) {
-      for (qsizetype i = 0; i < tablesCount; ++i) {
-        retVal = db.truncateTable(tablesNames.at(i));
-        if (!retVal) {
-          break;
-        }
-      }
-      if (retVal) {
-        retVal = db.optimizeDatabaseSize();
-      }
-      if (retVal) {
-        for (qsizetype i = 0; i < tablesCount; ++i) {
-          retVal = db.exec(creationStrings.at(i));
-          if (!retVal) {
-            break;
-          }
-        }
-      }
+      retVal = db.optimizeDatabaseSize();
+    }
+    i = 0;
+    while ((i < tablesCount) && retVal) {
+      retVal = db.exec(creationStrings.at(i));
+      ++i;
     }
     db.close();
   }
-
   if (!retVal) {
     errorString = db.errorString();
   }
