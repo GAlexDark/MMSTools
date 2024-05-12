@@ -56,7 +56,7 @@ private:
 
 protected:
     bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
-    qint64 indexOfEol(const qint64 startPos, const qint64 size);
+    qint64 indexOfEol(const qint64 startPos, const qint64 size) const;
     virtual bool checkHeader(const QString &line) = 0;
     virtual bool convertData(const QString &line) = 0;
     void setFileName(const QString &fileName) { m_fileName = fileName; }

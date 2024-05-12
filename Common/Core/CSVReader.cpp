@@ -42,32 +42,33 @@ CTextFileReader::checkBOM()
 }
 
 qint64
-CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size)
+CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size) const
 {
     qint64 retVal = -1;
-    qint64 index = startPos;
-    qint64 endPos = size - m_eolCharsCount;
-    bool isQuoted = false;
-    bool isSecondPart = false;
+    if (startPos >= 0) {
+        qint64 index = startPos;
+        qint64 endPos = size - m_eolCharsCount;
+        bool isQuoted = false;
+        bool isSecondPart = false;
 
-    char *d = m_buffer->data();
-    d += index;
+        const char *d = m_buffer->constData();
+        d += index;
 
-    while (index <= endPos) {
-        if (*d == m_quoteChar) {
-            isQuoted = !isQuoted;
-        } else {
-            if ((*d == '\n') && !isQuoted) {
-                retVal = isSecondPart ? index - 1 : index;
-                break;
+        while (index <= endPos) {
+            if (*d == m_quoteChar) {
+                isQuoted = !isQuoted;
             } else {
-                isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
+                if ((*d == '\n') && !isQuoted) {
+                    retVal = isSecondPart ? index - 1 : index;
+                    break;
+                } else {
+                    isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
+                }
             }
+            ++d;
+            ++index;
         }
-        ++d;
-        ++index;
     }
-
     return retVal;
 }
 
