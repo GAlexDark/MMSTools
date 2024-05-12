@@ -12,7 +12,6 @@ class CEventLogParserTest : public QObject {
 
 public:
   CEventLogParserTest(QObject *parent = nullptr);
-  ~CEventLogParserTest();
 
 private:
   CEventLogParser m_parser;
@@ -44,8 +43,6 @@ private slots:
 };
 
 CEventLogParserTest::CEventLogParserTest(QObject *parent) : QObject{parent} {}
-
-CEventLogParserTest::~CEventLogParserTest() {}
 
 void CEventLogParserTest::initTestCase() {
   // All fields are not empty
