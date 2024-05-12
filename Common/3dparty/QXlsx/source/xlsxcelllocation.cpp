@@ -13,12 +13,11 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-CellLocation::CellLocation()
-{
-    col = -1;
-    row = -1;
+CellLocation::CellLocation() {
+  col = -1;
+  row = -1;
 
-    cell.reset();
+  cell.reset();
 }
 
 QT_END_NAMESPACE_XLSX

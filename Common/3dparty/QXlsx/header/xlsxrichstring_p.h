@@ -40,19 +40,18 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-class RichStringPrivate : public QSharedData
-{
+class RichStringPrivate : public QSharedData {
 public:
-    RichStringPrivate();
-    RichStringPrivate(const RichStringPrivate &other);
-    ~RichStringPrivate();
+  RichStringPrivate();
+  RichStringPrivate(const RichStringPrivate &other);
+  ~RichStringPrivate();
 
-    QByteArray idKey() const;
+  QByteArray idKey() const;
 
-    QStringList fragmentTexts;
-    QList<Format> fragmentFormats;
-    QByteArray _idKey;
-    bool _dirty;
+  QStringList fragmentTexts;
+  QList<Format> fragmentFormats;
+  QByteArray _idKey;
+  bool _dirty;
 };
 
 QT_END_NAMESPACE_XLSX

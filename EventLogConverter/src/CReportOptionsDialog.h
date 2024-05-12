@@ -9,29 +9,31 @@ namespace Ui {
 class CReportOptionsDialog;
 }
 
-class CReportOptionsDialog : public QDialog
-{
-    Q_OBJECT
+class CReportOptionsDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    explicit CReportOptionsDialog(const quint16 logID, const QStringList &logsList, QWidget *parent = nullptr);
-    ~CReportOptionsDialog();
-    bool getOptions(quint16 &logID, QStringList &includeUsersList, QStringList &excludeUsersList);
+  explicit CReportOptionsDialog(const quint16 logID,
+                                const QStringList &logsList,
+                                QWidget *parent = nullptr);
+  ~CReportOptionsDialog();
+  bool getOptions(quint16 &logID, QStringList &includeUsersList,
+                  QStringList &excludeUsersList);
 
 private slots:
-    void doOkClicked();
-    void doCancelClicked();
+  void doOkClicked();
+  void doCancelClicked();
 
 private:
-    Ui::CReportOptionsDialog *ui;
-    QScopedPointer<QRegularExpressionValidator> m_rev;
-    quint16 m_logID = 0;
-    bool    m_isOkClicked = false;
+  Ui::CReportOptionsDialog *ui;
+  QScopedPointer<QRegularExpressionValidator> m_rev;
+  quint16 m_logID = 0;
+  bool m_isOkClicked = false;
 
-    QStringList m_includeUsersList;
-    QStringList m_excludeUsersList;
+  QStringList m_includeUsersList;
+  QStringList m_excludeUsersList;
 
-    void clearLists();
+  void clearLists();
 };
 
 #endif // CREPORTOPTIONSDIALOG_H

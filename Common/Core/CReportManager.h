@@ -1,19 +1,19 @@
 /****************************************************************************
-*
-*  Copyright (c) Oleksii Gaienko, 2024
-*  Contact: galexsoftware@gmail.com
-*
-*  Event Log Conversion Utility
-*  Common module
-*
-*  Module name: CReportManager.h
-*  Author(s): Oleksii Gaienko
-*  Reviewer(s):
-*
-*  Abstract:
-*     The class for report management
-*
-****************************************************************************/
+ *
+ *  Copyright (c) Oleksii Gaienko, 2024
+ *  Contact: galexsoftware@gmail.com
+ *
+ *  Event Log Conversion Utility
+ *  Common module
+ *
+ *  Module name: CReportManager.h
+ *  Author(s): Oleksii Gaienko
+ *  Reviewer(s):
+ *
+ *  Abstract:
+ *     The class for report management
+ *
+ ****************************************************************************/
 
 #ifndef CREPORTMANAGER_H
 #define CREPORTMANAGER_H
@@ -27,17 +27,16 @@
 #include "CBasicManager.h"
 #include "CBasicReport.h"
 
-class CReportManager : public CBasicManager<pBasicReport>
-{
+class CReportManager : public CBasicManager<pBasicReport> {
 public:
-    static CReportManager& instance();
-    void init(bool usePrettySelector = true);
-    QStringList getVisibleReportsNames() const { return m_visibleReportsNames; }
-    quint16 prettySelector(const quint16 id) const;
+  static CReportManager &instance();
+  void init(bool usePrettySelector = true);
+  QStringList getVisibleReportsNames() const { return m_visibleReportsNames; }
+  quint16 prettySelector(const quint16 id) const;
 
 private:
-    QStringList m_visibleReportsNames;
-    bool        m_usePrettySelector;
+  QStringList m_visibleReportsNames;
+  bool m_usePrettySelector;
 };
 
 #endif // CREPORTMANAGER_H

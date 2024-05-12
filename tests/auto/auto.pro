@@ -8,4 +8,3 @@ SUBDIRS += \
     CBasicDatabaseTest \
     CElcGuiAppSettingsTest \
     UtilsTest
-

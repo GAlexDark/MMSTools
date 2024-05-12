@@ -18,15 +18,14 @@ QT_BEGIN_NAMESPACE_XLSX
 
 class Cell;
 
-class QXLSX_EXPORT CellLocation
-{
+class QXLSX_EXPORT CellLocation {
 public:
-    CellLocation();
+  CellLocation();
 
-    int col;
-    int row;
+  int col;
+  int row;
 
-    std::shared_ptr<Cell> cell;
+  std::shared_ptr<Cell> cell;
 };
 
 QT_END_NAMESPACE_XLSX
