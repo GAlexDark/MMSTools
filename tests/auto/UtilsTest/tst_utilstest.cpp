@@ -29,7 +29,8 @@ public:
   ~UtilsTest();
 
 private:
-  QString m_basePath, m_newDir;
+  QString m_basePath;
+  QString m_newDir;
 private slots:
   void test_parseValuesList1();
   void test_parseValuesList2();
@@ -97,17 +98,31 @@ void UtilsTest::test_parseValuesList2() {
   QCOMPARE(data.size(), 0);
 
   data.clear();
-  data << "user1" << "user2" << "user3" << "user4";
+  data << "user1"
+       << "user2"
+       << "user3"
+       << "user4";
   elcUtils::parseValuesList(data);
   QCOMPARE(data.size(), 4);
 
   data.clear();
-  data << "user1" << "user2" << "user3" << "" << "user4" << "";
+  data << "user1"
+       << "user2"
+       << "user3"
+       << ""
+       << "user4"
+       << "";
   elcUtils::parseValuesList(data);
   QCOMPARE(data.size(), 4);
 
   data.clear();
-  data << "user1" << "user2" << "user3" << "" << "user4" << "" << "user2";
+  data << "user1"
+       << "user2"
+       << "user3"
+       << ""
+       << "user4"
+       << ""
+       << "user2";
   elcUtils::parseValuesList(data);
   QCOMPARE(data.size(), 4);
 
