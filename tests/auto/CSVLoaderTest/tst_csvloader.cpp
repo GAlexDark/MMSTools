@@ -17,7 +17,7 @@ private slots:
 };
 
 CSVLoaderTest::CSVLoaderTest(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {}
 
 CSVLoaderTest::~CSVLoaderTest() {}

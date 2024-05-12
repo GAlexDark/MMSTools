@@ -111,7 +111,7 @@ CEventLogParser::parseUserLogonDetails()
 }
 
 CEventLogParser::CEventLogParser(QObject *parent)
-    : CBasicParser(parent)
+    : CBasicParser{parent}
 {
     clearErrorString();
     initFfs(m_eolChars, m_quoteChar, m_delimiterChar);

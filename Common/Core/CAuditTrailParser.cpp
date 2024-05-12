@@ -68,7 +68,7 @@ CAuditTrailParser::parseAttributesDetails()
 }
 
 CAuditTrailParser::CAuditTrailParser(QObject *parent)
-    : CBasicParser(parent)
+    : CBasicParser{parent}
 {
     clearErrorString();
     initFfs(m_eolChars, m_quoteChar, m_delimiterChar);

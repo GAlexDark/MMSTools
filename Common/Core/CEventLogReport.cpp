@@ -19,7 +19,7 @@
 #include "DBStrings.h"
 
 CEventLogReport::CEventLogReport(QObject *parent)
-    : CBasicReport(parent)
+    : CBasicReport{parent}
 {
     clearErrorString();
 }

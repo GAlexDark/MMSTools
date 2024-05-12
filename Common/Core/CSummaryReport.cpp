@@ -19,7 +19,7 @@
 #include "DBStrings.h"
 
 CSummaryReport::CSummaryReport(QObject *parent)
-    : CBasicReport(parent)
+    : CBasicReport{parent}
 {
     clearErrorString();
 }

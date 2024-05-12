@@ -19,7 +19,7 @@
 #include "DBStrings.h"
 
 CAuditTrailReport::CAuditTrailReport(QObject *parent)
-    : CBasicReport(parent)
+    : CBasicReport{parent}
 {
     clearErrorString();
 }

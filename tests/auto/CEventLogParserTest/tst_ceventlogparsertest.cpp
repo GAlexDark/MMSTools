@@ -45,7 +45,7 @@ private slots:
 };
 
 CEventLogParserTest::CEventLogParserTest(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {}
 
 CEventLogParserTest::~CEventLogParserTest() {}

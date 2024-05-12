@@ -26,7 +26,7 @@ private slots:
 };
 
 CElcGuiAppSettingsTest::CElcGuiAppSettingsTest(QObject *parent)
-    : QObject(parent)
+    : QObject{parent}
 {}
 
 CElcGuiAppSettingsTest::~CElcGuiAppSettingsTest() {}

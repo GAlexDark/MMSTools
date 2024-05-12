@@ -47,10 +47,8 @@ QCommandLineParserHelper::QCommandLineParserHelper()
 }
 
 bool
-QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
+QCommandLineParserHelper::addElcOption(const QCoreApplication &app)
 {
-    m_parser.addHelpOption();
-
     const QString importOnlyDescription(QLatin1String("The utility starts in the import data-only mode without report generation. In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored."));
     const QString reportOnlyDescription(QLatin1String("The utility starts in the generation report-only mode without importing data. In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\nIf these options are not specified, data will be imported and the report generated."));
     const QString cleanDbOnlyDescription(QLatin1String("The utility starts in the clean database-only mode without import data and report generation."));
@@ -101,30 +99,48 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
             }
         }
     }
+    if (!retVal) {
+        m_errorString = QStringLiteral("The fatal error has occurredd. The program will be closed.");
+    }
 
-    if (retVal) {
-        const QString error1 = QLatin1String("The '%1' and '%2' options cannot be specified at the same time.");
-        bool comb1 = m_isImportOnly && m_isReportOnly && m_isCleanDbOnly;
-        bool comb2 = m_isImportOnly && m_isReportOnly;
-        bool comb3 = m_isImportOnly && m_isCleanDbOnly;
-        bool comb4 = m_isReportOnly && m_isCleanDbOnly;
+    return retVal;
+}
 
-        if (comb1 || comb2 || comb3 || comb4) {
-            m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
+bool
+QCommandLineParserHelper::checkElcOption()
+{
+    const QString error1 = QLatin1String("The '%1' and '%2' options cannot be specified at the same time.");
+    bool comb1 = m_isImportOnly && m_isReportOnly && m_isCleanDbOnly;
+    bool comb2 = m_isImportOnly && m_isReportOnly;
+    bool comb3 = m_isImportOnly && m_isCleanDbOnly;
+    bool comb4 = m_isReportOnly && m_isCleanDbOnly;
+
+    bool retVal = true;
+    if (comb1 || comb2 || comb3 || comb4) {
+        m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
+        retVal = false;
+    } else {
+        if (m_isExcluded && m_isIncluded) {
+            m_errorString = error1.arg("--exclude", "--include");
             retVal = false;
         } else {
-            if (m_isExcluded && m_isIncluded) {
-                m_errorString = error1.arg("--exclude", "--include");
+            if (!m_isPath && !m_isFiles) {
+                m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
                 retVal = false;
-            } else {
-                if (!m_isPath && !m_isFiles) {
-                    m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
-                    retVal = false;
-                }
             }
         }
-    } else {
-        m_errorString = QStringLiteral("The fatal error has occurredd. The program will be closed.");
+    }
+    return retVal;
+}
+
+bool
+QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
+{
+    m_parser.addHelpOption();
+
+    bool retVal = addElcOption(app);
+    if (retVal) {
+        retVal = checkElcOption();
     }
 
     return retVal;
