@@ -11,16 +11,17 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-class Theme : public AbstractOOXmlFile {
+class Theme : public AbstractOOXmlFile
+{
 public:
-  Theme(CreateFlag flag);
+    Theme(CreateFlag flag);
 
-  void saveToXmlFile(QIODevice *device) const override;
-  QByteArray saveToXmlData() const override;
-  bool loadFromXmlData(const QByteArray &data) override;
-  bool loadFromXmlFile(QIODevice *device) override;
+    void saveToXmlFile(QIODevice *device) const override;
+    QByteArray saveToXmlData() const override;
+    bool loadFromXmlData(const QByteArray &data) override;
+    bool loadFromXmlFile(QIODevice *device) override;
 
-  QByteArray xmlData;
+    QByteArray xmlData;
 };
 
 QT_END_NAMESPACE_XLSX

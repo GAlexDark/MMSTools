@@ -42,16 +42,17 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-class SimpleOOXmlFile : public AbstractOOXmlFile {
+class SimpleOOXmlFile : public AbstractOOXmlFile
+{
 public:
-  SimpleOOXmlFile(CreateFlag flag);
+    SimpleOOXmlFile(CreateFlag flag);
 
-  void saveToXmlFile(QIODevice *device) const override;
-  QByteArray saveToXmlData() const override;
-  bool loadFromXmlData(const QByteArray &data) override;
-  bool loadFromXmlFile(QIODevice *device) override;
+    void saveToXmlFile(QIODevice *device) const override;
+    QByteArray saveToXmlData() const override;
+    bool loadFromXmlData(const QByteArray &data) override;
+    bool loadFromXmlFile(QIODevice *device) override;
 
-  QByteArray xmlData;
+    QByteArray xmlData;
 };
 
 QT_END_NAMESPACE_XLSX

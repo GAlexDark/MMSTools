@@ -51,7 +51,7 @@ INCLUDEPATH += $${QXLSX_PARENTPATH}
 INCLUDEPATH += $${QXLSX_HEADERPATH}
 
 ########################################
-# source code
+# source code 
 
 HEADERS += \
 $${QXLSX_HEADERPATH}xlsxabstractooxmlfile.h \
@@ -143,31 +143,31 @@ $${QXLSX_SOURCEPATH}xlsxzipwriter.cpp
 
 win32-g++ {
     message("compiling for windows g++. mingw or msys or cygwin.")
-    INCLUDEPATH += $${QXLSX_HEADERPATH}win32-gcc
+    INCLUDEPATH += $${QXLSX_HEADERPATH}win32-gcc 
 	CONFIG(debug, debug|release) {
 	} else {
-	}
+	}	
 }
 win32-msvc2013 {
     message("Compiling for Visual Studio 2013")
-    INCLUDEPATH += $${QXLSX_HEADERPATH}msvc2013
+    INCLUDEPATH += $${QXLSX_HEADERPATH}msvc2013 
 	CONFIG(debug, debug|release) {
 	} else {
-	}
+	}		
 }
 win32-msvc2015 {
     message("Compiling for Visual Studio 2015")
-    INCLUDEPATH += $${QXLSX_HEADERPATH}msvc2015
+    INCLUDEPATH += $${QXLSX_HEADERPATH}msvc2015 
 	CONFIG(debug, debug|release) {
 	} else {
-	}
+	}		
 }
 win32-msvc2017 {
     message("Compiling for Visual Studio 2017")
-    INCLUDEPATH += $${QXLSX_HEADERPATH}msvc2017
+    INCLUDEPATH += $${QXLSX_HEADERPATH}msvc2017 
 	CONFIG(debug, debug|release) {
 	} else {
-	}
+	}		
 }
 win32-msvc2019 {
     message("Compiling for Visual Studio 2019")
@@ -189,15 +189,16 @@ unix {
 
     # target.path = /usr/lib
     # INSTALLS += target
-
+	
 	CONFIG(debug, debug|release) {
 	} else {
-	}
+	}		
 }
 mac {
     message("compiling for mac os")
     INCLUDEPATH += $${QXLSX_HEADERPATH}mac
 	CONFIG(debug, debug|release) {
 	} else {
-	}
+	}		
 }
+

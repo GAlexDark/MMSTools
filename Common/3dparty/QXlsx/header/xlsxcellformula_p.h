@@ -12,18 +12,20 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-class CellFormulaPrivate : public QSharedData {
+class CellFormulaPrivate : public QSharedData
+{
 public:
-  CellFormulaPrivate(const QString &formula, const CellRange &reference,
-                     CellFormula::FormulaType type);
-  CellFormulaPrivate(const CellFormulaPrivate &other);
-  ~CellFormulaPrivate();
+    CellFormulaPrivate(const QString &formula,
+                       const CellRange &reference,
+                       CellFormula::FormulaType type);
+    CellFormulaPrivate(const CellFormulaPrivate &other);
+    ~CellFormulaPrivate();
 
-  QString formula; // formula contents
-  CellFormula::FormulaType type;
-  CellRange reference;
-  bool ca; // Calculate Cell
-  int si;  // Shared group index
+    QString formula; // formula contents
+    CellFormula::FormulaType type;
+    CellRange reference;
+    bool ca; // Calculate Cell
+    int si;  // Shared group index
 };
 
 QT_END_NAMESPACE_XLSX

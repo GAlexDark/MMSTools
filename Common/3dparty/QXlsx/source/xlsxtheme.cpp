@@ -8,9 +8,7 @@ QT_BEGIN_NAMESPACE_XLSX
 
 const char *defaultXmlData =
     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-    "<a:theme "
-    "xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" "
-    "name=\"Office "
+    "<a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Office "
     "\xe4\xb8\xbb\xe9\xa2\x98\">"
     "<a:themeElements>"
     "<a:clrScheme name=\"Office\">"
@@ -34,11 +32,9 @@ const char *defaultXmlData =
     "<a:cs typeface=\"\"/>"
     "<a:font script=\"Jpan\" typeface=\"\xef\xbc\xad\xef\xbc\xb3 "
     "\xef\xbc\xb0\xe3\x82\xb4\xe3\x82\xb7\xe3\x83\x83\xe3\x82\xaf\"/>"
-    "<a:font script=\"Hang\" typeface=\"\xeb\xa7\x91\xec\x9d\x80 "
-    "\xea\xb3\xa0\xeb\x94\x95\"/>"
+    "<a:font script=\"Hang\" typeface=\"\xeb\xa7\x91\xec\x9d\x80 \xea\xb3\xa0\xeb\x94\x95\"/>"
     "<a:font script=\"Hans\" typeface=\"\xe5\xae\x8b\xe4\xbd\x93\"/>"
-    "<a:font script=\"Hant\" "
-    "typeface=\"\xe6\x96\xb0\xe7\xb4\xb0\xe6\x98\x8e\xe9\xab\x94\"/>"
+    "<a:font script=\"Hant\" typeface=\"\xe6\x96\xb0\xe7\xb4\xb0\xe6\x98\x8e\xe9\xab\x94\"/>"
     "<a:font script=\"Arab\" typeface=\"Times New Roman\"/>"
     "<a:font script=\"Hebr\" typeface=\"Times New Roman\"/>"
     "<a:font script=\"Thai\" typeface=\"Tahoma\"/>"
@@ -71,11 +67,9 @@ const char *defaultXmlData =
     "<a:cs typeface=\"\"/>"
     "<a:font script=\"Jpan\" typeface=\"\xef\xbc\xad\xef\xbc\xb3 "
     "\xef\xbc\xb0\xe3\x82\xb4\xe3\x82\xb7\xe3\x83\x83\xe3\x82\xaf\"/>"
-    "<a:font script=\"Hang\" typeface=\"\xeb\xa7\x91\xec\x9d\x80 "
-    "\xea\xb3\xa0\xeb\x94\x95\"/>"
+    "<a:font script=\"Hang\" typeface=\"\xeb\xa7\x91\xec\x9d\x80 \xea\xb3\xa0\xeb\x94\x95\"/>"
     "<a:font script=\"Hans\" typeface=\"\xe5\xae\x8b\xe4\xbd\x93\"/>"
-    "<a:font script=\"Hant\" "
-    "typeface=\"\xe6\x96\xb0\xe7\xb4\xb0\xe6\x98\x8e\xe9\xab\x94\"/>"
+    "<a:font script=\"Hant\" typeface=\"\xe6\x96\xb0\xe7\xb4\xb0\xe6\x98\x8e\xe9\xab\x94\"/>"
     "<a:font script=\"Arab\" typeface=\"Arial\"/>"
     "<a:font script=\"Hebr\" typeface=\"Arial\"/>"
     "<a:font script=\"Thai\" typeface=\"Tahoma\"/>"
@@ -108,28 +102,22 @@ const char *defaultXmlData =
     "<a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill>"
     "<a:gradFill rotWithShape=\"1\">"
     "<a:gsLst>"
-    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:tint "
-    "val=\"50000\"/><a:satMod "
+    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:tint val=\"50000\"/><a:satMod "
     "val=\"300000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"35000\"><a:schemeClr val=\"phClr\"><a:tint "
-    "val=\"37000\"/><a:satMod "
+    "<a:gs pos=\"35000\"><a:schemeClr val=\"phClr\"><a:tint val=\"37000\"/><a:satMod "
     "val=\"300000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:tint "
-    "val=\"15000\"/><a:satMod "
+    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:tint val=\"15000\"/><a:satMod "
     "val=\"350000\"/></a:schemeClr></a:gs>"
     "</a:gsLst>"
     "<a:lin ang=\"16200000\" scaled=\"1\"/>"
     "</a:gradFill>"
     "<a:gradFill rotWithShape=\"1\">"
     "<a:gsLst>"
-    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:shade "
-    "val=\"51000\"/><a:satMod "
+    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:shade val=\"51000\"/><a:satMod "
     "val=\"130000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"80000\"><a:schemeClr val=\"phClr\"><a:shade "
-    "val=\"93000\"/><a:satMod "
+    "<a:gs pos=\"80000\"><a:schemeClr val=\"phClr\"><a:shade val=\"93000\"/><a:satMod "
     "val=\"130000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:shade "
-    "val=\"94000\"/><a:satMod "
+    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:shade val=\"94000\"/><a:satMod "
     "val=\"135000\"/></a:schemeClr></a:gs>"
     "</a:gsLst>"
     "<a:lin ang=\"16200000\" scaled=\"0\"/>"
@@ -153,30 +141,26 @@ const char *defaultXmlData =
     "<a:effectStyleLst>"
     "<a:effectStyle>"
     "<a:effectLst>"
-    "<a:outerShdw blurRad=\"40000\" dist=\"20000\" dir=\"5400000\" "
-    "rotWithShape=\"0\">"
+    "<a:outerShdw blurRad=\"40000\" dist=\"20000\" dir=\"5400000\" rotWithShape=\"0\">"
     "<a:srgbClr val=\"000000\"><a:alpha val=\"38000\"/></a:srgbClr>"
     "</a:outerShdw>"
     "</a:effectLst>"
     "</a:effectStyle>"
     "<a:effectStyle>"
     "<a:effectLst>"
-    "<a:outerShdw blurRad=\"40000\" dist=\"23000\" dir=\"5400000\" "
-    "rotWithShape=\"0\">"
+    "<a:outerShdw blurRad=\"40000\" dist=\"23000\" dir=\"5400000\" rotWithShape=\"0\">"
     "<a:srgbClr val=\"000000\"><a:alpha val=\"35000\"/></a:srgbClr>"
     "</a:outerShdw>"
     "</a:effectLst>"
     "</a:effectStyle>"
     "<a:effectStyle>"
     "<a:effectLst>"
-    "<a:outerShdw blurRad=\"40000\" dist=\"23000\" dir=\"5400000\" "
-    "rotWithShape=\"0\">"
+    "<a:outerShdw blurRad=\"40000\" dist=\"23000\" dir=\"5400000\" rotWithShape=\"0\">"
     "<a:srgbClr val=\"000000\"><a:alpha val=\"35000\"/></a:srgbClr>"
     "</a:outerShdw>"
     "</a:effectLst>"
     "<a:scene3d>"
-    "<a:camera prst=\"orthographicFront\"><a:rot lat=\"0\" lon=\"0\" "
-    "rev=\"0\"/></a:camera>"
+    "<a:camera prst=\"orthographicFront\"><a:rot lat=\"0\" lon=\"0\" rev=\"0\"/></a:camera>"
     "<a:lightRig rig=\"threePt\" dir=\"t\"><a:rot lat=\"0\" lon=\"0\" "
     "rev=\"1200000\"/></a:lightRig>"
     "</a:scene3d>"
@@ -187,26 +171,20 @@ const char *defaultXmlData =
     "<a:solidFill><a:schemeClr val=\"phClr\"/></a:solidFill>"
     "<a:gradFill rotWithShape=\"1\">"
     "<a:gsLst>"
-    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:tint "
-    "val=\"40000\"/><a:satMod "
+    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:tint val=\"40000\"/><a:satMod "
     "val=\"350000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"40000\"><a:schemeClr val=\"phClr\"><a:tint "
-    "val=\"45000\"/><a:shade "
+    "<a:gs pos=\"40000\"><a:schemeClr val=\"phClr\"><a:tint val=\"45000\"/><a:shade "
     "val=\"99000\"/><a:satMod val=\"350000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:shade "
-    "val=\"20000\"/><a:satMod "
+    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:shade val=\"20000\"/><a:satMod "
     "val=\"255000\"/></a:schemeClr></a:gs></a:gsLst>"
-    "<a:path path=\"circle\"><a:fillToRect l=\"50000\" t=\"-80000\" "
-    "r=\"50000\" "
+    "<a:path path=\"circle\"><a:fillToRect l=\"50000\" t=\"-80000\" r=\"50000\" "
     "b=\"180000\"/></a:path>"
     "</a:gradFill>"
     "<a:gradFill rotWithShape=\"1\">"
     "<a:gsLst>"
-    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:tint "
-    "val=\"80000\"/><a:satMod "
+    "<a:gs pos=\"0\"><a:schemeClr val=\"phClr\"><a:tint val=\"80000\"/><a:satMod "
     "val=\"300000\"/></a:schemeClr></a:gs>"
-    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:shade "
-    "val=\"30000\"/><a:satMod "
+    "<a:gs pos=\"100000\"><a:schemeClr val=\"phClr\"><a:shade val=\"30000\"/><a:satMod "
     "val=\"200000\"/></a:schemeClr></a:gs>"
     "</a:gsLst>"
     "<a:path path=\"circle\"><a:fillToRect l=\"50000\" t=\"50000\" r=\"50000\" "
@@ -219,30 +197,37 @@ const char *defaultXmlData =
     "<a:extraClrSchemeLst/>"
     "</a:theme>";
 
-Theme::Theme(CreateFlag flag) : AbstractOOXmlFile(flag) {}
-
-void Theme::saveToXmlFile(QIODevice *device) const {
-  if (xmlData.isEmpty())
-    device->write(defaultXmlData);
-  else
-    device->write(xmlData);
+Theme::Theme(CreateFlag flag)
+    : AbstractOOXmlFile(flag)
+{
 }
 
-QByteArray Theme::saveToXmlData() const {
-  if (xmlData.isEmpty())
-    return defaultXmlData;
-  else
-    return xmlData;
+void Theme::saveToXmlFile(QIODevice *device) const
+{
+    if (xmlData.isEmpty())
+        device->write(defaultXmlData);
+    else
+        device->write(xmlData);
 }
 
-bool Theme::loadFromXmlData(const QByteArray &data) {
-  xmlData = data;
-  return true;
+QByteArray Theme::saveToXmlData() const
+{
+    if (xmlData.isEmpty())
+        return defaultXmlData;
+    else
+        return xmlData;
 }
 
-bool Theme::loadFromXmlFile(QIODevice *device) {
-  xmlData = device->readAll();
-  return true;
+bool Theme::loadFromXmlData(const QByteArray &data)
+{
+    xmlData = data;
+    return true;
+}
+
+bool Theme::loadFromXmlFile(QIODevice *device)
+{
+    xmlData = device->readAll();
+    return true;
 }
 
 QT_END_NAMESPACE_XLSX
