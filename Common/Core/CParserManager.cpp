@@ -33,7 +33,6 @@ CParserManager& CParserManager::instance()
 void
 CParserManager::init()
 {
-    m_classList.clear();
     qRegisterMetaType<pEventLogParser>("CEventLogParser");
     m_classList.append(QLatin1String("CEventLogParser")); // ID=1, index=0
     qRegisterMetaType<pAuditTrailParser>("CAuditTrailParser");
