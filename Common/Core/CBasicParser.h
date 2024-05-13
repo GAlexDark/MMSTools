@@ -56,7 +56,6 @@ protected:
 private:
     QString     m_internalIpFirstOctet;
     QString     m_errorString;
-
 };
 
 typedef CBasicParser *pBasicParser;

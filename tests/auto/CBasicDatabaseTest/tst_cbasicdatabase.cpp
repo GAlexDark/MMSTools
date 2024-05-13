@@ -38,7 +38,6 @@ private slots:
     void test_getValues();
     void test_truncateTable();
     void test_InsertBindedValues();
-
 };
 
 void CBasicDatabaseTest::initTestCase()
@@ -238,7 +237,6 @@ void CBasicDatabaseTest::test_InsertBindedValues()
         count++;
     }
     QCOMPARE(count, 1);
-
 }
 
 QTEST_APPLESS_MAIN(CBasicDatabaseTest)
