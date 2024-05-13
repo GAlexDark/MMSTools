@@ -237,7 +237,6 @@ void CBasicDatabaseTest::test_InsertBindedValues()
         count++;
     }
     QCOMPARE(count, 1);
-
 }
 
 QTEST_APPLESS_MAIN(CBasicDatabaseTest)
