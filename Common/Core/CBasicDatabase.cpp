@@ -96,19 +96,18 @@ CBasicDatabase::trunvateDB(const QString &connectionString, QString &errorString
     bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
     if (retVal) {
         retVal = db.open();
+        qsizetype i = 0;
+        while ((i < tablesCount) && retVal) {
+            retVal = db.truncateTable(tablesNames.at(i));
+            ++i;
+        }
         if (retVal) {
-            for (qsizetype i = 0; i < tablesCount; ++i) {
-                retVal = db.truncateTable(tablesNames.at(i));
-                if (retVal) {
-                    retVal = db.optimizeDatabaseSize();
-                    if (retVal) {
-                        retVal = db.exec(creationStrings.at(i));
-                        if (!retVal) {
-                            break;
-                        }
-                    }
-                }
-            }
+            retVal = db.optimizeDatabaseSize();
+        }
+        i = 0;
+        while ((i < tablesCount) && retVal) {
+            retVal = db.exec(creationStrings.at(i));
+            ++i;
         }
         db.close();
     }

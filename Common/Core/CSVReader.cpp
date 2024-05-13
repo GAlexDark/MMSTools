@@ -62,9 +62,7 @@ CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size) const
           retVal = isSecondPart ? index - 1 : index;
           break;
         } else {
-          isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted
-                             ? true
-                             : false;
+          isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
         }
       }
       ++d;
