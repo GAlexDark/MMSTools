@@ -38,7 +38,6 @@ private slots:
     void test_getValues();
     void test_truncateTable();
     void test_InsertBindedValues();
-
 };
 
 void CBasicDatabaseTest::initTestCase()

@@ -30,8 +30,8 @@ public:
     explicit CReportBuilder();
     virtual ~CReportBuilder();
     bool init(quint16 logID, const QString &dbFileName, const QString &reportName,
-                const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList,
-                const bool showMilliseconds);
+              const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList,
+              const bool showMilliseconds);
     QString errorString() const { return m_errorString; }
     bool generateReport();
 
@@ -54,7 +54,7 @@ public:
     explicit CSVThreadReportBuilder(QObject *parent = nullptr);
     bool init(quint16 logID, const QString &dbFileName, const QString &reportName,
               const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList,
-                const bool showMilliseconds);
+              const bool showMilliseconds);
     void run() override;
     QString errorString() const { return m_errorString; }
     bool getStatus() const { return m_retVal; }
@@ -66,7 +66,6 @@ private:
     CReportBuilder  m_builder;
     QString         m_errorString;
     bool            m_retVal = false;
-
 };
 
 
