@@ -187,8 +187,7 @@ void
 MainWindow::onAboutProgram()
 {
     QMessageBox::about(this, tr("About MMS Event Log Conversion Utility"),
-                       tr("MMS Event Log Conversion Utility\nVersion %1\nCopyright (C) 2023 Oleksii Gaienko\n\n \
-This program uses QXlsx library:\n https://github.com/QtExcel/QXlsx.").arg(QCoreApplication::applicationVersion()));
+                       tr("MMS Event Log Conversion Utility\nVersion %1\nCopyright (C) 2023 Oleksii Gaienko\n\nThis program use QXlsx library:\n https://github.com/QtExcel/QXlsx.").arg(QCoreApplication::applicationVersion()));
 }
 
 void
