@@ -33,7 +33,6 @@ void
 CReportManager::init(bool usePrettySelector)
 {
     m_usePrettySelector = usePrettySelector;
-    m_classList.clear();
     qRegisterMetaType<pEventLogReport>("CEventLogReport");
     m_classList.append(QLatin1String("CEventLogReport")); // ID=1, index=0
     qRegisterMetaType<pAuditTrailReport>("CAuditTrailReport");

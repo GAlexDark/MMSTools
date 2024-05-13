@@ -26,6 +26,11 @@ template <class T>
 class CBasicManager
 {
 public:
+    CBasicManager()
+    {
+        m_classList.clear();
+        m_ids.clear();
+    }
     ~CBasicManager()
     {
         destroyInstance();
