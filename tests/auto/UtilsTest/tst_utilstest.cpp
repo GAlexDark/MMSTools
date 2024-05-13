@@ -31,8 +31,9 @@ public:
     explicit UtilsTest(QObject *parent = nullptr);
 
 private:
-    QString m_basePath;
-    QString m_newDir;
+    QString m_basePath = SRCDIR"data";
+    QString m_newDir = "source";
+
 private slots:
     void test_parseValuesList1();
     void test_parseValuesList2();
@@ -49,7 +50,7 @@ private slots:
 };
 
 UtilsTest::UtilsTest(QObject *parent)
-    : QObject{parent}, m_basePath(SRCDIR"data"), m_newDir("source")
+    : QObject{parent}
 {}
 
 void
