@@ -1,19 +1,19 @@
 /****************************************************************************
- *
- *  Copyright (c) Oleksii Gaienko, 2023-2024
- *  Contact: galexsoftware@gmail.com
- *
- *  Event Log Conversion Utility
- *  Common module
- *
- *  Module name: CSVLoader.h
- *  Author(s): Oleksii Gaienko
- *  Reviewer(s):
- *
- *  Abstract:
- *     The classes for loading data from the text files to the DB.
- *
- ****************************************************************************/
+*
+*  Copyright (c) Oleksii Gaienko, 2023-2024
+*  Contact: galexsoftware@gmail.com
+*
+*  Event Log Conversion Utility
+*  Common module
+*
+*  Module name: CSVLoader.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The classes for loading data from the text files to the DB.
+*
+****************************************************************************/
 
 #ifndef CSVREADER_H
 #define CSVREADER_H
@@ -22,89 +22,89 @@
 #include <QMap>
 #include <QThread>
 
-#include "CBasicDatabase.h"
 #include "CBasicParser.h"
+#include "CBasicDatabase.h"
 #include "MMSTypes.h"
 
 const qint64 defMaxFileSize = 1024 * 1024; // 1M
 
-class CTextFileReader {
+class CTextFileReader
+{
 public:
-  explicit CTextFileReader();
-  virtual ~CTextFileReader();
-  bool read();
-  QString errorString() const { return m_errorString; }
+    explicit CTextFileReader();
+    virtual ~CTextFileReader();
+    bool read();
+    QString errorString() const { return m_errorString; }
 
 private:
-  QFile m_file;
+    QFile       m_file;
 
-  char m_delimiterChar = 0;
-  char m_quoteChar = 0;
-  qint64 m_eolCharsCount = 0;
+    char        m_delimiterChar = 0;
+    char        m_quoteChar = 0;
+    qint64      m_eolCharsCount = 0;
 
-  QScopedPointer<QByteArray> m_buffer;
-  QString m_fileName;
-  bool m_isHeaders = false;
-  QString m_errorString;
-  quint64 m_lineNumber = 0;
+    QScopedPointer<QByteArray> m_buffer;
+    QString     m_fileName;
+    bool        m_isHeaders = false;
+    QString     m_errorString;
+    quint64     m_lineNumber = 0;
 
-  bool checkBOM();
-  bool readColumnNames(const qint64 bytesRead, bool &isEOF,
-                       qint64 &prevPosition);
-  bool readLargeFile();
-  bool readSmallFile();
+    bool checkBOM();
+    bool readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &prevPosition);
+    bool readLargeFile();
+    bool readSmallFile();
 
 protected:
-  bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
-  qint64 indexOfEol(const qint64 startPos, const qint64 size) const;
-  virtual bool checkHeader(const QString &line) = 0;
-  virtual bool convertData(const QString &line) = 0;
-  void setFileName(const QString &fileName) { m_fileName = fileName; }
-  void setErrorString(const QString &errorString) {
-    m_errorString = errorString;
-  }
-  void clearErrorString() { m_errorString.clear(); }
-  quint64 getLineNumber() const { return m_lineNumber; }
+    bool init(bool dataHasHeaders, const mms::ffs_t &ffs);
+    qint64 indexOfEol(const qint64 startPos, const qint64 size) const;
+    virtual bool checkHeader(const QString &line) = 0;
+    virtual bool convertData(const QString &line) = 0;
+    void setFileName(const QString &fileName) { m_fileName = fileName; }
+    void setErrorString(const QString &errorString) { m_errorString = errorString; }
+    void clearErrorString() { m_errorString.clear(); }
+    quint64 getLineNumber() const { return m_lineNumber; }
+
 };
 
 //-------------------------------------------------------------------------
 
-class CMmsLogsReader : public CTextFileReader {
+class CMmsLogsReader: public CTextFileReader
+{
 public:
-  virtual ~CMmsLogsReader();
-  bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
-            const QString &internalIpFirstOctet,
-            const mms::pragmaList_t *pragmaList);
+    virtual ~CMmsLogsReader();
+    bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
+              const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
 
-  bool checkHeader(const QString &line) override;
-  bool convertData(const QString &line) override;
-  QString insertString() const { return m_parser->insertString(); }
+    bool checkHeader(const QString &line) override;
+    bool convertData(const QString &line) override;
+    QString insertString() const { return m_parser->insertString(); }
 
 private:
-  pBasicParser m_parser = nullptr; // don't use the 'detele' operator, the
-                                   // ParserManager manage resources
-  dataItem_t m_data;
-  bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
+    pBasicParser    m_parser = nullptr; // don't use the 'detele' operator, the ParserManager manage resources
+    dataItem_t      m_data;
+    bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
 
 protected:
-  CBasicDatabase m_db;
+    CBasicDatabase  m_db;
 };
 
 //-------------------------------------------------------------------------
-class CMmsLogsThreadReader : public QThread, public CMmsLogsReader {
-  Q_OBJECT
+class CMmsLogsThreadReader: public QThread, public CMmsLogsReader
+{
+    Q_OBJECT
 public:
-  explicit CMmsLogsThreadReader(QObject *parent = nullptr);
-  void setFileNames(const QStringList &fileNames) { m_fileNames = fileNames; }
-  void run() override;
-  bool getStatus() const { return m_retVal; }
+    explicit CMmsLogsThreadReader(QObject *parent = nullptr);
+    void setFileNames(const QStringList &fileNames) { m_fileNames = fileNames; }
+    void run() override;
+    bool getStatus() const { return m_retVal; }
 
 signals:
-  void sendMessage(const QString &msg);
+    void sendMessage(const QString &msg);
 
 private:
-  bool m_retVal = false;
-  QStringList m_fileNames;
+    bool m_retVal = false;
+    QStringList m_fileNames;
+
 };
 
 #endif // CSVREADER_H
