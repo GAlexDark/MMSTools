@@ -37,8 +37,8 @@ protected:
     QString checkDetails(const QString &data);
     void setErrorString(const QString &errorString) { m_errorString = errorString; }
     void clearErrorString() { m_errorString.clear(); }
-    void setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const int dbFieldIndex, const int reportFieldIndex, const int row);
-    void setReportDataItem(QXlsx::Document *report, const pBasicDatabase db, const QString &dbFieldName, const int reportFieldIndex, const int row);
+    void setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row);
+    void setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row);
 
     QString         m_reportFileName;
     pBasicDatabase  m_db = nullptr;

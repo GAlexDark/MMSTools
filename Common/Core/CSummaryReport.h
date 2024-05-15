@@ -28,10 +28,6 @@ public:
     Q_INVOKABLE explicit CSummaryReport(QObject *parent = nullptr);
     bool generateReport(const QString &arguments) override;
     QString visibleReportName() override { return QObject::tr("(Experimental) Summary report"); }
-
-private:
-    inline void setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row);
-    inline void setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row);
 };
 
 Q_DECLARE_METATYPE(CSummaryReport *);

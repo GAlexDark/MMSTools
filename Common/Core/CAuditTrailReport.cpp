@@ -94,15 +94,3 @@ CAuditTrailReport::generateReport(const QString &arguments)
 
     return retVal;
 }
-
-void
-CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
-{
-    CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
-}
-
-void
-CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row)
-{
-    CBasicReport::setReportDataItem(report, m_db, dbFieldName, reportFieldIndex, row);
-}
