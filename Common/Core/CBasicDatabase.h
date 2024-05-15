@@ -37,9 +37,8 @@ public:
     CBasicDatabase();
     ~CBasicDatabase();
 
-    static bool trunvateDB(const QString &connectionString, QString &errorString,
-                    qsizetype tablesCount, const QStringList &tablesNames,
-                    const QStringList &creationStrings);
+    static bool truncateDB(const QString &connectionString, QString &errorString,
+                           qsizetype tablesCount, const QStringList &tablesNames);
 
     QString getConnectionName() const { return m_connectionName; }
     CBasicDatabase *getDBinstance() { return this; }

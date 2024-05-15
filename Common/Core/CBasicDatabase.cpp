@@ -88,9 +88,8 @@ CBasicDatabase::~CBasicDatabase()
 }
 
 bool
-CBasicDatabase::trunvateDB(const QString &connectionString, QString &errorString,
-                       qsizetype tablesCount, const QStringList &tablesNames,
-                       const QStringList &creationStrings)
+CBasicDatabase::truncateDB(const QString &connectionString, QString &errorString,
+                       qsizetype tablesCount, const QStringList &tablesNames)
 {
     CBasicDatabase db;
     bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
@@ -103,11 +102,6 @@ CBasicDatabase::trunvateDB(const QString &connectionString, QString &errorString
         }
         if (retVal) {
             retVal = db.optimizeDatabaseSize();
-        }
-        i = 0;
-        while ((i < tablesCount) && retVal) {
-            retVal = db.exec(creationStrings.at(i));
-            ++i;
         }
         db.close();
     }
@@ -240,10 +234,20 @@ CBasicDatabase::truncateTable(const QString &tableName)
     if (m_SQLRes->isActive()) {
         m_SQLRes->finish();
     }
-    bool retVal = _exec(QLatin1String("drop table if exists [%1];").arg(tableName));
-    if (retVal) {
-        retVal = optimizeDatabaseSize();
+
+    bool retVal = false;
+    QString req = QLatin1String("SELECT sql FROM sqlite_master WHERE name = '%1';");
+    dataList_t res = findInDB(req.arg(tableName), false);
+    if (!res.isEmpty()) {
+        QString buffer = res.at(0).at(0).toLatin1();
+        retVal = _exec(QLatin1String("DROP TABLE IF EXISTS [%1];").arg(tableName));
+        if (retVal) {
+            retVal = exec(buffer);
+        }
+    } else {
+        retVal = true; // the table does not exists and will be created later
     }
+
     return retVal;
 }
 
