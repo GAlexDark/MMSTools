@@ -58,6 +58,7 @@ public:
     bool rollbackTransaction();
     bool optimizeDatabaseSize();
     bool truncateTable(const QString &tableName);
+    bool checkTables(const QStringList &tables, QString &tableName);
     // add info in the DB
     bool prepareRequest(const QString &query);
     bool execRequest(pDataItem data);
