@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         excludedUsers.clear();
         includedUsers.clear();
         if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe result in the %1 file.").arg(reportName));
+            consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
         } else {
             consoleOut.outToConsole(QStringLiteral("Error generate report: %1").arg(report.errorString()));
             return 1;
