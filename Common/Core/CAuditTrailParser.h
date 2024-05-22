@@ -71,6 +71,7 @@ private:
     QString     m_username1;
 
     char        m_delimiterChar;
+    char        m_quoteChar = 0;
 };
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);

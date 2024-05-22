@@ -46,16 +46,17 @@ protected:
     void setErrorString(const QString &errorString) { m_errorString = errorString; }
     void clearErrorString() { m_errorString.clear(); }
     void initFfs(QByteArray &eolChars, char &quoteChar, char &delimiterChar);
+    void setQuoteChar(char quoteChar) { m_quoteChar = quoteChar; }
 
     QString     m_ipaddresses;
     QString     m_internalip;
     QString     m_externalip;
-    char        m_quoteChar = 0;
     QByteArray  m_eolChars;
 
 private:
     QString     m_internalIpFirstOctet;
     QString     m_errorString;
+    char        m_quoteChar = 0;
 };
 
 typedef CBasicParser *pBasicParser;

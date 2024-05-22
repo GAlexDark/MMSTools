@@ -115,6 +115,7 @@ CEventLogParser::CEventLogParser(QObject *parent)
 {
     clearErrorString();
     initFfs(m_eolChars, m_quoteChar, m_delimiterChar);
+    setQuoteChar(m_quoteChar);
 }
 
 bool

@@ -90,6 +90,7 @@ private:
     QString     m_type;
 
     char        m_delimiterChar;
+    char        m_quoteChar = 0;
 };
 
 Q_DECLARE_METATYPE(CEventLogParser *);
