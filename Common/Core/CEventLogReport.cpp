@@ -17,6 +17,7 @@
 
 #include "CEventLogReport.h"
 #include "DBStrings.h"
+#include <QScopedPointer>
 
 CEventLogReport::CEventLogReport(QObject *parent)
     : CBasicReport{parent}
@@ -25,77 +26,94 @@ CEventLogReport::CEventLogReport(QObject *parent)
 }
 
 bool
-CEventLogReport::generateReport(const QString &arguments)
+CEventLogReport::generateReport()
 {
-    bool retVal = m_db->exec(eventlog::selectData.arg(arguments));
-    if (retVal) {
-        // Set datetime format
-        QXlsx::Format dateFormat;
-        setDateTimeFormat(dateFormat);
+    bool retVal = true;
+    // Set datetime format
+    QXlsx::Format dateFormat;
+    setDateTimeFormat(dateFormat);
 
-        int row = 1;
-        int colRowNumber = 1;
-        int colTimestampISO8601 = 2;
-        int colTimestamp = 3;
-        int colExternalIP = 4;
-        int colUsername = 5;
-        int colType = 6;
-        int colDetails = 7;
-        int colAuthType = 8;
-        int colInternalIP = 9;
-        int colRequestid = 10;
+    int colRowNumber = 1;
+    int colTimestampISO8601 = 2;
+    int colTimestamp = 3;
+    int colExternalIP = 4;
+    int colUsername = 5;
+    int colType = 6;
+    int colDetails = 7;
+    int colAuthType = 8;
+    int colInternalIP = 9;
+    int colRequestid = 10;
 
-        QXlsx::Document xlsxReport;
-        // Add header
-        QVariant writeValue = QStringLiteral("№");
-        xlsxReport.write(row, colRowNumber, writeValue);
+    QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
+    int row = 1;
+    // Add header
+    QVariant writeValue;
+    try {
+        writeValue = QStringLiteral("№");
+        setReportDataItem(xlsxReport.data(), colRowNumber, row, writeValue);
 
         writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
-        xlsxReport.write(row, colTimestampISO8601, writeValue);
+        setReportDataItem(xlsxReport.data(), colTimestampISO8601, row, writeValue);
         writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-        xlsxReport.write(row, colTimestamp, writeValue);
+        setReportDataItem(xlsxReport.data(), colTimestamp, row, writeValue);
         writeValue = QStringLiteral("Зовнішній IP");
-        xlsxReport.write(row, colExternalIP, writeValue);
+        setReportDataItem(xlsxReport.data(), colExternalIP, row, writeValue);
         writeValue = QStringLiteral("Ім'я користувача");
-        xlsxReport.write(row, colUsername, writeValue);
+        setReportDataItem(xlsxReport.data(), colUsername, row, writeValue);
         writeValue = QStringLiteral("Тип");
-        xlsxReport.write(row, colType, writeValue);
+        setReportDataItem(xlsxReport.data(), colType, row, writeValue);
         writeValue = QStringLiteral("Деталі");
-        xlsxReport.write(row, colDetails, writeValue);
+        setReportDataItem(xlsxReport.data(), colDetails, row, writeValue);
         writeValue = QStringLiteral("Тип авторизації");
-        xlsxReport.write(row, colAuthType, writeValue);
+        setReportDataItem(xlsxReport.data(), colAuthType, row, writeValue);
         writeValue = QStringLiteral("Внутрішній IP");
-        xlsxReport.write(row, colInternalIP, writeValue);
+        setReportDataItem(xlsxReport.data(), colInternalIP, row, writeValue);
         writeValue = QStringLiteral("ID запиту");
-        xlsxReport.write(row, colRequestid, writeValue);
+        setReportDataItem(xlsxReport.data(), colRequestid, row, writeValue);
         ++row;
-
+        bool isDataTooLong;
+        int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
-            xlsxReport.write(row, colRowNumber, row - 1);
-
-            setReportDataItem(&xlsxReport, "timestampISO8601", colTimestampISO8601, row);
+            setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
+            setReportDataItem(xlsxReport.data(), "timestampISO8601", colTimestampISO8601, row);
 
             writeValue = m_db->geValue("timestamp").toDateTime();
-            xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
+            if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
+                throw "Write error";
+            }
+            setReportDataItem(xlsxReport.data(), "externalip", colExternalIP, row);
+            setReportDataItem(xlsxReport.data(), "username", colUsername, row);
+            setReportDataItem(xlsxReport.data(), "type", colType, row);
 
-            setReportDataItem(&xlsxReport, "externalip", colExternalIP, row);
-            setReportDataItem(&xlsxReport, "username", colUsername, row);
-            setReportDataItem(&xlsxReport, "type", colType, row);
-            setReportDataItem(&xlsxReport, "details", colDetails, row);
-            setReportDataItem(&xlsxReport, "authtype", colAuthType, row);
-            setReportDataItem(&xlsxReport, "internalip", colInternalIP, row);
-            setReportDataItem(&xlsxReport, "requestid", colRequestid, row);
-
+            writeValue = checkDetails(m_db->geValue("details").toString(), isDataTooLong);
+            if (!xlsxReport->write(row, colDetails, writeValue) && !isDataTooLong) {
+                throw "Write error";
+            }
+            setReportDataItem(xlsxReport.data(), "authtype", colAuthType, row);
+            setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
+            setReportDataItem(xlsxReport.data(), "requestid", colRequestid, row);
             ++row;
-        } // while
 
-        retVal = xlsxReport.saveAs(m_reportFileName);
+            if (row > maxRowsCount) {
+                break;
+            }
+        } // while
+    } catch (const char* ex) {
+        setErrorString(ex);
+        retVal = false;
+    }
+    if (retVal) {
+        const QString fileName = createReportFilename(row);
+        retVal = xlsxReport->saveAs(fileName);
         if (!retVal) {
             setErrorString(QStringLiteral("Error save report file"));
         }
-    } else {
-        setErrorString(m_db->errorString());
     }
-
     return retVal;
+}
+
+QString
+CEventLogReport::selectString() const
+{
+    return eventlog::selectData;
 }

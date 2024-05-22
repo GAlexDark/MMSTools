@@ -25,80 +25,93 @@ CSummaryReport::CSummaryReport(QObject *parent)
 }
 
 bool
-CSummaryReport::generateReport(const QString &arguments)
+CSummaryReport::generateReport()
 {
-    bool retVal = m_db->exec(other::selectEvtLogAndAuditTrailData.arg(arguments));
-    if (retVal) {
-        // Set datetime format
-        QXlsx::Format dateFormat;
-        setDateTimeFormat(dateFormat);
+    bool retVal = true;
+    // Set datetime format
+    QXlsx::Format dateFormat;
+    setDateTimeFormat(dateFormat);
 
-        int row = 1;
-        int colRowNumber = 1;
-        int colTimestamp = 2;
-        int colUsername = 3;
-        int colCompanyRole = 4;
-        int colTypeOrMethod = 5;
-        int colStatus = 6;
-        int colDetailsOrAttributes = 7;
-        int colAuthType = 8;
-        int colExternalIP = 9;
-        int colInternalIP = 10;
-        int colRequestid = 11;
+    int colRowNumber = 1;
+    int colTimestamp = 2;
+    int colUsername = 3;
+    int colCompanyRole = 4;
+    int colTypeOrMethod = 5;
+    int colStatus = 6;
+    int colDetailsOrAttributes = 7;
+    int colAuthType = 8;
+    int colExternalIP = 9;
+    int colInternalIP = 10;
+    int colRequestid = 11;
 
-        QXlsx::Document xlsxReport;
-        // Add header
-        QVariant writeValue = QStringLiteral("№");
-        xlsxReport.write(row, colRowNumber, writeValue);
+    QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
+    int row = 1;
+    // Add header
+    QVariant writeValue;
+    try {
+        writeValue = QStringLiteral("№");
+        setReportDataItem(xlsxReport.data(), colRowNumber, row, writeValue);
 
         writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-        xlsxReport.write(row, colTimestamp, writeValue);
+        setReportDataItem(xlsxReport.data(), colTimestamp, row, writeValue);
         writeValue = QStringLiteral("Ім'я користувача");
-        xlsxReport.write(row, colUsername, writeValue);
+        setReportDataItem(xlsxReport.data(), colUsername, row, writeValue);
         writeValue = QStringLiteral("Роль в компанії");
-        xlsxReport.write(row, colCompanyRole, writeValue);
+        setReportDataItem(xlsxReport.data(), colCompanyRole, row, writeValue);
         writeValue = QStringLiteral("Тип / Метод");
-        xlsxReport.write(row, colTypeOrMethod, writeValue);
+        setReportDataItem(xlsxReport.data(), colTypeOrMethod, row, writeValue);
         writeValue = QStringLiteral("Статус");
-        xlsxReport.write(row, colStatus, writeValue);
+        setReportDataItem(xlsxReport.data(), colStatus, row, writeValue);
         writeValue = QStringLiteral("Деталі / Атрибути");
-        xlsxReport.write(row, colDetailsOrAttributes, writeValue);
+        setReportDataItem(xlsxReport.data(), colDetailsOrAttributes, row, writeValue);
         writeValue = QStringLiteral("Тип авторизації");
-        xlsxReport.write(row, colAuthType, writeValue);
+        setReportDataItem(xlsxReport.data(), colAuthType, row, writeValue);
         writeValue = QStringLiteral("Зовнішній IP");
-        xlsxReport.write(row, colExternalIP, writeValue);
+        setReportDataItem(xlsxReport.data(), colExternalIP, row, writeValue);
         writeValue = QStringLiteral("Внутрішній IP");
-        xlsxReport.write(row, colInternalIP, writeValue);
+        setReportDataItem(xlsxReport.data(), colInternalIP, row, writeValue);
         writeValue = QStringLiteral("ID запиту");
-        xlsxReport.write(row, colRequestid, writeValue);
+        setReportDataItem(xlsxReport.data(), colRequestid, row, writeValue);
         ++row;
-
+        int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
-            xlsxReport.write(row, colRowNumber, row - 1);
+            setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
 
             writeValue = m_db->geValue("timestamp").toDateTime();
-            xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
-
-            setReportDataItem(&xlsxReport, "username", colUsername, row);
-            setReportDataItem(&xlsxReport, "company_role", colCompanyRole, row);
-            setReportDataItem(&xlsxReport, "type_or_method", colTypeOrMethod, row);
-            setReportDataItem(&xlsxReport, "status", colStatus, row);
-            setReportDataItem(&xlsxReport, "details_or_attributes", colDetailsOrAttributes, row);
-            setReportDataItem(&xlsxReport, "authtype", colAuthType, row);
-            setReportDataItem(&xlsxReport, "externalip", colExternalIP, row);
-            setReportDataItem(&xlsxReport, "internalip", colInternalIP, row);
-            setReportDataItem(&xlsxReport, "requestid", colRequestid, row);
-
+            if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
+                throw "Write error";
+            }
+            setReportDataItem(xlsxReport.data(), "username", colUsername, row);
+            setReportDataItem(xlsxReport.data(), "company_role", colCompanyRole, row);
+            setReportDataItem(xlsxReport.data(), "type_or_method", colTypeOrMethod, row);
+            setReportDataItem(xlsxReport.data(), "status", colStatus, row);
+            setReportDataItem(xlsxReport.data(), "details_or_attributes", colDetailsOrAttributes, row);
+            setReportDataItem(xlsxReport.data(), "authtype", colAuthType, row);
+            setReportDataItem(xlsxReport.data(), "externalip", colExternalIP, row);
+            setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
+            setReportDataItem(xlsxReport.data(), "requestid", colRequestid, row);
             ++row;
-        } // while
 
-        retVal = xlsxReport.saveAs(m_reportFileName);
+            if (row > maxRowsCount) {
+                break;
+            }
+        } // while
+    } catch (const char* ex) {
+        setErrorString(ex);
+        retVal = false;
+    }
+    if (retVal) {
+        const QString fileName = createReportFilename(row);
+        retVal = xlsxReport->saveAs(fileName);
         if (!retVal) {
             setErrorString(QStringLiteral("Error save report file"));
         }
-    } else {
-        setErrorString(m_db->errorString());
     }
-
     return retVal;
+}
+
+QString
+CSummaryReport::selectString() const
+{
+    return other::selectEvtLogAndAuditTrailData;
 }

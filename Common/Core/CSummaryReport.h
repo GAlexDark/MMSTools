@@ -24,10 +24,12 @@ class CSummaryReport : public CBasicReport
 {
     Q_OBJECT
     Q_CLASSINFO("ID", "3")
+    Q_CLASSINFO("source", "eventlog|audittraillog")
 public:
     Q_INVOKABLE explicit CSummaryReport(QObject *parent = nullptr);
-    bool generateReport(const QString &arguments) override;
+    bool generateReport() override;
     QString visibleReportName() override { return QObject::tr("(Experimental) Summary report"); }
+    QString selectString() const override;
 };
 
 Q_DECLARE_METATYPE(CSummaryReport *);

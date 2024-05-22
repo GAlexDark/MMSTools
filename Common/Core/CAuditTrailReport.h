@@ -24,10 +24,12 @@ class CAuditTrailReport : public CBasicReport
 {
     Q_OBJECT
     Q_CLASSINFO("ID", "2")
+    Q_CLASSINFO("source", "audittraillog")
 public:
     Q_INVOKABLE explicit CAuditTrailReport(QObject *parent = nullptr);
-    bool generateReport(const QString &arguments) override;
+    bool generateReport() override;
     QString visibleReportName() override { return QObject::tr("Audit Trail Log"); }
+    QString selectString() const override;
 };
 
 Q_DECLARE_METATYPE(CAuditTrailReport *);
