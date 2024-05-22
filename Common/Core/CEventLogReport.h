@@ -24,14 +24,12 @@ class CEventLogReport : public CBasicReport
 {
     Q_OBJECT
     Q_CLASSINFO("ID", "1")
+    Q_CLASSINFO("source", "eventlog")
 public:
     Q_INVOKABLE explicit CEventLogReport(QObject *parent = nullptr);
-    bool generateReport(const QString &arguments) override;
+    bool generateReport() override;
     QString visibleReportName() override { return QObject::tr("Event Log"); }
-
-private:
-    inline void setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row);
-    inline void setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row);
+    QString selectString() const override;
 };
 
 Q_DECLARE_METATYPE(CEventLogReport *);

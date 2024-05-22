@@ -145,8 +145,7 @@ int main(int argc, char *argv[])
         const CParserManager &parserManager = CParserManager::instance();
         qsizetype count = parserManager.getItemCount();
         QStringList tables = parserManager.getTablesList();
-        QStringList creationStrings = parserManager.getCreateTableRequestList();
-        if (!CBasicDatabase::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
+        if (!CBasicDatabase::truncateDB(dbName, errorString, count, tables)) {
             QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\nDetails: %2").arg(dbName, errorString), QMessageBox::Ok);
             return 1;
         }

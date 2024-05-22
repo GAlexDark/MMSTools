@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include "CSVReader.h"
-#include <QScopedPointer>
 #ifdef QT_DEBUG
   #include <QElapsedTimer>
   #include "Debug.h"
@@ -289,11 +288,11 @@ CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragm
 
             const CParserManager &parserManager = CParserManager::instance();
             dbCommandItems.append(parserManager.getCreateTableRequestList());
-            for (const QString &item : dbCommandItems) {
-                retVal = m_db.exec(item);
-                if (!retVal) {
-                    break;
-                }
+
+            qsizetype i = 0;
+            while ((i < dbCommandItems.size()) && retVal) {
+                retVal = m_db.exec(dbCommandItems.at(i));
+                ++i;
             }
         }
     }

@@ -101,8 +101,7 @@ int main(int argc, char *argv[])
             const CParserManager &parserManager = CParserManager::instance();
             qsizetype count = parserManager.getItemCount();
             QStringList tables = parserManager.getTablesList();
-            QStringList creationStrings = parserManager.getCreateTableRequestList();
-            if (!CBasicDatabase::trunvateDB(dbName, errorString, count, tables, creationStrings)) {
+            if (!CBasicDatabase::truncateDB(dbName, errorString, count, tables)) {
                 consoleOut.outToConsole(QLatin1String("Cannot clean database: %1").arg(errorString));
                 return 1;
             }
@@ -195,7 +194,7 @@ int main(int argc, char *argv[])
         excludedUsers.clear();
         includedUsers.clear();
         if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe result in the %1 file.").arg(reportName));
+            consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
         } else {
             consoleOut.outToConsole(QStringLiteral("Error generate report: %1").arg(report.errorString()));
             return 1;

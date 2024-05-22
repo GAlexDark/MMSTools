@@ -64,13 +64,26 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
             }
         }
         if (retVal) {
-            m_report->init(&m_db, reportName, showMilliseconds);
+            QStringList tables = m_report->sources();
+            if (!tables.isEmpty()) {
+                QString table;
+                retVal = m_db.checkTables(tables, table);
+                if (retVal) {
+                    m_report->init(&m_db, reportName, showMilliseconds);
+                } else {
+                    m_errorString = QStringLiteral("The table '%1' not found. The report cannot create results.").arg(table);
+                }
+            } else {
+                m_errorString = QStringLiteral("List of tables not found. The report cannot check them.");
+            }
         } else {
             m_errorString = m_db.errorString();
+        }
+        if (!retVal) {
             m_db.close();
         }
     } else {
-        m_errorString = QStringLiteral("The parser not found");
+        m_errorString = QStringLiteral("The report not found");
     }
 
     return retVal;
@@ -107,7 +120,8 @@ CReportBuilder::generateReport()
             }
         } // (isIncluded || isExcluded)
 
-        retVal = m_report->generateReport(args);
+        const QString request = m_report->selectString().arg(args);
+        retVal = m_report->generateReport(request);
         if (!retVal) {
             m_errorString = m_report->errorString();
         }
@@ -129,9 +143,14 @@ bool
 CSVThreadReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &reportName,
                              const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList, const bool showMilliseconds)
 {
+    m_errorString.clear();
     Q_CHECK_PTR(excludedUsernamesList);
     Q_CHECK_PTR(includedUsernamesList);
-    return m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList, showMilliseconds);
+    bool retVal = m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList, showMilliseconds);
+    if (!retVal) {
+        m_errorString = m_builder.errorString();
+    }
+    return retVal;
 }
 
 void

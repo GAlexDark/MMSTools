@@ -347,8 +347,7 @@ MainWindow::clearDBclick()
     const CParserManager &parserManager = CParserManager::instance();
     qsizetype count = parserManager.getItemCount();
     QStringList tables = parserManager.getTablesList();
-    QStringList creationStrings = parserManager.getCreateTableRequestList();
-    if (CBasicDatabase::trunvateDB(m_dbName, errorString, count, tables, creationStrings)) {
+    if (CBasicDatabase::truncateDB(m_dbName, errorString, count, tables)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {
@@ -401,7 +400,8 @@ MainWindow::generateReportClick()
             const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
             bool showMilliseconds = settings.getShowMilliseconds();
             CSVThreadReportBuilder report;
-            if (report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds)) {
+            retVal = report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+            if (retVal) {
                 report.start();
 
                 setInfoText(tr("wait..."));

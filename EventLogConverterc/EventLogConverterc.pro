@@ -51,7 +51,7 @@ RC_ICONS = img/elcc.ico
 
 MAJOR_VER = 1
 MINOR_VER = 0
-PATCH_VER = 2
+PATCH_VER = 3
 BUILD_VER = 131
 BUILD_DATE = $$_DATE_
 

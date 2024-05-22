@@ -25,84 +25,84 @@ CAuditTrailReport::CAuditTrailReport(QObject *parent)
 }
 
 bool
-CAuditTrailReport::generateReport(const QString &arguments)
+CAuditTrailReport::generateReport()
 {
-    bool retVal = m_db->exec(audittrail::selectData.arg(arguments));
-    if (retVal) {
-        // Set datetime format
-        QXlsx::Format dateFormat;
-        setDateTimeFormat(dateFormat);
+    bool retVal = true;
+    // Set datetime format
+    QXlsx::Format dateFormat;
+    setDateTimeFormat(dateFormat);
 
-        int row = 1;
-        int colRowNumber = 1;
-        int colTimestamp = 2;
-        int colUsername = 3;
-        int colRole = 4;
-        int colCompanyname = 5;
-        int colMethod = 6;
-        int colStatus = 7;
-        int colAttributes = 8;
-        int colInternalIP = 9;
+    int colRowNumber = 1;
+    int colTimestamp = 2;
+    int colUsername = 3;
+    int colRole = 4;
+    int colCompanyname = 5;
+    int colMethod = 6;
+    int colStatus = 7;
+    int colAttributes = 8;
+    int colInternalIP = 9;
 
-        QXlsx::Document xlsxReport;
-        // Add header
-        QVariant writeValue = QStringLiteral("№");
-        xlsxReport.write(row, colRowNumber, writeValue);
+    QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
+    int row = 1;
+    // Add header
+    QVariant writeValue;
+    try {
+        writeValue = QStringLiteral("№");
+        setReportDataItem(xlsxReport.data(), colRowNumber, row, writeValue);
 
         writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-        xlsxReport.write(row, colTimestamp, writeValue);
+        setReportDataItem(xlsxReport.data(), colTimestamp, row, writeValue);
         writeValue = QStringLiteral("Ім'я користувача");
-        xlsxReport.write(row, colUsername, writeValue);
+        setReportDataItem(xlsxReport.data(), colUsername, row, writeValue);
         writeValue = QStringLiteral("Роль");
-        xlsxReport.write(row, colRole, writeValue);
+        setReportDataItem(xlsxReport.data(), colRole, row, writeValue);
         writeValue = QStringLiteral("Компанія");
-        xlsxReport.write(row, colCompanyname, writeValue);
+        setReportDataItem(xlsxReport.data(), colCompanyname, row, writeValue);
         writeValue = QStringLiteral("Метод");
-        xlsxReport.write(row, colMethod, writeValue);
+        setReportDataItem(xlsxReport.data(), colMethod, row, writeValue);
         writeValue = QStringLiteral("Статус");
-        xlsxReport.write(row, colStatus, writeValue);
+        setReportDataItem(xlsxReport.data(), colStatus, row, writeValue);
         writeValue = QStringLiteral("Атрибути");
-        xlsxReport.write(row, colAttributes, writeValue);
+        setReportDataItem(xlsxReport.data(), colAttributes, row, writeValue);
         writeValue = QStringLiteral("Внутрішній IP");
-        xlsxReport.write(row, colInternalIP, writeValue);
+        setReportDataItem(xlsxReport.data(), colInternalIP, row, writeValue);
         ++row;
-
+        int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
-            xlsxReport.write(row, colRowNumber, row - 1);
+            setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
 
             writeValue = m_db->geValue("timestamp").toDateTime();
-            xlsxReport.write(row, colTimestamp, writeValue, dateFormat);
-
-            setReportDataItem(&xlsxReport, "username", colUsername, row);
-            setReportDataItem(&xlsxReport, "role", colRole, row);
-            setReportDataItem(&xlsxReport, "companyname", colCompanyname, row);
-            setReportDataItem(&xlsxReport, "method", colMethod, row);
-            setReportDataItem(&xlsxReport, "status", colStatus, row);
-            setReportDataItem(&xlsxReport, "attributes", colAttributes, row);
-            setReportDataItem(&xlsxReport, "internalip", colInternalIP, row);
-
+            if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
+                throw "Write error";
+            }
+            setReportDataItem(xlsxReport.data(), "username", colUsername, row);
+            setReportDataItem(xlsxReport.data(), "role", colRole, row);
+            setReportDataItem(xlsxReport.data(), "companyname", colCompanyname, row);
+            setReportDataItem(xlsxReport.data(), "method", colMethod, row);
+            setReportDataItem(xlsxReport.data(), "status", colStatus, row);
+            setReportDataItem(xlsxReport.data(), "attributes", colAttributes, row);
+            setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
             ++row;
+            if (row > maxRowsCount) {
+                break;
+            }
         } // while
-
-        retVal = xlsxReport.saveAs(m_reportFileName);
+    } catch (const char* ex) {
+        setErrorString(ex);
+        retVal = false;
+    }
+    if (retVal) {
+        const QString fileName = createReportFilename(row);
+        retVal = xlsxReport->saveAs(fileName);
         if (!retVal) {
             setErrorString(QStringLiteral("Error save report file"));
         }
-    } else {
-        setErrorString(m_db->errorString());
     }
-
     return retVal;
 }
 
-void
-CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row)
+QString
+CAuditTrailReport::selectString() const
 {
-    CBasicReport::setReportDataItem(report, m_db, dbFieldIndex, reportFieldIndex, row);
-}
-
-void
-CAuditTrailReport::setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row)
-{
-    CBasicReport::setReportDataItem(report, m_db, dbFieldName, reportFieldIndex, row);
+    return audittrail::selectData;
 }
