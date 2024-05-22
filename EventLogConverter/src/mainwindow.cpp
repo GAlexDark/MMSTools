@@ -400,7 +400,8 @@ MainWindow::generateReportClick()
             const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
             bool showMilliseconds = settings.getShowMilliseconds();
             CSVThreadReportBuilder report;
-            if (report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds)) {
+            retVal = report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+            if (retVal) {
                 report.start();
 
                 setInfoText(tr("wait..."));
