@@ -11,7 +11,7 @@
 *  Reviewer(s):
 *
 *  Abstract:
-*     The base class for work with a database.
+*     The base class for work with a databases.
 *
 ****************************************************************************/
 
@@ -21,7 +21,7 @@
 #include <QtSql/QSqlRecord>
 
 void
-CBasicDatabase::_Deinit()
+CBasicDatabase::_deinit()
 {
     if (m_isInited) {
 /***************************
@@ -56,6 +56,8 @@ CBasicDatabase::_exec()
     if (!retVal) {
         QSqlError error = m_SQLRes->lastError();
         m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
+    } else {
+        m_SQLRes->finish();
     }
     return retVal;
 }
@@ -83,54 +85,7 @@ CBasicDatabase::CBasicDatabase()
 
 CBasicDatabase::~CBasicDatabase()
 {
-    close();
-    _Deinit();
-}
-
-bool
-CBasicDatabase::truncateDB(const QString &connectionString, QString &errorString,
-                       qsizetype tablesCount, const QStringList &tablesNames)
-{
-    CBasicDatabase db;
-    bool retVal = db.init(QLatin1String("QSQLITE"), connectionString);
-    if (retVal) {
-        retVal = db.open();
-        qsizetype i = 0;
-        while ((i < tablesCount) && retVal) {
-            retVal = db.truncateTable(tablesNames.at(i));
-            ++i;
-        }
-        if (retVal) {
-            retVal = db.optimizeDatabaseSize();
-        }
-        db.close();
-    }
-
-    if (!retVal) {
-        errorString = db.errorString();
-    }
-    return retVal;
-}
-
-bool
-CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
-{
-    if (!m_isInited) {
-        if (connectionString.isEmpty() || dbDriverName.isEmpty()) {
-            m_errorString = QStringLiteral("Empty connection string");
-        } else {
-            // соединяемся с базой данных
-            m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
-            m_isInited = m_db.isValid();
-            if (m_isInited) {
-                m_db.setDatabaseName(connectionString);
-            } else {
-                QSqlError error = m_db.lastError();
-                m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
-            }
-        }
-    }
-    return m_isInited;
+    deinit();
 }
 
 bool
@@ -170,7 +125,7 @@ void
 CBasicDatabase::deinit()
 {
     close();
-    _Deinit();
+    _deinit();
 }
 
 bool
@@ -220,54 +175,6 @@ CBasicDatabase::rollbackTransaction()
 }
 
 bool
-CBasicDatabase::optimizeDatabaseSize()
-{
-    if (m_SQLRes->isActive()) {
-        m_SQLRes->finish();
-    }
-    return _exec(QLatin1String("VACUUM;"));
-}
-
-bool
-CBasicDatabase::truncateTable(const QString &tableName)
-{
-    if (m_SQLRes->isActive()) {
-        m_SQLRes->finish();
-    }
-
-    bool retVal = false;
-    const QString req = QLatin1String("SELECT sql FROM sqlite_master WHERE name = '%1';");
-    dataList_t res = findInDB(req.arg(tableName), false);
-    if (!res.isEmpty()) {
-        retVal = _exec(QLatin1String("DROP TABLE IF EXISTS [%1];").arg(tableName));
-        if (retVal) {
-            const QString buffer = res.at(0).at(0).toLatin1();
-            retVal = exec(buffer);
-        }
-    } else {
-        retVal = true; // the table does not exists and will be created later
-    }
-
-    return retVal;
-}
-
-bool
-CBasicDatabase::checkTables(const QStringList &tables, QString &tableName)
-{
-    bool retVal = true;
-    const QString req = QLatin1String("SELECT sql FROM sqlite_master WHERE name = '%1';");
-    for (const QString &item : tables) {
-        tableName = item;
-        dataList_t res = findInDB(req.arg(tableName), false);
-        if (res.isEmpty()) {
-            retVal = false;
-            break;
-        }
-    }
-    return retVal;
-}
-
-bool
 CBasicDatabase::prepareRequest(const QString &query)
 {
     m_SQLRes->clear();
@@ -301,15 +208,7 @@ CBasicDatabase::insertToDB(const QString &query, pDataItem data)
     Q_CHECK_PTR(data);
     bool retVal = prepareRequest(query);
     if (retVal) {
-        auto itStart = data->begin();
-        auto itEnd = data->end();
-
-        while (itStart != itEnd) {
-            m_SQLRes->bindValue (itStart.key(), itStart.value());
-            ++itStart;
-        }
-        retVal = _exec();
-        m_SQLRes->finish();
+        retVal = execRequest(data);
     }
     return retVal;
 }
@@ -317,9 +216,9 @@ CBasicDatabase::insertToDB(const QString &query, pDataItem data)
 dataList_t
 CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
 {
-    bool hasResult = false;
     dataList_t retVal;
-    if (exec(query)) {
+    bool hasResult = exec(query);
+    if (hasResult) {
         QStringList item;
 
         QSqlRecord rec = m_SQLRes->record();
@@ -332,7 +231,6 @@ CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
         }
 
         while(m_SQLRes->next()) {
-            hasResult = true;
             item.clear();
             for (int i = 0; i < columnCount; i++) {
                 item.append(m_SQLRes->value(i).toString().trimmed());
@@ -347,6 +245,49 @@ CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
 bool
 CBasicDatabase::exec(const QString &query)
 {
-    bool retVal = _exec(query);
-    return retVal;
+    return _exec(query);
+}
+
+bool
+CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
+{
+    if (!m_isInited) {
+        if (connectionString.isEmpty()) {
+            m_errorString = QStringLiteral("Empty connection string");
+        } else {
+            if (dbDriverName.isEmpty()) {
+                m_errorString = QStringLiteral("The DB driver name is empty");
+            } else {
+                // соединяемся с базой данных
+                m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
+                m_isInited = m_db.isValid();
+                if (m_isInited) {
+                    m_db.setDatabaseName(connectionString);
+                } else {
+                    QSqlError error = m_db.lastError();
+                    m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
+                }
+            }
+        }
+    }
+    return m_isInited;
+}
+
+void
+CBasicDatabase::setUserName(const QString &name)
+{
+    m_db.setUserName(name);
+}
+void
+CBasicDatabase::setPassword(const QString &password)
+{
+    m_db.setPassword(password);
+}
+
+void
+CBasicDatabase::sqlQueryFinish()
+{
+    if (m_SQLRes && m_SQLRes->isActive()) {
+        m_SQLRes->finish();
+    }
 }
