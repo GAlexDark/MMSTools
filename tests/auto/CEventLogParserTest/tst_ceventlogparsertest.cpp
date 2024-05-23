@@ -3,7 +3,6 @@
 #include <QDateTime>
 
 #include "CEventLogParser.h"
-#include "qtestcase.h"
 
 // add necessary includes here
 

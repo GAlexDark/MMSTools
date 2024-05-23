@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QByteArray>
 
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 #include "DBStrings.h"
 
 // add necessary includes here
@@ -21,7 +21,7 @@ public:
     ~CBasicDatabaseTest();
 
 private:
-    CBasicDatabase m_fakeDB;
+    CSqliteDatabase m_fakeDB;
 
 private slots:
     void initTestCase();
@@ -47,7 +47,7 @@ void CBasicDatabaseTest::initTestCase()
         qDebug() << retVal;
     }
     QVERIFY(retVal);
-    retVal = m_fakeDB.init(QLatin1String("QSQLITE"), SRCDIR"data/fakedb.db");
+    retVal = m_fakeDB.init(SRCDIR"data/fakedb.db");
     QVERIFY(retVal);
 }
 
