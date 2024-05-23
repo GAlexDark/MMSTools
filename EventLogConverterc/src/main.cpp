@@ -28,7 +28,7 @@
 #include "elcUtils.h"
 #include "CParserManager.h"
 #include "CReportManager.h"
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 
 int main(int argc, char *argv[])
 {
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
             const CParserManager &parserManager = CParserManager::instance();
             qsizetype count = parserManager.getItemCount();
             QStringList tables = parserManager.getTablesList();
-            if (!CBasicDatabase::truncateDB(dbName, errorString, count, tables)) {
+            if (!CSqliteDatabase::truncateDB(dbName, errorString, count, tables)) {
                 consoleOut.outToConsole(QLatin1String("Cannot clean database: %1").arg(errorString));
                 return 1;
             }

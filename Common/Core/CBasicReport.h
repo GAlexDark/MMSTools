@@ -19,7 +19,7 @@
 #define CBASICREPORT_H
 
 #include <QObject>
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 
 const int maxRowsCount = 1048575;
 
@@ -27,7 +27,7 @@ class CBasicReport : public QObject
 {
 public:
     explicit CBasicReport(QObject *parent = nullptr);
-    void init(pBasicDatabase db, const QString &reportName, bool showMilliseconds);
+    void init(pSqliteDatabase db, const QString &reportName, bool showMilliseconds);
     bool generateReport(const QString &request);
     virtual bool generateReport() = 0;
     QString errorString() const { return m_errorString; }
@@ -47,7 +47,7 @@ protected:
     QString createReportFilename(const int row);
     int getMultipartRowCount() const { return m_multipartRowCount; }
 
-    pBasicDatabase m_db = nullptr;
+    pSqliteDatabase m_db = nullptr;
 
 private:
     QString createReportPartFilename();

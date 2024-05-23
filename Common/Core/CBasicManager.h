@@ -31,6 +31,7 @@ public:
         m_classList.clear();
         m_ids.clear();
     }
+
     ~CBasicManager()
     {
         destroyInstance();

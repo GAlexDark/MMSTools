@@ -269,7 +269,7 @@ CTextFileReader::read()
 bool
 CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList)
 {
-    bool retVal = m_db.init(QLatin1String("QSQLITE"), dbFileName);
+    bool retVal = m_db.init(dbFileName);
     if (retVal) {
         retVal = m_db.open();
         if (retVal) {

@@ -347,7 +347,7 @@ MainWindow::clearDBclick()
     const CParserManager &parserManager = CParserManager::instance();
     qsizetype count = parserManager.getItemCount();
     QStringList tables = parserManager.getTablesList();
-    if (CBasicDatabase::truncateDB(m_dbName, errorString, count, tables)) {
+    if (CSqliteDatabase::truncateDB(m_dbName, errorString, count, tables)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {
@@ -391,7 +391,6 @@ MainWindow::generateReportClick()
                                                         tr("Excel (*.xlsx)"));
         if (!reportName.isEmpty()) {
             setInfoText(tr("The report will be created here: %1").arg(reportName));
-            bool retVal = true;
 
             setInfoText(tr("Generating report..."));
             setStateText(tr("Generating report"));
@@ -400,7 +399,7 @@ MainWindow::generateReportClick()
             const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
             bool showMilliseconds = settings.getShowMilliseconds();
             CSVThreadReportBuilder report;
-            retVal = report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+            bool retVal = report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
             if (retVal) {
                 report.start();
 

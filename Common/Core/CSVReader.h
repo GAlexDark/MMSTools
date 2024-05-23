@@ -23,7 +23,7 @@
 #include <QThread>
 
 #include "CBasicParser.h"
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 #include "MMSTypes.h"
 
 const qint64 defMaxFileSize = 1024 * 1024; // 1M
@@ -84,7 +84,7 @@ private:
     bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
 
 protected:
-    CBasicDatabase  m_db;
+    CSqliteDatabase  m_db;
 };
 
 //-------------------------------------------------------------------------

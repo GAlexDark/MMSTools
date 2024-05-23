@@ -1,5 +1,6 @@
 HEADERS += \
     ../Common/Core/CBasicDatabase.h \
+    ../Common/Core/CSqliteDatabase.h \
     ../Common/Core/CBasicParser.h \
     ../Common/Core/CBasicReport.h \
     ../Common/Core/CBasicSettings.h \
@@ -22,6 +23,7 @@ HEADERS += \
 
 SOURCES += \
     ../Common/Core/CBasicDatabase.cpp \
+    ../Common/Core/CSqliteDatabase.cpp \
     ../Common/Core/CBasicParser.cpp \
     ../Common/Core/CBasicReport.cpp \
     ../Common/Core/CBasicSettings.cpp \

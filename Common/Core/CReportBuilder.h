@@ -21,7 +21,7 @@
 #include <QThread>
 #include <QString>
 #include <QStringList>
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 #include "CBasicReport.h"
 
 class CReportBuilder
@@ -39,7 +39,7 @@ private:
     CReportBuilder(const CReportBuilder&) = delete;
     CReportBuilder& operator=(CReportBuilder&) = delete;
 
-    CBasicDatabase  m_db;
+    CSqliteDatabase  m_db;
     pBasicReport    m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources
     QString         m_errorString;
     QStringList     m_excludedUsernamesList;

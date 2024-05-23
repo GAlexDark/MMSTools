@@ -20,9 +20,7 @@
 #include <QMetaClassInfo>
 #include "elcUtils.h"
 
-//const QString eolChar(QLatin1String("\n"));
 const QChar eolChar(QLatin1Char('\n'));
-//const QString emptyChar("");
 const QChar emptyChar = QChar();
 const QString vs_long(QLatin1String("VALIDATE_SCHEDULES"));
 const QString vs_short(QLatin1String("V_S"));
@@ -43,7 +41,7 @@ CBasicReport::CBasicReport(QObject *parent)
 }
 
 void
-CBasicReport::init(pBasicDatabase db, const QString &reportName, bool showMilliseconds)
+CBasicReport::init(pSqliteDatabase db, const QString &reportName, bool showMilliseconds)
 {
     m_db = db;
     Q_CHECK_PTR(m_db);
