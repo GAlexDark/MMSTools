@@ -57,6 +57,10 @@ private:
     QString     m_internalIpFirstOctet;
     QString     m_errorString;
     char        m_quoteChar = 0;
+
+    QStringList m_externalIpList;
+    QStringList m_internalIpList;
+    QStringList m_ipAddressList;
 };
 
 typedef CBasicParser *pBasicParser;

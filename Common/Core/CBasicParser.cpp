@@ -43,31 +43,33 @@ void
 CBasicParser::analizeIPAdresses()
 {
     qsizetype pos = m_ipaddresses.indexOf(',');
+    m_externalip.clear();
+    m_internalip.clear();
     if (pos != -1) {
-        QString firstip = m_ipaddresses.sliced(0, pos).trimmed();
-        QString secondip = m_ipaddresses.mid(pos + 1).trimmed();
-        bool isPrivateFirstIP = firstip.startsWith(m_internalIpFirstOctet);
-        bool isPrivateSecondIP = secondip.startsWith(m_internalIpFirstOctet);
-
-        if (isPrivateFirstIP && isPrivateSecondIP) {
-            m_externalip.clear();
-            m_internalip = m_ipaddresses;
-        } else {
-            if (isPrivateFirstIP) {
-                m_externalip = secondip;
-                m_internalip = firstip;
+        QString buf;
+        m_externalIpList.clear();
+        m_internalIpList.clear();
+        m_ipAddressList.clear();
+        m_ipAddressList = m_ipaddresses.split(',');
+        for (const QString &item : m_ipAddressList) {
+            buf = item.trimmed();
+            if (buf.startsWith(m_internalIpFirstOctet)) {
+                m_internalIpList.append(buf);
             } else {
-                m_externalip = firstip;
-                m_internalip = secondip;
+                m_externalIpList.append(buf);
             }
-        } // if &&
+        }
+        if (!m_externalIpList.isEmpty()) {
+            m_externalip = m_externalIpList.join(", ");
+        }
+        if (!m_internalIpList.isEmpty()) {
+            m_internalip = m_internalIpList.join(", ");
+        }
     } else {
         if (m_ipaddresses.startsWith(m_internalIpFirstOctet)) {
-            m_externalip.clear();
             m_internalip = m_ipaddresses;
         } else {
             m_externalip = m_ipaddresses;
-            m_internalip.clear();
         }
     } // (pos != -1)
 }
