@@ -37,7 +37,7 @@ public:
     QString getReportName() const;
     bool getExcludedUserNames(QStringList &excludedUsersList);
     bool getIncludedUserNames(QStringList &includedUsersList);
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
 
 private:
     QStringList excludedUsernames() const;

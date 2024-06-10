@@ -30,7 +30,7 @@ public:
     void init(pSqliteDatabase db, const QString &reportName, bool showMilliseconds);
     bool generateReport(const QString &request);
     virtual bool generateReport() = 0;
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
     virtual QString selectString() const = 0;
     virtual QString visibleReportName() = 0;
     quint16 reportID() const;

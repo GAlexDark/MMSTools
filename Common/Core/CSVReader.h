@@ -34,7 +34,7 @@ public:
     explicit CTextFileReader();
     virtual ~CTextFileReader();
     bool read();
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
 
 private:
     QFile       m_file;

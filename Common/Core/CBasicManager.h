@@ -58,7 +58,7 @@ public:
         return m_instancePtr;
     }
 
-    QStringList getClassList() const { return m_classList; }
+    const QStringList& getClassList() const { return m_classList; }
     qsizetype getItemCount() const { return m_classList.size(); }
     bool checkID(const quint16 id) const { return m_ids.indexOf(id) != -1 ? true : false; }
 

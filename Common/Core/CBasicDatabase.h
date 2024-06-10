@@ -37,9 +37,9 @@ public:
     CBasicDatabase();
     virtual ~CBasicDatabase();
 
-    QString getConnectionName() const { return m_connectionName; }
+    const QString& getConnectionName() const { return m_connectionName; }
     CBasicDatabase *getDBinstance() { return this; }
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
 
     bool open();
     void close();

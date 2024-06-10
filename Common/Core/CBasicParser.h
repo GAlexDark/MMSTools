@@ -27,7 +27,7 @@ class CBasicParser : public QObject
 public:
     explicit CBasicParser(QObject *parent = nullptr);
     void init(const QString &internalIpFirstOctet);
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
 
     virtual bool parse(const QString& line) = 0;
     virtual void convertData(mms::dataItem_t &data) = 0;
