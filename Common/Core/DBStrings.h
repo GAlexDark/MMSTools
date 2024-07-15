@@ -44,6 +44,9 @@ inline const QString phRole(QLatin1String(":role"));
 inline const QString phCompanyname(QLatin1String(":companyname"));
 inline const QString phAttributes(QLatin1String(":attributes"));
 
+inline const QString phSeverity(QLatin1String(":severity"));
+inline const QString phMessage(QLatin1String(":message"));
+
 //this query uses autotest
 namespace eventlog {
     inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME NOT NULL, PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);"));
@@ -59,6 +62,12 @@ namespace audittrail {
 
 namespace other {
     inline const QString selectEvtLogAndAuditTrailData(QLatin1String("SELECT e.timestamp as timestamp, e.username as username, null as company_role, e.type as type_or_method, null as status, e.details as details_or_attributes, e.authtype as authtype, e.externalip as externalip, e.internalip as internalip, e.requestid as requestid FROM eventlog e %1 UNION ALL SELECT a.timestamp as timestamp, a.username as username, a.companyname || ' ' || a.role as company_role, a.method as type_or_method, a.status as status, a.attributes as details_or_attributes, null as authtype, a.externalip as externalip, a.internalip as internalip, null as requestid FROM audittraillog a %1 ORDER BY timestamp DESC;"));
+}
+
+namespace systemlog {
+inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [systemlog] (severity TEXT NOT NULL, timestamp DATETIME NOT NULL, message TEXT NOT NULL, username TEXT, username1 TEXT, role TEXT, companyname TEXT)"));
+    inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [systemlog] (severity, timestamp, message, username, username1, role, companyname)  VALUES (:severity, :timestamp, :message, :username, :username1, :role, :companyname)"));
+    inline const QString selectData(QLatin1String(""));
 }
 
 #endif // DBSTRINGS_H
