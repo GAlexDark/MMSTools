@@ -34,7 +34,7 @@ CTextFileReader::checkBOM()
     QByteArray bom = m_buffer->sliced(0, sizeof(utf8bomRaw));
     if (bom != utf8bom) {
         retVal = false;
-        m_errorString = QStringLiteral("Wrong BOM header. The file must have UTF-8 BOM 0xef 0xbb 0xbf header");
+        m_errorString = QStringLiteral("Wrong the BOM header. The file must have the UTF-8 BOM 0xef 0xbb 0xbf header.");
     }
 
     return retVal;
@@ -80,7 +80,7 @@ CTextFileReader::readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &pr
         QString line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
         retVal = checkHeader(line);
         if (!retVal) {
-            m_errorString = QStringLiteral("Error in column names: %1").arg(line);
+            m_errorString = QStringLiteral("Error in the column names: %1").arg(line);
         }
         prevPosition = nextPosition + m_eolCharsCount;
         m_lineNumber++;
@@ -353,7 +353,7 @@ CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHa
             retVal = initDB(dbFileName, pragmaList);
         }
     } else {
-        setErrorString(QStringLiteral("The parser with same ID not found."));
+        setErrorString(QStringLiteral("The parser with the same ID is not found."));
     }
 
     return retVal;
