@@ -78,11 +78,14 @@ void
 CBasicParser::initFfs(QByteArray &eolChars, char &quoteChar, char &delimiterChar)
 {
     QString buf;
-    elcUtils::getMetaClassInfo(this, "eolChars", buf);
+    bool retVal = elcUtils::getMetaClassInfo(this, "eolChars", buf);
+    Q_ASSERT(retVal);
     eolChars = buf.toUtf8();
-    elcUtils::getMetaClassInfo(this, "quoteChar", buf);
+    retVal = elcUtils::getMetaClassInfo(this, "quoteChar", buf);
+    Q_ASSERT(retVal);
     quoteChar = buf.at(0).toLatin1();
-    elcUtils::getMetaClassInfo(this, "delimiterChar", buf);
+    retVal = elcUtils::getMetaClassInfo(this, "delimiterChar", buf);
+    Q_ASSERT(retVal);
     delimiterChar = buf.at(0).toLatin1();
 }
 
