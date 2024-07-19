@@ -16,6 +16,7 @@ HEADERS += \
     ../Common/Core/elcUtils.h \
     ../Common/Core/stdafx.h \
     ../Common/Core/CAuditTrailReport.h \
+    ../Common/Core/CSystemLogReport.h \
     ../Common/Core/CSummaryReport.h \
     ../Common/Core/MMSTypes.h \
     ../Common/Core/CParserManager.h \
@@ -38,6 +39,7 @@ SOURCES += \
     ../Common/Core/CSingleApplication.cpp \
     ../Common/Core/elcUtils.cpp \
     ../Common/Core/CAuditTrailReport.cpp \
+    ../Common/Core/CSystemLogReport.cpp \
     ../Common/Core/CSummaryReport.cpp \
     ../Common/Core/CParserManager.cpp \
     ../Common/Core/CReportManager.cpp
