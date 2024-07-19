@@ -65,9 +65,9 @@ namespace other {
 }
 
 namespace systemlog {
-inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [systemlog] (severity TEXT NOT NULL, timestamp DATETIME NOT NULL, message TEXT NOT NULL, username TEXT, username1 TEXT, role TEXT, companyname TEXT)"));
+    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [systemlog] (severity TEXT NOT NULL, timestamp DATETIME NOT NULL, message TEXT NOT NULL, username TEXT, username1 TEXT, role TEXT, companyname TEXT, PRIMARY KEY (severity, timestamp, message) ON CONFLICT IGNORE);"));
     inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [systemlog] (severity, timestamp, message, username, username1, role, companyname)  VALUES (:severity, :timestamp, :message, :username, :username1, :role, :companyname)"));
-    inline const QString selectData(QLatin1String(""));
+    inline const QString selectData(QLatin1String("SELECT a.timestamp, a.username1, a.role, a.companyname, a.severity, a.message FROM systemlog a %1 ORDER BY a.timestamp DESC;"));
 }
 
 #endif // DBSTRINGS_H
