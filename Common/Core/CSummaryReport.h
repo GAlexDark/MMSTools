@@ -23,7 +23,7 @@
 class CSummaryReport : public CBasicReport
 {
     Q_OBJECT
-    Q_CLASSINFO("ID", "3")
+    Q_CLASSINFO("ID", "1000") //3
     Q_CLASSINFO("source", "eventlog|audittraillog")
 public:
     Q_INVOKABLE explicit CSummaryReport(QObject *parent = nullptr);
