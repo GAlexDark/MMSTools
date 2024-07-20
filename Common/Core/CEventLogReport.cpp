@@ -16,8 +16,10 @@
 ****************************************************************************/
 
 #include "CEventLogReport.h"
-#include "DBStrings.h"
 #include <QScopedPointer>
+
+#include "DBStrings.h"
+#include "MMSTypes.h"
 
 CEventLogReport::CEventLogReport(QObject *parent)
     : CBasicReport{parent}
@@ -79,7 +81,7 @@ CEventLogReport::generateReport()
 
             writeValue = m_db->geValue("timestamp").toDateTime();
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw "Write error";
+                throw mms::XlsxError();
             }
             setReportDataItem(xlsxReport.data(), "externalip", colExternalIP, row);
             setReportDataItem(xlsxReport.data(), "username", colUsername, row);
@@ -87,7 +89,7 @@ CEventLogReport::generateReport()
 
             writeValue = checkDetails(m_db->geValue("details").toString(), isDataTooLong);
             if (!xlsxReport->write(row, colDetails, writeValue) && !isDataTooLong) {
-                throw "Write error";
+                throw mms::XlsxError();
             }
             setReportDataItem(xlsxReport.data(), "authtype", colAuthType, row);
             setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
@@ -98,8 +100,8 @@ CEventLogReport::generateReport()
                 break;
             }
         } // while
-    } catch (const char* ex) {
-        setErrorString(ex);
+    } catch (mms::XlsxError &ex) {
+        setErrorString(ex.what());
         retVal = false;
     }
     if (retVal) {

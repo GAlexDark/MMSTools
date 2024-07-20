@@ -19,6 +19,7 @@
 #include <QMetaObject>
 #include <QMetaClassInfo>
 #include "elcUtils.h"
+#include "MMSTypes.h"
 
 const QChar eolChar(QLatin1Char('\n'));
 const QChar emptyChar = QChar();
@@ -100,7 +101,7 @@ CBasicReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex,
 {
     QVariant writeValue = m_db->geValue(dbFieldIndex);
     if (!report->write(row, reportFieldIndex, writeValue))  {
-        throw "Write error";
+        throw mms::XlsxError();
     }
 }
 
@@ -109,7 +110,7 @@ CBasicReport::setReportDataItem(QXlsx::Document *report, const QString &dbFieldN
 {
     QVariant writeValue = m_db->geValue(dbFieldName);
     if (!report->write(row, reportFieldIndex, writeValue)) {
-        throw "Write error";
+        throw mms::XlsxError();
     }
 }
 
@@ -117,7 +118,7 @@ void
 CBasicReport::setReportDataItem(QXlsx::Document *report, const int column, const int row, const QVariant &writeValue)
 {
     if (!report->write(row, column, writeValue)) {
-        throw "Write error";
+        throw mms::XlsxError();
     }
 }
 

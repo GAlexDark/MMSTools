@@ -17,6 +17,7 @@
 
 #include "CSystemLogReport.h"
 #include "DBStrings.h"
+#include "MMSTypes.h"
 
 CSystemLogReport::CSystemLogReport(QObject *parent)
     : CBasicReport{parent}
@@ -65,10 +66,10 @@ CSystemLogReport::generateReport()
         int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
             setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
-
+            throw mms::XlsxError();
             writeValue = m_db->geValue("timestamp").toDateTime();
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw "Write error";
+                throw mms::XlsxError();
             }
             setReportDataItem(xlsxReport.data(), "username1", colUsername, row);
             setReportDataItem(xlsxReport.data(), "role", colRole, row);
@@ -80,8 +81,8 @@ CSystemLogReport::generateReport()
                 break;
             }
         } // while
-    } catch (const char* ex) {
-        setErrorString(ex);
+    } catch (mms::XlsxError &ex) {
+        setErrorString(ex.what());
         retVal = false;
     }
     if (retVal) {
