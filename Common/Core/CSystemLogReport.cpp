@@ -66,7 +66,7 @@ CSystemLogReport::generateReport()
         int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
             setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
-            throw mms::XlsxError();
+
             writeValue = m_db->geValue("timestamp").toDateTime();
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
                 throw mms::XlsxError();
