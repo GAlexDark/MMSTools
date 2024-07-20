@@ -19,6 +19,8 @@
 #define CBASICREPORT_H
 
 #include <QObject>
+#include <QException>
+
 #include "CSqliteDatabase.h"
 
 const int maxRowsCount = 1048575;
@@ -61,5 +63,29 @@ private:
 };
 
 using pBasicReport = CBasicReport *;
+
+class MmsCommonException : public QException
+{
+private:
+    char *m_message;
+
+public:
+    explicit MmsCommonException(char *text = nullptr) noexcept
+        :m_message(text) {}
+    virtual ~MmsCommonException() {}
+    void raise() const override { throw *this; }
+    MmsCommonException *clone() const override { return new MmsCommonException(*this); }
+    const char *what() const noexcept override
+    {
+        return m_message;
+    }
+};
+
+class XlsxError : public MmsCommonException
+{
+public:
+    explicit XlsxError(char *text = "QXlsx write error") noexcept
+        :MmsCommonException(text) {}
+};
 
 #endif // CBASICREPORT_H

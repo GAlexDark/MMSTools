@@ -79,7 +79,7 @@ CSummaryReport::generateReport()
 
             writeValue = m_db->geValue("timestamp").toDateTime();
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw "Write error";
+                throw XlsxError();
             }
             setReportDataItem(xlsxReport.data(), "username", colUsername, row);
             setReportDataItem(xlsxReport.data(), "company_role", colCompanyRole, row);
@@ -96,8 +96,8 @@ CSummaryReport::generateReport()
                 break;
             }
         } // while
-    } catch (const char* ex) {
-        setErrorString(ex);
+    } catch (XlsxError &ex) {
+        setErrorString(ex.what());
         retVal = false;
     }
     if (retVal) {
