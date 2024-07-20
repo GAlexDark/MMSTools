@@ -60,6 +60,6 @@ private:
     bool m_showMilliseconds = false;
 };
 
-typedef CBasicReport *pBasicReport;
+using pBasicReport = CBasicReport *;
 
 #endif // CBASICREPORT_H

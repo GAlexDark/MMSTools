@@ -95,6 +95,6 @@ private:
 
 Q_DECLARE_METATYPE(CEventLogParser *);
 
-typedef CEventLogParser *pEventLogParser;
+using pEventLogParser = CEventLogParser *;
 
 #endif // CEVENTLOGPARSER_H

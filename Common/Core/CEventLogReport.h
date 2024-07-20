@@ -34,6 +34,6 @@ public:
 
 Q_DECLARE_METATYPE(CEventLogReport *);
 
-typedef CEventLogReport *pEventLogReport;
+using pEventLogReport = CEventLogReport *;
 
 #endif // CEVENTLOGREPORT_H

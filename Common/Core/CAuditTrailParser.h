@@ -76,6 +76,6 @@ private:
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);
 
-typedef CAuditTrailParser *pAuditTrailParser;
+using pAuditTrailParser = CAuditTrailParser *;
 
 #endif // CAUDITTRAILPARSER_H

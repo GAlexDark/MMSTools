@@ -93,6 +93,6 @@ protected:
     void sqlQueryFinish();
 };
 
-typedef CBasicDatabase *pBasicDatabase;
+using pBasicDatabase = CBasicDatabase *;
 
 #endif // CBASICDATABASE_H
