@@ -56,7 +56,7 @@ namespace mms {
     class XlsxError : public MmsCommonException
     {
     public:
-        explicit XlsxError(char *text = const_cast<char*>("QXlsx write error")) noexcept
+        explicit XlsxError(char *text = "QXlsx write error") noexcept
             :MmsCommonException(text) {}
     };
 }
