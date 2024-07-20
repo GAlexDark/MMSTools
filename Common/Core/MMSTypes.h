@@ -42,7 +42,7 @@ namespace mms {
         char *m_message;
 
     public:
-        MmsCommonException(char *text = nullptr) noexcept
+        explicit MmsCommonException(char *text = nullptr) noexcept
             :m_message(text) {}
         virtual ~MmsCommonException() {}
         void raise() const override { throw *this; }
@@ -56,7 +56,7 @@ namespace mms {
     class XlsxError : public MmsCommonException
     {
     public:
-        XlsxError(char *text = const_cast<char*>("QXlsx write error")) noexcept
+        explicit XlsxError(char *text = "QXlsx write error") noexcept
             :MmsCommonException(text) {}
     };
 }

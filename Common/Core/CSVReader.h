@@ -70,7 +70,7 @@ protected:
 class CMmsLogsReader: public CTextFileReader
 {
 public:
-    virtual ~CMmsLogsReader() override;
+    ~CMmsLogsReader() override;
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
               const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
 
