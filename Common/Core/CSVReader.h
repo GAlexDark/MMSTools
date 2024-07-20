@@ -23,7 +23,7 @@
 #include <QThread>
 
 #include "CBasicParser.h"
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 #include "MMSTypes.h"
 
 const qint64 defMaxFileSize = 1024 * 1024; // 1M
@@ -34,7 +34,7 @@ public:
     explicit CTextFileReader();
     virtual ~CTextFileReader();
     bool read();
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
 
 private:
     QFile       m_file;
@@ -70,7 +70,7 @@ protected:
 class CMmsLogsReader: public CTextFileReader
 {
 public:
-    virtual ~CMmsLogsReader();
+    virtual ~CMmsLogsReader() override;
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
               const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
 
@@ -84,7 +84,7 @@ private:
     bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
 
 protected:
-    CBasicDatabase  m_db;
+    CSqliteDatabase  m_db;
 };
 
 //-------------------------------------------------------------------------

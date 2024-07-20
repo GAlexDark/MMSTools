@@ -47,7 +47,7 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
     if (retVal) {
         m_report = reportManager.getInstance(logID);
         Q_CHECK_PTR(m_report);
-        retVal = m_db.init(QLatin1String("QSQLITE"), dbFileName);
+        retVal = m_db.init(dbFileName);
         if (retVal) {
             retVal = m_db.open();
             if (retVal) {

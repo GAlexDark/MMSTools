@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QByteArray>
 
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 #include "DBStrings.h"
 
 // add necessary includes here
@@ -21,14 +21,12 @@ public:
     ~CBasicDatabaseTest();
 
 private:
-    CBasicDatabase m_fakeDB;
+    CSqliteDatabase m_fakeDB;
 
 private slots:
     void initTestCase();
     void test_connectionName();
     void test_getDBinstance();
-
-    void test_initDB();
     void test_openDB();
     void test_createTable();
     void test_importData();
@@ -48,6 +46,8 @@ void CBasicDatabaseTest::initTestCase()
         retVal = QFile::remove(file.absoluteFilePath());
         qDebug() << retVal;
     }
+    QVERIFY(retVal);
+    retVal = m_fakeDB.init(SRCDIR"data/fakedb.db");
     QVERIFY(retVal);
 }
 
@@ -76,12 +76,6 @@ void CBasicDatabaseTest::test_connectionName()
 void CBasicDatabaseTest::test_getDBinstance()
 {
     QVERIFY(m_fakeDB.getDBinstance());
-}
-
-void CBasicDatabaseTest::test_initDB()
-{
-    bool retVal = m_fakeDB.init(QLatin1String("QSQLITE"), SRCDIR"data/fakedb.db");
-    QVERIFY(retVal);
 }
 
 void CBasicDatabaseTest::test_openDB()
@@ -174,19 +168,15 @@ void CBasicDatabaseTest::test_getValues()
 
 void CBasicDatabaseTest::test_truncateTable()
 {
-    QFile file(SRCDIR"data/fakedb.db");
-    qint64 oldSize = file.size();
-    qDebug() << "Old size: " << oldSize;
-
-    bool retVal = m_fakeDB.truncateTable("eventlog");
+    const QString insertString = QStringLiteral("INSERT INTO eventlog (username, timestampISO8601, requestid, type, details, username1, authtype, externalip, internalip, timestamp) VALUES ('mr_data', '2023-05-09T11:19:57.36Z', 'edbfa4ea24038861', 'Вхід користувача - успішно', 'username: mr_data,\r\n  type: PASSWORD,\r\n  ip address: 192.0.2.211, 10.10.10.10', 'mr_data', 'PASSWORD', '192.0.2.211', '10.10.10.10', '2023-05-09T14:19:57.360');");
+    bool retVal = m_fakeDB.exec(insertString);
     QVERIFY(retVal);
-    dataList_t res = m_fakeDB.findInDB("SELECT name FROM sqlite_master WHERE type='table' AND name='eventlog';", false);
-    QVERIFY(res.isEmpty());
 
-    qint64 newSize = file.size();
-    qDebug() << "New size: " << newSize;
-
-    QVERIFY(oldSize != newSize);
+    retVal = m_fakeDB.truncateTable("eventlog");
+    QVERIFY(retVal);
+    dataList_t res = m_fakeDB.findInDB(selectCount, false);
+    int columnCount = res.at(0).at(0).toInt();
+    QCOMPARE(columnCount, 0);
 }
 
 void CBasicDatabaseTest::test_InsertBindedValues()

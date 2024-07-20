@@ -347,7 +347,7 @@ MainWindow::clearDBclick()
     const CParserManager &parserManager = CParserManager::instance();
     qsizetype count = parserManager.getItemCount();
     QStringList tables = parserManager.getTablesList();
-    if (CBasicDatabase::truncateDB(m_dbName, errorString, count, tables)) {
+    if (CSqliteDatabase::truncateDB(m_dbName, errorString, count, tables)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {
@@ -370,8 +370,7 @@ MainWindow::generateReportClick()
     QStringList includedUsers, excludedUsers;
     const CReportManager &reportManager = CReportManager::instance();
     QStringList reportsList = reportManager.getVisibleReportsNames();
-    quint16 logId = reportManager.prettySelector(m_logId);
-    if (showReportOptionsDialog(reportsList, logId, includedUsers, excludedUsers)) {
+    if (showReportOptionsDialog(reportsList, m_logId, includedUsers, excludedUsers)) {
         setInfoText(tr("Additional report filtering settings:"));
         if (includedUsers.isEmpty()) {
             setInfoText(tr("\tThe included users list is empty."));
@@ -383,7 +382,7 @@ MainWindow::generateReportClick()
         } else {
             setInfoText(tr("\tThe excluded users: %1").arg(excludedUsers.join(',')));
         }
-        setInfoText(tr("Selected report type: %1").arg(reportsList.at(logId - 1)));
+        setInfoText(tr("Selected report type: %1").arg(reportsList.at(m_logId - 1)));
         QCoreApplication::processEvents();
 
         QString reportName = QFileDialog::getSaveFileName(this, tr("Save MMS Event Log report"),
@@ -391,7 +390,6 @@ MainWindow::generateReportClick()
                                                         tr("Excel (*.xlsx)"));
         if (!reportName.isEmpty()) {
             setInfoText(tr("The report will be created here: %1").arg(reportName));
-            bool retVal = true;
 
             setInfoText(tr("Generating report..."));
             setStateText(tr("Generating report"));
@@ -400,7 +398,7 @@ MainWindow::generateReportClick()
             const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
             bool showMilliseconds = settings.getShowMilliseconds();
             CSVThreadReportBuilder report;
-            retVal = report.init(logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+            bool retVal = report.init(m_logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
             if (retVal) {
                 report.start();
 

@@ -19,10 +19,9 @@
 #include <QMetaObject>
 #include <QMetaClassInfo>
 #include "elcUtils.h"
+#include "MMSTypes.h"
 
-//const QString eolChar(QLatin1String("\n"));
 const QChar eolChar(QLatin1Char('\n'));
-//const QString emptyChar("");
 const QChar emptyChar = QChar();
 const QString vs_long(QLatin1String("VALIDATE_SCHEDULES"));
 const QString vs_short(QLatin1String("V_S"));
@@ -43,7 +42,7 @@ CBasicReport::CBasicReport(QObject *parent)
 }
 
 void
-CBasicReport::init(pBasicDatabase db, const QString &reportName, bool showMilliseconds)
+CBasicReport::init(pSqliteDatabase db, const QString &reportName, bool showMilliseconds)
 {
     m_db = db;
     Q_CHECK_PTR(m_db);
@@ -102,7 +101,7 @@ CBasicReport::setReportDataItem(QXlsx::Document *report, const int dbFieldIndex,
 {
     QVariant writeValue = m_db->geValue(dbFieldIndex);
     if (!report->write(row, reportFieldIndex, writeValue))  {
-        throw "Write error";
+        throw mms::XlsxError();
     }
 }
 
@@ -111,7 +110,7 @@ CBasicReport::setReportDataItem(QXlsx::Document *report, const QString &dbFieldN
 {
     QVariant writeValue = m_db->geValue(dbFieldName);
     if (!report->write(row, reportFieldIndex, writeValue)) {
-        throw "Write error";
+        throw mms::XlsxError();
     }
 }
 
@@ -119,7 +118,7 @@ void
 CBasicReport::setReportDataItem(QXlsx::Document *report, const int column, const int row, const QVariant &writeValue)
 {
     if (!report->write(row, column, writeValue)) {
-        throw "Write error";
+        throw mms::XlsxError();
     }
 }
 

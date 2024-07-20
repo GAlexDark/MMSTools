@@ -25,7 +25,7 @@
 #include "CElcGuiAppSettings.h"
 #include "elcUtils.h"
 #include "CParserManager.h"
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 
 void
 initTranslation(QTranslator *translator, const QApplication *qa, const QStringList &list, const QString &fileName)
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
         const CParserManager &parserManager = CParserManager::instance();
         qsizetype count = parserManager.getItemCount();
         QStringList tables = parserManager.getTablesList();
-        if (!CBasicDatabase::truncateDB(dbName, errorString, count, tables)) {
+        if (!CSqliteDatabase::truncateDB(dbName, errorString, count, tables)) {
             QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\nDetails: %2").arg(dbName, errorString), QMessageBox::Ok);
             return 1;
         }

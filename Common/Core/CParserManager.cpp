@@ -22,6 +22,7 @@
 
 #include "CEventLogParser.h"
 #include "CAuditTrailParser.h"
+#include "CSystemLogParser.h"
 
 static CParserManager g_parserManager;
 
@@ -37,6 +38,8 @@ CParserManager::init()
     m_classList.append(QLatin1String("CEventLogParser")); // ID=1, index=0
     qRegisterMetaType<pAuditTrailParser>("CAuditTrailParser");
     m_classList.append(QLatin1String("CAuditTrailParser")); // ID=2, index=1
+    qRegisterMetaType<pSystemLogParser>("CSystemLogParser");
+    m_classList.append(QLatin1String("CSystemLogParser")); // ID=3, index=2
 
     m_visibleLogsNames.resize(m_classList.size());
     m_tablesList.resize(m_classList.size());

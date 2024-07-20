@@ -6,28 +6,27 @@
 *  Event Log Conversion Utility
 *  Common module
 *
-*  Module name: CAuditTrailReport.cpp
+*  Module name: CSystemLogReport.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
 *  Abstract:
-*     The class for build MMS Audit Trail logs report.
+*     The class for build the MMS System logs report.
 *
 ****************************************************************************/
 
-#include "CAuditTrailReport.h"
+#include "CSystemLogReport.h"
 #include "DBStrings.h"
 #include "MMSTypes.h"
 
-
-CAuditTrailReport::CAuditTrailReport(QObject *parent)
+CSystemLogReport::CSystemLogReport(QObject *parent)
     : CBasicReport{parent}
 {
     clearErrorString();
 }
 
 bool
-CAuditTrailReport::generateReport()
+CSystemLogReport::generateReport()
 {
     bool retVal = true;
     // Set datetime format
@@ -39,10 +38,8 @@ CAuditTrailReport::generateReport()
     int colUsername = 3;
     int colRole = 4;
     int colCompanyname = 5;
-    int colMethod = 6;
-    int colStatus = 7;
-    int colAttributes = 8;
-    int colInternalIP = 9;
+    int colSeverity = 6;
+    int colMessage = 7;
 
     QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
     int row = 1;
@@ -60,14 +57,11 @@ CAuditTrailReport::generateReport()
         setReportDataItem(xlsxReport.data(), colRole, row, writeValue);
         writeValue = QStringLiteral("Компанія");
         setReportDataItem(xlsxReport.data(), colCompanyname, row, writeValue);
-        writeValue = QStringLiteral("Метод");
-        setReportDataItem(xlsxReport.data(), colMethod, row, writeValue);
-        writeValue = QStringLiteral("Статус");
-        setReportDataItem(xlsxReport.data(), colStatus, row, writeValue);
-        writeValue = QStringLiteral("Атрибути");
-        setReportDataItem(xlsxReport.data(), colAttributes, row, writeValue);
-        writeValue = QStringLiteral("Внутрішній IP");
-        setReportDataItem(xlsxReport.data(), colInternalIP, row, writeValue);
+        writeValue = QStringLiteral("Рівень");
+        setReportDataItem(xlsxReport.data(), colSeverity, row, writeValue);
+        writeValue = QStringLiteral("Повідомлення");
+        setReportDataItem(xlsxReport.data(), colMessage, row, writeValue);
+
         ++row;
         int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
@@ -77,13 +71,11 @@ CAuditTrailReport::generateReport()
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
                 throw mms::XlsxError();
             }
-            setReportDataItem(xlsxReport.data(), "username", colUsername, row);
+            setReportDataItem(xlsxReport.data(), "username1", colUsername, row);
             setReportDataItem(xlsxReport.data(), "role", colRole, row);
             setReportDataItem(xlsxReport.data(), "companyname", colCompanyname, row);
-            setReportDataItem(xlsxReport.data(), "method", colMethod, row);
-            setReportDataItem(xlsxReport.data(), "status", colStatus, row);
-            setReportDataItem(xlsxReport.data(), "attributes", colAttributes, row);
-            setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
+            setReportDataItem(xlsxReport.data(), "severity", colSeverity, row);
+            setReportDataItem(xlsxReport.data(), "message", colMessage, row);
             ++row;
             if (row > maxRowsCount) {
                 break;
@@ -104,7 +96,7 @@ CAuditTrailReport::generateReport()
 }
 
 QString
-CAuditTrailReport::selectString() const
+CSystemLogReport::selectString() const
 {
-    return audittrail::selectData;
+    return systemlog::selectData;
 }

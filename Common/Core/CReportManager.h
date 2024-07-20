@@ -31,13 +31,11 @@ class CReportManager : public CBasicManager<pBasicReport>
 {
 public:
     static CReportManager& instance();
-    void init(bool usePrettySelector = true);
-    QStringList getVisibleReportsNames() const { return m_visibleReportsNames; }
-    quint16 prettySelector(const quint16 id) const;
+    void init();
+    const QStringList& getVisibleReportsNames() const { return m_visibleReportsNames; }
 
 private:
     QStringList m_visibleReportsNames;
-    bool        m_usePrettySelector;
 };
 
 #endif // CREPORTMANAGER_H

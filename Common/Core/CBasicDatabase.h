@@ -11,7 +11,7 @@
 *  Reviewer(s):
 *
 *  Abstract:
-*     The base class for work with a database.
+*     The base class for work with a databases.
 *
 ****************************************************************************/
 
@@ -35,30 +35,19 @@ class CBasicDatabase
 public:
     explicit CBasicDatabase(const QString &connectionName);
     CBasicDatabase();
-    ~CBasicDatabase();
+    virtual ~CBasicDatabase();
 
-    static bool truncateDB(const QString &connectionString, QString &errorString,
-                           qsizetype tablesCount, const QStringList &tablesNames);
-
-    QString getConnectionName() const { return m_connectionName; }
+    const QString& getConnectionName() const { return m_connectionName; }
     CBasicDatabase *getDBinstance() { return this; }
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
 
-/*!
- * bool CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString).
- * Inited the DB connection with the DB driver name \a dbDriverName and the \a connectionString.
- * If used QSLite, the \a connectionString is the path to the DB file.
- */
-    bool init(const QString &dbDriverName, const QString &connectionString);
     bool open();
     void close();
     void deinit();
     bool beginTransaction();
     bool commitTransaction();
     bool rollbackTransaction();
-    bool optimizeDatabaseSize();
-    bool truncateTable(const QString &tableName);
-    bool checkTables(const QStringList &tables, QString &tableName);
+
     // add info in the DB
     bool prepareRequest(const QString &query);
     bool execRequest(pDataItem data);
@@ -80,16 +69,28 @@ private:
     QSqlDatabase    m_db;
     QScopedPointer<QSqlQuery> m_SQLRes;
 
-    bool            m_isInited = false;         //флаг подключения к БД. True - connected, false - not connected
-    QString         m_connectionName;   //Уникальное имя соединения
-    int             m_ErrorCode = 0;        //Код ошибки
+    bool            m_isInited = false; //флаг подключения к БД. True - connected, false - not connected
+    QString         m_connectionName; //Уникальное имя соединения
+    int             m_ErrorCode = 0; //Код ошибки
     QString         m_errorString;
 
     bool            m_isBeginTransaction = false;
 
-    void _Deinit();
+    void _deinit();
     bool _exec(const QString &query);
     bool _exec();
+
+protected:
+/*!
+    Protected function.
+    Inited the DB connection with the DB driver name \a dbDriverName and the connection string \a connectionString.
+    If used QSLite, the connectionString is the path to the DB file.
+    Returns true on success.
+ */
+    bool init(const QString &dbDriverName, const QString &connectionString);
+    void setUserName(const QString &name);
+    void setPassword(const QString &password);
+    void sqlQueryFinish();
 };
 
 typedef CBasicDatabase *pBasicDatabase;

@@ -6,76 +6,69 @@
 *  Event Log Conversion Utility
 *  Common module
 *
-*  Module name: CAuditTrailParser.h
+*  Module name: CSystemLogParser.h
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
 *  Abstract:
-*     The class for MMS Audit Trail logs parsing.
+*     The class for the MMS System logs parsing.
 *
 ****************************************************************************/
 
-#ifndef CAUDITTRAILPARSER_H
-#define CAUDITTRAILPARSER_H
+#ifndef CSYSTEMLOGPARSER_H
+#define CSYSTEMLOGPARSER_H
 
 #include <QString>
 #include <QDateTime>
 
 #include "CBasicParser.h"
 
-class CAuditTrailParser: public CBasicParser
+class CSystemLogParser: public CBasicParser
 {
     Q_OBJECT
-    Q_CLASSINFO("tablename", "audittraillog")
-    Q_CLASSINFO("columns", "Succeeded;Date;Method;Username;Companyname;Attributes;IpAddress")
-    Q_CLASSINFO("ID", "2")
+    Q_CLASSINFO("tablename", "systemlog")
+    Q_CLASSINFO("columns", "Severity;Logdate;Message;User")
+    Q_CLASSINFO("ID", "3")
     Q_CLASSINFO("quoteChar", "\"")
     Q_CLASSINFO("delimiterChar", ";")
     Q_CLASSINFO("eolChars", "\n")
 
 public:
-    Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CSystemLogParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(mms::dataItem_t &data) override;
     bool checkHeader(const QString &line) override;
     QString insertString() const override;
-    void getParsedData(QString &status,
+    void getParsedData(QString &severity,
                        QDateTime &timestamp,
-                       QString &method,
+                       QString &message,
                        QString &username,
-                       QString &role,
-                       QString &companyname,
-                       QString &attributes,
                        QString &username1,
-                       QString &internalip,
-                       QString &externalip) const;
+                       QString &role,
+                       QString &companyname) const;
 
     QString createTable() const override;
-    QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
+    QString visibleLogName() override { return QObject::tr("System Log"); } // Don't use the 'const' because translation does not work.
     mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 private:
-    bool parsePersonDataDetails();
-    bool parseLoadAuditTrail();
-    bool parseAttributesDetails();
+    bool parseMessage();
 
     QDateTime   m_timestamp;
 
-    QString     m_header;
-    QString     m_status;
-    QString     m_method;
+    QString     m_severity;
+    QString     m_message;
     QString     m_username;
+    QString     m_username1;
     QString     m_role;
     QString     m_companyname;
-    QString     m_attributes;
-    QString     m_username1;
 
     char        m_delimiterChar;
     char        m_quoteChar = 0;
 };
 
-Q_DECLARE_METATYPE(CAuditTrailParser *);
+Q_DECLARE_METATYPE(CSystemLogParser *);
 
-typedef CAuditTrailParser *pAuditTrailParser;
+typedef CSystemLogParser *pSystemLogParser;
 
-#endif // CAUDITTRAILPARSER_H
+#endif // CSYSTEMLOGPARSER_H

@@ -33,9 +33,9 @@ class CParserManager : public CBasicManager<pBasicParser>
 public:
     static CParserManager& instance();
     void init();
-    QStringList getVisibleLogsNames() const { return m_visibleLogsNames; }
-    QStringList getTablesList() const { return m_tablesList; }
-    QStringList getCreateTableRequestList() const { return m_createTableRequestList; }
+    const QStringList& getVisibleLogsNames() const { return m_visibleLogsNames; }
+    const QStringList& getTablesList() const { return m_tablesList; }
+    const QStringList& getCreateTableRequestList() const { return m_createTableRequestList; }
 
 private:
     QStringList     m_visibleLogsNames;

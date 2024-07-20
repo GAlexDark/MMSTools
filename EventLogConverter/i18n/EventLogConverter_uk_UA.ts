@@ -61,22 +61,22 @@
 <context>
     <name>CMmsLogsThreadReader</name>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="406"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="405"/>
         <source>Preparing to read the file(s).</source>
         <translation>Підготовка до читання файлу(ів).</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="420"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="419"/>
         <source>Reading of the file %1 has started.</source>
         <translation>Читання файлу %1 розпочалося.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="430"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="429"/>
         <source>The file %1 was read</source>
         <translation>Файл %1 прочитаний</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="430"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="429"/>
         <source>The file %1 was not read</source>
         <translation>Файл %1 не прочитаний</translation>
     </message>
@@ -211,8 +211,8 @@
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="158"/>
-        <location filename="../src/mainwindow.cpp" line="353"/>
-        <location filename="../src/mainwindow.cpp" line="424"/>
+        <location filename="../src/mainwindow.cpp" line="352"/>
+        <location filename="../src/mainwindow.cpp" line="423"/>
         <source>Ready</source>
         <translation>Готовий</translation>
     </message>
@@ -361,20 +361,20 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation>Початок очищення БД...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="355"/>
+        <location filename="../src/mainwindow.cpp" line="354"/>
         <source>Cannot clean database: %1</source>
         <translation>Неможливо очистити БД: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="268"/>
-        <location filename="../src/mainwindow.cpp" line="356"/>
-        <location filename="../src/mainwindow.cpp" line="419"/>
-        <location filename="../src/mainwindow.cpp" line="430"/>
+        <location filename="../src/mainwindow.cpp" line="355"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
+        <location filename="../src/mainwindow.cpp" line="429"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="376"/>
+        <location filename="../src/mainwindow.cpp" line="375"/>
         <source>Additional report filtering settings:</source>
         <translation>Додаткові параметри фільтрації звітів:</translation>
     </message>
@@ -387,18 +387,18 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Список виключених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="390"/>
+        <location filename="../src/mainwindow.cpp" line="389"/>
         <source>Save MMS Event Log report</source>
         <translation>Зберегти звіт журналу MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="394"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>The report will be created here: %1</source>
         <translation>Звіт буде створено тут: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="312"/>
-        <location filename="../src/mainwindow.cpp" line="407"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>wait...</source>
         <translation>Зачекайте...</translation>
     </message>
@@ -447,7 +447,7 @@ Copyright (C) 2023 Олексій Гаєнко
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="266"/>
-        <location filename="../src/mainwindow.cpp" line="428"/>
+        <location filename="../src/mainwindow.cpp" line="427"/>
         <source>Error open options dialog.</source>
         <translation>Помилка відкриття діалогового вікна параметрів.</translation>
     </message>
@@ -457,12 +457,12 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation>Початок читання та конвертації файлу(-ів)...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="367"/>
+        <location filename="../src/mainwindow.cpp" line="366"/>
         <source>Start generating the report...</source>
         <translation>Початок створення звіту...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="368"/>
+        <location filename="../src/mainwindow.cpp" line="367"/>
         <source>Start generating the report</source>
         <translation>Початок створення звіту</translation>
     </message>
@@ -471,59 +471,59 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">(Експериментальний) Зведений звіт</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="378"/>
+        <location filename="../src/mainwindow.cpp" line="377"/>
         <source>	The included users list is empty.</source>
         <translation>	Перелік включених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="380"/>
+        <location filename="../src/mainwindow.cpp" line="379"/>
         <source>	The included users: %1</source>
         <translation>	Включені користувачі: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="383"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
         <source>	The excluded users list is empty.</source>
         <translation>	Перелік виключених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="385"/>
+        <location filename="../src/mainwindow.cpp" line="384"/>
         <source>	The excluded users: %1</source>
         <translation>	Виключені користувачі: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="387"/>
+        <location filename="../src/mainwindow.cpp" line="386"/>
         <source>Selected report type: %1</source>
         <translation>Вибраний тип звіту: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="397"/>
+        <location filename="../src/mainwindow.cpp" line="395"/>
         <source>Generating report...</source>
         <translation>Створення звіту...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="415"/>
+        <location filename="../src/mainwindow.cpp" line="414"/>
         <source>Report generating finished.
 The report was saved in the %1 file.</source>
         <translation>Формування звіту завершено.
 Звіт збережено у файлі %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="416"/>
+        <location filename="../src/mainwindow.cpp" line="415"/>
         <source>Report created</source>
         <translation>Звіт створено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="418"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>Error generate report: %1</source>
         <translation>Помилка створення звіту: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="423"/>
+        <location filename="../src/mainwindow.cpp" line="422"/>
         <source>Report name is empty</source>
         <translation>Відсутня назва звіту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="432"/>
+        <location filename="../src/mainwindow.cpp" line="431"/>
         <source>Report generation canceled.</source>
         <translation>Створення звіту скасовано.</translation>
     </message>
@@ -604,7 +604,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Зберегти звіт MMS EventLog</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="392"/>
+        <location filename="../src/mainwindow.cpp" line="391"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
@@ -649,7 +649,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 розпарений</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="398"/>
+        <location filename="../src/mainwindow.cpp" line="396"/>
         <source>Generating report</source>
         <translation>Створення звіту</translation>
     </message>
@@ -662,7 +662,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 збережено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="352"/>
+        <location filename="../src/mainwindow.cpp" line="351"/>
         <source>Database was cleared</source>
         <translation>БД очищена</translation>
     </message>
@@ -755,7 +755,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <location filename="../src/main.cpp" line="121"/>
         <location filename="../src/main.cpp" line="125"/>
         <location filename="../src/main.cpp" line="140"/>
-        <location filename="../src/main.cpp" line="150"/>
+        <location filename="../src/main.cpp" line="149"/>
         <location filename="../src/mainwindow.cpp" line="89"/>
         <location filename="../src/mainwindow.cpp" line="107"/>
         <source>Error</source>
@@ -788,7 +788,7 @@ The database file will be created on the default path.</source>
   Файл бази даних буде створено за типовим шляхом.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="150"/>
+        <location filename="../src/main.cpp" line="149"/>
         <source>Cannot open database: %1
 Details: %2</source>
         <translation>Неможливо відкрити базу даних: %1
@@ -808,18 +808,18 @@ Details: %2</source>
     </message>
     <message>
         <location filename="../../Common/Core/CAuditTrailParser.h" line="54"/>
-        <location filename="../../Common/Core/CAuditTrailReport.h" line="30"/>
+        <location filename="../../Common/Core/CAuditTrailReport.h" line="31"/>
         <source>Audit Trail Log</source>
         <translation>Журнал контролю</translation>
     </message>
     <message>
         <location filename="../../Common/Core/CEventLogParser.h" line="53"/>
-        <location filename="../../Common/Core/CEventLogReport.h" line="30"/>
+        <location filename="../../Common/Core/CEventLogReport.h" line="31"/>
         <source>Event Log</source>
         <translation>Журнал подій</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSummaryReport.h" line="30"/>
+        <location filename="../../Common/Core/CSummaryReport.h" line="31"/>
         <source>(Experimental) Summary report</source>
         <translation>(Експериментальний) Зведений звіт</translation>
     </message>
@@ -832,6 +832,11 @@ Details: %2</source>
         <location filename="../src/mainwindow.cpp" line="106"/>
         <source>Unable to open the advanced file reading settings window.</source>
         <translation>Неможливо відкрити вікно додаткових налаштувань для читання файлів.</translation>
+    </message>
+    <message>
+        <location filename="../../Common/Core/CSystemLogParser.h" line="51"/>
+        <source>System Log</source>
+        <translation>Журнал системи</translation>
     </message>
 </context>
 </TS>

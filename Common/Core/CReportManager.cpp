@@ -17,10 +17,12 @@
 
 #include "CReportManager.h"
 #include <QMetaClassInfo>
+#include <QMap>
 
 #include "CEventLogReport.h"
 #include "CAuditTrailReport.h"
 #include "CSummaryReport.h"
+#include "CSystemLogReport.h"
 
 static CReportManager g_reportManager;
 
@@ -30,18 +32,18 @@ CReportManager& CReportManager::instance()
 }
 
 void
-CReportManager::init(bool usePrettySelector)
+CReportManager::init()
 {
-    m_usePrettySelector = usePrettySelector;
     qRegisterMetaType<pEventLogReport>("CEventLogReport");
-    m_classList.append(QLatin1String("CEventLogReport")); // ID=1, index=0
+    m_classList.append(QLatin1String("CEventLogReport")); // ID=1
     qRegisterMetaType<pAuditTrailReport>("CAuditTrailReport");
-    m_classList.append(QLatin1String("CAuditTrailReport")); // ID=2, index=1
+    m_classList.append(QLatin1String("CAuditTrailReport")); // ID=2
     qRegisterMetaType<pSummaryReport>("CSummaryReport");
-    m_classList.append(QLatin1String("CSummaryReport")); // ID=3, index=2
+    m_classList.append(QLatin1String("CSummaryReport")); // ID=1000
+    qRegisterMetaType<pSystemLogReport>("CSystemLogReport");
+    m_classList.append(QLatin1String("CSystemLogReport")); // ID=3
 
-    m_visibleReportsNames.resize(m_classList.size());
-
+    QMap<quint16, QString> reportNameMap;
     pBasicReport ptr = nullptr;
     QMetaType type;
     for (const QString &name : m_classList) {
@@ -51,37 +53,14 @@ CReportManager::init(bool usePrettySelector)
             Q_CHECK_PTR(ptr);
             quint16 id = ptr->reportID();
             m_ids.append(id);
-            m_visibleReportsNames[id - 1] = ptr->visibleReportName();
+            reportNameMap[id] = ptr->visibleReportName();
 
             type.destroy(ptr);
             ptr = nullptr;
         }
     }
-}
-
-/***************************************************************************
- *       -= Parser =-            |       -= Report =-            |  pretty
- * -------------------------------------------------------------------------
- * ID=1: Event Log parser        | ID=1: Event Log report        |
- * ID=2: Audit Trail Log parser  | ID=2: Audit Trail Log report  |
- *                               | ID=3: Summury report          |
- * ID=3: Other Log parser        | ID=4: Other report            |  id++
- **************************************************************************/
-quint16
-CReportManager::prettySelector(const quint16 id) const
-{
-    quint16 retVal = id;
-    if (m_usePrettySelector) {
-        if (retVal >= 3) {
-            retVal++;
-        }
-/*************************************************
-        Other verifications must be here
-        if (conditions(retVal)) {
-            ...
-        }
-*************************************************/
-    } // m_usePrettySelector
-
-    return retVal;
+    std::sort(m_ids.begin(), m_ids.end());
+    for (qsizetype i = 0; i < m_ids.size(); ++i) {
+        m_visibleReportsNames.append(reportNameMap[m_ids.at(i)]);
+    }
 }

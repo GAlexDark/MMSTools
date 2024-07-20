@@ -21,7 +21,7 @@
 #include <QThread>
 #include <QString>
 #include <QStringList>
-#include "CBasicDatabase.h"
+#include "CSqliteDatabase.h"
 #include "CBasicReport.h"
 
 class CReportBuilder
@@ -32,14 +32,14 @@ public:
     bool init(quint16 logID, const QString &dbFileName, const QString &reportName,
               const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList,
               const bool showMilliseconds);
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
     bool generateReport();
 
 private:
     CReportBuilder(const CReportBuilder&) = delete;
     CReportBuilder& operator=(CReportBuilder&) = delete;
 
-    CBasicDatabase  m_db;
+    CSqliteDatabase  m_db;
     pBasicReport    m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources
     QString         m_errorString;
     QStringList     m_excludedUsernamesList;
@@ -56,7 +56,7 @@ public:
               const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList,
               const bool showMilliseconds);
     void run() override;
-    QString errorString() const { return m_errorString; }
+    const QString& errorString() const { return m_errorString; }
     bool getStatus() const { return m_retVal; }
 
 signals:

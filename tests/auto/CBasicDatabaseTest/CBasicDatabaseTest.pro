@@ -12,10 +12,12 @@ INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.h \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CSqliteDatabase.h \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/DBStrings.h
 
 SOURCES +=  \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicDatabase.cpp \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CSqliteDatabase.cpp \
     tst_cbasicdatabase.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
