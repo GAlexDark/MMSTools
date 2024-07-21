@@ -26,8 +26,9 @@
 #include <QList>
 #include <QScopedPointer>
 
-typedef QMap<QString, QVariant> dataItem_t;
-typedef dataItem_t *pDataItem;
+#include "MMSTypes.h"
+
+typedef mms::dataItem_t *pDataItem;
 typedef QList<QStringList> dataList_t;
 
 class CBasicDatabase
