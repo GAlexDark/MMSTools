@@ -4,7 +4,7 @@ QT += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-QT_CVERSION = c++11
+QT_CVERSION = c++17
 CONFIG += QT_CVERSION precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
@@ -62,7 +62,7 @@ RC_ICONS = img/elc.ico
 
 MAJOR_VER = 2
 MINOR_VER = 0
-PATCH_VER = 4
+PATCH_VER = 5
 BUILD_VER = 131
 BUILD_DATE = $$_DATE_
 

@@ -2,7 +2,7 @@ TEMPLATE = app
 
 QT = core sql
 
-QT_CVERSION = c++11
+QT_CVERSION = c++17
 CONFIG += QT_CVERSION cmdline precompile_header
 CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
 CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
