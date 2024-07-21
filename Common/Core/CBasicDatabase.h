@@ -28,8 +28,8 @@
 
 #include "MMSTypes.h"
 
-typedef mms::dataItem_t *pDataItem;
-typedef QList<QStringList> dataList_t;
+using pDataItem = mms::dataItem_t *;
+using dataList_t = QList<QStringList>;
 
 class CBasicDatabase
 {

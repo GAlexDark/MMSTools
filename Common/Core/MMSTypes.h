@@ -25,10 +25,9 @@ namespace mms {
         char quoteChar; // ' "
         QByteArray eolChars; // \n \r\n
     };
-    typedef fileFieldsSeparation_t ffs_t;
-
-    typedef QMap<QString, QString> pragmaList_t;
-    typedef QMap<QString, QVariant> dataItem_t;
+    using ffs_t = fileFieldsSeparation_t;
+    using pragmaList_t = QMap<QString, QString>;
+    using dataItem_t = QMap<QString, QVariant>;
 
     //reserved to the future
     enum class MmsLogsTypes { LT_NONE, LT_EVENTLOG_MMS, LT_EVENTLOG_REPORT, LT_AUDITTRAIL_MMS, LT_AUDITTRAIL_REPORT };
