@@ -60,7 +60,7 @@ CReportManager::init()
         }
     }
     std::sort(m_ids.begin(), m_ids.end());
-    for (qsizetype i = 0; i < m_ids.size(); ++i) {
-        m_visibleReportsNames.append(reportNameMap[m_ids.at(i)]);
+    for (const quint16 i: m_ids) {
+        m_visibleReportsNames.append(reportNameMap[i]);
     }
 }
