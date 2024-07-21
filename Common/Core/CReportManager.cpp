@@ -61,6 +61,6 @@ CReportManager::init()
     }
     std::sort(m_ids.begin(), m_ids.end());
     for (const quint16 i: m_ids) {
-        m_visibleReportsNames.append(reportNameMap[i]); // m_ids.at(i)
+        m_visibleReportsNames.append(reportNameMap[i]);
     }
 }

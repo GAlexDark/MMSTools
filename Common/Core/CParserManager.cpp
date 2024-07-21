@@ -35,16 +35,20 @@ void
 CParserManager::init()
 {
     qRegisterMetaType<pEventLogParser>("CEventLogParser");
-    m_classList.append(QLatin1String("CEventLogParser")); // ID=1, index=0
+    m_classList.append(QLatin1String("CEventLogParser")); // ID=1
     qRegisterMetaType<pAuditTrailParser>("CAuditTrailParser");
-    m_classList.append(QLatin1String("CAuditTrailParser")); // ID=2, index=1
+    m_classList.append(QLatin1String("CAuditTrailParser")); // ID=2
     qRegisterMetaType<pSystemLogParser>("CSystemLogParser");
-    m_classList.append(QLatin1String("CSystemLogParser")); // ID=3, index=2
+    m_classList.append(QLatin1String("CSystemLogParser")); // ID=3
 
-    m_visibleLogsNames.resize(m_classList.size());
-    m_tablesList.resize(m_classList.size());
-    m_createTableRequestList.resize(m_classList.size());
+    struct parserData_t
+    {
+        QString visibleLogName;
+        QString tableName;
+        QString createTableString;
+    };
 
+    QMap<quint16, parserData_t> parserNameMap;
     pBasicParser ptr = nullptr;
     QMetaType type;
     for (const QString &name : m_classList) {
@@ -54,12 +58,20 @@ CParserManager::init()
             Q_CHECK_PTR(ptr);
             quint16 id = ptr->parserID();
             m_ids.append(id);
-            m_visibleLogsNames[id - 1] = ptr->visibleLogName();
-            m_tablesList[id - 1] = ptr->tableName();
-            m_createTableRequestList[id - 1] = ptr->createTable();
+
+            parserNameMap[id].visibleLogName = ptr->visibleLogName();
+            parserNameMap[id].tableName = ptr->tableName();
+            parserNameMap[id].createTableString = ptr->createTable();
 
             type.destroy(ptr);
             ptr = nullptr;
         }
+    }
+
+    std::sort(m_ids.begin(), m_ids.end());
+    for (const quint16 i: m_ids) {
+        m_visibleLogsNames.append(parserNameMap[i].visibleLogName);
+        m_tablesList.append(parserNameMap[i].tableName);
+        m_createTableRequestList.append(parserNameMap[i].createTableString);
     }
 }
