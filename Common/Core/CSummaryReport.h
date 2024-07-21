@@ -34,6 +34,6 @@ public:
 
 Q_DECLARE_METATYPE(CSummaryReport *);
 
-typedef CSummaryReport *pSummaryReport;
+using pSummaryReport = CSummaryReport *;
 
 #endif // CSUMMARYREPORT_H

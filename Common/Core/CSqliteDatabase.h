@@ -32,6 +32,6 @@ public:
     bool checkTables(const QStringList &tables, QString &tableName);
 };
 
-typedef CSqliteDatabase *pSqliteDatabase;
+using pSqliteDatabase = CSqliteDatabase *;
 
 #endif // CSQLITEDATABASE_H

@@ -80,7 +80,7 @@ public:
 
 private:
     pBasicParser    m_parser = nullptr; // don't use the 'detele' operator, the ParserManager manage resources
-    dataItem_t      m_data;
+    mms::dataItem_t      m_data;
     bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
 
 protected:

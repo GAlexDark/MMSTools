@@ -26,9 +26,10 @@
 #include <QList>
 #include <QScopedPointer>
 
-typedef QMap<QString, QVariant> dataItem_t;
-typedef dataItem_t *pDataItem;
-typedef QList<QStringList> dataList_t;
+#include "MMSTypes.h"
+
+using pDataItem = mms::dataItem_t *;
+using dataList_t = QList<QStringList>;
 
 class CBasicDatabase
 {
@@ -93,6 +94,6 @@ protected:
     void sqlQueryFinish();
 };
 
-typedef CBasicDatabase *pBasicDatabase;
+using pBasicDatabase = CBasicDatabase *;
 
 #endif // CBASICDATABASE_H

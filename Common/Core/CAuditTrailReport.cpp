@@ -17,8 +17,6 @@
 
 #include "CAuditTrailReport.h"
 #include "DBStrings.h"
-#include "MMSTypes.h"
-
 
 CAuditTrailReport::CAuditTrailReport(QObject *parent)
     : CBasicReport{parent}
@@ -75,7 +73,7 @@ CAuditTrailReport::generateReport()
 
             writeValue = m_db->geValue("timestamp").toDateTime();
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw mms::XlsxError();
+                throw XlsxError();
             }
             setReportDataItem(xlsxReport.data(), "username", colUsername, row);
             setReportDataItem(xlsxReport.data(), "role", colRole, row);
@@ -89,7 +87,7 @@ CAuditTrailReport::generateReport()
                 break;
             }
         } // while
-    } catch (mms::XlsxError &ex) {
+    } catch (XlsxError &ex) {
         setErrorString(ex.what());
         retVal = false;
     }

@@ -19,6 +19,7 @@
 #define CBASICREPORT_H
 
 #include <QObject>
+
 #include "CSqliteDatabase.h"
 
 const int maxRowsCount = 1048575;
@@ -60,6 +61,31 @@ private:
     bool m_showMilliseconds = false;
 };
 
-typedef CBasicReport *pBasicReport;
+using pBasicReport = CBasicReport *;
+
+class MmsCommonException : public std::exception
+{
+private:
+    char *m_message;
+
+public:
+    explicit MmsCommonException(char *text = nullptr) noexcept
+        :m_message(text) {}
+    const char *what() const noexcept override
+    {
+        return m_message;
+    }
+};
+
+class XlsxError : public MmsCommonException
+{
+public:
+    explicit XlsxError(char *text = nullptr) noexcept
+        :MmsCommonException(text) {}
+    const char *what() const noexcept override
+    {
+        return "QXlsx write error";
+    }
+};
 
 #endif // CBASICREPORT_H

@@ -34,6 +34,6 @@ public:
 
 Q_DECLARE_METATYPE(CSystemLogReport *);
 
-typedef CSystemLogReport *pSystemLogReport;
+using pSystemLogReport = CSystemLogReport *;
 
 #endif // CSYSTEMLOGREPORT_H

@@ -69,6 +69,6 @@ private:
 
 Q_DECLARE_METATYPE(CSystemLogParser *);
 
-typedef CSystemLogParser *pSystemLogParser;
+using pSystemLogParser = CSystemLogParser *;
 
 #endif // CSYSTEMLOGPARSER_H

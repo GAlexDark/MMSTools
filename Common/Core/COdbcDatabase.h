@@ -27,6 +27,6 @@ public:
     bool init(const QString &connectionString);
 };
 
-typedef COdbcDatabase *pOdbcDatabase;
+using pOdbcDatabase = COdbcDatabase *;
 
 #endif // CODBCDATABASE_H

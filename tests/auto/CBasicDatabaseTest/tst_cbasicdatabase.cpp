@@ -185,7 +185,7 @@ void CBasicDatabaseTest::test_InsertBindedValues()
     bool retVal = m_fakeDB.prepareRequest(eventlog::insertData);
     QVERIFY(retVal);
 
-    dataItem_t data;
+    mms::dataItem_t data;
     data[phUsername] = "mr_data";
     data[phTimestampISO8601] = "2023-05-09T11:19:57.36Z";
     data[phTimestamp] = "2023-05-09T14:19:57.360";

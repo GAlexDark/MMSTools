@@ -63,6 +63,6 @@ private:
     QStringList m_ipAddressList;
 };
 
-typedef CBasicParser *pBasicParser;
+using pBasicParser = CBasicParser *;
 
 #endif // CBASICPARSER_H

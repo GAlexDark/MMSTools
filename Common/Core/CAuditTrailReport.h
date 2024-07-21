@@ -34,6 +34,6 @@ public:
 
 Q_DECLARE_METATYPE(CAuditTrailReport *);
 
-typedef CAuditTrailReport *pAuditTrailReport;
+using pAuditTrailReport = CAuditTrailReport *;
 
 #endif // CAUDITTRAILREPORT_H
