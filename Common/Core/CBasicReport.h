@@ -19,7 +19,6 @@
 #define CBASICREPORT_H
 
 #include <QObject>
-#include <QException>
 
 #include "CSqliteDatabase.h"
 
@@ -64,7 +63,7 @@ private:
 
 using pBasicReport = CBasicReport *;
 
-class MmsCommonException : public QException
+class MmsCommonException : public std::exception
 {
 private:
     char *m_message;
@@ -72,9 +71,6 @@ private:
 public:
     explicit MmsCommonException(char *text = nullptr) noexcept
         :m_message(text) {}
-    virtual ~MmsCommonException() {}
-    void raise() const override { throw *this; }
-    MmsCommonException *clone() const override { return new MmsCommonException(*this); }
     const char *what() const noexcept override
     {
         return m_message;
@@ -84,8 +80,12 @@ public:
 class XlsxError : public MmsCommonException
 {
 public:
-    explicit XlsxError(char *text = "QXlsx write error") noexcept
+    explicit XlsxError(char *text = nullptr) noexcept
         :MmsCommonException(text) {}
+    const char *what() const noexcept override
+    {
+        return "QXlsx write error";
+    }
 };
 
 #endif // CBASICREPORT_H
