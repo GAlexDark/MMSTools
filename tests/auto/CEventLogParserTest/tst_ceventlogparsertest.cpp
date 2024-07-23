@@ -61,7 +61,8 @@ void CEventLogParserTest::initTestCase()
     file.close();
 
     m_parser.init("10.");
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 }
@@ -81,7 +82,8 @@ void CEventLogParserTest::initTestCaseEng()
     file.close();
 
     m_parser.init("10.");
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 }
@@ -136,7 +138,8 @@ void CEventLogParserTest::test_failedAuthUkrLang() {
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -168,7 +171,8 @@ void CEventLogParserTest::test_failedAuthEngLang() {
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -200,7 +204,8 @@ void CEventLogParserTest::test_successAuth_wINTERNAL_ips() {
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -232,7 +237,8 @@ void CEventLogParserTest::test_successAuth_wEXTERNAL_ips() {
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -265,7 +271,8 @@ void CEventLogParserTest::test_otherData1()
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -298,7 +305,8 @@ void CEventLogParserTest::test_otherData2()
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -331,7 +339,8 @@ void CEventLogParserTest::test_otherData3_exception()
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -363,7 +372,8 @@ void CEventLogParserTest::test_DateTimeFormats()
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -384,7 +394,8 @@ void CEventLogParserTest::test_DateTimeFormats()
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
@@ -405,7 +416,8 @@ void CEventLogParserTest::test_DateTimeFormats()
     QVERIFY(!buf.isEmpty());
     file.close();
 
-    m_parser.parse(buf);
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
     m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 
