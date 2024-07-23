@@ -7,4 +7,5 @@ SUBDIRS += \
     CElcConsoleAppSettingsTest \
     CBasicDatabaseTest \
     CElcGuiAppSettingsTest \
+    CSystemLogParserTest \
     UtilsTest
