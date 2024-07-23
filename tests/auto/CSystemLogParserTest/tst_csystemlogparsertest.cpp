@@ -38,7 +38,8 @@ CSystemLogParserTest::CSystemLogParserTest(QObject *parent)
 
 CSystemLogParserTest::~CSystemLogParserTest() {}
 
-void CSystemLogParserTest::initTestCase()
+void
+CSystemLogParserTest::initTestCase()
 {
     m_parser.init("10.");
 }
