@@ -1,6 +1,7 @@
 #include <QtTest>
 #include <QFile>
 #include <QDateTime>
+#include <QByteArray>
 
 #include "CEventLogParser.h"
 
