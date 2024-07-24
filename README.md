@@ -1,5 +1,6 @@
 # MMSTools
 
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)][pre-commit]
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e26cc8d025c641119bc96da0c236cefd)][Codacy Badge]  
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=alert_status)][Quality Gate Status]
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=bugs)][Bugs]
@@ -11,6 +12,7 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=sqale_rating)][Maintainability Rating]
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=GAlexDark_MMSTools&metric=ncloc)][Lines of Code]
 
+[pre-commit]: https://github.com/pre-commit/pre-commit
 [Codacy Badge]: https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
 [Quality Gate Status]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 [Bugs]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
