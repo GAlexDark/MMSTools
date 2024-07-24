@@ -67,9 +67,9 @@ CBasicParser::analizeIPAdresses()
         }
     } else {
         if (m_ipaddresses.startsWith(m_internalIpFirstOctet)) {
-            m_internalip = m_ipaddresses;
+            m_internalip = m_ipaddresses.trimmed();
         } else {
-            m_externalip = m_ipaddresses;
+            m_externalip = m_ipaddresses.trimmed();
         }
     } // (pos != -1)
 }
