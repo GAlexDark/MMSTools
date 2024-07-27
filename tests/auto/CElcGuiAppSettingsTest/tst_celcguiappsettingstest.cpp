@@ -34,7 +34,8 @@ removeIniFile()
     QString fp = QDir(filePath).filePath(fileName);
     QFile file(fp);
     if (file.exists()) {
-        file.remove();
+        bool retVal = file.remove();
+        Q_ASSERT(retVal);
     }
 }
 

@@ -175,7 +175,8 @@ bool
 CEventLogParser::checkHeader(const QString &line)
 {
     QString columns;
-    elcUtils::getMetaClassInfo(this, "columns", columns);
+    bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
+    Q_ASSERT(retVal);
     QStringList columnsList = columns.split('|');
     return columnsList.indexOf(line) != -1 ? true : false;
 }

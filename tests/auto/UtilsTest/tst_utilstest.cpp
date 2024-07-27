@@ -18,7 +18,8 @@ createTestFile(const QString &fileName)
 #else
     if (f.open(QIODevice::WriteOnly)) {
 #endif
-        f.write("test");
+        qint64 retVal = f.write("test");
+        Q_ASSERT(retVal != -1);
         f.close();
     }
 }
@@ -205,7 +206,8 @@ UtilsTest::cleanupTestCase()
 {
     QString tstPath = m_basePath + QStringLiteral("/") + m_newDir;
     QDir dir(tstPath);
-    dir.removeRecursively();
+    bool retVal = dir.removeRecursively();
+    Q_ASSERT(retVal);
 }
 
 void
