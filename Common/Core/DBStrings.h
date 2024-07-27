@@ -61,13 +61,13 @@ namespace audittrail {
 }
 
 namespace other {
-    inline const QString selectEvtLogAndAuditTrailData(QLatin1String("SELECT e.timestamp as timestamp, e.username as username, null as company_role, e.type as type_or_method, null as status, e.details as details_or_attributes, e.authtype as authtype, e.externalip as externalip, e.internalip as internalip, e.requestid as requestid FROM eventlog e %1 UNION ALL SELECT a.timestamp as timestamp, a.username as username, a.companyname || ' ' || a.role as company_role, a.method as type_or_method, a.status as status, a.attributes as details_or_attributes, null as authtype, a.externalip as externalip, a.internalip as internalip, null as requestid FROM audittraillog a %1 ORDER BY timestamp DESC;"));
+    inline const QString selectEvtLogAndAuditTrailData(QLatin1String("SELECT e.timestamp as timestamp, e.username as username, null as company_role, e.type as type_or_method, null as status, e.details as details_or_attributes, e.authtype as authtype, e.externalip as externalip, e.internalip as internalip, e.requestid as requestid FROM eventlog e %1 UNION ALL SELECT a.timestamp as timestamp, a.username as username, a.companyname || ' ' || a.role as company_role, a.method as type_or_method, a.status as status, a.attributes as details_or_attributes, null as authtype, a.externalip as externalip, a.internalip as internalip, null as requestid FROM audittraillog a %1 UNION ALL SELECT s.timestamp as timestamp, s.username1 as username, s.companyname || ' ' || s.role as company_role, s.type as type_or_method, s.severity as status, s.message as details_or_attributes, null as authtype, null as externalip, null as internalip, null as requestid FROM systemlog s %1 ORDER BY timestamp ASC;"));
 }
 
 namespace systemlog {
-    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [systemlog] (severity TEXT NOT NULL, timestamp DATETIME NOT NULL, message TEXT NOT NULL, username TEXT, username1 TEXT, role TEXT, companyname TEXT, PRIMARY KEY (severity, timestamp, message) ON CONFLICT IGNORE);"));
-    inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [systemlog] (severity, timestamp, message, username, username1, role, companyname)  VALUES (:severity, :timestamp, :message, :username, :username1, :role, :companyname)"));
-    inline const QString selectData(QLatin1String("SELECT a.timestamp, a.username1, a.role, a.companyname, a.severity, a.message FROM systemlog a %1 ORDER BY a.timestamp DESC;"));
+    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [systemlog] (severity TEXT NOT NULL, timestamp DATETIME NOT NULL, message TEXT NOT NULL, username TEXT, username1 TEXT, role TEXT, companyname TEXT, type TEXT, PRIMARY KEY (severity, timestamp, message) ON CONFLICT IGNORE);"));
+    inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [systemlog] (severity, timestamp, message, username, username1, role, companyname, type)  VALUES (:severity, :timestamp, :message, :username, :username1, :role, :companyname, :type)"));
+    inline const QString selectData(QLatin1String("SELECT a.timestamp, a.username1, a.role, a.companyname, a.type, a.severity, a.message FROM systemlog a %1 ORDER BY a.timestamp DESC;"));
 }
 
 #endif // DBSTRINGS_H

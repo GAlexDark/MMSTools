@@ -61,6 +61,10 @@ public:
     const QStringList& getClassList() const { return m_classList; }
     qsizetype getItemCount() const { return m_classList.size(); }
     bool checkID(const quint16 id) const { return m_ids.indexOf(id) != -1 ? true : false; }
+    quint16 getIdByIndex(const quint16 index) const
+    {
+        return index > 0 && index <= m_ids.size() ?  m_ids.at(index - 1) : 0xFFFF;
+    }
 
 protected:
     QStringList m_classList;

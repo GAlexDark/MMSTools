@@ -137,7 +137,8 @@ bool
 CAuditTrailParser::checkHeader(const QString &line)
 {
     QString columns;
-    elcUtils::getMetaClassInfo(this, "columns", columns);
+    bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
+    Q_ASSERT(retVal);
     return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0 ? true : false;
 }
 

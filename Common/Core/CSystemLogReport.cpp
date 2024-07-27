@@ -37,8 +37,9 @@ CSystemLogReport::generateReport()
     int colUsername = 3;
     int colRole = 4;
     int colCompanyname = 5;
-    int colSeverity = 6;
-    int colMessage = 7;
+    int colType = 6;
+    int colSeverity = 7;
+    int colMessage = 8;
 
     QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
     int row = 1;
@@ -56,6 +57,8 @@ CSystemLogReport::generateReport()
         setReportDataItem(xlsxReport.data(), colRole, row, writeValue);
         writeValue = QStringLiteral("Компанія");
         setReportDataItem(xlsxReport.data(), colCompanyname, row, writeValue);
+        writeValue = QStringLiteral("Тип");
+        setReportDataItem(xlsxReport.data(), colType, row, writeValue);
         writeValue = QStringLiteral("Рівень");
         setReportDataItem(xlsxReport.data(), colSeverity, row, writeValue);
         writeValue = QStringLiteral("Повідомлення");
@@ -73,6 +76,7 @@ CSystemLogReport::generateReport()
             setReportDataItem(xlsxReport.data(), "username1", colUsername, row);
             setReportDataItem(xlsxReport.data(), "role", colRole, row);
             setReportDataItem(xlsxReport.data(), "companyname", colCompanyname, row);
+            setReportDataItem(xlsxReport.data(), "type", colType, row);
             setReportDataItem(xlsxReport.data(), "severity", colSeverity, row);
             setReportDataItem(xlsxReport.data(), "message", colMessage, row);
             ++row;

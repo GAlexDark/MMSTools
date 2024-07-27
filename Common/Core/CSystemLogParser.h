@@ -63,6 +63,8 @@ private:
     QString     m_role;
     QString     m_companyname;
 
+    QString     m_type;
+
     char        m_delimiterChar;
     char        m_quoteChar = 0;
 };
