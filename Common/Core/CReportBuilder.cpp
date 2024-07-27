@@ -43,7 +43,8 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
     m_includedUsernamesList = *includedUsernamesList;
 
     CReportManager &reportManager = CReportManager::instance();
-    bool retVal = reportManager.checkID(logID);
+    logID = reportManager.getIdByIndex(logID);
+    bool retVal = (logID != 0xFFFF);
     if (retVal) {
         m_report = reportManager.getInstance(logID);
         Q_CHECK_PTR(m_report);
