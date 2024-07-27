@@ -11,7 +11,6 @@ class CSystemLogParserTest : public QObject
 
 public:
     explicit CSystemLogParserTest(QObject *parent = nullptr);
-    ~CSystemLogParserTest();
 
 private:
     CSystemLogParser m_parser;
@@ -36,8 +35,6 @@ private slots:
 CSystemLogParserTest::CSystemLogParserTest(QObject *parent)
     : QObject{parent}
 {}
-
-CSystemLogParserTest::~CSystemLogParserTest() {}
 
 void
 CSystemLogParserTest::initTestCase()

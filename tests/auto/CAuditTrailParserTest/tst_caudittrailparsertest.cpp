@@ -11,7 +11,6 @@ class CAuditTrailParserTest : public QObject
 
 public:
     explicit CAuditTrailParserTest(QObject *parent = nullptr);
-    ~CAuditTrailParserTest();
 
 private:
     CAuditTrailParser m_parser;
@@ -41,8 +40,6 @@ private slots:
 CAuditTrailParserTest::CAuditTrailParserTest(QObject *parent)
     : QObject{parent}
 {}
-
-CAuditTrailParserTest::~CAuditTrailParserTest() {}
 
 void
 CAuditTrailParserTest::initTestCase()
