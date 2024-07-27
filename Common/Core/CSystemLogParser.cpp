@@ -46,12 +46,14 @@ CSystemLogParser::parseMessage()
             m_username1 = match1.captured(1);
             m_role = match1.captured(2);
             m_companyname = match1.captured(3);
+            m_type = QStringLiteral("Using role");
         } else {
             QRegularExpressionMatch match2 = reUserData2.match(m_message);
             if (match2.hasMatch()) {
                 m_username1 = match2.captured(1);
                 m_role.clear();
                 m_companyname.clear();
+                m_type = QStringLiteral("User login - successful");
             } else {
                 retVal = false;
             }
@@ -86,6 +88,7 @@ CSystemLogParser::parse(const QString& line)
             m_username1.clear();
             m_role.clear();
             m_companyname.clear();
+            m_type.clear();
         }
         m_username = match.captured(4);
     } else {
@@ -104,13 +107,15 @@ CSystemLogParser::convertData(mms::dataItem_t &data)
     data[phUsername1] = m_username1;
     data[phRole] = m_role;
     data[phCompanyname] = m_companyname;
+    data[phType] = m_type;
 }
 
 bool
 CSystemLogParser::checkHeader(const QString &line)
 {
     QString columns;
-    elcUtils::getMetaClassInfo(this, "columns", columns);
+    bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
+    Q_ASSERT(retVal);
     return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0 ? true : false;
 }
 

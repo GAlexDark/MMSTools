@@ -60,7 +60,7 @@ CSummaryReport::generateReport()
         setReportDataItem(xlsxReport.data(), colCompanyRole, row, writeValue);
         writeValue = QStringLiteral("Тип / Метод");
         setReportDataItem(xlsxReport.data(), colTypeOrMethod, row, writeValue);
-        writeValue = QStringLiteral("Статус");
+        writeValue = QStringLiteral("Статус / Рівень");
         setReportDataItem(xlsxReport.data(), colStatus, row, writeValue);
         writeValue = QStringLiteral("Деталі / Атрибути");
         setReportDataItem(xlsxReport.data(), colDetailsOrAttributes, row, writeValue);
