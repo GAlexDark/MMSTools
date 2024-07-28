@@ -27,6 +27,8 @@ const QRegularExpression reUserData2(QLatin1String("^User\\s\"(.*?)\""));
 
 const QString nullValue(QLatin1String("null"));
 const QString user(QLatin1String("User "));
+const QString usingRole(QLatin1String("Using role"));
+const QString loginSuccess(QLatin1String("User login - successful"));
 
 CSystemLogParser::CSystemLogParser(QObject *parent)
     : CBasicParser{parent}
@@ -46,14 +48,14 @@ CSystemLogParser::parseMessage()
             m_username1 = match1.captured(1);
             m_role = match1.captured(2);
             m_companyname = match1.captured(3);
-            m_type = QStringLiteral("Using role");
+            m_type = usingRole;
         } else {
             QRegularExpressionMatch match2 = reUserData2.match(m_message);
             if (match2.hasMatch()) {
                 m_username1 = match2.captured(1);
                 m_role.clear();
                 m_companyname.clear();
-                m_type = QStringLiteral("User login - successful");
+                m_type = loginSuccess;
             } else {
                 retVal = false;
             }
