@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    QCommandLineParserHelper cmd;
+    elc::QCommandLineParserHelper cmd;
     if (!cmd.parseCmdArgs(a)) {
         consoleOut.outToConsole(cmd.errorString());
         return 1;

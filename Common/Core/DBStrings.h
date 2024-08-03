@@ -18,6 +18,8 @@
 #ifndef DBSTRINGS_H
 #define DBSTRINGS_H
 
+#include <QString>
+
 inline const QString pragmaUTF8(QLatin1String("PRAGMA encoding = \"UTF-8\";"));
 inline const QString pragmaPageSize(QLatin1String("PRAGMA page_size = %1;"));
 inline const QString pragmaJournalMode(QLatin1String("PRAGMA journal_mode = %1;"));
@@ -47,6 +49,10 @@ inline const QString phAttributes(QLatin1String(":attributes"));
 inline const QString phSeverity(QLatin1String(":severity"));
 inline const QString phMessage(QLatin1String(":message"));
 
+inline const QString phNumber(QLatin1String(":number"));
+inline const QString phParticipantEic(QLatin1String(":participantEic"));
+inline const QString phDateToWhichRelated(QLatin1String(":dateToWhichRelated"));
+
 //this query uses autotest
 namespace eventlog {
     inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME NOT NULL, PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);"));
@@ -68,6 +74,15 @@ namespace systemlog {
     inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [systemlog] (severity TEXT NOT NULL, timestamp DATETIME NOT NULL, message TEXT NOT NULL, username TEXT, username1 TEXT, role TEXT, companyname TEXT, type TEXT, PRIMARY KEY (severity, timestamp, message) ON CONFLICT IGNORE);"));
     inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [systemlog] (severity, timestamp, message, username, username1, role, companyname, type)  VALUES (:severity, :timestamp, :message, :username, :username1, :role, :companyname, :type)"));
     inline const QString selectData(QLatin1String("SELECT a.timestamp, a.username1, a.role, a.companyname, a.type, a.severity, a.message FROM systemlog a %1 ORDER BY a.timestamp DESC;"));
+}
+
+namespace MotActivations {
+    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [mot_activations_request_data] (number INTEGER NOT NULL, participant_eic TEXT NOT NULL, date_to_which_related DATE NOT NULL);"));
+    inline const QString insertData(QLatin1String("INSERT INTO [mot_activations_request_data] (number, participant_eic, date_to_which_related) VALUES (:number, :participant_eic, :date_to_which_related)"));
+    inline const QString selectRequestData(QLatin1String("SELECT DISTINCT participant_eic, date_to_which_related FROM mot_activations_request_data;"));
+    inline const QString createResponseDataTable(QLatin1String("CREATE TABLE IF NOT EXISTS [mot_activations_response_data] (day TEXT NOT NULL, hour TEXT NOT NULL, call_start TEXT NOT NULL, call_end TEXT NOT NULL, offer_volume TEXT NOT NULL, mba TEXT NOT NULL, oom TEXT NOT NULL, direction TEXT NOT NULL, price TEXT NOT NULL, company TEXT NOT NULL, company_alias TEXT NOT NULL, resource TEXT NOT NULL, resource_alias TEXT NOT NULL, bidid TEXT NOT NULL);"));
+    inline const QString insertResponseData(QLatin1String("INSERT INTO [mot_activations_response_data] (day, hour, call_start, call_end, offer_volume, mba, oom, direction, price, company, company_alias, resource, resource_alias, bidid) VALUES (:day, :hour, :call_start, :call_end, :offer_volume, :mba, :oom, :direction, :price, :company, :company_alias, :resource, :resource_alias, :bidid)"));
+    inline const QString selectResponseData(QLatin1String("SELECT convert(date, us.LOCAL) as [DAY], concat (datepart(hour, us.local), ' - ', datepart(hour, dateadd(hour, 1, us.LOCAL))) as [Hour], convert(time, (left(US.LOCAL, 14) + right(c.startDate, 9))) AS [Call Start], convert(time, (left(Ue.LOCAL, 14) + right(c.endDate, 9))) AS [Call End], o.volume as [Offer Volume], O.marketBalanceAreaEic AS [MBA], c.outOfMerit AS [OOM], CASE WHEN m.direction = 'D' THEN 'UP' WHEN m.direction ='P' THEN 'DOWN' END as [Direction], o.price AS [Price], mp.eic AS [Company], mp.alias AS [Company alias], s.eic AS [Resource], cm.alias AS [Resource alias], O.id AS [BIDid] FROM emdbukrenergomms_mot.dbo.motCall C left join emdbukrenergomms_mot.dbo.motMolEntry E on E.pk = C.molEntryPk left join emdbukrenergomms_mot.dbo.motMol M on M.pk = E.molPk left join emdbukrenergomms_mot.dbo.motOffer O on O.pk = E.offerPk left join emdbukrenergomms_mot.dbo.motSupplier s on s.pk = o.supplierPk left join emdbukrenergomms_mot.dbo.emtCompany Cm on Cm.eic = s.eic left join emdbukrenergomms.dbo.emtCompany mp on mp.eic like left(cm.comRegNumber, 16) left join ReportServer.dbo.UTC_LOCAL us on left(us.UTC, 14) = left(c.startDate, 14) left join ReportServer.dbo.UTC_LOCAL ue on left(ue.UTC, 14) = left(c.endDate, 14) WHERE convert(date, us.LOCAL) between :from and :to ORDER BY o.startDate;"));
 }
 
 #endif // DBSTRINGS_H

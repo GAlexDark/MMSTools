@@ -23,7 +23,7 @@
 #include "CElcConsoleAppSettings.h"
 
 bool
-QCommandLineParserHelper::checkData(const QStringList &data)
+elc::QCommandLineParserHelper::checkData(const QStringList &data)
 {
     bool retVal = true;
     const CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
@@ -40,14 +40,14 @@ QCommandLineParserHelper::checkData(const QStringList &data)
     return retVal;
 }
 
-QCommandLineParserHelper::QCommandLineParserHelper()
+elc::QCommandLineParserHelper::QCommandLineParserHelper()
 {
     m_filesList.clear();
     m_errorString.clear();
 }
 
 bool
-QCommandLineParserHelper::addElcOption(const QCoreApplication &app)
+elc::QCommandLineParserHelper::addElcOption(const QCoreApplication &app)
 {
     const QString importOnlyDescription(QLatin1String("The utility starts in the import data-only mode without report generation. In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored."));
     const QString reportOnlyDescription(QLatin1String("The utility starts in the generation report-only mode without importing data. In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\nIf these options are not specified, data will be imported and the report generated."));
@@ -107,7 +107,7 @@ QCommandLineParserHelper::addElcOption(const QCoreApplication &app)
 }
 
 bool
-QCommandLineParserHelper::checkElcOption()
+elc::QCommandLineParserHelper::checkElcOption()
 {
     const QString error1 = QLatin1String("The '%1' and '%2' options cannot be specified at the same time.");
     bool comb1 = m_isImportOnly && m_isReportOnly && m_isCleanDbOnly;
@@ -134,7 +134,7 @@ QCommandLineParserHelper::checkElcOption()
 }
 
 bool
-QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
+elc::QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
 {
     m_parser.addHelpOption();
 
@@ -147,14 +147,15 @@ QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
 }
 
 QStringList
-QCommandLineParserHelper::excludedUsernames() const
+elc::QCommandLineParserHelper::excludedUsernames() const
 {
     QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
 
-QStringList QCommandLineParserHelper::includedUsernames() const
+QStringList
+elc::QCommandLineParserHelper::includedUsernames() const
 {
     QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
     elcUtils::parseValuesList(retVal);
@@ -162,13 +163,13 @@ QStringList QCommandLineParserHelper::includedUsernames() const
 }
 
 [[noreturn]] void
-QCommandLineParserHelper::showHelpAndExit()
+elc::QCommandLineParserHelper::showHelpAndExit()
 {
     m_parser.showHelp(0);
 }
 
 RunningMode
-QCommandLineParserHelper::getRunningMode() const
+elc::QCommandLineParserHelper::getRunningMode() const
 {
     RunningMode retVal = RunningMode::RUNNINGMODE_DEFAULT;
     if (m_isCleanDbOnly) {
@@ -186,7 +187,7 @@ QCommandLineParserHelper::getRunningMode() const
 }
 
 bool
-QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
+elc::QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 {
     bool retVal = true;
     if (m_isFiles) {
@@ -229,7 +230,7 @@ QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 }
 
 QString
-QCommandLineParserHelper::getReportName() const
+elc::QCommandLineParserHelper::getReportName() const
 {
     QString retVal;
     if (m_isReportName) {
@@ -256,14 +257,14 @@ QCommandLineParserHelper::getReportName() const
 }
 
 bool
-QCommandLineParserHelper::getExcludedUserNames(QStringList &excludedUsersList)
+elc::QCommandLineParserHelper::getExcludedUserNames(QStringList &excludedUsersList)
 {
     excludedUsersList = excludedUsernames();
     return checkData(excludedUsersList);
 }
 
 bool
-QCommandLineParserHelper::getIncludedUserNames(QStringList &includedUsersList)
+elc::QCommandLineParserHelper::getIncludedUserNames(QStringList &includedUsersList)
 {
     includedUsersList = includedUsernames();
     return checkData(includedUsersList);

@@ -1,21 +1,6 @@
-TEMPLATE = app
+QT = core
 
-QT = core sql
-
-QT_CVERSION = c++17
-CONFIG += QT_CVERSION cmdline precompile_header
-CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
-CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
-CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -O0 -fno-omit-frame-pointer -gdwarf-3
-
-DEFINES += QT_USE_QSTRINGBUILDER
-
-lessThan(QT_MAJOR_VERSION, 6) {
-    CONFIG(debug, debug|release): message("gprof mode")
-    CONFIG(debug, debug|release): QMAKE_CFLAGS_DEBUG += -g -pg  #-no-pie
-    CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -g -pg  #-no-pie
-    CONFIG(debug, debug|release): QMAKE_LFLAGS_DEBUG += -g -pg -lgmon #-no-pie
-}
+CONFIG += c++17 cmdline
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -33,14 +18,13 @@ INCLUDEPATH += . src
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
-include(../commonmodules.pro)
 HEADERS += \
     ../Common/Core/CConsoleOutput.h \
-    src/CElcConsoleAppSettings.h \
+    ../Common/Core/elcUtils.h \
     src/QCommandLineParserHelper.h
 
 SOURCES += \
-    src/CElcConsoleAppSettings.cpp \
+    ../Common/Core/elcUtils.cpp \
     src/QCommandLineParserHelper.cpp \
     src/main.cpp
 
@@ -51,8 +35,8 @@ RC_ICONS = img/elcc.ico
 
 MAJOR_VER = 1
 MINOR_VER = 0
-PATCH_VER = 3
-BUILD_VER = 131
+PATCH_VER = 0
+BUILD_VER = 1
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}
@@ -61,9 +45,9 @@ else: VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
 
 VERSION_PE_HEADER = $${VER_PE}
 VERSION = $${VERSTR}
-QMAKE_TARGET_DESCRIPTION = MMS Event Log Conversion Console Utility
-QMAKE_TARGET_COPYRIGHT = (C) 2023 Oleksii Gaienko
-QMAKE_TARGET_PRODUCT = MMS Event Log Conversion Utility
+QMAKE_TARGET_DESCRIPTION = MMS Xlsx to Json Conversion Console Utility
+QMAKE_TARGET_COPYRIGHT = (C) 2024 Oleksii Gaienko
+QMAKE_TARGET_PRODUCT = MMS Xlsx to Json Conversion Utility
 QMAKE_TARGET_INTERNALNAME = $${TARGET}
 QMAKE_TARGET_COMMENTS = support@galexsoftware.info
 
