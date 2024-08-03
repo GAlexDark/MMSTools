@@ -35,7 +35,7 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 include(../commonmodules.pro)
 HEADERS += \
-    src/CConsoleOutput.h \
+    ../Common/Core/CConsoleOutput.h \
     src/CElcConsoleAppSettings.h \
     src/QCommandLineParserHelper.h
 

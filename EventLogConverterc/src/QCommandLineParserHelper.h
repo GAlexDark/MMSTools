@@ -23,6 +23,7 @@
 
 enum class RunningMode { RUNNINGMODE_DEFAULT, RUNNINGMODE_IMPORT_ONLY, RUNNINGMODE_REPORT_ONLY, RUNNINGMODE_CLEAN_DB };
 
+namespace elc {
 class QCommandLineParserHelper
 {
 public:
@@ -61,5 +62,7 @@ private:
     bool addElcOption(const QCoreApplication &app);
     bool checkElcOption();
 };
+} // namespace elc
+
 
 #endif // QCOMMANDLINEPARSERHELPER_H
