@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  MMS XLSX to JSON Conversion Console Utility
+*  MMS XLSX to JSON Conversion Console Utility
+*
+*  Module name: main.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     Main file
+*
+****************************************************************************/
+
 #include <QCoreApplication>
 #include <QTextStream>
 #include <QJsonObject>
@@ -39,7 +56,7 @@ double
 toDouble(const QVariant &value, bool &isOk)
 {
     double retVal = 0.0;
-    QString buf = toString(value, isOk);
+    QString buf = toString(value, isOk); //for correct conversion of values ​​like 10,000.00
     if (isOk) {
         QLocale c(QLocale::C);
         retVal = c.toDouble(buf, &isOk);
