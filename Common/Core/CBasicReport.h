@@ -76,7 +76,11 @@ public:
             m_message.reset(new char [maxBufSize]);
             std::string buf = text.toStdString();
             const char *source = buf.c_str();
-            strncpy(m_message.data(), source, maxBufSize);
+            //strncpy(m_message.data(), source, maxBufSize);
+            errno_t retVal = strncpy_s(m_message.data(), maxBufSize, source, buf.length());
+            if (retVal != 0) {
+                assert(false);
+            }
         } catch (...) {
             assert(false);
         }
