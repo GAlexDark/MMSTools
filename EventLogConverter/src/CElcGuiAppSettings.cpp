@@ -61,9 +61,9 @@ CElcGuiAppSettings::getLastDir() const
     return getMain(QLatin1String("HISTORY/last_dir")).toString().trimmed();
 }
 #ifdef Q_OS_WIN
-quint32
+qsizetype
 CElcGuiAppSettings::getDefaultMonitor() const
 {
-    return getMain(QLatin1String("SETTINGS/default_monitor")).toUInt();
+    return getMain(QLatin1String("SETTINGS/default_monitor")).toLongLong();
 }
 #endif

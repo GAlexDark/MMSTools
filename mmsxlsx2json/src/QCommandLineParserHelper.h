@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  MMS XLSX to JSON Conversion Console Utility
+*  MMS XLSX to JSON Conversion Console Utility
+*
+*  Module name: QCommandLineParserHelper.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The console utility input arguments parsing Class.
+*
+****************************************************************************/
+
 #ifndef QCOMMANDLINEPARSERHELPER_H
 #define QCOMMANDLINEPARSERHELPER_H
 

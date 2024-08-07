@@ -117,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
     const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
 #ifdef Q_OS_WIN
     QList<QScreen *> monitorList = QGuiApplication::screens();
-    quint32 monitorNumber = settings.getDefaultMonitor();
+    qsizetype monitorNumber = settings.getDefaultMonitor();
     if (monitorNumber > monitorList.size()) {
         monitorNumber = 0;
     }

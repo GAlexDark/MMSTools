@@ -66,26 +66,34 @@ using pBasicReport = CBasicReport *;
 class MmsCommonException : public std::exception
 {
 private:
-    char *m_message;
+    QScopedPointer<char> m_message;
 
 public:
-    explicit MmsCommonException(char *text = nullptr) noexcept
-        :m_message(text) {}
+    explicit MmsCommonException(const QString &text) noexcept
+    {
+        try {
+            size_t maxBufSize = 4096;
+            m_message.reset(new char [maxBufSize]);
+            std::string buf = text.toStdString();
+            const char *source = buf.c_str();
+            errno_t retVal = strncpy_s(m_message.data(), maxBufSize, source, buf.length());
+            if (retVal != 0) {
+                assert(false);
+            }
+        } catch (...) {
+            assert(false);
+        }
+    }
     const char *what() const noexcept override
     {
-        return m_message;
+        return m_message.data();
     }
 };
 
 class XlsxError : public MmsCommonException
 {
 public:
-    explicit XlsxError(char *text = nullptr) noexcept
+    explicit XlsxError(const QString &text = "QXlsx write error") noexcept
         :MmsCommonException(text) {}
-    const char *what() const noexcept override
-    {
-        return "QXlsx write error";
-    }
 };
-
 #endif // CBASICREPORT_H

@@ -45,7 +45,7 @@ else: VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
 
 VERSION_PE_HEADER = $${VER_PE}
 VERSION = $${VERSTR}
-QMAKE_TARGET_DESCRIPTION = MMS Xlsx to Json Conversion Console Utility
+QMAKE_TARGET_DESCRIPTION = MMS XLSX to JSON Conversion Console Utility
 QMAKE_TARGET_COPYRIGHT = (C) 2024 Oleksii Gaienko
 QMAKE_TARGET_PRODUCT = MMS Xlsx to Json Conversion Utility
 QMAKE_TARGET_INTERNALNAME = $${TARGET}

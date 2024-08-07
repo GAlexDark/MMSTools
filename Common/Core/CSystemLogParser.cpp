@@ -29,6 +29,28 @@ const QString nullValue(QLatin1String("null"));
 const QString user(QLatin1String("User "));
 const QString usingRole(QLatin1String("Using role"));
 const QString loginSuccess(QLatin1String("User login - successful"));
+const QString email(QLatin1String("Email"));
+const QString received(QLatin1String("received"));
+const QString processed(QLatin1String("processed"));
+const QString emailReceived(QLatin1String("Email - received"));
+const QString emailProcessed(QLatin1String("Email - processed"));
+const QString fileProcessing(QLatin1String("file processing"));
+const QString started(QLatin1String("started"));
+const QString finished(QLatin1String("finished"));
+const QString fileProcessingStarted(QLatin1String("File processing - started"));
+const QString fileProcessingFinished(QLatin1String("File processing - finished"));
+
+const QString gate(QLatin1String("Gate"));
+const QString gateAutomaticallyOpened(QLatin1String("Gate - automatically opened"));
+const QString gateAutomaticallyClosed(QLatin1String("Gate - automatically closed"));
+const QString gateReopened(QLatin1String("Gate - reopened"));
+const QString gateOpened(QLatin1String("Gate - opened"));
+const QString gateClosed(QLatin1String("Gate - closed"));
+const QString automaticallyOpened(QLatin1String("automatically opened"));
+const QString automaticallyClosed(QLatin1String("automatically closed"));
+const QString opened(QLatin1String("opened"));
+const QString reopened(QLatin1String("reopened"));
+const QString closed(QLatin1String("closed"));
 
 CSystemLogParser::CSystemLogParser(QObject *parent)
     : CBasicParser{parent}
@@ -39,7 +61,7 @@ CSystemLogParser::CSystemLogParser(QObject *parent)
 }
 
 bool
-CSystemLogParser::parseMessage()
+CSystemLogParser::parseUserData()
 {
     bool retVal = m_message.startsWith(user);
     if (retVal) {
@@ -64,6 +86,114 @@ CSystemLogParser::parseMessage()
     return retVal;
 }
 
+bool
+CSystemLogParser::parseEmailMessages()
+{
+    bool retVal = m_message.startsWith(email);
+    if (retVal) {
+        if (m_message.indexOf(received) != -1) {
+            m_username1.clear();
+            m_role.clear();
+            m_companyname.clear();
+            m_type = emailReceived;
+        } else {
+            if (m_message.indexOf(processed) != -1) {
+                m_username1.clear();
+                m_role.clear();
+                m_companyname.clear();
+                m_type = emailProcessed;
+            } else {
+                retVal = false;
+            }
+        }
+    }
+    return retVal;
+}
+
+bool
+CSystemLogParser::parseFileInfo()
+{
+    bool retVal = m_message.startsWith(fileProcessing);
+    if (retVal) {
+        if (m_message.indexOf(started) != -1) {
+            m_username1.clear();
+            m_role.clear();
+            m_companyname.clear();
+            m_type = fileProcessingStarted;
+        } else {
+            if (m_message.indexOf(finished) != -1) {
+                m_username1.clear();
+                m_role.clear();
+                m_companyname.clear();
+                m_type = fileProcessingFinished;
+            } else {
+                retVal = false;
+            }
+        }
+    }
+    return retVal;
+}
+
+bool
+CSystemLogParser::parseGateInfo()
+{
+    bool retVal = m_message.startsWith(gate);
+    if (retVal) {
+        if (m_message.indexOf(automaticallyOpened) != -1) {
+            m_username1.clear();
+            m_role.clear();
+            m_companyname.clear();
+            m_type = gateAutomaticallyOpened;
+        } else {
+            if (m_message.indexOf(automaticallyClosed) != -1) {
+                m_username1.clear();
+                m_role.clear();
+                m_companyname.clear();
+                m_type = gateAutomaticallyClosed;
+            } else {
+                if (m_message.indexOf(reopened) != -1) {
+                    m_username1.clear();
+                    m_role.clear();
+                    m_companyname.clear();
+                    m_type = gateReopened;
+                } else {
+                    if (m_message.indexOf(opened) != -1) {
+                        m_username1.clear();
+                        m_role.clear();
+                        m_companyname.clear();
+                        m_type = gateOpened;
+                    } else {
+                        if (m_message.indexOf(closed) != -1) {
+                            m_username1.clear();
+                            m_role.clear();
+                            m_companyname.clear();
+                            m_type = gateClosed;
+                        } else {
+                            retVal = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return retVal;
+}
+
+bool
+CSystemLogParser::parseMessage()
+{
+    bool retVal = parseUserData();
+    if (!retVal) {
+        retVal = parseEmailMessages();
+        if (!retVal) {
+            retVal = parseFileInfo();
+            if (!retVal) {
+                retVal = parseGateInfo();
+            }
+        }
+    }
+    return retVal;
+}
 
 bool
 CSystemLogParser::parse(const QString& line)
