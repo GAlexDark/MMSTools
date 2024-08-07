@@ -52,6 +52,10 @@ public:
     mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 private:
+    bool parseUserData();
+    bool parseEmailMessages();
+    bool parseFileInfo();
+    bool parseGateInfo();
     bool parseMessage();
 
     QDateTime   m_timestamp;
