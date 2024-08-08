@@ -1,7 +1,7 @@
 QT = core
 
-CONFIG += c++17 cmdline
-
+QT_CVERSION = c++17
+CONFIG += QT_CVERSION cmdline precompile_header
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -47,7 +47,7 @@ VERSION_PE_HEADER = $${VER_PE}
 VERSION = $${VERSTR}
 QMAKE_TARGET_DESCRIPTION = MMS XLSX to JSON Conversion Console Utility
 QMAKE_TARGET_COPYRIGHT = (C) 2024 Oleksii Gaienko
-QMAKE_TARGET_PRODUCT = MMS Xlsx to Json Conversion Utility
+QMAKE_TARGET_PRODUCT = MMS XLSX to JSON Conversion Utility
 QMAKE_TARGET_INTERNALNAME = $${TARGET}
 QMAKE_TARGET_COMMENTS = support@galexsoftware.info
 
