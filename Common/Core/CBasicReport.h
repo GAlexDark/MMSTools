@@ -47,6 +47,7 @@ protected:
     void setReportDataItem(QXlsx::Document *report, const int column, const int row, const QVariant &writeValue);
     QString createReportFilename(const int row);
     int getMultipartRowCount() const { return m_multipartRowCount; }
+    bool isShowMilliseconds() const { return m_showMilliseconds; }
 
     pSqliteDatabase m_db = nullptr;
 

@@ -31,6 +31,7 @@ CEventLogReport::generateReport()
 {
     bool retVal = true;
     // Set datetime format
+    QDateTime timeStamp;
     QXlsx::Format dateFormat;
     setDateTimeFormat(dateFormat);
 
@@ -78,7 +79,14 @@ CEventLogReport::generateReport()
             setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
             setReportDataItem(xlsxReport.data(), "timestampISO8601", colTimestampISO8601, row);
 
-            writeValue = m_db->geValue("timestamp").toDateTime();
+            timeStamp = m_db->geValue("timestamp").toDateTime();
+            if (!isShowMilliseconds()) { // set milliseconds 0
+                QTime time;
+                time.setHMS(timeStamp.time().hour(), timeStamp.time().minute(), timeStamp.time().second());
+                timeStamp.setTime(time);
+            }
+            writeValue = timeStamp;
+
             if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
                 throw XlsxError();
             }
