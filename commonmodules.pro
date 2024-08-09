@@ -14,7 +14,6 @@ HEADERS += \
     ../Common/Core/CReportBuilder.h \
     ../Common/Core/CSingleApplication.h \
     ../Common/Core/elcUtils.h \
-#    ../Common/Core/stdafx.h \
     ../Common/Core/CAuditTrailReport.h \
     ../Common/Core/CSystemLogReport.h \
     ../Common/Core/CSummaryReport.h \
