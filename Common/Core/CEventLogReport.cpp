@@ -81,8 +81,8 @@ CEventLogReport::generateReport()
 
             timeStamp = m_db->geValue("timestamp").toDateTime();
             if (!isShowMilliseconds()) { // set milliseconds 0
-                QTime time;
-                time.setHMS(timeStamp.time().hour(), timeStamp.time().minute(), timeStamp.time().second());
+                QTime time = timeStamp.time();
+                time.setHMS(time.hour(), time.minute(), time.second(), 0);
                 timeStamp.setTime(time);
             }
             writeValue = timeStamp;
