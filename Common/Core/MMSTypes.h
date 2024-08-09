@@ -33,7 +33,32 @@ namespace mms {
     enum class MmsLogsTypes { LT_NONE, LT_EVENTLOG_MMS, LT_EVENTLOG_REPORT, LT_AUDITTRAIL_MMS, LT_AUDITTRAIL_REPORT };
     enum class MmsReportsTypes {RT_NONE, RT_EVENTLOG, RT_AUDITTRAIL, RT_COMBINED };
 
-}
+    class MmsCommonException : public std::exception
+    {
+    private:
+        QScopedPointer<char> m_message;
 
+    public:
+        explicit MmsCommonException(const QString &text) noexcept
+        {
+            try {
+                size_t maxBufSize = 4096;
+                m_message.reset(new char [maxBufSize]);
+                std::string buf = text.toStdString();
+                const char *source = buf.c_str();
+                errno_t retVal = strncpy_s(m_message.data(), maxBufSize, source, buf.length());
+                if (retVal != 0) {
+                    assert(false);
+                }
+            } catch (...) {
+                assert(false);
+            }
+        }
+        const char *what() const noexcept override
+        {
+            return m_message.data();
+        }
+    };
+}
 
 #endif // MMSTYPES_H

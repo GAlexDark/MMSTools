@@ -20,6 +20,7 @@
 
 #include <QObject>
 
+#include "MMSTypes.h"
 #include "CSqliteDatabase.h"
 
 const int maxRowsCount = 1048575;
@@ -64,37 +65,10 @@ private:
 
 using pBasicReport = CBasicReport *;
 
-class MmsCommonException : public std::exception
-{
-private:
-    QScopedPointer<char> m_message;
-
-public:
-    explicit MmsCommonException(const QString &text) noexcept
-    {
-        try {
-            size_t maxBufSize = 4096;
-            m_message.reset(new char [maxBufSize]);
-            std::string buf = text.toStdString();
-            const char *source = buf.c_str();
-            errno_t retVal = strncpy_s(m_message.data(), maxBufSize, source, buf.length());
-            if (retVal != 0) {
-                assert(false);
-            }
-        } catch (...) {
-            assert(false);
-        }
-    }
-    const char *what() const noexcept override
-    {
-        return m_message.data();
-    }
-};
-
-class XlsxError : public MmsCommonException
+class XlsxError : public mms::MmsCommonException
 {
 public:
     explicit XlsxError(const QString &text = "QXlsx write error") noexcept
-        :MmsCommonException(text) {}
+        : MmsCommonException(text) {}
 };
 #endif // CBASICREPORT_H
