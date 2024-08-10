@@ -1,3 +1,6 @@
+#ifndef STDAFX_H
+#define STDAFX_H
+
 /* Add C includes here */
 
 #if defined __cplusplus
@@ -12,3 +15,4 @@
 #include "xlsxformat.h"
 
 #endif
+#endif // STDAFX_H
