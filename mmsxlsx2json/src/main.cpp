@@ -26,8 +26,17 @@
 #include "CConsoleOutput.h"
 #include "elcUtils.h"
 #include "QCommandLineParserHelper.h"
+#include "MMSTypes.h"
 
 const int defaultNumberOfColumns = 6;
+const QString errorMsg = QStringLiteral("\nError at line %1: The '%2' value '%3' is wrong!\n");
+const QString DataSend = QLatin1String("dataSend");
+const QString DebtCredit = QLatin1String("debtCredit");
+const QString DebtDebit = QLatin1String("debtDebit");
+const QString PaymentSumCredit = QLatin1String("paymentSumCredit");
+const QString PaymentSumDebit = QLatin1String("paymentSumDebit");
+const QString ReportNumber = QLatin1String("reportNumber");
+
 
 QString
 toString(const QVariant &value, bool &isOk)
@@ -88,7 +97,7 @@ checkHeader(const QXlsx::Document &value)
     QVariant cell;
     QString buf;
     int row = 1;
-    QStringList headers = { "dataSend", "debtCredit", "debtDebit", "paymentSumCredit", "paymentSumDebit", "reportNumber" };
+    QStringList headers = { DataSend, DebtCredit, DebtDebit, PaymentSumCredit, PaymentSumDebit, ReportNumber };
     for (int i = 0; i < headers.size() - 1; ++i) {
         cell = value.read(row, i + 1);
         buf = toString(cell, retVal);
@@ -97,7 +106,80 @@ checkHeader(const QXlsx::Document &value)
             break;
         }
     }
+    return retVal;
+}
 
+class jsonConvError : public mms::MmsCommonException
+{
+public:
+    explicit jsonConvError(const QString &text) noexcept
+        : mms::MmsCommonException(text) {}
+};
+
+QJsonArray
+read(const QXlsx::Document &dataSource)
+{
+    int row = 2;
+    int numberOfRow = dataSource.dimension().lastRow();
+    QVariant cell;
+    QString dataSend;
+    double debtCredit;
+    double debtDebit;
+    double paymentSumCredit;
+    double paymentSumDebit;
+    QString reportNumber;
+    bool res = true;
+    QJsonObject recordObject;
+    QJsonArray retVal;
+
+    while (row <= numberOfRow) {
+        cell = dataSource.read(row, 1);
+        dataSend = toDateTimeAsString(cell, res);
+        if (!res) {
+            throw jsonConvError(errorMsg.arg(row).arg(DataSend, dataSend));
+        }
+
+        cell = dataSource.read(row, 2);
+        debtCredit = toDouble(cell, res);
+        if (!res) {
+            throw jsonConvError(errorMsg.arg(row).arg(DebtCredit).arg(debtCredit));
+        }
+
+        cell = dataSource.read(row, 3);
+        debtDebit = toDouble(cell, res);
+        if (!res) {
+            throw jsonConvError(errorMsg.arg(row).arg(DebtDebit).arg(debtDebit));
+        }
+
+        cell = dataSource.read(row, 4);
+        paymentSumCredit = toDouble(cell, res);
+        if (!res) {
+            throw jsonConvError(errorMsg.arg(row).arg(PaymentSumCredit).arg(paymentSumCredit));
+        }
+
+        cell = dataSource.read(row, 5);
+        paymentSumDebit = toDouble(cell, res);
+        if (!res) {
+            throw jsonConvError(errorMsg.arg(row).arg(PaymentSumDebit).arg(paymentSumDebit));
+        }
+
+        cell = dataSource.read(row, 6);
+        reportNumber = toReportNumber(cell, res);
+        if (!res) {
+            throw jsonConvError(errorMsg.arg(row).arg(ReportNumber, reportNumber));
+        }
+
+        recordObject = QJsonObject();
+        recordObject.insert(DataSend, QJsonValue::fromVariant(dataSend));
+        recordObject.insert(DebtCredit, QJsonValue::fromVariant(debtCredit));
+        recordObject.insert(DebtDebit, QJsonValue::fromVariant(debtDebit));
+        recordObject.insert(PaymentSumCredit, QJsonValue::fromVariant(paymentSumCredit));
+        recordObject.insert(PaymentSumDebit, QJsonValue::fromVariant(paymentSumDebit));
+        recordObject.insert(ReportNumber, QJsonValue::fromVariant(reportNumber));
+        retVal.push_back(recordObject);
+
+        ++row;
+    } // while
     return retVal;
 }
 
@@ -140,100 +222,43 @@ int main(int argc, char *argv[])
                 int row = 2;
                 int numberOfRow = dataSource.dimension().lastRow();
                 if (numberOfRow >= row) {
-                    QVariant cell;
-                    QString dataSend;
-                    double debtCredit;
-                    double debtDebit;
-                    double paymentSumCredit;
-                    double paymentSumDebit;
-                    QString reportNumber;
-                    QJsonObject recordObject;
-                    QJsonArray recordsArray;
-
-                    while (row <= numberOfRow) {
-                        cell = dataSource.read(row, 1);
-                        dataSend = toDateTimeAsString(cell, retVal);
-                        if (!retVal) {
-                            consoleOut.outToConsole(QStringLiteral("Error at line %1: The 'dataSend' value '%2' is wrong!").arg(row).arg(dataSend));
-                            break;
-                        }
-
-                        cell = dataSource.read(row, 2);
-                        debtCredit = toDouble(cell, retVal);
-                        if (!retVal) {
-                            consoleOut.outToConsole(QStringLiteral("Error at line %1: The 'debtCredit' value '%2' is wrong!").arg(row).arg(debtCredit));
-                            break;
-                        }
-
-                        cell = dataSource.read(row, 3);
-                        debtDebit = toDouble(cell, retVal);
-                        if (!retVal) {
-                            consoleOut.outToConsole(QStringLiteral("Error at line %1: The 'debtDebit' value '%2' is wrong!").arg(row).arg(debtDebit));
-                            break;
-                        }
-
-                        cell = dataSource.read(row, 4);
-                        paymentSumCredit = toDouble(cell, retVal);
-                        if (!retVal) {
-                            consoleOut.outToConsole(QStringLiteral("Error at line %1: The 'paymentSumCredit' value '%2' is wrong!").arg(row).arg(paymentSumCredit));
-                            break;
-                        }
-
-                        cell = dataSource.read(row, 5);
-                        paymentSumDebit = toDouble(cell, retVal);
-                        if (!retVal) {
-                            consoleOut.outToConsole(QStringLiteral("Error at line %1: The 'paymentSumDebit' value '%2' is wrong!").arg(row).arg(paymentSumDebit));
-                            break;
-                        }
-
-                        cell = dataSource.read(row, 6);
-                        reportNumber = toReportNumber(cell, retVal);
-                        if (!retVal) {
-                            consoleOut.outToConsole(QStringLiteral("Error at line %1: The 'reportNumber' value '%2' is wrong!").arg(row).arg(reportNumber));
-                            break;
-                        }
-
-                        recordObject = QJsonObject();
-                        recordObject.insert("dataSend", QJsonValue::fromVariant(dataSend));
-                        recordObject.insert("debtCredit", QJsonValue::fromVariant(debtCredit));
-                        recordObject.insert("debtDebit", QJsonValue::fromVariant(debtDebit));
-                        recordObject.insert("paymentSumCredit", QJsonValue::fromVariant(paymentSumCredit));
-                        recordObject.insert("paymentSumDebit", QJsonValue::fromVariant(paymentSumDebit));
-                        recordObject.insert("reportNumber", QJsonValue::fromVariant(reportNumber));
-
-                        recordsArray.push_back(recordObject);
-
-                        ++row;
-                    } // while
-
-                    if (retVal) {
-                        QJsonDocument jsonResult(recordsArray);
+                    try {
+                        QJsonArray recordsArray = read(dataSource);
                         fileName = cmd.getReportName();
                         QFile jsonFile(fileName);
-                        if (jsonFile.open(QIODevice::WriteOnly)) {
-                            OutputMode mode = cmd.getOutputMode();
-                            if (mode == OutputMode::OUTPUTMODE_INDENTED) {
-                                retVal = jsonFile.write(jsonResult.toJson(QJsonDocument::Indented));
-                            } else {
-                                retVal = jsonFile.write(jsonResult.toJson(QJsonDocument::Compact));
-                            }
-                            jsonFile.close();
-                        }
+                        retVal = jsonFile.open(QIODevice::WriteOnly);
                         if (retVal) {
-                            consoleOut.outToConsole(QStringLiteral("\nTotal rows converted: %1.").arg(row - 1));
-                            consoleOut.outToConsole(QStringLiteral("The JSON was saved in the %1 file.").arg(fileName));
+                            OutputMode mode = cmd.getOutputMode();
+                            QJsonDocument jsonResult(recordsArray);
+                            QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
+                            retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat));
+                            jsonFile.close();
+                            QString msg;
+                            if (retVal) {
+                                msg = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(numberOfRow - 1)).arg(fileName);
+                            } else {
+                                msg = QLatin1String("Error save result to the file: %1").arg(fileName);
+                            }
+                            consoleOut.outToConsole(msg);
+                        } else {
+                            consoleOut.outToConsole(QLatin1String("Error create file %1").arg(fileName));
                         }
+                    } catch (jsonConvError &ex) {
+                        consoleOut.outToConsole(ex.what());
+                        retVal = false;
                     }
+                } else {
+                    consoleOut.outToConsole(QLatin1String("The file %1 is empty.").arg(fileName));
                 }
             } else {
                 consoleOut.outToConsole(QLatin1String("The file %1 header is wrong.").arg(fileName));
             }
         } else {
-            consoleOut.outToConsole(QLatin1String("Wrong xlsx file %1.").arg(fileName));
+            consoleOut.outToConsole(QLatin1String("Wrong xlsx file %1").arg(fileName));
             retVal = false;
         }
     } else {
-        consoleOut.outToConsole(QLatin1String("Error load xlsx file %1.").arg(fileName));
+        consoleOut.outToConsole(QLatin1String("Error load xlsx file %1").arg(fileName));
     }
 
     return retVal ? 0 : 1;
