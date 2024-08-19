@@ -1,7 +1,13 @@
-QT = core
+TEMPLATE = app
+
+QT += core
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION cmdline precompile_header
+CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
+CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
+CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -O0 -fno-omit-frame-pointer -gdwarf-3
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0

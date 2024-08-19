@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT = core sql
+QT += core sql
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION cmdline precompile_header
