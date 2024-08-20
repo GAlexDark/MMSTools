@@ -6,8 +6,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION precompile_header
-CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
-CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
 
 DEFINES += QT_USE_QSTRINGBUILDER
 
