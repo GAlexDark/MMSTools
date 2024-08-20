@@ -4,18 +4,8 @@ QT += core sql
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION cmdline precompile_header
-CONFIG(release, debug|release): QMAKE_CXXFLAGS_RELEASE += -Ofast
-CONFIG(release, debug|release): QMAKE_CXXFLAGS += -Ofast
-CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -O0 -fno-omit-frame-pointer -gdwarf-3
 
 DEFINES += QT_USE_QSTRINGBUILDER
-
-lessThan(QT_MAJOR_VERSION, 6) {
-    CONFIG(debug, debug|release): message("gprof mode")
-    CONFIG(debug, debug|release): QMAKE_CFLAGS_DEBUG += -g -pg  #-no-pie
-    CONFIG(debug, debug|release): QMAKE_CXXFLAGS_DEBUG += -g -pg  #-no-pie
-    CONFIG(debug, debug|release): QMAKE_LFLAGS_DEBUG += -g -pg -lgmon #-no-pie
-}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
