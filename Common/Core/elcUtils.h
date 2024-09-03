@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QThread>
 #include <QMetaClassInfo>
+#include <QFile>
 
 namespace elcUtils
 {
@@ -40,6 +41,7 @@ namespace elcUtils
     void expandEnvironmentStrings(QString &path);
     bool mkPath(const QString &dirPath, QString &errorString);
     QStringList getDataSourceList(const QString &path, const QStringList &mask);
+    QString getFileErrorMessage(const QFile::FileError error);
 
     template <typename T>
     bool getMetaClassInfo(T *object, const QString &name, QString &value)
