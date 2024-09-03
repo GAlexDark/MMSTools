@@ -6,7 +6,7 @@
 *  MMS XLSX to JSON Conversion Console Utility
 *  MMS XLSX to JSON Conversion Console Utility
 *
-*  Module name: QCommandLineParserHelper.cpp
+*  Module name: CX2jConvCmdLineParser.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -15,12 +15,12 @@
 *
 ****************************************************************************/
 
-#include "QCommandLineParserHelper.h"
+#include "CX2jConvCmdLineParser.h"
 
 #include <QFileInfo>
 
 bool
-xlsxc::QCommandLineParserHelper::addCnvOption(const QCoreApplication &app)
+xlsxc::CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString importDescription(QLatin1String("The path to the XLSX file for conversion to the JSON. Usage:\n-i file or\n--input file"));
     const QString outputDescription(QLatin1String("The path to the directory and name of the JSON output file. Usege:\n-o file or\n--output file"));
@@ -49,7 +49,7 @@ xlsxc::QCommandLineParserHelper::addCnvOption(const QCoreApplication &app)
 }
 
 bool
-xlsxc::QCommandLineParserHelper::checkCnvOption()
+xlsxc::CX2jConvCmdLineParser::checkOption()
 {
     bool retVal = m_isImport && m_isMode;
     if (!retVal) {
@@ -58,32 +58,32 @@ xlsxc::QCommandLineParserHelper::checkCnvOption()
     return retVal;
 }
 
-xlsxc::QCommandLineParserHelper::QCommandLineParserHelper()
+xlsxc::CX2jConvCmdLineParser::CX2jConvCmdLineParser()
 {
     m_errorString.clear();
 }
 
 bool
-xlsxc::QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
+xlsxc::CX2jConvCmdLineParser::parseCmdArgs(const QCoreApplication &app)
 {
     m_parser.addHelpOption();
 
-    bool retVal = addCnvOption(app);
+    bool retVal = addOption(app);
     if (retVal) {
-        retVal = checkCnvOption();
+        retVal = checkOption();
     }
 
     return retVal;
 }
 
 [[noreturn]] void
-xlsxc::QCommandLineParserHelper::showHelpAndExit()
+xlsxc::CX2jConvCmdLineParser::showHelpAndExit()
 {
     m_parser.showHelp(0);
 }
 
 bool
-xlsxc::QCommandLineParserHelper::getDataFile(QString &fileName)
+xlsxc::CX2jConvCmdLineParser::getDataFile(QString &fileName)
 {
     bool retVal = m_isImport;
     if (retVal) {
@@ -107,7 +107,7 @@ xlsxc::QCommandLineParserHelper::getDataFile(QString &fileName)
 }
 
 QString
-xlsxc::QCommandLineParserHelper::getReportName() const
+xlsxc::CX2jConvCmdLineParser::getReportName() const
 {
     QString retVal;
     if (m_isOutput) {
@@ -133,7 +133,7 @@ xlsxc::QCommandLineParserHelper::getReportName() const
 }
 
 OutputMode
-xlsxc::QCommandLineParserHelper::getOutputMode() const
+xlsxc::CX2jConvCmdLineParser::getOutputMode() const
 {
     OutputMode retVal = OutputMode::OUTPUTMODE_COMPACT;
     QString buf = m_parser.value("mode");

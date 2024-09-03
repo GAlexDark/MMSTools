@@ -25,11 +25,11 @@ HEADERS += \
     ../Common/Core/CConsoleOutput.h \
     ../Common/Core/elcUtils.h \
     ../Common/Core/MMSTypes.h \
-    src/QCommandLineParserHelper.h
+    src/CX2jConvCmdLineParser.h
 
 SOURCES += \
     ../Common/Core/elcUtils.cpp \
-    src/QCommandLineParserHelper.cpp \
+    src/CX2jConvCmdLineParser.cpp \
     src/main.cpp
 
 include(../deployment.pri)

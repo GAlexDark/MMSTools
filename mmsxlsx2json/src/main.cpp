@@ -25,7 +25,7 @@
 
 #include "CConsoleOutput.h"
 #include "elcUtils.h"
-#include "QCommandLineParserHelper.h"
+#include "CX2jConvCmdLineParser.h"
 #include "MMSTypes.h"
 
 const int defaultNumberOfColumns = 6;
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
     description.append(QStringLiteral("This program use Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
     consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
 
-    xlsxc::QCommandLineParserHelper cmd;
+    CX2jConvCmdLineParser cmd;
     if (!cmd.parseCmdArgs(a)) {
         consoleOut.outToConsole(cmd.errorString());
         return 1;

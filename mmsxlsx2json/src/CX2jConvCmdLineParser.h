@@ -6,7 +6,7 @@
 *  MMS XLSX to JSON Conversion Console Utility
 *  MMS XLSX to JSON Conversion Console Utility
 *
-*  Module name: QCommandLineParserHelper.h
+*  Module name: CX2jConvCmdLineParser.h
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -15,8 +15,8 @@
 *
 ****************************************************************************/
 
-#ifndef QCOMMANDLINEPARSERHELPER_H
-#define QCOMMANDLINEPARSERHELPER_H
+#ifndef CX2JCONVCMDLINEPARSER_H
+#define CX2JCONVCMDLINEPARSER_H
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
@@ -25,11 +25,10 @@
 
 enum class OutputMode { OUTPUTMODE_INDENTED, OUTPUTMODE_COMPACT };
 
-namespace xlsxc {
-class QCommandLineParserHelper
+class CX2jConvCmdLineParser
 {
 public:
-    explicit QCommandLineParserHelper();
+    explicit CX2jConvCmdLineParser();
     bool parseCmdArgs(const QCoreApplication &app);
     [[noreturn]] void showHelpAndExit();
     bool getDataFile(QString &fileName);
@@ -39,8 +38,8 @@ public:
     const QString& errorString() const { return m_errorString; }
 
 private:
-    bool addCnvOption(const QCoreApplication &app);
-    bool checkCnvOption();
+    bool addOption(const QCoreApplication &app);
+    bool checkOption();
 
     QCommandLineParser  m_parser;
     bool m_isImport = false;
@@ -49,7 +48,5 @@ private:
     QString m_errorString;
     QDir m_path;
 };
-} // namespace xlsxconv
 
-
-#endif // QCOMMANDLINEPARSERHELPER_H
+#endif // CX2JCONVCMDLINEPARSER_H
