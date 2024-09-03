@@ -33,7 +33,7 @@ CElcCmdLineParser::checkData(const QStringList &data)
     int pos = 0;
     QString buf = data.join(';');
     if (v.validate(buf, pos) == QValidator::Invalid) {
-        m_errorString = QStringLiteral("Invalid character(s) in the usernames: %1\nDefault allowed characters in the usernames: a..z, A..Z, 0..9 and _ (underscore).").arg(buf);
+        setErrorString(QStringLiteral("Invalid character(s) in the usernames: %1\nDefault allowed characters in the usernames: a..z, A..Z, 0..9 and _ (underscore).").arg(buf));
         retVal = false;
     }
 
@@ -43,7 +43,6 @@ CElcCmdLineParser::checkData(const QStringList &data)
 CElcCmdLineParser::CElcCmdLineParser()
 {
     m_filesList.clear();
-    m_errorString.clear();
 }
 
 bool
@@ -100,7 +99,7 @@ CElcCmdLineParser::addOption(const QCoreApplication &app)
         }
     }
     if (!retVal) {
-        m_errorString = QStringLiteral("The fatal error has occurredd. The program will be closed.");
+        setErrorString(QStringLiteral("The fatal error has occurredd. The program will be closed."));
     }
 
   return retVal;
@@ -117,22 +116,22 @@ CElcCmdLineParser::checkOption()
 
     bool retVal = true;
     if (comb1 || comb2 || comb3 || comb4) {
-        m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
+        setErrorString(error1.arg("--cleandb', '--importonly", "--reportonly"));
         retVal = false;
     } else {
         if (m_isExcluded && m_isIncluded) {
-            m_errorString = error1.arg("--exclude", "--include");
+            setErrorString(error1.arg("--exclude", "--include"));
             retVal = false;
         } else {
             if (!m_isPath && !m_isFiles) {
-                m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
+                setErrorString(QStringLiteral("The <path> and <files> arguments are missing."));
                 retVal = false;
             }
         }
     }
     return retVal;
 }
-
+/*
 bool
 CElcCmdLineParser::parseCmdArgs(const QCoreApplication &app)
 {
@@ -145,7 +144,7 @@ CElcCmdLineParser::parseCmdArgs(const QCoreApplication &app)
 
   return retVal;
 }
-
+*/
 QStringList
 CElcCmdLineParser::excludedUsernames() const
 {
@@ -161,13 +160,13 @@ CElcCmdLineParser::includedUsernames() const
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
-
+/*
 [[noreturn]] void
 CElcCmdLineParser::showHelpAndExit()
 {
     m_parser.showHelp(0);
 }
-
+*/
 RunningMode
 CElcCmdLineParser::getRunningMode() const
 {
@@ -198,7 +197,7 @@ CElcCmdLineParser::getDataFilesList(QStringList &fileList)
             if (fi.exists() && fi.isFile()) {
                 item = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             } else {
-                m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
+                setErrorString(QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName()));
                 retVal = false;
             }
         }
@@ -215,7 +214,7 @@ CElcCmdLineParser::getDataFilesList(QStringList &fileList)
             searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
         } else {
-            m_errorString = QStringLiteral("Cannot find the directory %1.").arg(searchFolder);
+            setErrorString(QStringLiteral("Cannot find the directory %1.").arg(searchFolder));
             retVal = false;
         }
     }
