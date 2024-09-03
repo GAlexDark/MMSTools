@@ -19,33 +19,27 @@
 #define CX2JCONVCMDLINEPARSER_H
 
 #include <QCoreApplication>
-#include <QCommandLineParser>
-
 #include <QDir>
+#include <QString>
+
+#include "CBasicCmdLineParser.h"
 
 enum class OutputMode { OUTPUTMODE_INDENTED, OUTPUTMODE_COMPACT };
 
-class CX2jConvCmdLineParser
+class CX2jConvCmdLineParser : public CBasicCmdLineParser
 {
 public:
-    explicit CX2jConvCmdLineParser();
-    bool parseCmdArgs(const QCoreApplication &app);
-    [[noreturn]] void showHelpAndExit();
     bool getDataFile(QString &fileName);
     QString getReportName() const;
     OutputMode getOutputMode() const;
 
-    const QString& errorString() const { return m_errorString; }
-
 private:
-    bool addOption(const QCoreApplication &app);
-    bool checkOption();
+    bool addOption(const QCoreApplication &app) override;
+    bool checkOption() override;
 
-    QCommandLineParser  m_parser;
     bool m_isImport = false;
     bool m_isOutput = false;
     bool m_isMode = false;
-    QString m_errorString;
     QDir m_path;
 };
 

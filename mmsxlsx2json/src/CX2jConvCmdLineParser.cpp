@@ -18,6 +18,7 @@
 #include "CX2jConvCmdLineParser.h"
 
 #include <QFileInfo>
+#include <QDateTime>
 
 bool
 CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
@@ -43,7 +44,7 @@ CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
         }
     }
     if (!retVal) {
-        m_errorString = QLatin1String("The fatal error has occurredd. The program will be closed.");
+        setErrorString(QLatin1String("The fatal error has occurredd. The program will be closed."));
     }
     return retVal;
 }
@@ -53,33 +54,9 @@ CX2jConvCmdLineParser::checkOption()
 {
     bool retVal = m_isImport && m_isMode;
     if (!retVal) {
-        m_errorString = QLatin1String("The <input> or <mode> arguments are missing.");
+        setErrorString(QLatin1String("The <input> or <mode> arguments are missing."));
     }
     return retVal;
-}
-
-CX2jConvCmdLineParser::CX2jConvCmdLineParser()
-{
-    m_errorString.clear();
-}
-
-bool
-CX2jConvCmdLineParser::parseCmdArgs(const QCoreApplication &app)
-{
-    m_parser.addHelpOption();
-
-    bool retVal = addOption(app);
-    if (retVal) {
-        retVal = checkOption();
-    }
-
-    return retVal;
-}
-
-[[noreturn]] void
-CX2jConvCmdLineParser::showHelpAndExit()
-{
-    m_parser.showHelp(0);
 }
 
 bool
@@ -94,11 +71,11 @@ CX2jConvCmdLineParser::getDataFile(QString &fileName)
                 fileName = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
                 m_path = fi.absoluteDir();
             } else {
-                m_errorString = QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName());
+                setErrorString(QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName()));
                 retVal = false;
             }
         } else {
-            m_errorString = QLatin1String("The file %1 is corrupted or missing.").arg(fi.fileName());
+            setErrorString(QLatin1String("The file %1 is corrupted or missing.").arg(fi.fileName()));
             retVal = false;
         }
     }
