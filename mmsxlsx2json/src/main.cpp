@@ -223,11 +223,11 @@ int main(int argc, char *argv[])
                 int numberOfRow = dataSource.dimension().lastRow();
                 if (numberOfRow >= row) {
                     try {
-                        QJsonArray recordsArray = read(dataSource);
                         fileName = cmd.getReportName();
                         QFile jsonFile(fileName);
                         retVal = jsonFile.open(QIODevice::WriteOnly);
                         if (retVal) {
+                            QJsonArray recordsArray = read(dataSource);
                             OutputMode mode = cmd.getOutputMode();
                             QJsonDocument jsonResult(recordsArray);
                             QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
