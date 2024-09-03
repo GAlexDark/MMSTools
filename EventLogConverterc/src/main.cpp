@@ -23,7 +23,7 @@
 #include "CReportBuilder.h"
 #include "CElcConsoleAppSettings.h"
 #include "CSingleApplication.h"
-#include "QCommandLineParserHelper.h"
+#include "CElcCmdLineParser.h"
 #include "CConsoleOutput.h"
 #include "elcUtils.h"
 #include "CParserManager.h"
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    elc::QCommandLineParserHelper cmd;
+    CElcCmdLineParser cmd;
     if (!cmd.parseCmdArgs(a)) {
         consoleOut.outToConsole(cmd.errorString());
         return 1;

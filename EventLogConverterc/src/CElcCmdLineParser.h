@@ -6,7 +6,7 @@
 *  Event Log Conversion Utility
 *  Event Log Conversion Console Utility
 *
-*  Module name: QCommandLineParserHelper.h
+*  Module name: CElcCmdLineParser.h
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -15,19 +15,18 @@
 *
 ****************************************************************************/
 
-#ifndef QCOMMANDLINEPARSERHELPER_H
-#define QCOMMANDLINEPARSERHELPER_H
+#ifndef CELCCMDLINEPARSER_H
+#define CELCCMDLINEPARSER_H
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
 
 enum class RunningMode { RUNNINGMODE_DEFAULT, RUNNINGMODE_IMPORT_ONLY, RUNNINGMODE_REPORT_ONLY, RUNNINGMODE_CLEAN_DB };
 
-namespace elc {
-class QCommandLineParserHelper
+class CElcCmdLineParser
 {
 public:
-    explicit QCommandLineParserHelper();
+    explicit CElcCmdLineParser();
 
     bool parseCmdArgs(const QCoreApplication &app);
 
@@ -59,10 +58,8 @@ private:
     QString             m_errorString;
 
     bool checkData(const QStringList &data);
-    bool addElcOption(const QCoreApplication &app);
-    bool checkElcOption();
+    bool addOption(const QCoreApplication &app);
+    bool checkOption();
 };
-} // namespace elc
 
-
-#endif // QCOMMANDLINEPARSERHELPER_H
+#endif // CELCCMDLINEPARSER_H

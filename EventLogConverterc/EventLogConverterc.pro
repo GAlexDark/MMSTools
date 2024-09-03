@@ -27,11 +27,11 @@ include(../commonmodules.pro)
 HEADERS += \
     ../Common/Core/CConsoleOutput.h \
     src/CElcConsoleAppSettings.h \
-    src/QCommandLineParserHelper.h
+    src/CElcCmdLineParser.h
 
 SOURCES += \
     src/CElcConsoleAppSettings.cpp \
-    src/QCommandLineParserHelper.cpp \
+    src/CElcCmdLineParser.cpp \
     src/main.cpp
 
 include(../deployment.pri)
