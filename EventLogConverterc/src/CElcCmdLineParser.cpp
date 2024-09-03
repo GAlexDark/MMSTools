@@ -16,6 +16,7 @@
 ****************************************************************************/
 
 #include "CElcCmdLineParser.h"
+
 #include <QFileInfo>
 #include <QDir>
 #include <QRegularExpressionValidator>
@@ -131,20 +132,7 @@ CElcCmdLineParser::checkOption()
     }
     return retVal;
 }
-/*
-bool
-CElcCmdLineParser::parseCmdArgs(const QCoreApplication &app)
-{
-    m_parser.addHelpOption();
 
-    bool retVal = addOption(app);
-        if (retVal) {
-            retVal = checkOption();
-        }
-
-  return retVal;
-}
-*/
 QStringList
 CElcCmdLineParser::excludedUsernames() const
 {
@@ -160,13 +148,7 @@ CElcCmdLineParser::includedUsernames() const
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
-/*
-[[noreturn]] void
-CElcCmdLineParser::showHelpAndExit()
-{
-    m_parser.showHelp(0);
-}
-*/
+
 RunningMode
 CElcCmdLineParser::getRunningMode() const
 {
