@@ -23,11 +23,13 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 
 HEADERS += \
     ../Common/Core/CConsoleOutput.h \
+    ../Common/Core/CBasicCmdLineParser.h \
     ../Common/Core/elcUtils.h \
     ../Common/Core/MMSTypes.h \
     src/CX2jConvCmdLineParser.h
 
 SOURCES += \
+    ../Common/Core/CBasicCmdLineParser.cpp \
     ../Common/Core/elcUtils.cpp \
     src/CX2jConvCmdLineParser.cpp \
     src/main.cpp
