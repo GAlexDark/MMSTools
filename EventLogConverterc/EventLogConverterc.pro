@@ -26,12 +26,14 @@ PRECOMPILED_HEADER  = ../Common/Core/stdafx.h
 include(../commonmodules.pro)
 HEADERS += \
     ../Common/Core/CConsoleOutput.h \
+    ../Common/Core/CBasicCmdLineParser.h \
     src/CElcConsoleAppSettings.h \
-    src/QCommandLineParserHelper.h
+    src/CElcCmdLineParser.h
 
 SOURCES += \
+    ../Common/Core/CBasicCmdLineParser.cpp \
     src/CElcConsoleAppSettings.cpp \
-    src/QCommandLineParserHelper.cpp \
+    src/CElcCmdLineParser.cpp \
     src/main.cpp
 
 include(../deployment.pri)

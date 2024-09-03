@@ -18,6 +18,10 @@
 #ifndef MMSTYPES_H
 #define MMSTYPES_H
 
+#include <QByteArray>
+#include <QScopedPointer>
+#include <QString>
+
 namespace mms {
     struct fileFieldsSeparation_t
     {

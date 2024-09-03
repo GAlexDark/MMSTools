@@ -18,6 +18,7 @@
 
 #ifndef CELCCONSOLEAPPSETTINGS_H
 #define CELCCONSOLEAPPSETTINGS_H
+
 #include "CElcCommonSettings.h"
 
 class CElcConsoleAppSettings : public CElcCommonSettings

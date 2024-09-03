@@ -6,7 +6,7 @@
 *  Event Log Conversion Utility
 *  Event Log Conversion Console Utility
 *
-*  Module name: QCommandLineParserHelper.cpp
+*  Module name: CElcCmdLineParser.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -15,7 +15,8 @@
 *
 ****************************************************************************/
 
-#include "QCommandLineParserHelper.h"
+#include "CElcCmdLineParser.h"
+
 #include <QFileInfo>
 #include <QDir>
 #include <QRegularExpressionValidator>
@@ -23,7 +24,7 @@
 #include "CElcConsoleAppSettings.h"
 
 bool
-elc::QCommandLineParserHelper::checkData(const QStringList &data)
+CElcCmdLineParser::checkData(const QStringList &data)
 {
     bool retVal = true;
     const CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
@@ -33,21 +34,20 @@ elc::QCommandLineParserHelper::checkData(const QStringList &data)
     int pos = 0;
     QString buf = data.join(';');
     if (v.validate(buf, pos) == QValidator::Invalid) {
-        m_errorString = QStringLiteral("Invalid character(s) in the usernames: %1\nDefault allowed characters in the usernames: a..z, A..Z, 0..9 and _ (underscore).").arg(buf);
+        setErrorString(QStringLiteral("Invalid character(s) in the usernames: %1\nDefault allowed characters in the usernames: a..z, A..Z, 0..9 and _ (underscore).").arg(buf));
         retVal = false;
     }
 
     return retVal;
 }
 
-elc::QCommandLineParserHelper::QCommandLineParserHelper()
+CElcCmdLineParser::CElcCmdLineParser()
 {
     m_filesList.clear();
-    m_errorString.clear();
 }
 
 bool
-elc::QCommandLineParserHelper::addElcOption(const QCoreApplication &app)
+CElcCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString importOnlyDescription(QLatin1String("The utility starts in the import data-only mode without report generation. In this mode cleaning the database on startup will be ignored. When using this option, the report options are ignored."));
     const QString reportOnlyDescription(QLatin1String("The utility starts in the generation report-only mode without importing data. In this mode cleaning the database on startup will be ignored. When using this option, the import options are ignored.\nIf these options are not specified, data will be imported and the report generated."));
@@ -100,14 +100,14 @@ elc::QCommandLineParserHelper::addElcOption(const QCoreApplication &app)
         }
     }
     if (!retVal) {
-        m_errorString = QStringLiteral("The fatal error has occurredd. The program will be closed.");
+        setErrorString(QStringLiteral("The fatal error has occurredd. The program will be closed."));
     }
 
   return retVal;
 }
 
 bool
-elc::QCommandLineParserHelper::checkElcOption()
+CElcCmdLineParser::checkOption()
 {
     const QString error1 = QLatin1String("The '%1' and '%2' options cannot be specified at the same time.");
     bool comb1 = m_isImportOnly && m_isReportOnly && m_isCleanDbOnly;
@@ -117,15 +117,15 @@ elc::QCommandLineParserHelper::checkElcOption()
 
     bool retVal = true;
     if (comb1 || comb2 || comb3 || comb4) {
-        m_errorString = error1.arg("--cleandb', '--importonly", "--reportonly");
+        setErrorString(error1.arg("--cleandb', '--importonly", "--reportonly"));
         retVal = false;
     } else {
         if (m_isExcluded && m_isIncluded) {
-            m_errorString = error1.arg("--exclude", "--include");
+            setErrorString(error1.arg("--exclude", "--include"));
             retVal = false;
         } else {
             if (!m_isPath && !m_isFiles) {
-                m_errorString = QStringLiteral("The <path> and <files> arguments are missing.");
+                setErrorString(QStringLiteral("The <path> and <files> arguments are missing."));
                 retVal = false;
             }
         }
@@ -133,21 +133,8 @@ elc::QCommandLineParserHelper::checkElcOption()
     return retVal;
 }
 
-bool
-elc::QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
-{
-    m_parser.addHelpOption();
-
-    bool retVal = addElcOption(app);
-        if (retVal) {
-            retVal = checkElcOption();
-        }
-
-  return retVal;
-}
-
 QStringList
-elc::QCommandLineParserHelper::excludedUsernames() const
+CElcCmdLineParser::excludedUsernames() const
 {
     QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
     elcUtils::parseValuesList(retVal);
@@ -155,21 +142,15 @@ elc::QCommandLineParserHelper::excludedUsernames() const
 }
 
 QStringList
-elc::QCommandLineParserHelper::includedUsernames() const
+CElcCmdLineParser::includedUsernames() const
 {
     QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
     elcUtils::parseValuesList(retVal);
     return retVal;
 }
 
-[[noreturn]] void
-elc::QCommandLineParserHelper::showHelpAndExit()
-{
-    m_parser.showHelp(0);
-}
-
 RunningMode
-elc::QCommandLineParserHelper::getRunningMode() const
+CElcCmdLineParser::getRunningMode() const
 {
     RunningMode retVal = RunningMode::RUNNINGMODE_DEFAULT;
     if (m_isCleanDbOnly) {
@@ -187,7 +168,7 @@ elc::QCommandLineParserHelper::getRunningMode() const
 }
 
 bool
-elc::QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
+CElcCmdLineParser::getDataFilesList(QStringList &fileList)
 {
     bool retVal = true;
     if (m_isFiles) {
@@ -198,7 +179,7 @@ elc::QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
             if (fi.exists() && fi.isFile()) {
                 item = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             } else {
-                m_errorString = QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName());
+                setErrorString(QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName()));
                 retVal = false;
             }
         }
@@ -215,7 +196,7 @@ elc::QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
             searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
             fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
         } else {
-            m_errorString = QStringLiteral("Cannot find the directory %1.").arg(searchFolder);
+            setErrorString(QStringLiteral("Cannot find the directory %1.").arg(searchFolder));
             retVal = false;
         }
     }
@@ -230,7 +211,7 @@ elc::QCommandLineParserHelper::getDataFilesList(QStringList &fileList)
 }
 
 QString
-elc::QCommandLineParserHelper::getReportName() const
+CElcCmdLineParser::getReportName() const
 {
     QString retVal;
     if (m_isReportName) {
@@ -257,14 +238,14 @@ elc::QCommandLineParserHelper::getReportName() const
 }
 
 bool
-elc::QCommandLineParserHelper::getExcludedUserNames(QStringList &excludedUsersList)
+CElcCmdLineParser::getExcludedUserNames(QStringList &excludedUsersList)
 {
     excludedUsersList = excludedUsernames();
     return checkData(excludedUsersList);
 }
 
 bool
-elc::QCommandLineParserHelper::getIncludedUserNames(QStringList &includedUsersList)
+CElcCmdLineParser::getIncludedUserNames(QStringList &includedUsersList)
 {
     includedUsersList = includedUsernames();
     return checkData(includedUsersList);

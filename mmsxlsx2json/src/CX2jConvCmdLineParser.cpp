@@ -6,7 +6,7 @@
 *  MMS XLSX to JSON Conversion Console Utility
 *  MMS XLSX to JSON Conversion Console Utility
 *
-*  Module name: QCommandLineParserHelper.cpp
+*  Module name: CX2jConvCmdLineParser.cpp
 *  Author(s): Oleksii Gaienko
 *  Reviewer(s):
 *
@@ -15,12 +15,13 @@
 *
 ****************************************************************************/
 
-#include "QCommandLineParserHelper.h"
+#include "CX2jConvCmdLineParser.h"
 
 #include <QFileInfo>
+#include <QDateTime>
 
 bool
-xlsxc::QCommandLineParserHelper::addCnvOption(const QCoreApplication &app)
+CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString importDescription(QLatin1String("The path to the XLSX file for conversion to the JSON. Usage:\n-i file or\n--input file"));
     const QString outputDescription(QLatin1String("The path to the directory and name of the JSON output file. Usege:\n-o file or\n--output file"));
@@ -43,47 +44,23 @@ xlsxc::QCommandLineParserHelper::addCnvOption(const QCoreApplication &app)
         }
     }
     if (!retVal) {
-        m_errorString = QLatin1String("The fatal error has occurredd. The program will be closed.");
+        setErrorString(QLatin1String("The fatal error has occurredd. The program will be closed."));
     }
     return retVal;
 }
 
 bool
-xlsxc::QCommandLineParserHelper::checkCnvOption()
+CX2jConvCmdLineParser::checkOption()
 {
     bool retVal = m_isImport && m_isMode;
     if (!retVal) {
-        m_errorString = QLatin1String("The <input> or <mode> arguments are missing.");
+        setErrorString(QLatin1String("The <input> or <mode> arguments are missing."));
     }
     return retVal;
 }
 
-xlsxc::QCommandLineParserHelper::QCommandLineParserHelper()
-{
-    m_errorString.clear();
-}
-
 bool
-xlsxc::QCommandLineParserHelper::parseCmdArgs(const QCoreApplication &app)
-{
-    m_parser.addHelpOption();
-
-    bool retVal = addCnvOption(app);
-    if (retVal) {
-        retVal = checkCnvOption();
-    }
-
-    return retVal;
-}
-
-[[noreturn]] void
-xlsxc::QCommandLineParserHelper::showHelpAndExit()
-{
-    m_parser.showHelp(0);
-}
-
-bool
-xlsxc::QCommandLineParserHelper::getDataFile(QString &fileName)
+CX2jConvCmdLineParser::getDataFile(QString &fileName)
 {
     bool retVal = m_isImport;
     if (retVal) {
@@ -94,11 +71,11 @@ xlsxc::QCommandLineParserHelper::getDataFile(QString &fileName)
                 fileName = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
                 m_path = fi.absoluteDir();
             } else {
-                m_errorString = QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName());
+                setErrorString(QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName()));
                 retVal = false;
             }
         } else {
-            m_errorString = QLatin1String("The file %1 is corrupted or missing.").arg(fi.fileName());
+            setErrorString(QLatin1String("The file %1 is corrupted or missing.").arg(fi.fileName()));
             retVal = false;
         }
     }
@@ -107,7 +84,7 @@ xlsxc::QCommandLineParserHelper::getDataFile(QString &fileName)
 }
 
 QString
-xlsxc::QCommandLineParserHelper::getReportName() const
+CX2jConvCmdLineParser::getReportName() const
 {
     QString retVal;
     if (m_isOutput) {
@@ -133,7 +110,7 @@ xlsxc::QCommandLineParserHelper::getReportName() const
 }
 
 OutputMode
-xlsxc::QCommandLineParserHelper::getOutputMode() const
+CX2jConvCmdLineParser::getOutputMode() const
 {
     OutputMode retVal = OutputMode::OUTPUTMODE_COMPACT;
     QString buf = m_parser.value("mode");
