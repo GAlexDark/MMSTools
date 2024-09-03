@@ -20,7 +20,7 @@
 #include <QFileInfo>
 
 bool
-xlsxc::CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
+CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString importDescription(QLatin1String("The path to the XLSX file for conversion to the JSON. Usage:\n-i file or\n--input file"));
     const QString outputDescription(QLatin1String("The path to the directory and name of the JSON output file. Usege:\n-o file or\n--output file"));
@@ -49,7 +49,7 @@ xlsxc::CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
 }
 
 bool
-xlsxc::CX2jConvCmdLineParser::checkOption()
+CX2jConvCmdLineParser::checkOption()
 {
     bool retVal = m_isImport && m_isMode;
     if (!retVal) {
@@ -58,13 +58,13 @@ xlsxc::CX2jConvCmdLineParser::checkOption()
     return retVal;
 }
 
-xlsxc::CX2jConvCmdLineParser::CX2jConvCmdLineParser()
+CX2jConvCmdLineParser::CX2jConvCmdLineParser()
 {
     m_errorString.clear();
 }
 
 bool
-xlsxc::CX2jConvCmdLineParser::parseCmdArgs(const QCoreApplication &app)
+CX2jConvCmdLineParser::parseCmdArgs(const QCoreApplication &app)
 {
     m_parser.addHelpOption();
 
@@ -77,13 +77,13 @@ xlsxc::CX2jConvCmdLineParser::parseCmdArgs(const QCoreApplication &app)
 }
 
 [[noreturn]] void
-xlsxc::CX2jConvCmdLineParser::showHelpAndExit()
+CX2jConvCmdLineParser::showHelpAndExit()
 {
     m_parser.showHelp(0);
 }
 
 bool
-xlsxc::CX2jConvCmdLineParser::getDataFile(QString &fileName)
+CX2jConvCmdLineParser::getDataFile(QString &fileName)
 {
     bool retVal = m_isImport;
     if (retVal) {
@@ -107,7 +107,7 @@ xlsxc::CX2jConvCmdLineParser::getDataFile(QString &fileName)
 }
 
 QString
-xlsxc::CX2jConvCmdLineParser::getReportName() const
+CX2jConvCmdLineParser::getReportName() const
 {
     QString retVal;
     if (m_isOutput) {
@@ -133,7 +133,7 @@ xlsxc::CX2jConvCmdLineParser::getReportName() const
 }
 
 OutputMode
-xlsxc::CX2jConvCmdLineParser::getOutputMode() const
+CX2jConvCmdLineParser::getOutputMode() const
 {
     OutputMode retVal = OutputMode::OUTPUTMODE_COMPACT;
     QString buf = m_parser.value("mode");
