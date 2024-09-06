@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include <QCoreApplication>
-#include <QTextStream>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -28,7 +27,6 @@
 #include "CX2jConvCmdLineParser.h"
 #include "MMSTypes.h"
 
-const int defaultNumberOfColumns = 6;
 const QString errorMsg = QStringLiteral("\nError at line %1: The '%2' value '%3' is wrong!\n");
 const QString DataSend = QLatin1String("dataSend");
 const QString DebtCredit = QLatin1String("debtCredit");
@@ -117,9 +115,9 @@ public:
 };
 
 QJsonArray
-read(const QXlsx::Document &dataSource)
+read(const QXlsx::Document &dataSource, int &row)
 {
-    int row = 2;
+    //int row = 2;
     int numberOfRow = dataSource.dimension().lastRow();
     QVariant cell;
     QString dataSend;
@@ -215,47 +213,41 @@ int main(int argc, char *argv[])
     QXlsx::Document dataSource(fileName);
     bool retVal = dataSource.load();
     if (retVal) {
-        int numberOfColumn = dataSource.dimension().lastColumn();
-        if (numberOfColumn == defaultNumberOfColumns) {
-            retVal = checkHeader(dataSource);
-            if (retVal) {
-                int row = 2;
-                int numberOfRow = dataSource.dimension().lastRow();
-                if (numberOfRow >= row) {
+        retVal = checkHeader(dataSource);
+        if (retVal) {
+            int row = 2;
+            int numberOfRow = dataSource.dimension().lastRow();
+            if (numberOfRow >= row) {
+                fileName = cmd.getReportName();
+                QFile jsonFile(fileName);
+                retVal = jsonFile.open(QIODevice::WriteOnly);
+                if (retVal) {
+                    QJsonArray recordsArray;
                     try {
-                        fileName = cmd.getReportName();
-                        QFile jsonFile(fileName);
-                        retVal = jsonFile.open(QIODevice::WriteOnly);
-                        if (retVal) {
-                            QJsonArray recordsArray = read(dataSource);
-                            OutputMode mode = cmd.getOutputMode();
-                            QJsonDocument jsonResult(recordsArray);
-                            QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
-                            retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat));
-                            jsonFile.close();
-                            QString msg;
-                            if (retVal) {
-                                msg = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(numberOfRow - 1)).arg(fileName);
-                            } else {
-                                msg = QLatin1String("Error save result to the file: %1").arg(fileName);
-                            }
-                            consoleOut.outToConsole(msg);
-                        } else {
-                            consoleOut.outToConsole(QLatin1String("Error create file %1").arg(fileName));
-                        }
+                        recordsArray = read(dataSource, row);
                     } catch (jsonConvError &ex) {
-                        consoleOut.outToConsole(ex.what());
-                        retVal = false;
+                        consoleOut.outToConsole(QLatin1String("%1\nThe utility save converted data.").arg(ex.what()));
                     }
+                    OutputMode mode = cmd.getOutputMode();
+                    QJsonDocument jsonResult(recordsArray);
+                    QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
+                    retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat));
+                    jsonFile.close();
+                    QString msg;
+                    if (retVal) {
+                        msg = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 2)).arg(fileName);
+                    } else {
+                        msg = QLatin1String("Error save result to the file: %1").arg(fileName);
+                    }
+                    consoleOut.outToConsole(msg);
                 } else {
-                    consoleOut.outToConsole(QLatin1String("The file %1 is empty.").arg(fileName));
+                    consoleOut.outToConsole(QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString()));
                 }
             } else {
-                consoleOut.outToConsole(QLatin1String("The file %1 header is wrong.").arg(fileName));
+                consoleOut.outToConsole(QLatin1String("The file %1 is empty.").arg(fileName));
             }
         } else {
-            consoleOut.outToConsole(QLatin1String("Wrong xlsx file %1").arg(fileName));
-            retVal = false;
+            consoleOut.outToConsole(QLatin1String("The file %1 header is wrong.").arg(fileName));
         }
     } else {
         consoleOut.outToConsole(QLatin1String("Error load xlsx file %1").arg(fileName));
