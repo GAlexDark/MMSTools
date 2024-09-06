@@ -7,7 +7,6 @@
 #include <openssl/pem.h>
 #include <openssl/err.h>
 #include "BioByteArray.h"
-#include "elcUtils.h"
 
 
 QString
@@ -97,7 +96,7 @@ CPkcs7::readCertFromFile(const QString &certFileName)
             }
         }
     } else {
-        m_errorString = QStringLiteral("Error load certificate from file '%1': %2").arg(certFileName, elcUtils::getFileErrorMessage(file.error())) ;
+        m_errorString = QStringLiteral("Error load certificate from file '%1': %2").arg(certFileName, file.errorString()) ;
     }
     return retVal;
 }
@@ -142,7 +141,6 @@ CPkcs7::readStore(const QString &fileName)
 bool
 CPkcs7::appendCerts(const QStringList &filesList)
 {
-
     bool retVal = true;
     if (m_pkcs7Store.isNull()) { // the p7b file not read and m_pkcs7Store is empty
         ERR_clear_error();
@@ -197,12 +195,12 @@ CPkcs7::saveStore(const QString &fileName)
             if (retVal) {
                 res = file.write(buf);
                 if (res == -1) {
-                    m_errorString = QStringLiteral("Error write to file: '%1': %2").arg(fileName, elcUtils::getFileErrorMessage(file.error()));
+                    m_errorString = QStringLiteral("Error write to file: '%1': %2").arg(fileName, file.errorString());
                     retVal = false;
                 }
                 file.close();
             } else {
-                m_errorString = QStringLiteral("Error opening file: '%1': %2").arg(fileName, elcUtils::getFileErrorMessage(file.error()));
+                m_errorString = QStringLiteral("Error opening file: '%1': %2").arg(fileName, file.errorString());
             }
         } else {
             m_errorString = QStringLiteral("Error decoding write data: %1").arg(getOpenSslErrorMessage());
@@ -251,7 +249,7 @@ CPkcs7::createHashFile(const QString &fileName, QString &errorString)
             stream << QStringLiteral("%1 *%2").arg(hash.toHex(), file);
             hashFile.close();
         } else {
-            errorString = QStringLiteral("Error! Could not create hash file: %1").arg(elcUtils::getFileErrorMessage(hashFile.error()));
+            errorString = QStringLiteral("Error! Could not create hash file: %1").arg(hashFile.errorString());
         }
     } else {
         errorString = QStringLiteral("Error calculate hash.");
