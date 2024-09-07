@@ -16,7 +16,6 @@
 ****************************************************************************/
 
 #include <QCoreApplication>
-#include <QTextStream>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -28,8 +27,7 @@
 #include "CX2jConvCmdLineParser.h"
 #include "MMSTypes.h"
 
-const int defaultNumberOfColumns = 6;
-const QString errorMsg = QStringLiteral("\nError at line %1: The '%2' value '%3' is wrong!\n");
+const QString errorMsg = QStringLiteral("Error at line %1: The '%2' value '%3' is wrong!\n");
 const QString DataSend = QLatin1String("dataSend");
 const QString DebtCredit = QLatin1String("debtCredit");
 const QString DebtDebit = QLatin1String("debtDebit");
@@ -68,6 +66,9 @@ toDouble(const QVariant &value, bool &isOk)
     QString buf = toString(value, isOk); //for correct conversion of values ​​like 10,000.00
     if (isOk) {
         QLocale c(QLocale::C);
+        if ((buf.indexOf('.') == -1) && buf.indexOf(',') != -1 ) {
+            buf.replace(',', '.');
+        }
         retVal = c.toDouble(buf, &isOk);
         isOk = isOk && !std::isnan(retVal);
     }
@@ -117,9 +118,8 @@ public:
 };
 
 QJsonArray
-read(const QXlsx::Document &dataSource)
+read(const QXlsx::Document &dataSource, int &row)
 {
-    int row = 2;
     int numberOfRow = dataSource.dimension().lastRow();
     QVariant cell;
     QString dataSend;
@@ -183,6 +183,52 @@ read(const QXlsx::Document &dataSource)
     return retVal;
 }
 
+bool
+convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputMode mode, QString &msgString)
+{
+    bool retVal = checkHeader(dataSource);
+    if (retVal) {
+        int row = 2;
+        int numberOfRow = dataSource.dimension().lastRow();
+        if (numberOfRow >= row) {
+            QJsonArray recordsArray;
+            try {
+                recordsArray = read(dataSource, row);
+            } catch (const jsonConvError &ex) {
+                msgString = ex.what();
+                retVal = false;
+            }
+            if (retVal) {
+                if (!recordsArray.isEmpty()) {
+                    QFile jsonFile(fileName);
+                    retVal = jsonFile.open(QIODevice::WriteOnly);
+                    if (retVal) {
+                        QJsonDocument jsonResult(recordsArray);
+                        QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
+                        retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
+                        jsonFile.close();
+                        if (retVal) {
+                            msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 2)).arg(fileName);
+                        } else {
+                            msgString = QLatin1String("Error save result to the file: %1").arg(fileName);
+                        }
+                    } else {
+                        msgString = QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString());
+                    }
+                } else {
+                    msgString = QLatin1String("Nothing to save.");
+                    retVal = true;
+                }
+            }
+        } else {
+            msgString = QLatin1String("The file %1 is empty.").arg(fileName);
+        }
+    } else {
+        msgString = QLatin1String("The file %1 header is wrong.").arg(fileName);
+    }
+    return retVal;
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -204,7 +250,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    consoleOut.outToConsole(QLatin1String("MMS XLSX to JSON Conversion Utility starting..."));
+    consoleOut.outToConsole(QLatin1String("MMS XLSX to JSON Conversion Utility starting...\n"));
 
     QString fileName;
     if (!cmd.getDataFile(fileName)) {
@@ -215,47 +261,29 @@ int main(int argc, char *argv[])
     QXlsx::Document dataSource(fileName);
     bool retVal = dataSource.load();
     if (retVal) {
-        int numberOfColumn = dataSource.dimension().lastColumn();
-        if (numberOfColumn == defaultNumberOfColumns) {
-            retVal = checkHeader(dataSource);
-            if (retVal) {
-                int row = 2;
-                int numberOfRow = dataSource.dimension().lastRow();
-                if (numberOfRow >= row) {
-                    try {
-                        fileName = cmd.getReportName();
-                        QFile jsonFile(fileName);
-                        retVal = jsonFile.open(QIODevice::WriteOnly);
-                        if (retVal) {
-                            QJsonArray recordsArray = read(dataSource);
-                            OutputMode mode = cmd.getOutputMode();
-                            QJsonDocument jsonResult(recordsArray);
-                            QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
-                            retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat));
-                            jsonFile.close();
-                            QString msg;
-                            if (retVal) {
-                                msg = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(numberOfRow - 1)).arg(fileName);
-                            } else {
-                                msg = QLatin1String("Error save result to the file: %1").arg(fileName);
-                            }
-                            consoleOut.outToConsole(msg);
-                        } else {
-                            consoleOut.outToConsole(QLatin1String("Error create file %1").arg(fileName));
-                        }
-                    } catch (jsonConvError &ex) {
-                        consoleOut.outToConsole(ex.what());
-                        retVal = false;
-                    }
+        fileName = cmd.getReportName();
+        OutputMode mode = cmd.getOutputMode();
+        QString msgString;
+        qsizetype sheetCount = dataSource.sheetNames().size();
+        if (sheetCount > 1) {
+            QString currentSheetName;
+            QString fileNameWithSheet;
+            for (int sheetIndexNumber = 0; sheetIndexNumber < sheetCount; ++sheetIndexNumber) {
+                currentSheetName = dataSource.sheetNames().at(sheetIndexNumber);
+                fileNameWithSheet = fileName;
+                fileNameWithSheet.replace(QLatin1String(".json"), QStringLiteral(".%1.json").arg(currentSheetName));
+                retVal = dataSource.selectSheet(sheetIndexNumber);
+                if (retVal) {
+                    retVal = convertSheet(dataSource, fileNameWithSheet, mode, msgString);
+                    consoleOut.outToConsole(QStringLiteral("Worksheet '%1': %2").arg(currentSheetName, msgString));
                 } else {
-                    consoleOut.outToConsole(QLatin1String("The file %1 is empty.").arg(fileName));
+                    consoleOut.outToConsole(QStringLiteral("Worksheet select error."));
+                    break;
                 }
-            } else {
-                consoleOut.outToConsole(QLatin1String("The file %1 header is wrong.").arg(fileName));
-            }
+            } //for
         } else {
-            consoleOut.outToConsole(QLatin1String("Wrong xlsx file %1").arg(fileName));
-            retVal = false;
+            retVal = convertSheet(dataSource, fileName, mode, msgString);
+            consoleOut.outToConsole(msgString);
         }
     } else {
         consoleOut.outToConsole(QLatin1String("Error load xlsx file %1").arg(fileName));
