@@ -117,8 +117,8 @@ public:
         : mms::MmsCommonException(text) {}
 };
 
-QJsonArray
-read(const QXlsx::Document &dataSource, int &row)
+void
+read(const QXlsx::Document &dataSource, int &row, QJsonArray *array)
 {
     int numberOfRow = dataSource.dimension().lastRow();
     QVariant cell;
@@ -128,44 +128,43 @@ read(const QXlsx::Document &dataSource, int &row)
     double paymentSumCredit;
     double paymentSumDebit;
     QString reportNumber;
-    bool res = true;
+    bool isOk = true;
     QJsonObject recordObject;
-    QJsonArray retVal;
 
     while (row <= numberOfRow) {
         cell = dataSource.read(row, 1);
-        dataSend = toDateTimeAsString(cell, res);
-        if (!res) {
-            throw jsonConvError(errorMsg.arg(row).arg(DataSend, dataSend));
+        dataSend = toDateTimeAsString(cell, isOk);
+        if (!isOk) {
+            break;
         }
 
         cell = dataSource.read(row, 2);
-        debtCredit = toDouble(cell, res);
-        if (!res) {
+        debtCredit = toDouble(cell, isOk);
+        if (!isOk) {
             throw jsonConvError(errorMsg.arg(row).arg(DebtCredit).arg(debtCredit));
         }
 
         cell = dataSource.read(row, 3);
-        debtDebit = toDouble(cell, res);
-        if (!res) {
+        debtDebit = toDouble(cell, isOk);
+        if (!isOk) {
             throw jsonConvError(errorMsg.arg(row).arg(DebtDebit).arg(debtDebit));
         }
 
         cell = dataSource.read(row, 4);
-        paymentSumCredit = toDouble(cell, res);
-        if (!res) {
+        paymentSumCredit = toDouble(cell, isOk);
+        if (!isOk) {
             throw jsonConvError(errorMsg.arg(row).arg(PaymentSumCredit).arg(paymentSumCredit));
         }
 
         cell = dataSource.read(row, 5);
-        paymentSumDebit = toDouble(cell, res);
-        if (!res) {
+        paymentSumDebit = toDouble(cell, isOk);
+        if (!isOk) {
             throw jsonConvError(errorMsg.arg(row).arg(PaymentSumDebit).arg(paymentSumDebit));
         }
 
         cell = dataSource.read(row, 6);
-        reportNumber = toReportNumber(cell, res);
-        if (!res) {
+        reportNumber = toReportNumber(cell, isOk);
+        if (!isOk) {
             throw jsonConvError(errorMsg.arg(row).arg(ReportNumber, reportNumber));
         }
 
@@ -176,11 +175,10 @@ read(const QXlsx::Document &dataSource, int &row)
         recordObject.insert(PaymentSumCredit, QJsonValue::fromVariant(paymentSumCredit));
         recordObject.insert(PaymentSumDebit, QJsonValue::fromVariant(paymentSumDebit));
         recordObject.insert(ReportNumber, QJsonValue::fromVariant(reportNumber));
-        retVal.push_back(recordObject);
+        array->push_back(recordObject);
 
         ++row;
     } // while
-    return retVal;
 }
 
 bool
@@ -191,27 +189,30 @@ convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputM
         int row = 2;
         int numberOfRow = dataSource.dimension().lastRow();
         if (numberOfRow >= row) {
-            QJsonArray recordsArray;
+            QScopedPointer<QJsonArray> recordsArray(new QJsonArray);
             try {
-                recordsArray = read(dataSource, row);
+                read(dataSource, row, recordsArray.data());
             } catch (const jsonConvError &ex) {
                 msgString = ex.what();
                 retVal = false;
+            } catch (...) {
+                msgString = QLatin1String("The unknown exception occurred.");
+                retVal = false;
             }
             if (retVal) {
-                if (!recordsArray.isEmpty()) {
+                if (!recordsArray->isEmpty()) {
                     QFile jsonFile(fileName);
                     retVal = jsonFile.open(QIODevice::WriteOnly);
                     if (retVal) {
-                        QJsonDocument jsonResult(recordsArray);
+                        QJsonDocument jsonResult(*recordsArray);
                         QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
                         retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
-                        jsonFile.close();
                         if (retVal) {
                             msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 2)).arg(fileName);
                         } else {
-                            msgString = QLatin1String("Error save result to the file: %1").arg(fileName);
+                            msgString = QLatin1String("Error save result to the file '%1':").arg(fileName, jsonFile.errorString());
                         }
+                        jsonFile.close();
                     } else {
                         msgString = QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString());
                     }
@@ -221,10 +222,10 @@ convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputM
                 }
             }
         } else {
-            msgString = QLatin1String("The file %1 is empty.").arg(fileName);
+            msgString = QLatin1String("The file '%1' is empty.").arg(fileName);
         }
     } else {
-        msgString = QLatin1String("The file %1 header is wrong.").arg(fileName);
+        msgString = QLatin1String("The file '%1' header is wrong.").arg(fileName);
     }
     return retVal;
 }
@@ -288,6 +289,7 @@ int main(int argc, char *argv[])
     } else {
         consoleOut.outToConsole(QLatin1String("Error load xlsx file %1").arg(fileName));
     }
+    consoleOut.outToConsole("DONE");
 
     return retVal ? 0 : 1;
 }
