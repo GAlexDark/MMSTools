@@ -179,6 +179,7 @@ read(const QXlsx::Document &dataSource, int &row, QJsonArray *array)
 
         ++row;
     } // while
+    --row;
 }
 
 bool
@@ -208,7 +209,7 @@ convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputM
                         QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
                         retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
                         if (retVal) {
-                            msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 2)).arg(fileName);
+                            msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 1)).arg(fileName);
                         } else {
                             msgString = QLatin1String("Error save result to the file '%1':").arg(fileName, jsonFile.errorString());
                         }
