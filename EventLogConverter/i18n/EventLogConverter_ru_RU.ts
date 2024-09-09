@@ -53,7 +53,7 @@
         <translation>Пожалуйста, выберите тип журнала MMS</translation>
     </message>
     <message>
-        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="13"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="34"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
@@ -61,22 +61,22 @@
 <context>
     <name>CMmsLogsThreadReader</name>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="405"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="409"/>
         <source>Preparing to read the file(s).</source>
         <translation>Подготовка к чтению файла(-ов).</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="419"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="423"/>
         <source>Reading of the file %1 has started.</source>
         <translation>Чтение файла %1 началось.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="429"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="433"/>
         <source>The file %1 was read</source>
         <translation>Файл %1 прочитан</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="429"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="433"/>
         <source>The file %1 was not read</source>
         <translation>Файл %1 не прочитан</translation>
     </message>
@@ -119,7 +119,7 @@
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Список имен пользователей, разделенных символами &apos;,&apos; или &apos;;&apos;, которые необходимо исключить из отчета.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/CReportOptionsDialog.cpp" line="23"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="44"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
@@ -210,9 +210,9 @@
         <translation>О версии Qt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="158"/>
-        <location filename="../src/mainwindow.cpp" line="352"/>
-        <location filename="../src/mainwindow.cpp" line="423"/>
+        <location filename="../src/mainwindow.cpp" line="162"/>
+        <location filename="../src/mainwindow.cpp" line="356"/>
+        <location filename="../src/mainwindow.cpp" line="426"/>
         <source>Ready</source>
         <translation>Готов</translation>
     </message>
@@ -229,7 +229,7 @@ Copyright (C) 2023 Алексей Гаенко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="225"/>
+        <location filename="../src/mainwindow.cpp" line="229"/>
         <source>Open MMS Event Log file</source>
         <translation>Открыть журнал событий MMS</translation>
     </message>
@@ -238,7 +238,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Журнал событий MMS (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="233"/>
+        <location filename="../src/mainwindow.cpp" line="237"/>
         <source>The selected file(s): </source>
         <translation>Выбранный(-е) файл(ы): </translation>
     </message>
@@ -251,7 +251,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Нет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="247"/>
+        <location filename="../src/mainwindow.cpp" line="251"/>
         <source>The file(s) was selected</source>
         <translation>Файл(ы) выбран(ы)</translation>
     </message>
@@ -270,12 +270,12 @@ Copyright (C) 2023 Алексей Гаенко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="203"/>
+        <location filename="../src/mainwindow.cpp" line="207"/>
         <source>Contacts - MMS Event Log Conversion Utility</source>
         <translation>Контакты - Утилита преобразования журналов событий MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="204"/>
+        <location filename="../src/mainwindow.cpp" line="208"/>
         <source>&lt;p&gt;The MMS Event Log Conversion Utility developers can be reached at the mail:&lt;/p&gt;%1&lt;p&gt;Please use %2 for bigger chunks of text.&lt;/p&gt;</source>
         <translation>&lt;p&gt;С разработчиками утилиты преобразования журнала событий MMS можно связаться по электронной почте:&lt;/p&gt;%1&lt;p&gt;Пожалуйста, используйте %2 для больших фрагментов текста.&lt;/p&gt;</translation>
     </message>
@@ -290,49 +290,49 @@ No - Otherwise.</source>
 Нет - В противном случае.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="254"/>
+        <location filename="../src/mainwindow.cpp" line="258"/>
         <source>The data file(s) has headers</source>
         <translation>Файл(ы) данных имеет(-ют) заголовки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="256"/>
+        <location filename="../src/mainwindow.cpp" line="260"/>
         <source>The data file(s) has no headers</source>
         <translation>Файл(ы) данных не имеет(-ют) заголовков</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="270"/>
+        <location filename="../src/mainwindow.cpp" line="274"/>
         <source>File selection canceled.</source>
         <translation>Выбор файла(-ов) отменен.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="277"/>
-        <location filename="../src/mainwindow.cpp" line="330"/>
+        <location filename="../src/mainwindow.cpp" line="281"/>
+        <location filename="../src/mainwindow.cpp" line="334"/>
         <source>No files selected</source>
         <translation>Файлы не выбраны</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="304"/>
+        <location filename="../src/mainwindow.cpp" line="308"/>
         <source>Read and converting</source>
         <translation>Чтение и конвертация</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="320"/>
+        <location filename="../src/mainwindow.cpp" line="324"/>
         <source>Reading file(s) completed</source>
         <translation>Чтение файла(-ов) окончено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="321"/>
+        <location filename="../src/mainwindow.cpp" line="325"/>
         <source>Reading complete</source>
         <translation>Чтение окончено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="323"/>
+        <location filename="../src/mainwindow.cpp" line="327"/>
         <source>Error reading file(s): %1</source>
         <translation>Ошибка чтения файла(-ов): %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="262"/>
-        <location filename="../src/mainwindow.cpp" line="324"/>
+        <location filename="../src/mainwindow.cpp" line="266"/>
+        <location filename="../src/mainwindow.cpp" line="328"/>
         <source>Error reading</source>
         <translation>Ошибка чтения</translation>
     </message>
@@ -351,30 +351,47 @@ Copyright (C) 2023 Алексей Гаенко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="327"/>
+        <location filename="../src/mainwindow.cpp" line="331"/>
         <source>Error in internal IP address mask. Please check it in the config file.</source>
         <translation>Ошибка в маске внутреннего IP-адреса. Пожалуйста, проверьте это в файле конфигурации.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="343"/>
+        <location filename="../src/mainwindow.cpp" line="347"/>
         <source>Starting cleaning database...</source>
         <translation>Начало очистки БД...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="358"/>
         <source>Cannot clean database: %1</source>
         <translation>Невозможно очистить БД: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="268"/>
-        <location filename="../src/mainwindow.cpp" line="355"/>
-        <location filename="../src/mainwindow.cpp" line="418"/>
-        <location filename="../src/mainwindow.cpp" line="429"/>
+        <location filename="../src/mainwindow.cpp" line="272"/>
+        <location filename="../src/mainwindow.cpp" line="359"/>
+        <location filename="../src/mainwindow.cpp" line="421"/>
+        <location filename="../src/mainwindow.cpp" line="432"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
+        <source>MMS Event Log Conversion Utility
+Version %1
+Copyright (C) 2023 Oleksii Gaienko
+This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
+
+This program use QXlsx library:
+ https://github.com/QtExcel/QXlsx.</source>
+        <translation>Утилита преобразования журналов событий MMS
+Версия %1
+Copyright (C) 2023 Алексей Гаенко
+На эту программу АБСОЛЮТНО НЕТ ГАРАНТИИ. Это бесплатное программное обеспечение, и вы можете распространять его в соответствии с условиями GPL версии 3.
+
+ Эта программа использует библиотеку Xlsx:
+ https://github.com/QtExcel/QXlsx.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="378"/>
         <source>Additional report filtering settings:</source>
         <translation>Дополнительные настройки фильтрации отчетов:</translation>
     </message>
@@ -387,30 +404,29 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Список исключенных пользователей пуст.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="389"/>
+        <location filename="../src/mainwindow.cpp" line="392"/>
         <source>Save MMS Event Log report</source>
         <translation>Сохранить отчет журнала событий MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="393"/>
+        <location filename="../src/mainwindow.cpp" line="396"/>
         <source>The report will be created here: %1</source>
         <translation>Отчет будет создан здесь: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="312"/>
-        <location filename="../src/mainwindow.cpp" line="406"/>
+        <location filename="../src/mainwindow.cpp" line="316"/>
+        <location filename="../src/mainwindow.cpp" line="409"/>
         <source>wait...</source>
         <translation>Подождите...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="190"/>
         <source>MMS Event Log Conversion Utility
 Version %1
 Copyright (C) 2023 Oleksii Gaienko
 
 This program use QXlsx library:
  https://github.com/QtExcel/QXlsx.</source>
-        <translation>Утилита преобразования журнала событий MMS
+        <translation type="vanished">Утилита преобразования журнала событий MMS
 Версия %1
 Copyright (C) 2023 Алексей Гаенко
 
@@ -418,12 +434,12 @@ Copyright (C) 2023 Алексей Гаенко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="227"/>
+        <location filename="../src/mainwindow.cpp" line="231"/>
         <source>MMS log files (*.csv)</source>
         <translation>Журналы событий MMS (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="238"/>
+        <location filename="../src/mainwindow.cpp" line="242"/>
         <source>%1 - this file have zero size and will be removed from the list.</source>
         <translation>%1 - этот файл имеет нулевой размер и будет удален из списка.</translation>
     </message>
@@ -436,33 +452,33 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Журнал аудита</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="258"/>
+        <location filename="../src/mainwindow.cpp" line="262"/>
         <source>Selected Log type: %1</source>
         <translation>Выбранный тип журнала: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="261"/>
+        <location filename="../src/mainwindow.cpp" line="265"/>
         <source>Unknown MMS Log type.</source>
         <translation>Неизвестный тип журнала MMS.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="266"/>
-        <location filename="../src/mainwindow.cpp" line="427"/>
+        <location filename="../src/mainwindow.cpp" line="270"/>
+        <location filename="../src/mainwindow.cpp" line="430"/>
         <source>Error open options dialog.</source>
         <translation>Ошибка открытия диалогового окна параметров.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="303"/>
+        <location filename="../src/mainwindow.cpp" line="307"/>
         <source>Start reading and converting file(s)...</source>
         <translation>Начало чтения и конвертации файла(-ов)...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="366"/>
+        <location filename="../src/mainwindow.cpp" line="370"/>
         <source>Start generating the report...</source>
         <translation>Начало создания отчета...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="367"/>
+        <location filename="../src/mainwindow.cpp" line="371"/>
         <source>Start generating the report</source>
         <translation>Начало создания отчета</translation>
     </message>
@@ -471,59 +487,59 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">(Экспериментальный) Сводный отчет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="377"/>
+        <location filename="../src/mainwindow.cpp" line="380"/>
         <source>	The included users list is empty.</source>
         <translation>	Список включенных пользователей пуст.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="379"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
         <source>	The included users: %1</source>
         <translation>	Список включенных пользователей: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="382"/>
+        <location filename="../src/mainwindow.cpp" line="385"/>
         <source>	The excluded users list is empty.</source>
         <translation>	Список исключенных пользователей пуст.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="384"/>
+        <location filename="../src/mainwindow.cpp" line="387"/>
         <source>	The excluded users: %1</source>
         <translation>	Список исключенных пользователей: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="386"/>
+        <location filename="../src/mainwindow.cpp" line="389"/>
         <source>Selected report type: %1</source>
         <translation>Выбранный тип отчета: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="395"/>
+        <location filename="../src/mainwindow.cpp" line="398"/>
         <source>Generating report...</source>
         <translation>Создание отчета...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="414"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>Report generating finished.
 The report was saved in the %1 file.</source>
         <translation>Формирование отчета завершено.
 Отчет сохранен в файле %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="415"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
         <source>Report created</source>
         <translation>Отчет создан</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="417"/>
+        <location filename="../src/mainwindow.cpp" line="420"/>
         <source>Error generate report: %1</source>
         <translation>Ошибка создания отчета: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="422"/>
+        <location filename="../src/mainwindow.cpp" line="425"/>
         <source>Report name is empty</source>
         <translation>Название отчета пусто</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="431"/>
+        <location filename="../src/mainwindow.cpp" line="434"/>
         <source>Report generation canceled.</source>
         <translation>Создание отчета отменено.</translation>
     </message>
@@ -549,7 +565,7 @@ Version 1.0
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="179"/>
-        <location filename="../src/mainwindow.cpp" line="189"/>
+        <location filename="../src/mainwindow.cpp" line="193"/>
         <source>About MMS Event Log Conversion Utility</source>
         <translation>Об утилите преобразования журнала событий MMS</translation>
     </message>
@@ -612,7 +628,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Сохранить отчет MMS EventLog</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="391"/>
+        <location filename="../src/mainwindow.cpp" line="394"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
@@ -657,7 +673,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Файл %1 распарсен</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="396"/>
+        <location filename="../src/mainwindow.cpp" line="399"/>
         <source>Generating report</source>
         <translation>Создание отчета</translation>
     </message>
@@ -670,7 +686,7 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Файл %1 сохранен</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="351"/>
+        <location filename="../src/mainwindow.cpp" line="355"/>
         <source>Database was cleared</source>
         <translation>БД очищена</translation>
     </message>
@@ -725,31 +741,31 @@ Copyright (C) 2023 Алексей Гаенко
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="43"/>
-        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="49"/>
-        <location filename="../src/CReportOptionsDialog.cpp" line="62"/>
-        <location filename="../src/CReportOptionsDialog.cpp" line="70"/>
-        <location filename="../src/main.cpp" line="135"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="64"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="70"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="83"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="91"/>
+        <location filename="../src/main.cpp" line="139"/>
         <source>Warning</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="43"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="64"/>
         <source>The presence/absence of headers in the file(s) is not specified.</source>
         <translation>Наличие/отсутствие заголовков в файле(ах) не указано.</translation>
     </message>
     <message>
-        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="49"/>
+        <location filename="../src/CLoadFilesOptionsDialog.cpp" line="70"/>
         <source>The MMS log type is not selected.</source>
         <translation>Тип журнала MMS не выбран.</translation>
     </message>
     <message>
-        <location filename="../src/CReportOptionsDialog.cpp" line="62"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="83"/>
         <source>The MMS report type is not selected.</source>
         <translation>Тип отчета MMS не выбран.</translation>
     </message>
     <message>
-        <location filename="../src/CReportOptionsDialog.cpp" line="71"/>
+        <location filename="../src/CReportOptionsDialog.cpp" line="92"/>
         <source>User exclusion and inclusion lists cannot be specified at the same time.</source>
         <translation>Списки исключения и включения пользователей не могут быть указаны одновременно.</translation>
     </message>
@@ -762,40 +778,40 @@ Copyright (C) 2023 Алексей Гаенко
         <translation type="vanished">Недопустимый символ в значении %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="110"/>
+        <location filename="../src/main.cpp" line="114"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="111"/>
+        <location filename="../src/main.cpp" line="115"/>
         <source>The another copy of the Utility is still running. Please close it.</source>
         <translation>Другая копия утилиты все еще работает. Пожалуйста, закройте ее.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="121"/>
         <location filename="../src/main.cpp" line="125"/>
-        <location filename="../src/main.cpp" line="140"/>
-        <location filename="../src/main.cpp" line="149"/>
-        <location filename="../src/mainwindow.cpp" line="89"/>
-        <location filename="../src/mainwindow.cpp" line="107"/>
+        <location filename="../src/main.cpp" line="129"/>
+        <location filename="../src/main.cpp" line="144"/>
+        <location filename="../src/main.cpp" line="153"/>
+        <location filename="../src/mainwindow.cpp" line="93"/>
+        <location filename="../src/mainwindow.cpp" line="111"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="121"/>
-        <location filename="../src/main.cpp" line="140"/>
+        <location filename="../src/main.cpp" line="125"/>
+        <location filename="../src/main.cpp" line="144"/>
         <source>Cannot create folder: %1
 Details: %2</source>
         <translation>Невозможно создать папку: %1
 Детали: %2</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="125"/>
+        <location filename="../src/main.cpp" line="129"/>
         <source>The settings Class cannot be initialized.</source>
         <translation>Класс настроек не может быть инициализирован.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="135"/>
+        <location filename="../src/main.cpp" line="139"/>
         <source>Unable to get database file name.
 The database file will be created on the default path.</source>
         <translation>Невозможно получить имя файла базы данных.
@@ -808,7 +824,7 @@ The database file will be created on the default path.</source>
   Файл базы данных будет создан по пути по умолчанию.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="149"/>
+        <location filename="../src/main.cpp" line="153"/>
         <source>Cannot open database: %1
 Details: %2</source>
         <translation>Невозможно открыть базу данных: %1
@@ -831,34 +847,35 @@ Details: %2</source>
         <translation type="vanished">Критическая ошибка: %1</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CAuditTrailParser.h" line="54"/>
-        <location filename="../../Common/Core/CAuditTrailReport.h" line="31"/>
+        <location filename="../../Common/Core/CAuditTrailParser.h" line="58"/>
+        <location filename="../../Common/Core/CAuditTrailReport.h" line="35"/>
         <source>Audit Trail Log</source>
         <translation>Журнал контроля</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CEventLogParser.h" line="53"/>
-        <location filename="../../Common/Core/CEventLogReport.h" line="31"/>
+        <location filename="../../Common/Core/CEventLogParser.h" line="57"/>
+        <location filename="../../Common/Core/CEventLogReport.h" line="35"/>
         <source>Event Log</source>
         <translation>Журнал событий</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSummaryReport.h" line="31"/>
+        <location filename="../../Common/Core/CSummaryReport.h" line="35"/>
         <source>(Experimental) Summary report</source>
         <translation>(Экспериментальный) Сводный отчет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="88"/>
+        <location filename="../src/mainwindow.cpp" line="92"/>
         <source>Unable to open advanced report filtering settings window.</source>
         <translation>Невозможно открыть окно дополнительных настроек фильтрации отчетов.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="106"/>
+        <location filename="../src/mainwindow.cpp" line="110"/>
         <source>Unable to open the advanced file reading settings window.</source>
         <translation>Невозможно открыть окно дополнительных настроек чтения файлов.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSystemLogParser.h" line="51"/>
+        <location filename="../../Common/Core/CSystemLogParser.h" line="55"/>
+        <location filename="../../Common/Core/CSystemLogReport.h" line="35"/>
         <source>System Log</source>
         <translation>Журнал системы</translation>
     </message>
