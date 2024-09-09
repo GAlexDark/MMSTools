@@ -1,3 +1,22 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  p7b file maker Console Utility
+*  Common module
+*
+*  Module name: CPkcs7.h
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The Class for working with the p7b files
+*     This class use the BioByteArray Class from the XCA Project
+*     ToDo: X509 will be placed in an individual class
+*
+****************************************************************************/
+
 #ifndef CPKCS7_H
 #define CPKCS7_H
 
