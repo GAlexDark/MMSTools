@@ -20,7 +20,7 @@ private:
     CSingleApplication(const CSingleApplication&) = delete;
     CSingleApplication& operator=(CSingleApplication&) = delete;
 
-    QString              m_id;
+    QString m_id;
     QScopedPointer<QSystemSemaphore> m_semaphore;
     QScopedPointer<QSharedMemory> m_sharedMemory;
 };
