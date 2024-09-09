@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  p7b file maker Console Utility
+*  p7b file maker Console Utility
+*
+*  Module name: main.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     Main file
+*
+****************************************************************************/
+
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QDate>

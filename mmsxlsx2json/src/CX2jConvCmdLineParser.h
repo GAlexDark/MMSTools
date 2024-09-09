@@ -41,6 +41,7 @@ private:
     bool m_isOutput = false;
     bool m_isMode = false;
     QDir m_path;
+    QString m_baseName;
 };
 
 #endif // CX2JCONVCMDLINEPARSER_H

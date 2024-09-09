@@ -1,3 +1,20 @@
+/****************************************************************************
+*
+*  Copyright (c) Oleksii Gaienko, 2024
+*  Contact: galexsoftware@gmail.com
+*
+*  p7b file maker Console Utility
+*  p7b file maker Console Utility
+*
+*  Module name: CP7bMakerCmdLineParser.cpp
+*  Author(s): Oleksii Gaienko
+*  Reviewer(s):
+*
+*  Abstract:
+*     The console utility input arguments parsing Class.
+*
+****************************************************************************/
+
 #include "CP7bMakerCmdLineParser.h"
 
 #include <QFileInfo>

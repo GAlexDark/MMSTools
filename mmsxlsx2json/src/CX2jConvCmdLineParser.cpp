@@ -70,6 +70,7 @@ CX2jConvCmdLineParser::getDataFile(QString &fileName)
             if (QString::compare(fi.suffix(), QLatin1String("xlsx"), Qt::CaseInsensitive) == 0) {
                 fileName = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
                 m_path = fi.absoluteDir();
+                m_baseName = fi.baseName();
             } else {
                 setErrorString(QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName()));
                 retVal = false;
@@ -86,14 +87,7 @@ CX2jConvCmdLineParser::getDataFile(QString &fileName)
 QString
 CX2jConvCmdLineParser::getReportName() const
 {
-    QString retVal;
-    if (m_isOutput) {
-        retVal = m_parser.value("output");
-    } else {
-        QDateTime now = QDateTime::currentDateTime();
-        retVal = QLatin1String("%1.json").arg(now.toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
-    }
-
+    QString retVal = m_isOutput ? m_parser.value("output") : QLatin1String("%1.json").arg(m_baseName);
     if (!retVal.endsWith(QLatin1String(".json"), Qt::CaseInsensitive)) {
         retVal = retVal + QLatin1String(".json");
     }
