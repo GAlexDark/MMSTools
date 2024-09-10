@@ -60,6 +60,9 @@ CP7bMakerCmdLineParser::getP7bFileName(QStringList &p7bFileName)
     bool retVal = true;
     if (m_isStore) {
         m_searchFolder = m_parser.value("localstore");
+        if (!m_searchFolder.endsWith('/') && !m_searchFolder.endsWith('\\')) {
+            m_searchFolder += "/";
+        }
         QFileInfo sf(m_searchFolder);
         QDir dir = sf.absoluteDir();
         if (dir.exists()) {
