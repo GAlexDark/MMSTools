@@ -39,7 +39,7 @@ void BioByteArray::biowrite(const QByteArray &qba)
 	BIO_write(read_write, qba.data(), qba.size());
 }
 
-void BioByteArray::cleanse_and_free(BIO *bio)
+void BioByteArray::cleanse_and_free(BIO *bio) const
 {
 	if (!bio)
 		return;

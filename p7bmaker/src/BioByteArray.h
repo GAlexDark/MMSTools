@@ -22,7 +22,7 @@ class BioByteArray
 	void set(const QByteArray &qba);
 	void add(const QByteArray &qba);
 	void biowrite(const QByteArray &qba);
-	void cleanse_and_free(BIO *bio);
+    void cleanse_and_free(BIO *bio) const;
 
   public:
     explicit BioByteArray(const QByteArray &qba) : store(qba) { }
