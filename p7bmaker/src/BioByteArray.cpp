@@ -72,9 +72,11 @@ BIO *BioByteArray::bio()
 
 BIO *BioByteArray::ro()
 {
-	if (!read_only)
+    if (!read_only) {
+        const void* data = store.constData();
 		read_only = BIO_new_mem_buf(
-			(void*)store.constData(), store.length());
+            data, store.length());
+    }
 	Q_CHECK_PTR(read_only);
 	return read_only;
 }
