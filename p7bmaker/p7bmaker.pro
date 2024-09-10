@@ -30,11 +30,11 @@ HOST_DEPENDENT_PATH = D:/QtSDK/Tools/OpenSSLv3
   message(MinGW)
   CONFIG(debug, debug|release) {
     message(config_debug)
-    LIBS += -L$${HOST_DEPENDENT_PATH}/MinGW/dll/debug/lib64 -llibssl -llibcrypto
+    LIBS += -L$${HOST_DEPENDENT_PATH}/MinGW/lib/debug/lib64 -llibssl -llibcrypto
   }
   CONFIG(release, debug|release) {
     message(config_release)
-    LIBS += -L$${HOST_DEPENDENT_PATH}/MinGW/dll/release/lib64 -llibssl -llibcrypto
+    LIBS += -L$${HOST_DEPENDENT_PATH}/MinGW/lib/release/lib64 -llibssl -llibcrypto
   }
   INCLUDEPATH += $${HOST_DEPENDENT_PATH}/MinGW/lib/src/include
   LIBS += -lws2_32 -lGDI32 -lADVAPI32 -lCRYPT32 -lUSER32
