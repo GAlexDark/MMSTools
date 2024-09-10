@@ -27,7 +27,7 @@ class BioByteArray
   public:
     explicit BioByteArray(const QByteArray &qba) : store(qba) { }
     explicit BioByteArray(const BioByteArray &bba) : store(bba.byteArray()) { }
-	BioByteArray() { }
+    BioByteArray() = default;
 	~BioByteArray();
 	int size() const;
 	BIO *bio();
