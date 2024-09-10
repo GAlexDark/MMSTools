@@ -35,7 +35,7 @@ class BioByteArray
 	QByteArray byteArray() const;
 	QString qstring() const;
 	operator BIO*();
-	operator QByteArray();
+    operator QByteArray() const;
 	BioByteArray &operator = (const BioByteArray &other);
 	BioByteArray &operator = (const QByteArray &qba);
 	BioByteArray &operator += (const BioByteArray &other);

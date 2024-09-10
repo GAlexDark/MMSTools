@@ -110,7 +110,7 @@ BioByteArray::operator BIO*()
 	return bio();
 }
 
-BioByteArray::operator QByteArray()
+BioByteArray::operator QByteArray() const
 {
 	return byteArray();
 }
