@@ -223,7 +223,6 @@ convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputM
                     }
                 } else {
                     msgString = QLatin1String("Nothing to save.");
-                    retVal = true;
                 }
             }
         } else {

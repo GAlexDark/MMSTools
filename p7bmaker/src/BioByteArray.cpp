@@ -39,7 +39,7 @@ void BioByteArray::biowrite(const QByteArray &qba)
 	BIO_write(read_write, qba.data(), qba.size());
 }
 
-void BioByteArray::cleanse_and_free(BIO *bio)
+void BioByteArray::cleanse_and_free(BIO *bio) const
 {
 	if (!bio)
 		return;
@@ -72,9 +72,11 @@ BIO *BioByteArray::bio()
 
 BIO *BioByteArray::ro()
 {
-	if (!read_only)
+    if (!read_only) {
+        const void* data = store.constData();
 		read_only = BIO_new_mem_buf(
-			(void*)store.constData(), store.length());
+            data, store.length());
+    }
 	Q_CHECK_PTR(read_only);
 	return read_only;
 }
@@ -108,7 +110,7 @@ BioByteArray::operator BIO*()
 	return bio();
 }
 
-BioByteArray::operator QByteArray()
+BioByteArray::operator QByteArray() const
 {
 	return byteArray();
 }
