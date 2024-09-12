@@ -39,11 +39,11 @@ void
 CParserManager::init()
 {
     qRegisterMetaType<pEventLogParser>("CEventLogParser");
-    m_classList.append(QLatin1String("CEventLogParser")); // ID=1
+    addClassListItem(QLatin1String("CEventLogParser")); // ID=1
     qRegisterMetaType<pAuditTrailParser>("CAuditTrailParser");
-    m_classList.append(QLatin1String("CAuditTrailParser")); // ID=2
+    addClassListItem(QLatin1String("CAuditTrailParser")); // ID=2
     qRegisterMetaType<pSystemLogParser>("CSystemLogParser");
-    m_classList.append(QLatin1String("CSystemLogParser")); // ID=3
+    addClassListItem(QLatin1String("CSystemLogParser")); // ID=3
 
     struct parserData_t
     {
@@ -55,7 +55,8 @@ CParserManager::init()
     QMap<quint16, parserData_t> parserNameMap;
     pBasicParser ptr = nullptr;
     QMetaType type;
-    for (const QString &name : m_classList) {
+    QStringList classList = getClassList();
+    for (const QString &name : classList) {
         type = QMetaType::fromName(name.toUtf8());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicParser>(type.metaObject()->newInstance());

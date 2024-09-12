@@ -72,7 +72,10 @@ public:
     }
 
 protected:
-    QStringList m_classList;
+    void addClassListItem(const QString &value)
+    {
+        m_classList.append(value);
+    }
     QVector<quint16> m_ids;
 
 private:
@@ -86,6 +89,7 @@ private:
 
     QMetaType m_type;
     T m_instancePtr = nullptr;
+    QStringList m_classList;
 };
 
 #endif // CBASICMANAGER_H

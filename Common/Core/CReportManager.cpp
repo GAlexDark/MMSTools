@@ -39,18 +39,19 @@ void
 CReportManager::init()
 {
     qRegisterMetaType<pEventLogReport>("CEventLogReport");
-    m_classList.append(QLatin1String("CEventLogReport")); // ID=1
+    addClassListItem(QLatin1String("CEventLogReport")); // ID=1
     qRegisterMetaType<pAuditTrailReport>("CAuditTrailReport");
-    m_classList.append(QLatin1String("CAuditTrailReport")); // ID=2
+    addClassListItem(QLatin1String("CAuditTrailReport")); // ID=2
     qRegisterMetaType<pSummaryReport>("CSummaryReport");
-    m_classList.append(QLatin1String("CSummaryReport")); // ID=1000
+    addClassListItem(QLatin1String("CSummaryReport")); // ID=1000
     qRegisterMetaType<pSystemLogReport>("CSystemLogReport");
-    m_classList.append(QLatin1String("CSystemLogReport")); // ID=3
+    addClassListItem(QLatin1String("CSystemLogReport")); // ID=3
 
     QMap<quint16, QString> reportNameMap;
     pBasicReport ptr = nullptr;
     QMetaType type;
-    for (const QString &name : m_classList) {
+    QStringList classList = getClassList();
+    for (const QString &name : classList) {
         type = QMetaType::fromName(name.toUtf8());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicReport>(type.metaObject()->newInstance());
