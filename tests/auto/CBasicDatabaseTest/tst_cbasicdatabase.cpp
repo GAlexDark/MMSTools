@@ -17,7 +17,7 @@ class CBasicDatabaseTest : public QObject
     Q_OBJECT
 
 public:
-    explicit CBasicDatabaseTest(QObject *parent = nullptr);
+    using QObject::QObject;
     ~CBasicDatabaseTest();
 
 private:
@@ -50,11 +50,6 @@ void CBasicDatabaseTest::initTestCase()
     retVal = m_fakeDB.init(SRCDIR"data/fakedb.db");
     QVERIFY(retVal);
 }
-
-
-CBasicDatabaseTest::CBasicDatabaseTest(QObject *parent)
-    : QObject{parent}
-{}
 
 CBasicDatabaseTest::~CBasicDatabaseTest()
 {

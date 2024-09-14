@@ -10,16 +10,12 @@ class CSingleApplicationTest : public QObject
     Q_OBJECT
 
 public:
-    explicit CSingleApplicationTest(QObject *parent = nullptr);
+    using QObject::QObject;
 
 private slots:
     void test_checkSecondStart() const;
     void test_applicationPid() const;
 };
-
-CSingleApplicationTest::CSingleApplicationTest(QObject *parent)
-    : QObject{parent}
-{}
 
 void CSingleApplicationTest::test_checkSecondStart() const
 {
