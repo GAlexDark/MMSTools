@@ -36,6 +36,7 @@ public:
     bool getDataFile(QString &fileName);
     QString getReportName() const;
     OutputMode getOutputMode() const;
+    bool isSilent() const { return m_isSilent; };
 
 private:
     bool addOption(const QCoreApplication &app) override;
@@ -44,6 +45,7 @@ private:
     bool m_isImport = false;
     bool m_isOutput = false;
     bool m_isMode = false;
+    bool m_isSilent = false;
     QDir m_path;
     QString m_baseName;
 };

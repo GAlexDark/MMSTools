@@ -25,6 +25,7 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QLocale>
+#include <QStringList>
 
 #include "CConsoleOutput.h"
 #include "elcUtils.h"
@@ -240,10 +241,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
 
     CConsoleOutput consoleOut;
-    QString description(QStringLiteral("MMS XLSX to JSON Conversion Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-    description.append(QStringLiteral("This program use Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
-    consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
-
     CX2jConvCmdLineParser cmd;
     if (!cmd.parseCmdArgs(a)) {
         consoleOut.outToConsole(cmd.errorString());
@@ -255,7 +252,12 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    consoleOut.outToConsole(QLatin1String("MMS XLSX to JSON Conversion Utility starting...\n"));
+    if (!cmd.isSilent()) {
+        QString description(QStringLiteral("MMS XLSX to JSON Conversion Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
+        description.append(QStringLiteral("This program use Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
+        consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
+        consoleOut.outToConsole(QLatin1String("MMS XLSX to JSON Conversion Utility starting...\n"));
+    }
 
     QString fileName;
     if (!cmd.getDataFile(fileName)) {

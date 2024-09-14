@@ -39,32 +39,33 @@ void
 CReportManager::init()
 {
     qRegisterMetaType<pEventLogReport>("CEventLogReport");
-    m_classList.append(QLatin1String("CEventLogReport")); // ID=1
+    addClassListItem(QLatin1String("CEventLogReport")); // ID=1
     qRegisterMetaType<pAuditTrailReport>("CAuditTrailReport");
-    m_classList.append(QLatin1String("CAuditTrailReport")); // ID=2
+    addClassListItem(QLatin1String("CAuditTrailReport")); // ID=2
     qRegisterMetaType<pSummaryReport>("CSummaryReport");
-    m_classList.append(QLatin1String("CSummaryReport")); // ID=1000
+    addClassListItem(QLatin1String("CSummaryReport")); // ID=1000
     qRegisterMetaType<pSystemLogReport>("CSystemLogReport");
-    m_classList.append(QLatin1String("CSystemLogReport")); // ID=3
+    addClassListItem(QLatin1String("CSystemLogReport")); // ID=3
 
     QMap<quint16, QString> reportNameMap;
     pBasicReport ptr = nullptr;
     QMetaType type;
-    for (const QString &name : m_classList) {
+    QStringList classList = getClassList();
+    for (const QString &name : classList) {
         type = QMetaType::fromName(name.toUtf8());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicReport>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
             quint16 id = ptr->reportID();
-            m_ids.append(id);
+            addId(id);
             reportNameMap[id] = ptr->visibleReportName();
 
             type.destroy(ptr);
             ptr = nullptr;
         }
     }
-    std::sort(m_ids.begin(), m_ids.end());
-    for (const quint16 i: m_ids) {
+    sortIds();
+    for (const quint16 i: getIds()) {
         m_visibleReportsNames.append(reportNameMap[i]);
     }
 }
