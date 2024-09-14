@@ -29,7 +29,7 @@ class UtilsTest : public QObject
     Q_OBJECT
 
 public:
-    explicit UtilsTest(QObject *parent = nullptr);
+    using QObject::QObject;
 
 private:
     QString m_basePath = SRCDIR"data";
@@ -49,10 +49,6 @@ private slots:
     void test_sanitizeValue();
     void test_getMetaClassInfo();
 };
-
-UtilsTest::UtilsTest(QObject *parent)
-    : QObject{parent}
-{}
 
 void
 UtilsTest::test_parseValuesList1()

@@ -13,7 +13,7 @@ class CElcConsoleAppSettingsTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit CElcConsoleAppSettingsTest(QObject *parent = nullptr);
+    using QObject::QObject;
 
 private slots:
     void initTestCase();
@@ -22,10 +22,6 @@ private slots:
     void test_fileExists();
     void test_getDBName();
 };
-
-CElcConsoleAppSettingsTest::CElcConsoleAppSettingsTest(QObject *parent)
-    : QObject{parent}
-{}
 
 void
 removeIniFile()

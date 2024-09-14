@@ -10,7 +10,7 @@ class CAuditTrailParserTest : public QObject
     Q_OBJECT
 
 public:
-    explicit CAuditTrailParserTest(QObject *parent = nullptr);
+    using QObject::QObject;
 
 private:
     CAuditTrailParser m_parser;
@@ -36,10 +36,6 @@ private slots:
     void test_doFileUpload();
     void test_listTransactions();
 };
-
-CAuditTrailParserTest::CAuditTrailParserTest(QObject *parent)
-    : QObject{parent}
-{}
 
 void
 CAuditTrailParserTest::initTestCase()

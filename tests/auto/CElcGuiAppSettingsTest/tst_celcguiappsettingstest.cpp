@@ -13,7 +13,7 @@ class CElcGuiAppSettingsTest : public QObject
     Q_OBJECT
 
 public:
-    explicit CElcGuiAppSettingsTest(QObject *parent = nullptr);
+    using QObject::QObject;
 
 private slots:
     void initTestCase();
@@ -23,10 +23,6 @@ private slots:
     void test_getDBName();
     void test_checkLastDir();
 };
-
-CElcGuiAppSettingsTest::CElcGuiAppSettingsTest(QObject *parent)
-    : QObject{parent}
-{}
 
 void
 removeIniFile()

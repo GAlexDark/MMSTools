@@ -12,7 +12,7 @@ class CEventLogParserTest : public QObject
     Q_OBJECT
 
 public:
-    explicit CEventLogParserTest(QObject *parent = nullptr);
+    using QObject::QObject;
 
 private:
     CEventLogParser m_parser;
@@ -42,10 +42,6 @@ private slots:
     void test_otherData3_exception();
     void test_DateTimeFormats();
 };
-
-CEventLogParserTest::CEventLogParserTest(QObject *parent)
-    : QObject{parent}
-{}
 
 void CEventLogParserTest::initTestCase()
 {
