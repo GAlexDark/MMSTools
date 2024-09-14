@@ -31,12 +31,9 @@ template <class T>
 class CBasicManager
 {
 public:
-    CBasicManager()
-    {
-        m_classList.clear();
-        m_ids.clear();
-    }
-
+    CBasicManager() = default;
+    CBasicManager(CBasicManager const&) = delete;
+    CBasicManager& operator=(CBasicManager const&) = delete;
     ~CBasicManager()
     {
         destroyInstance();
@@ -76,7 +73,18 @@ protected:
     {
         m_classList.append(value);
     }
-    QVector<quint16> m_ids;
+    void addId(quint16 value)
+    {
+        m_ids.append(value);
+    }
+    void sortIds()
+    {
+        std::sort(m_ids.begin(), m_ids.end());
+    }
+    const QVector<quint16>& getIds() const
+    {
+        return m_ids;
+    }
 
 private:
     void destroyInstance()
@@ -90,6 +98,7 @@ private:
     QMetaType m_type;
     T m_instancePtr = nullptr;
     QStringList m_classList;
+    QVector<quint16> m_ids;
 };
 
 #endif // CBASICMANAGER_H

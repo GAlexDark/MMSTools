@@ -57,15 +57,15 @@ CReportManager::init()
             ptr = dynamic_cast<pBasicReport>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
             quint16 id = ptr->reportID();
-            m_ids.append(id);
+            addId(id);
             reportNameMap[id] = ptr->visibleReportName();
 
             type.destroy(ptr);
             ptr = nullptr;
         }
     }
-    std::sort(m_ids.begin(), m_ids.end());
-    for (const quint16 i: m_ids) {
+    sortIds();
+    for (const quint16 i: getIds()) {
         m_visibleReportsNames.append(reportNameMap[i]);
     }
 }
