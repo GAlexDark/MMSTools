@@ -33,15 +33,18 @@ class CConsoleOutput : public QObject
 {
     Q_OBJECT
 public:
+#ifndef Q_OS_WIN32
+    using QObject::QObject;
+#else
     explicit CConsoleOutput(QObject *parent = nullptr)
         : QObject{parent}
     {
-#ifdef Q_OS_WIN32
         // ref: https://github.com/tsnsoft/CppConsoleUnicode
         SetConsoleCP(65001);
         SetConsoleOutputCP(65001);
-#endif
     }
+#endif
+
     void
     outToConsole(const QString &msg) const
     {
@@ -51,6 +54,7 @@ public:
             cout.flush();
         }
     }
+
 public slots:
     void printToConsole(const QString &msg) const
     {
