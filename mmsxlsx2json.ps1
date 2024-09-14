@@ -66,7 +66,7 @@ Param (
 try {
     $isWorkDirExists = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
 } catch {
-    Write-Warning $err
+    Write-Error $err
     exit 1
 }
 if (!$isWorkDirExists) {
@@ -83,7 +83,7 @@ Write-Host "This script used the function Start-ProcessWithOutput() by Tomas Mad
 " -ForegroundColor Yellow
 
 function Start-ProcessWithOutput {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param (
         [Parameter(Mandatory = $true)]
         [string] $FilePath,
@@ -93,8 +93,13 @@ function Start-ProcessWithOutput {
 
     begin {
         $tmp = [System.IO.Path]::GetTempFileName()
-        $readJob = Start-Job -ScriptBlock { param( $Path ) Get-Content -Path $Path -Wait -Encoding UTF8 } -ArgumentList $tmp
-        $process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentsList -RedirectStandardOutput $tmp -Wait -NoNewWindow -PassThru
+        try {
+            $readJob = Start-Job -ScriptBlock { param( $Path ) Get-Content -Path $Path -Wait -Encoding UTF8 } -ArgumentList $tmp  -ErrorAction Stop -ErrorVariable err
+            $process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentsList -RedirectStandardOutput $tmp -Wait -NoNewWindow -PassThru -ErrorAction Stop -ErrorVariable err
+        } catch {
+            Write-Error $err
+            exit 1
+        }
     }
 
     process {
@@ -110,18 +115,18 @@ function Start-ProcessWithOutput {
 }
 
 $pathToExecute = $PSScriptRoot + "\mmsxlsx2json.exe"
-Write-Host "Starting $pathToExecute..."
+Write-Output "Starting $pathToExecute..."
 
 try {
     $foundItems = Get-ChildItem -Path $Workdir -Filter *.xlsx -ErrorAction Stop -ErrorVariable err
 } catch {
-    Write-Warning $err
+    Write-Error $err
     exit 1
 }
 
 foreach ($item in $foundItems) {
     $fileName = '"' + $item.FullName + '"'
-    Write-Host "Target file: $fileName"
+    Write-Output "Target file: $fileName"
     Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-i $fileName -m compact --silent"
 }
 
