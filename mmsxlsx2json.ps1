@@ -80,11 +80,9 @@ if (!$isWorkDirExists) {
 Write-Host "MMS XLSX to JSON Conversion PoSH Script Version 1.0 `
 Copyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info `
 This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3. `
-
 " -ForegroundColor green
 
 Write-Host "This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721 `
-
 " -ForegroundColor Yellow
 
 function Start-ProcessWithOutput {
