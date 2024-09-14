@@ -30,6 +30,7 @@ CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
     const QString importDescription(QLatin1String("The path to the XLSX file for conversion to the JSON. Usage:\n-i file or\n--input file"));
     const QString outputDescription(QLatin1String("The path to the directory and name of the JSON output file. Usege:\n-o file or\n--output file"));
     const QString modeDescription(QLatin1String("This value defines the format of the JSON byte array produced when converting:\nindented - defines a human-readable output,\ncompact - defines a compact output.\nUsage:\n-m indented or\n-m compact"));
+    const QString silentDescription(QLatin1String("Silent mode"));
 
     QCommandLineOption importOption(QStringList() << "i" << "input", importDescription, "file");
     bool retVal = m_parser.addOption(importOption);
@@ -40,10 +41,15 @@ CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
             QCommandLineOption modeOption(QStringList() << "m" << "mode", modeDescription, "mode");
             retVal = m_parser.addOption(modeOption);
             if (retVal) {
-                m_parser.process(app);
-                m_isImport = m_parser.isSet(importOption);
-                m_isOutput = m_parser.isSet(outputOption);
-                m_isMode = m_parser.isSet(modeOption);
+                QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
+                retVal = m_parser.addOption(silentOption);
+                if (retVal) {
+                    m_parser.process(app);
+                    m_isImport = m_parser.isSet(importOption);
+                    m_isOutput = m_parser.isSet(outputOption);
+                    m_isMode = m_parser.isSet(modeOption);
+                    m_isSilent = m_parser.isSet(silentOption);
+                }
             }
         }
     }
