@@ -62,7 +62,7 @@ CParserManager::init()
             ptr = dynamic_cast<pBasicParser>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
             quint16 id = ptr->parserID();
-            addId(id); //m_ids.append(id);
+            addId(id);
 
             parserNameMap[id].visibleLogName = ptr->visibleLogName();
             parserNameMap[id].tableName = ptr->tableName();
