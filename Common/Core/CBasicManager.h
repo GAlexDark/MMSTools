@@ -32,8 +32,6 @@ class CBasicManager
 {
 public:
     CBasicManager() = default;
-    CBasicManager(CBasicManager const&) = delete;
-    CBasicManager& operator=(CBasicManager const&) = delete;
     ~CBasicManager()
     {
         destroyInstance();
@@ -87,6 +85,9 @@ protected:
     }
 
 private:
+    CBasicManager(CBasicManager const&) = delete;
+    CBasicManager& operator=(CBasicManager const&) = delete;
+
     void destroyInstance()
     {
         if (m_type.isValid() && (m_instancePtr != nullptr)) {
