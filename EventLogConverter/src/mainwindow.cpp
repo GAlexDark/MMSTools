@@ -371,7 +371,8 @@ MainWindow::generateReportClick()
     setStateText(tr("Start generating the report"));
     QCoreApplication::processEvents();
 
-    QStringList includedUsers, excludedUsers;
+    QStringList includedUsers;
+    QStringList excludedUsers;
     const CReportManager &reportManager = CReportManager::instance();
     QStringList reportsList = reportManager.getVisibleReportsNames();
     if (showReportOptionsDialog(reportsList, m_logId, includedUsers, excludedUsers)) {

@@ -33,7 +33,14 @@ public:
 #ifdef Q_OS_WIN
     qsizetype getDefaultMonitor() const;
 #endif
+
 private:
+    CElcGuiAppSettings() = default;
+    ~CElcGuiAppSettings() = default;
+
+    CElcGuiAppSettings(CElcGuiAppSettings const&) = delete;
+    CElcGuiAppSettings& operator= (CElcGuiAppSettings const&) = delete;
+
     void createDefault(const QString& iniPath) override;
 };
 
