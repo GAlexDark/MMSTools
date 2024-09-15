@@ -22,10 +22,9 @@
 
 #include "CElcConsoleAppSettings.h"
 
-static CElcConsoleAppSettings g_elcConsoleSettings;
-
 CElcConsoleAppSettings& CElcConsoleAppSettings::instance()
 {
+    static CElcConsoleAppSettings g_elcConsoleSettings;
     return g_elcConsoleSettings;
 }
 

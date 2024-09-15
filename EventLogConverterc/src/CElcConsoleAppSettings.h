@@ -32,6 +32,12 @@ public:
     bool isDataHasHeaders() const;
 
 private:
+    CElcConsoleAppSettings() = default;
+    ~CElcConsoleAppSettings() = default;
+
+    CElcConsoleAppSettings(CElcConsoleAppSettings const&) = delete;
+    CElcConsoleAppSettings& operator= (CElcConsoleAppSettings const&) = delete;
+
     void createDefault(const QString& iniPath) override;
 };
 
