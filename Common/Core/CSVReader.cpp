@@ -94,18 +94,6 @@ CTextFileReader::readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &pr
     return retVal;
 }
 bool CTextFileReader::readSmallFile() {
-    // "284 590 milliseconds" 4,74316667 minutes
-    // "317 529 milliseconds" 5,29215 minutes
-    // "292 992 milliseconds" 4,8832 minutes
-    // "132 515 milliseconds" 2,20858333 minutes
-    // "139 280 milliseconds" 2,32133333 minutes
-    // "139 681 milliseconds" 2,32801667 minutes
-    // "141 998 milliseconds" 2.3666 minutes
-    // "143 329 milliseconds"
-    // "132 359 milliseconds"
-    // "134 293 milliseconds" 2.2382 minutes
-    // "120 903 milliseconds" 2,01505 minutes
-
     /*
    * If you know that pos and len cannot be out of bounds,
    * use sliced() instead in new code, because it is faster.
@@ -158,14 +146,6 @@ bool CTextFileReader::readSmallFile() {
 bool
 CTextFileReader::readLargeFile()
 {
-    // "288 154 milliseconds" 4.8026 minutes
-    // "137 051 milliseconds" 2.2842 minutes
-    // "133 530 milliseconds" 2.2255 minutes
-    // "137 403 milliseconds"
-    // "126 503 milliseconds" 2.1084 minutes
-    // "129 879 milliseconds"
-    // "123 998 milliseconds"
-    // "114 631 milliseconds" 1,91051667 minutes
     qint64 bufferOffset = 0;
     bool retVal = true;
     m_file.seek(bufferOffset);
