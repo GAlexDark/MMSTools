@@ -42,6 +42,12 @@ public:
     const QStringList& getCreateTableRequestList() const { return m_createTableRequestList; }
 
 private:
+    CParserManager() = default;
+    ~CParserManager() = default;
+
+    CParserManager(CParserManager const&) = delete;
+    CParserManager& operator= (CParserManager const&) = delete;
+
     QStringList     m_visibleLogsNames;
     QStringList     m_tablesList;
     QStringList     m_createTableRequestList;

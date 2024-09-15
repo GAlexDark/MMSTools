@@ -39,6 +39,12 @@ public:
     const QStringList& getVisibleReportsNames() const { return m_visibleReportsNames; }
 
 private:
+    CReportManager() = default;
+    ~CReportManager() = default;
+
+    CReportManager(CReportManager const&) = delete;
+    CReportManager& operator= (CReportManager const&) = delete;
+
     QStringList m_visibleReportsNames;
 };
 

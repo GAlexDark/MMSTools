@@ -28,10 +28,9 @@
 #include "CSummaryReport.h"
 #include "CSystemLogReport.h"
 
-static CReportManager g_reportManager;
-
 CReportManager& CReportManager::instance()
 {
+    static CReportManager g_reportManager;
     return g_reportManager;
 }
 
