@@ -15,7 +15,7 @@ void BioByteArray::set(const QByteArray &qba)
 		qWarning() << "BioByteArray already in use";
 		while (BIO_read(read_write, buf, sizeof buf) > 0)
 			;
-		memset(buf, 0, sizeof buf);
+        OPENSSL_cleanse(&buf, sizeof(buf));
 	}
 	store.fill(0);
 	store.clear();
