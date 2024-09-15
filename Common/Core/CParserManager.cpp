@@ -28,10 +28,9 @@
 #include "CAuditTrailParser.h"
 #include "CSystemLogParser.h"
 
-static CParserManager g_parserManager;
-
 CParserManager& CParserManager::instance()
 {
+    static CParserManager g_parserManager;
     return g_parserManager;
 }
 
