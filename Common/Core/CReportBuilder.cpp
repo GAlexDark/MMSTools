@@ -24,6 +24,23 @@
 #include "elcUtils.h"
 #include "CReportManager.h"
 
+bool
+CReportBuilder::configureDb(const QString &dbFileName)
+{
+    bool retVal = true;
+    int blockSize = elcUtils::getStorageBlockSize(dbFileName);
+    QStringList pragmaItems;
+    pragmaItems.append(pragmaUTF8);
+    pragmaItems.append(pragmaPageSize.arg(blockSize));
+    for (const QString &item : pragmaItems) {
+        retVal = m_db.exec(item);
+        if (!retVal) {
+            break;
+        }
+    }
+    return retVal;
+}
+
 CReportBuilder::CReportBuilder()
 {
     m_errorString.clear();
@@ -56,16 +73,7 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
         if (retVal) {
             retVal = m_db.open();
             if (retVal) {
-                int blockSize = elcUtils::getStorageBlockSize(dbFileName);
-                QStringList pragmaItems;
-                pragmaItems.append(pragmaUTF8);
-                pragmaItems.append(pragmaPageSize.arg(blockSize));
-                for (const QString &item : pragmaItems) {
-                    retVal = m_db.exec(item);
-                    if (!retVal) {
-                        break;
-                    }
-                }
+                retVal = configureDb(dbFileName);
             }
         }
         if (retVal) {
