@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
-    QString appName(QCoreApplication::applicationName());
-    QString appPath(a.applicationDirPath());
+    QString appName = QCoreApplication::applicationName();
+    QString appPath = QCoreApplication::applicationDirPath();
 
     CConsoleOutput consoleOut;
     QString description(QStringLiteral("MMS Event Log Conversion Utility Version %1\nCopyright (C) 2023 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));

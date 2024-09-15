@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
     QString appName = QCoreApplication::applicationName();
 #ifdef Q_OS_WIN
-    QString appPath = a.applicationDirPath();
+    QString appPath = QApplication::applicationDirPath();
 #else
     QString appPath = QLatin1String("$HOME/.config/%1").arg(appName);
 #endif
