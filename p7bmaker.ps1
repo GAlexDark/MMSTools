@@ -77,13 +77,17 @@
 
 [CmdletBinding()]
 Param (
-    [Parameter (Mandatory=$true, Position=0, ParameterSetName="Dir",
+    [Parameter (Mandatory=$true, Position=0,
     HelpMessage="Enter the path to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.")]
-    [string] $Workdir
+    [string] $Workdir,
+
+    [Parameter (Position=1,
+    HelpMessage="Enter the actual Download Url.")]
+    [string] $Url
 )
 
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
-Write-Host "Attension! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!`n" -ForegroundColor Cyan
+Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
 # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
@@ -269,7 +273,6 @@ function Start-ProcessWithOutput {
      }
 }
 
-
 #Removing exists p7b and sha files
 if ($Workdir.EndsWith('\')) {
     $mask1 = $Workdir + "*.p7b"
@@ -288,6 +291,10 @@ if (-not $retVal) {
 }
 
 # Check domain name and site availability
+if (-not [string]::IsNullOrEmpty($Url)) {
+    $download_url = $Url.Trim()
+    Write-Host "The value of the 'download_url' was changed with the value from the Url argument..`n" -ForegroundColor Yellow
+}
 $domain = Get-DomainFromUrl $download_url
 $retVal = Test-CheckDnsName $domain
 if (-not $retVal) {

@@ -58,7 +58,7 @@
 
 [CmdletBinding()]
 Param (
-    [Parameter (Mandatory=$true, Position=0, ParameterSetName="Dir",
+    [Parameter (Mandatory=$true, Position=0,
     HelpMessage="Enter path to the folder, contains *.xlsx files.")]
     [string] $Workdir
 )
