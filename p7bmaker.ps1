@@ -29,6 +29,9 @@
 .PARAMETER Workdir
  Specifies the path to to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.
 
+.PARAMETER Url
+ Specifies the download URL.
+
 .INPUTS
  None. You can't pipe objects to p7bmaker.ps1.
 
@@ -71,19 +74,61 @@
  DONE
  DONE
 
+.EXAMPLE
+ PS> .\p7bmaker.ps1 -Workdir B:\certdata -Url "https://iit.com.ua/download/productfiles/CACertificates.p7b"
+ p7b file maker PoSH Script Version 1.0
+ Copyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info
+ This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
+
+ Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
+
+ The value of the 'download_url' was changed with the value from the Url argument...
+
+ OK - The domain name iit.com.ua was resolved to the IP address: 172.67.69.107,104.26.0.134,104.26.1.134  [hidden as minor]
+ OK - Site is available
+ OK - The file was successfully saved in B:\certdata\
+
+ Starting B:\MMSTools\p7bmaker.exe...
+
+ Start reading p7b file 'B:/certdata/CACertificates.p7b'.
+ The p7b file 'B:/certdata/CACertificates.p7b' was read successful.
+
+ The number of certificates in the container before adding: 628.
+
+ The 3 certificates found.
+ Start adding certificates.
+ The certificates were added successful.
+
+ The number of certificates in the container after adding: 631.
+
+ File 'B:/certdata/CACertificates20240917.p7b' saved successfully.
+
+ Calculating result p7b file hash:
+ SHA-1 hash: 3d70fbefe0c4a30fa75926301349cf0ecbd362db.
+
+ Creating hash File.
+ The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
+
+ DONE
+ DONE
+
 #>
 
 #requires -version 5
 
 [CmdletBinding()]
 Param (
-    [Parameter (Mandatory=$true, Position=0, ParameterSetName="Dir",
+    [Parameter (Mandatory=$true, Position=0,
     HelpMessage="Enter the path to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.")]
-    [string] $Workdir
+    [string] $Workdir,
+
+    [Parameter (Position=1,
+    HelpMessage="Enter the actual Download Url.")]
+    [string] $Url
 )
 
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
-Write-Host "Attension! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!`n" -ForegroundColor Cyan
+Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
 # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
@@ -159,23 +204,23 @@ function Test-WebStatus {
     )
 
     $retVal = $true
-	try {
-		[net.httpWebRequest] $req = [net.webRequest]::create($Domain)
-		$req.Method = “HEAD”
+    try {
+        [net.httpWebRequest] $req = [net.webRequest]::create($Domain)
+        $req.Method = “HEAD”
         $req.UserAgent = $userAgent
         $req.Timeout = 10000;
-		[net.httpWebResponse] $res = $req.getResponse()
-		if ($res.StatusCode -eq “200”) {
-			Write-Host “OK - Site is available” -ForegroundColor Green
-		} else {
-			Write-Host “Site $url is down” -ForegroundColor red
+        [net.httpWebResponse] $res = $req.getResponse()
+        if ($res.StatusCode -eq “200”) {
+            Write-Host “OK - Site is available” -ForegroundColor Green
+        } else {
+            Write-Host “Site $url is down” -ForegroundColor red
             $retVal = $false
-		}
-	} catch [System.Net.WebException] {
+        }
+    } catch [System.Net.WebException] {
         $errMessage = $PSItem.Exception.Message
-		Write-Host "Site $Domain is not available - $errMessage." -ForegroundColor red
+        Write-Host "Site $Domain is not available - $errMessage." -ForegroundColor red
         $retVal = $false
-	} catch {
+    } catch {
         Write-Error $PSItem
         $retVal = $false
     } finally {
@@ -269,7 +314,6 @@ function Start-ProcessWithOutput {
      }
 }
 
-
 #Removing exists p7b and sha files
 if ($Workdir.EndsWith('\')) {
     $mask1 = $Workdir + "*.p7b"
@@ -288,6 +332,10 @@ if (-not $retVal) {
 }
 
 # Check domain name and site availability
+if (-not [string]::IsNullOrEmpty($Url)) {
+    $download_url = $Url.Trim()
+    Write-Host "The value of the 'download_url' was changed with the value from the Url argument...`n" -ForegroundColor Yellow
+}
 $domain = Get-DomainFromUrl $download_url
 $retVal = Test-CheckDnsName $domain
 if (-not $retVal) {
