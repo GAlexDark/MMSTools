@@ -5,13 +5,13 @@
 
 .GUID 407dae93-b80e-4643-b8b5-f6e14e19daa9
 
-.AUTHOR support@galexsoftware.info
+.AUTHOR Oleksii Gaienko <support@galexsoftware.info>
 
 .COPYRIGHT 2024 Oleksii Gaienko. All rights reserved.
 
 .TAGS mmsxlsx2json
 
-.LICENSEURI http://www.gnu.org/licenses/
+.LICENSEURI https://www.gnu.org/licenses/#GPL
 
 .PROJECTURI https://github.com/GAlexDark/MMSTools
 
@@ -37,20 +37,20 @@
 
 .EXAMPLE
  PS> .\mmsxlsx2json.ps1 -Workdir C:\Data
-MMS XLSX to JSON Conversion PoSH Script Version 1.0
-Copyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info
-This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
+ MMS XLSX to JSON Conversion PoSH Script Version 1.0
+ Copyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info
+ This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
 
-This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721
+ This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721
 
-Starting B:\MMSTools\mmsxlsx2json.exe...
-Target file: "C:\Data\Book2.xlsx"
+ Starting B:\MMSTools\mmsxlsx2json.exe...
+ Target file: "C:\Data\Book2.xlsx"
 
-Total rows converted: 100.
-The JSON was saved in the file: B:/Data/Book2.json
+ Total rows converted: 100.
+ The JSON was saved in the file: B:/Data/Book2.json
 
-DONE
-DONE
+ DONE
+ DONE
 
 #>
 
@@ -66,7 +66,7 @@ Param (
 try {
     $isWorkDirExists = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
 } catch {
-    Write-Error $err
+    Write-Host $err.ErrorRecord -ForegroundColor Red
     exit 1
 }
 if (!$isWorkDirExists) {
@@ -115,12 +115,18 @@ function Start-ProcessWithOutput {
 }
 
 $pathToExecute = $PSScriptRoot + "\mmsxlsx2json.exe"
-Write-Output "Starting $pathToExecute..."
+$retVal = Test-Path $pathToExecute
+if (-not $retVal) {
+    Write-Host "The executable file mmsxlsx2json.exe not found" -ForegroundColor Red
+    exit 1
+}
+
+Write-Output "`nStarting $pathToExecute...`n"
 
 try {
     $foundItems = Get-ChildItem -Path $Workdir -Filter *.xlsx -ErrorAction Stop -ErrorVariable err
 } catch {
-    Write-Error $err
+    Write-Host $err.ErrorRecord -ForegroundColor Red
     exit 1
 }
 

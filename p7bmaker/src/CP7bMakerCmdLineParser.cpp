@@ -32,12 +32,18 @@ bool
 CP7bMakerCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString storeDescription(QLatin1String("The folder path contains one *.p7b file and several *.cer, *.crt files to add."));
+    const QString silentDescription(QLatin1String("Silent mode"));
 
     QCommandLineOption storeOption(QStringList() << "l" << "localstore", storeDescription, "path");
     bool retVal = m_parser.addOption(storeOption);
     if (retVal) {
-        m_parser.process(app);
-        m_isStore = m_parser.isSet(storeOption);
+        QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
+        retVal = m_parser.addOption(silentOption);
+        if (retVal) {
+            m_parser.process(app);
+            m_isStore = m_parser.isSet(storeOption);
+            m_isSilent = m_parser.isSet(silentOption);
+        }
     }
     if (!retVal) {
         setErrorString(QLatin1String("The fatal error has occurredd. The program will be closed."));

@@ -45,10 +45,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
 
     CConsoleOutput consoleOut;
-    QString description(QStringLiteral("p7b file maker Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-    description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1 and use the BioByteArray Class from the XCA Project: https://github.com/chris2511/xca.\n"));
-    consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
-
     CP7bMakerCmdLineParser cmd;
     if (!cmd.parseCmdArgs(a)) {
         consoleOut.outToConsole(cmd.errorString());
@@ -60,7 +56,12 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    consoleOut.outToConsole(QLatin1String("p7b file maker Utility starting...\n"));
+    if (!cmd.isSilent()) {
+        QString description(QStringLiteral("p7b file maker Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
+        description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1 and use the BioByteArray Class from the XCA Project: https://github.com/chris2511/xca.\n"));
+        consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
+        consoleOut.outToConsole(QLatin1String("p7b file maker Utility starting...\n"));
+    }
 
     QStringList p7bFiles;
     if (!cmd.getP7bFileName(p7bFiles)) {
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    consoleOut.outToConsole("Calculate result p7b file hash:");
+    consoleOut.outToConsole("Calculating result p7b file hash:");
     QByteArray hash = CPkcs7::getHash(dest).toHex();
     if (!hash.isEmpty()) {
         consoleOut.outToConsole(QStringLiteral("SHA-1 hash: %1.\n").arg(hash));
@@ -121,16 +122,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    consoleOut.outToConsole(QStringLiteral("Create hash File."));
+    consoleOut.outToConsole(QStringLiteral("Creating hash File."));
     QString errorString;
     retVal = CPkcs7::createHashFile(dest, errorString);
     if (retVal) {
-        consoleOut.outToConsole(QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest));
+        consoleOut.outToConsole(QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest.replace("p7b", "sha")));
     } else {
         consoleOut.outToConsole(errorString);
     }
 
-    consoleOut.outToConsole("Done");
+    consoleOut.outToConsole("DONE");
 
     return retVal ? 0 : 1;
 }
