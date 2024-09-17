@@ -31,6 +31,7 @@ class CP7bMakerCmdLineParser : public CBasicCmdLineParser
 public:
     bool getP7bFileName(QStringList &p7bFileName);
     bool getCertsList(QStringList &certsList);
+    bool isSilent() const { return m_isSilent; };
 
 private:
     bool addOption(const QCoreApplication &app) override;
@@ -38,6 +39,7 @@ private:
 
     bool m_isStore = false;
     bool m_isSearchFolderExists = false;
+    bool m_isSilent = false;
     QString m_searchFolder;
 };
 
