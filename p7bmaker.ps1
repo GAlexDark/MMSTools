@@ -47,7 +47,6 @@
  Attension! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
 
  OK - The domain name iit.com.ua was resolved to the IP address: 104.26.0.134,104.26.1.134,172.67.69.107 [hidden as minor]
- OK - Site is UP
  OK - The file was successfully saved in B:\certdata
 
  Starting B:\MMSTools\p7bmaker.exe...
@@ -85,7 +84,6 @@
  The value of the 'download_url' was changed with the value from the Url argument...
 
  OK - The domain name iit.com.ua was resolved to the IP address: 172.67.69.107,104.26.0.134,104.26.1.134  [hidden as minor]
- OK - Site is available
  OK - The file was successfully saved in B:\certdata\
 
  Starting B:\MMSTools\p7bmaker.exe...
@@ -120,31 +118,39 @@
 Param (
     [Parameter (Mandatory=$true, Position=0,
     HelpMessage="Enter the path to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.")]
+    [ValidateNotNullOrEmpty()]
     [string] $Workdir,
 
-    [Parameter (Position=1,
+    [Parameter (Mandatory=$false, Position=1,
+    HelpMessage="Enable flag when the script run in the Corporate Network.")]
+    [switch]$UseProxy = $false,
+
+    [Parameter (Mandatory=$false, Position=2,
     HelpMessage="Enter the actual Download Url.")]
     [string] $Url
 )
 
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
-Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!`n" -ForegroundColor Cyan
+Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
 # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
-$download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b"
+ [string] $download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b"
 #
 #**************************************************************************************
-#$download_url = "https://gatekeeper.galexsoftware.info/CACertificates.p7b"
 [string] $userAgent = "p7bmaker PoSH downloader module/1.0"
+# Nondefault Web Proxy:
+[string] $proxyName = ""
 
 function Remove-File {
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('FullName')]
         [string] $FileName
     )
 
-    $retVal = Test-Path $FileName
+    [bool] $retVal = Test-Path $FileName
     if ($retVal) {
         try {
             Remove-Item -Path $FileName -Force -ErrorAction Stop -ErrorVariable err
@@ -162,12 +168,14 @@ function Remove-File {
 function Get-DomainFromUrl {
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string] $baseUrl
     )
 
-    $baseUrl = $baseUrl.Substring(0, $baseUrl.LastIndexOf("/") + 1)
-    $baseSlash = $baseUrl.IndexOf("/", $baseUrl.IndexOf("://") + 3)
+    [string] $baseUrl = $baseUrl.Substring(0, $baseUrl.LastIndexOf("/") + 1)
+    [string] $baseSlash = $baseUrl.IndexOf("/", $baseUrl.IndexOf("://") + 3)
 
+    [string] $retVal = ""
     if($baseSlash -ge 0) {
         $retVal = $baseUrl.Substring(0, $baseSlash) + '/'
     } else {
@@ -179,15 +187,16 @@ function Get-DomainFromUrl {
 function Test-CheckDnsName {
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string] $Domain
     )
 
-    $retVal = $true;
-    $startIndex = $Domain.IndexOf("://")
-    $name = $Domain.Substring($startIndex + 3, $Domain.LastIndexOf("/") - $startIndex - 3)
+    [bool] $retVal = $true;
+    [int] $startIndex = $Domain.IndexOf("://")
+    [string] $name = $Domain.Substring($startIndex + 3, $Domain.LastIndexOf("/") - $startIndex - 3)
     try {
         $dnsRecord = Resolve-DnsName -Name $name -DnsOnly -ErrorAction Stop
-        Write-Host "OK - The domain name $name was resolved to the IP address: $($dnsRecord.IPAddress -join ',')" -ForegroundColor green
+        Write-Host "OK - The domain name '$name' was resolved to the IP address: $($dnsRecord.IPAddress -join ',')" -ForegroundColor green
     } catch {
         $errMessage = $PSItem.Exception.Message
         Write-Host "Error resolve host $errMessage" -ForegroundColor Red
@@ -197,51 +206,31 @@ function Test-CheckDnsName {
     return $retVal
 }
 
-function Test-WebStatus {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $Domain
-    )
-
-    $retVal = $true
-    try {
-        [net.httpWebRequest] $req = [net.webRequest]::create($Domain)
-        $req.Method = “HEAD”
-        $req.UserAgent = $userAgent
-        $req.Timeout = 10000;
-        [net.httpWebResponse] $res = $req.getResponse()
-        if ($res.StatusCode -eq “200”) {
-            Write-Host “OK - Site is available” -ForegroundColor Green
-        } else {
-            Write-Host “Site $url is down” -ForegroundColor red
-            $retVal = $false
-        }
-    } catch [System.Net.WebException] {
-        $errMessage = $PSItem.Exception.Message
-        Write-Host "Site $Domain is not available - $errMessage." -ForegroundColor red
-        $retVal = $false
-    } catch {
-        Write-Error $PSItem
-        $retVal = $false
-    } finally {
-        if($null -ne $res) {
-            $res.Dispose()
-        }
+function Get-ProxyInfo
+{
+    $res = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
+    $ProxyInfo = New-Object -TypeName PSObject
+    if ($res.ProxyEnable -eq 0) {
+        $data = [ordered]@{isProxyEnabled = $false; proxyServer = ""; Message = "No Proxy Settings detected"}
+    } else {
+        $data = [ordered]@{isProxyEnabled = $true; proxyServer = $res.ProxyServer; Message = "The Proxy Settings was detected"}
     }
-
-    return $retVal
+    $ProxyInfo | Add-Member -NotePropertyMembers $data -TypeName ProxyInfo
+    return $ProxyInfo
 }
 
 function Get-DownloadFile {
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string] $DownloadUrl,
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('FullName')]
         [string] $SavePath
     )
 
-    $retVal = $true
-    $fileName = $DownloadUrl.Substring($DownloadUrl.LastIndexOf('/') + 1)
+    [string] $fileName = $DownloadUrl.Substring($DownloadUrl.LastIndexOf('/') + 1)
     if ($SavePath.EndsWith('\')) {
         $fileName = $SavePath + $fileName
     } else {
@@ -249,36 +238,52 @@ function Get-DownloadFile {
     }
 
     Add-Type -AssemblyName System.Net.Http
-    $httpClient = New-Object System.Net.Http.HttpClient
+    if ($UseProxy) {
+        $handler = New-Object System.Net.Http.HttpClientHandler
+        $handler.UseDefaultCredentials = $true
+		if ([string]::IsNullOrEmpty($proxyName)) {
+			$handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
+		} else {
+			$handler.Proxy = New-Object System.Net.WebProxy($proxyName)
+		}
+        $handler.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials
+        $httpClient = New-Object System.Net.Http.HttpClient($handler)
+    } else {
+        $httpClient = New-Object System.Net.Http.HttpClient
+    }
+
+    [bool] $retVal = $false
     try {
         $httpClient.DefaultRequestHeaders.add('User-Agent', $userAgent)
         $response = $httpClient.GetAsync($DownloadUrl)
         $response.Wait()
         $result = $response.Result
-        if (-not $result.IsSuccessStatusCode) {
-            Write-Host $('Error download file: Status {0}, Reason: {1}.' -f [int]$result.StatusCode, $result.ReasonPhrase)
-            $retVal = $false
-        } else {
+        if ($result.StatusCode -eq 200) {
             try {
                 $outputFileStream = [System.IO.FileStream]::new($fileName, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write)
                 $downloadTask = $response.Result.Content.CopyToAsync($outputFileStream)
                 $downloadTask.Wait()
                 Write-Host "OK - The file was successfully saved in $SavePath" -ForegroundColor Green
+                $retVal = $true
             } catch {
                 Write-Host "Error save file $SavePath Reason: $($PSItem.ToString())" -ForegroundColor Red
-                $retVal = $false
             } finally {
                 $outputFileStream.Close()
             }
+        } else {
+            Write-Host $('Error download file: Status {0}, Reason: {1}.' -f [int]$result.StatusCode, $result.ReasonPhrase)
         }
     } catch {
         Write-Error ('Error: {0}' -f $PSItem)
-        $retVal = $false
     } finally {
         if($null -ne $result) {
             $result.Dispose()
         }
+        if ($null -ne $handler) {
+            $handler.Dispose()
+        }
     }
+
     return $retVal
 }
 
@@ -292,7 +297,7 @@ function Start-ProcessWithOutput {
      )
 
     begin {
-        $tmp = [System.IO.Path]::GetTempFileName()
+        [string] $tmp = [System.IO.Path]::GetTempFileName()
         try {
             $readJob = Start-Job -ScriptBlock { param( $Path ) Get-Content -Path $Path -Wait -Encoding UTF8 } -ArgumentList $tmp  -ErrorAction Stop -ErrorVariable err
             $process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentsList -RedirectStandardOutput $tmp -Wait -NoNewWindow -PassThru -ErrorAction Stop -ErrorVariable err
@@ -314,39 +319,47 @@ function Start-ProcessWithOutput {
      }
 }
 
-#Removing exists p7b and sha files
 if ($Workdir.EndsWith('\')) {
-    $mask1 = $Workdir + "*.p7b"
-    $mask2 = $Workdir + "*.sha"
+    $maskP7b = $Workdir + "*.p7b"
+    $maskSha = $Workdir + "*.sha"
+    $maskZip = $Workdir + "*.zip"
+    $maskCer = $Workdir + "*.cer"
+    $newDir = $Workdir + (Get-Date).ToString('yyyyMMdd')
 } else {
-    $mask1 = $Workdir + "\*.p7b"
-    $mask2 = $Workdir + "\*.sha"
+    $maskP7b = $Workdir + "\*.p7b"
+    $maskSha = $Workdir + "\*.sha"
+    $maskZip = $Workdir + "\*.zip"
+    $maskCer = $Workdir + "\*.cer"
+    $newDir = $Workdir + "\" + (Get-Date).ToString('yyyyMMdd')
 }
-$retVal = Remove-File $mask1
+#Removing exists p7b and sha files
+[bool] $retVal = Remove-File $maskP7b
 if (-not $retVal) {
     exit 1
 }
-$retVal = Remove-File $mask2
+$retVal = Remove-File $maskSha
+if (-not $retVal) {
+    exit 1
+}
+#remove previsions zip archives
+$retVal = Remove-File $maskZip
 if (-not $retVal) {
     exit 1
 }
 
-# Check domain name and site availability
+# Check domain name
 if (-not [string]::IsNullOrEmpty($Url)) {
     $download_url = $Url.Trim()
     Write-Host "The value of the 'download_url' was changed with the value from the Url argument...`n" -ForegroundColor Yellow
 }
-$domain = Get-DomainFromUrl $download_url
+[string] $domain = Get-DomainFromUrl $download_url
 $retVal = Test-CheckDnsName $domain
-if (-not $retVal) {
-    exit 1
-}
-$retVal = Test-WebStatus $domain
 if (-not $retVal) {
     exit 1
 }
 
 #Download and save CACertificates.p7b file
+Write-Output "`nStarting download the CACertificates.p7b file from the '$download_url' Url.`n"
 $retVal = Get-DownloadFile $download_url $WorkDir
 if (-not $retVal) {
     exit 1
@@ -363,6 +376,43 @@ if (-not $retVal) {
 Write-Output "`nStarting $pathToExecute...`n"
 
 Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-l $WorkDir --silent"
+
+#create archive
+$archiveName = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".zip"
+Write-Host "`nCreating archive: $archiveName"
+
+$newP7b = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".p7b"
+if ($Workdir.EndsWith('\')) {
+    $archiveName = $Workdir + $archiveName
+    $newP7b = $Workdir + $newP7b
+} else {
+    $archiveName = $Workdir + "\" + $archiveName
+    $newP7b = $Workdir + "\" + $newP7b
+}
+try {
+    Compress-Archive -Path $newP7b,$maskSha -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction stop
+} catch {
+    Write-Error $PSItem
+    exit 1
+}
+
+#create the new folder and copy files to it
+$retVal = Remove-File $newDir
+if (-not $retVal) {
+    exit 1
+}
+
+Write-Host "Creating folder $newDir and copy files to it"
+try {
+    New-Item -ItemType Directory -Path $newDir -ErrorAction Stop
+    Copy-Item -Path $maskP7b -Destination $newDir -Force -ErrorAction Stop
+    Copy-Item -Path $maskSha -Destination $newDir -Force -ErrorAction Stop
+    Copy-Item -Path $archiveName -Destination $newDir -Force -ErrorAction Stop
+    Copy-Item -Path $maskCer -Destination $newDir -Force -ErrorAction Stop
+} catch {
+    Write-Error $PSItem
+    exit 1
+}
 
 Write-Host "DONE" -ForegroundColor Green
 
