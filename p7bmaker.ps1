@@ -172,7 +172,7 @@ function Remove-File {
         [string] $FileName
     )
 
-    [bool] $retVal = Test-Path $FileName
+    [bool] $retVal = Test-Path -Path $FileName
     if ($retVal) {
         try {
             Remove-Item -Path $FileName -Force -ErrorAction Stop -ErrorVariable err
@@ -389,7 +389,7 @@ if (-not $retVal) {
 
 # Let's start creating a p7b container with the necessary certificates
 $pathToExecute = $PSScriptRoot + "\p7bmaker.exe"
-$retVal = Test-Path $pathToExecute
+$retVal = Test-Path -Path $pathToExecute
 if (-not $retVal) {
     Write-Host "The executable file p7bmaker.exe not found" -ForegroundColor Red
     exit 1
