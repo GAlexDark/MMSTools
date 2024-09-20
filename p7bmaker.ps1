@@ -152,9 +152,14 @@ Param (
     [string] $Url
 )
 
-[bool]  $retVal = Test-Path -Path $Workdir
-if (-not $retVal) {
-    Write-Host "The $Workdir folder not found" -ForegroundColor Red
+try {
+    [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
+	if (!$retVal) {
+		Write-Warning "The work dir $Workdir not found."
+		exit 1
+	}
+} catch {
+    Write-Host $err.ErrorRecord -ForegroundColor Red
     exit 1
 }
 
@@ -361,7 +366,7 @@ if ($Workdir.EndsWith('\')) {
     $newDir = $Workdir + "\" + (Get-Date).ToString('yyyyMMdd')
 }
 #Removing exists p7b and sha files
-$retVal = Remove-File $maskP7b
+[bool] $retVal = Remove-File $maskP7b
 if (-not $retVal) {
     exit 1
 }

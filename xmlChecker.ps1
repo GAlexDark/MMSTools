@@ -46,9 +46,14 @@ Param (
     [string] $FilePath
 )
 
-$retVal = Test-Path -Path $FilePath
-if (-not $retVal) {
-    Write-Host "The $FilePath file not found" -ForegroundColor Red
+try {
+    [bool] $retVal = Test-Path -Path $FilePath -ErrorAction Stop -ErrorVariable err
+	if (!$retVal) {
+		Write-Warning "The $FilePath file not found."
+		exit 1
+	}
+} catch {
+    Write-Host $err.ErrorRecord -ForegroundColor Red
     exit 1
 }
 
