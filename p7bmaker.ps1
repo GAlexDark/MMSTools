@@ -71,6 +71,17 @@
  The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
 
  DONE
+
+ Creating archive: CACertificates20240917.zip
+ Creating folder B:\certdata\20240919 and copy files to it
+
+ Directory: B:\certdata
+
+
+ Mode                LastWriteTime         Length Name
+ ----                -------------         ------ ----
+ d-----        9/19/2024   4:01 PM                20240919
+
  DONE
 
 .EXAMPLE
@@ -108,6 +119,17 @@
  The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
 
  DONE
+
+ Creating archive: CACertificates20240917.zip
+ Creating folder B:\certdata\20240919 and copy files to it
+
+ Directory: B:\certdata
+
+
+ Mode                LastWriteTime         Length Name
+ ----                -------------         ------ ----
+ d-----        9/19/2024   4:01 PM                20240919
+
  DONE
 
 #>
