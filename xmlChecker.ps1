@@ -46,6 +46,7 @@ Param (
     [string] $FilePath
 )
 
+$FilePath = $FilePath.Trim()
 try {
     [bool] $retVal = Test-Path -Path $FilePath -ErrorAction Stop -ErrorVariable err
 	if (!$retVal) {
@@ -94,17 +95,13 @@ Write-Host "Classification type: $processClassificationTypeValue`n"
 
 $sender_MarketParticipantmRIDcodingSchemeValue = $docElem.'sender_MarketParticipant.mRID'.codingScheme
 $sender_MarketParticipantmRIDValue = $docElem.'sender_MarketParticipant.mRID'.InnerText
-Write-Host "Sender Market Participant mRID: $sender_MarketParticipantmRIDValue [Scheme: $sender_MarketParticipantmRIDcodingSchemeValue]"
-
 $sender_MarketParticipantMarketRoleTypeValue = $docElem.'sender_MarketParticipant.marketRole.type'
-Write-Host "Sender Market Participant Market Role type: $sender_MarketParticipantMarketRoleTypeValue`n"
+Write-Host "Sender Market Participant:`n`tmRID: $sender_MarketParticipantmRIDValue [Scheme: $sender_MarketParticipantmRIDcodingSchemeValue]`n`tRole type: $sender_MarketParticipantMarketRoleTypeValue`n"
 
 $receiver_MarketParticipantmRIDcodingSchemeValue = $docElem.'receiver_MarketParticipant.mRID'.codingScheme
 $receiver_MarketParticipantmRIDValue = $docElem.'receiver_MarketParticipant.mRID'.InnerText
-Write-Host "Receiver Market Participant mRID: $receiver_MarketParticipantmRIDValue [Scheme: $receiver_MarketParticipantmRIDcodingSchemeValue]"
-
 $receiver_MarketParticipantMarketRoleTypeValue = $docElem.'receiver_MarketParticipant.marketRole.type'
-Write-Host "Receiver Market Participant Market Role type: $receiver_MarketParticipantMarketRoleTypeValue`n"
+Write-Host "Receiver Market Participant:`n`tmRID: $receiver_MarketParticipantmRIDValue [Scheme: $receiver_MarketParticipantmRIDcodingSchemeValue]`n`tRole type: $receiver_MarketParticipantMarketRoleTypeValue`n"
 
 $createdDateTimeValue = $docElem.createdDateTime
 Write-Host "Creation DateTime: $createdDateTimeValue"
@@ -123,17 +120,22 @@ $timeSeries = $docElem.GetElementsByTagName("TimeSeries")
 $timeSeriasCount = $timeSeries.Count
 Write-Host "Total Time Series found: $timeSeriasCount`n"
 
+$i = 1
 $timeSeries | ForEach-Object {
     $count = $_.Period.Point.Count
     $periodResolution = $_.Period.resolution
     $status = "OK"
-    if ($periodResolution -eq "PT60M") {
-        $hoursPerDay = 24
+    switch ( $periodResolution ) {
+        "PT1M" { $hoursPerDay = 1440 }
+        "PT15M" { $hoursPerDay = 96 }
+        "PT30M" { $hoursPerDay = 48 }
+        "PT60M" { $hoursPerDay = 24 }
     }
     if ($count -ne $hoursPerDay) {
         $status = "WARNING"
     }
     [PSCustomObject]@{
+        'Item#' = $i
         'area_Domain_mRID' = $_.'area_Domain.mRID'.InnerText
         'marketParticipant_mRID' = $_.'marketParticipant.mRID'.InnerText
         'marketEvaluationPoint_mRID' = $_.'marketEvaluationPoint.mRID'.InnerText
@@ -141,6 +143,7 @@ $timeSeries | ForEach-Object {
         'Points_Count' = $count
         'Status' = $status
     }
+    $i++
 
 } | Format-Table -AutoSize
 

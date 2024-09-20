@@ -152,6 +152,7 @@ Param (
     [string] $Url
 )
 
+$Workdir = $Workdir.Trim()
 try {
     [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
 	if (!$retVal) {
