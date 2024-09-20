@@ -152,6 +152,12 @@ Param (
     [string] $Url
 )
 
+[bool]  $retVal = Test-Path -Path $Workdir
+if (-not $retVal) {
+    Write-Host "The $Workdir folder not found" -ForegroundColor Red
+    exit 1
+}
+
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
 Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 #**************************************************************************************
@@ -355,7 +361,7 @@ if ($Workdir.EndsWith('\')) {
     $newDir = $Workdir + "\" + (Get-Date).ToString('yyyyMMdd')
 }
 #Removing exists p7b and sha files
-[bool] $retVal = Remove-File $maskP7b
+$retVal = Remove-File $maskP7b
 if (-not $retVal) {
     exit 1
 }
