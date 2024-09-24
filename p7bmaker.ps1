@@ -343,9 +343,10 @@ if ($Workdir.EndsWith('\')) {
 
 #Checking certs
 $certs = Get-ChildItem -Path $Workdir -Filter *.cer
-$currentDate = Get-Date
-try {
-    $certs | ForEach-Object {
+if ($certs) {
+    $currentDate = Get-Date
+    try {
+        $certs | ForEach-Object {
         $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
         $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
         if ($currentDate -gt $certValidTo) {
@@ -353,10 +354,15 @@ try {
             exit 1
             }
         }
-} catch {
-    Write-Error $PSItem
+    } catch {
+        Write-Error $PSItem
+        exit 1
+    }
+} else {
+    Write-Host "The certificates is not found!" -ForegroundColor Red
     exit 1
 }
+exit 0
 
 #Removing exists p7b and sha files
 [bool] $retVal = Remove-File $maskP7b
