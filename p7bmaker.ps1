@@ -56,7 +56,7 @@
 
  The number of certificates in the container before adding: 628.
 
- The 3 certificates found.
+ The 2 certificates found.
  Start adding certificates.
  The certificates were added successful.
 
@@ -73,15 +73,8 @@
  DONE
 
  Creating archive: CACertificates20240917.zip
- Creating folder B:\certdata\20240919 and copy files to it
-
- Directory: B:\certdata
-
-
- Mode                LastWriteTime         Length Name
- ----                -------------         ------ ----
- d-----        9/19/2024   4:01 PM                20240919
-
+ Delete the B:\certdata\20240917 folder if it exists
+ Creating the B:\certdata\20240917 folder and copy files to it
  DONE
 
 .EXAMPLE
@@ -104,7 +97,7 @@
 
  The number of certificates in the container before adding: 628.
 
- The 3 certificates found.
+ The 2 certificates found.
  Start adding certificates.
  The certificates were added successful.
 
@@ -121,15 +114,8 @@
  DONE
 
  Creating archive: CACertificates20240917.zip
- Creating folder B:\certdata\20240919 and copy files to it
-
- Directory: B:\certdata
-
-
- Mode                LastWriteTime         Length Name
- ----                -------------         ------ ----
- d-----        9/19/2024   4:01 PM                20240919
-
+ Delete the B:\certdata\20240917 folder if it exists
+ Creating the B:\certdata\20240917 folder and copy files to it
  DONE
 
 #>
@@ -187,7 +173,7 @@ function Remove-File {
     [bool] $retVal = Test-Path -Path $FileName
     if ($retVal) {
         try {
-            Remove-Item -Path $FileName -Force -ErrorAction Stop -ErrorVariable err
+            Remove-Item -Path $FileName -Force -Recurse -ErrorAction Stop -ErrorVariable err
         } catch {
             Write-Host $err.ErrorRecord -ForegroundColor Red
             $retVal = $false
@@ -238,19 +224,6 @@ function Test-CheckDnsName {
     }
 
     return $retVal
-}
-
-function Get-ProxyInfo
-{
-    $res = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
-    $ProxyInfo = New-Object -TypeName PSObject
-    if ($res.ProxyEnable -eq 0) {
-        $data = [ordered]@{isProxyEnabled = $false; proxyServer = ""; Message = "No Proxy Settings detected"}
-    } else {
-        $data = [ordered]@{isProxyEnabled = $true; proxyServer = $res.ProxyServer; Message = "The Proxy Settings was detected"}
-    }
-    $ProxyInfo | Add-Member -NotePropertyMembers $data -TypeName ProxyInfo
-    return $ProxyInfo
 }
 
 function Get-DownloadFile {
@@ -308,7 +281,8 @@ function Get-DownloadFile {
             Write-Host $('Error download file: Status {0}, Reason: {1}.' -f [int]$result.StatusCode, $result.ReasonPhrase)
         }
     } catch {
-        Write-Error ('Error: {0}' -f $PSItem)
+        $e = $response.Exception.InnerException
+        Write-Error ('Fatal Error: {0}' -f $e)
     } finally {
         if($null -ne $result) {
             $result.Dispose()
@@ -366,6 +340,24 @@ if ($Workdir.EndsWith('\')) {
     $maskCer = $Workdir + "\*.cer"
     $newDir = $Workdir + "\" + (Get-Date).ToString('yyyyMMdd')
 }
+
+#Checking certs
+$certs = Get-ChildItem -Path $Workdir -Filter *.cer
+$currentDate = Get-Date
+try {
+    $certs | ForEach-Object {
+        $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
+        $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
+        if ($currentDate -gt $certValidTo) {
+            Write-Warning "The certificate SN=$certSN expired!"
+            exit 1
+            }
+        }
+} catch {
+    Write-Error $PSItem
+    exit 1
+}
+
 #Removing exists p7b and sha files
 [bool] $retVal = Remove-File $maskP7b
 if (-not $retVal) {
@@ -412,10 +404,10 @@ Write-Output "`nStarting $pathToExecute...`n"
 Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-l $WorkDir --silent"
 
 #create archive
-$archiveName = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".zip"
+[string] $archiveName = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".zip"
 Write-Host "`nCreating archive: $archiveName"
 
-$newP7b = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".p7b"
+[string] $newP7b = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".p7b"
 if ($Workdir.EndsWith('\')) {
     $archiveName = $Workdir + $archiveName
     $newP7b = $Workdir + $newP7b
@@ -431,14 +423,15 @@ try {
 }
 
 #create the new folder and copy files to it
+Write-Host "Delete the $newDir folder if it exists"
 $retVal = Remove-File $newDir
 if (-not $retVal) {
     exit 1
 }
 
-Write-Host "Creating folder $newDir and copy files to it"
+Write-Host "Creating the $newDir folder and copy files to it"
 try {
-    New-Item -ItemType Directory -Path $newDir -ErrorAction Stop
+    New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
     Copy-Item -Path $maskP7b -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $maskSha -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $archiveName -Destination $newDir -Force -ErrorAction Stop
