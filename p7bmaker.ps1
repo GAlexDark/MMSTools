@@ -347,11 +347,12 @@ if ($certs) {
     $currentDate = Get-Date
     try {
         $certs | ForEach-Object {
-        $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
-        $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
-        if ($currentDate -gt $certValidTo) {
-            Write-Warning "The certificate SN=$certSN expired!"
-            exit 1
+            $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
+            $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
+            if ($currentDate -gt $certValidTo) {
+                Write-Warning "The certificate SN=$certSN expired!"
+                $newName = $_.FullName + ".expired"
+                Rename-Item -Path $_.FullName -NewName $newName -ErrorAction Stop
             }
         }
     } catch {
@@ -362,7 +363,6 @@ if ($certs) {
     Write-Host "The certificates is not found!" -ForegroundColor Red
     exit 1
 }
-exit 0
 
 #Removing exists p7b and sha files
 [bool] $retVal = Remove-File $maskP7b
