@@ -63,6 +63,7 @@ Param (
     [string] $Workdir
 )
 
+$Workdir = $Workdir.Trim()
 try {
     $isWorkDirExists = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
 } catch {

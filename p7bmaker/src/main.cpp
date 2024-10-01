@@ -32,7 +32,7 @@
 QString
 getP7bResultFileName(const QString &fileName)
 {
-    QString baseName = QFileInfo(fileName).baseName(); // filename (wo ext)
+    QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
     QString path = QFileInfo(fileName).path();
     QDate now = QDate::currentDate();
     QString retVal = QStringLiteral("%1/%2%3.p7b").arg(path, baseName, now.toString(QLatin1String("yyyyMMdd")));

@@ -56,7 +56,7 @@
 
  The number of certificates in the container before adding: 628.
 
- The 3 certificates found.
+ The 2 certificates found.
  Start adding certificates.
  The certificates were added successful.
 
@@ -71,6 +71,10 @@
  The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
 
  DONE
+
+ Creating archive: CACertificates20240917.zip
+ Delete the B:\certdata\20240917 folder if it exists
+ Creating the B:\certdata\20240917 folder and copy files to it
  DONE
 
 .EXAMPLE
@@ -93,7 +97,7 @@
 
  The number of certificates in the container before adding: 628.
 
- The 3 certificates found.
+ The 2 certificates found.
  Start adding certificates.
  The certificates were added successful.
 
@@ -108,6 +112,10 @@
  The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
 
  DONE
+
+ Creating archive: CACertificates20240917.zip
+ Delete the B:\certdata\20240917 folder if it exists
+ Creating the B:\certdata\20240917 folder and copy files to it
  DONE
 
 #>
@@ -130,7 +138,20 @@ Param (
     [string] $Url
 )
 
+$Workdir = $Workdir.Trim()
+try {
+    [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
+    if (!$retVal) {
+        Write-Warning "The work dir $Workdir not found."
+        exit 1
+    }
+} catch {
+    Write-Host $err.ErrorRecord -ForegroundColor Red
+    exit 1
+}
+
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
+Write-Host "This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721`n" -ForegroundColor Yellow
 Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
@@ -150,10 +171,10 @@ function Remove-File {
         [string] $FileName
     )
 
-    [bool] $retVal = Test-Path $FileName
+    [bool] $retVal = Test-Path -Path $FileName
     if ($retVal) {
         try {
-            Remove-Item -Path $FileName -Force -ErrorAction Stop -ErrorVariable err
+            Remove-Item -Path $FileName -Force -Recurse -ErrorAction Stop -ErrorVariable err
         } catch {
             Write-Host $err.ErrorRecord -ForegroundColor Red
             $retVal = $false
@@ -204,19 +225,6 @@ function Test-CheckDnsName {
     }
 
     return $retVal
-}
-
-function Get-ProxyInfo
-{
-    $res = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
-    $ProxyInfo = New-Object -TypeName PSObject
-    if ($res.ProxyEnable -eq 0) {
-        $data = [ordered]@{isProxyEnabled = $false; proxyServer = ""; Message = "No Proxy Settings detected"}
-    } else {
-        $data = [ordered]@{isProxyEnabled = $true; proxyServer = $res.ProxyServer; Message = "The Proxy Settings was detected"}
-    }
-    $ProxyInfo | Add-Member -NotePropertyMembers $data -TypeName ProxyInfo
-    return $ProxyInfo
 }
 
 function Get-DownloadFile {
@@ -274,7 +282,8 @@ function Get-DownloadFile {
             Write-Host $('Error download file: Status {0}, Reason: {1}.' -f [int]$result.StatusCode, $result.ReasonPhrase)
         }
     } catch {
-        Write-Error ('Error: {0}' -f $PSItem)
+        $e = $response.Exception.InnerException
+        Write-Error ('Fatal Error: {0}' -f $e)
     } finally {
         if($null -ne $result) {
             $result.Dispose()
@@ -332,6 +341,30 @@ if ($Workdir.EndsWith('\')) {
     $maskCer = $Workdir + "\*.cer"
     $newDir = $Workdir + "\" + (Get-Date).ToString('yyyyMMdd')
 }
+
+#Checking certs
+$certs = Get-ChildItem -Path $Workdir -Filter *.cer
+if ($certs) {
+    $currentDate = Get-Date
+    try {
+        $certs | ForEach-Object {
+            $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
+            $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
+            if ($currentDate -gt $certValidTo) {
+                Write-Warning "The certificate SN=$certSN expired!"
+                $newName = $_.FullName + ".expired"
+                Rename-Item -Path $_.FullName -NewName $newName -ErrorAction Stop
+            }
+        }
+    } catch {
+        Write-Error $PSItem
+        exit 1
+    }
+} else {
+    Write-Host "The certificates is not found!" -ForegroundColor Red
+    exit 1
+}
+
 #Removing exists p7b and sha files
 [bool] $retVal = Remove-File $maskP7b
 if (-not $retVal) {
@@ -367,7 +400,7 @@ if (-not $retVal) {
 
 # Let's start creating a p7b container with the necessary certificates
 $pathToExecute = $PSScriptRoot + "\p7bmaker.exe"
-$retVal = Test-Path $pathToExecute
+$retVal = Test-Path -Path $pathToExecute
 if (-not $retVal) {
     Write-Host "The executable file p7bmaker.exe not found" -ForegroundColor Red
     exit 1
@@ -378,10 +411,10 @@ Write-Output "`nStarting $pathToExecute...`n"
 Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-l $WorkDir --silent"
 
 #create archive
-$archiveName = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".zip"
+[string] $archiveName = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".zip"
 Write-Host "`nCreating archive: $archiveName"
 
-$newP7b = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".p7b"
+[string] $newP7b = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".p7b"
 if ($Workdir.EndsWith('\')) {
     $archiveName = $Workdir + $archiveName
     $newP7b = $Workdir + $newP7b
@@ -397,14 +430,15 @@ try {
 }
 
 #create the new folder and copy files to it
+Write-Host "Delete the $newDir folder if it exists"
 $retVal = Remove-File $newDir
 if (-not $retVal) {
     exit 1
 }
 
-Write-Host "Creating folder $newDir and copy files to it"
+Write-Host "Creating the $newDir folder and copy files to it"
 try {
-    New-Item -ItemType Directory -Path $newDir -ErrorAction Stop
+    New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
     Copy-Item -Path $maskP7b -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $maskSha -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $archiveName -Destination $newDir -Force -ErrorAction Stop
