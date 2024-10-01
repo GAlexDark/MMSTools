@@ -411,10 +411,13 @@ Write-Output "`nStarting $pathToExecute...`n"
 Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-l $WorkDir --silent"
 
 #create archive
-[string] $archiveName = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".zip"
+[string] $baseName = $download_url.Substring($download_url.LastIndexOf('/') + 1)
+$baseName = $baseName.Substring(0, $baseName.LastIndexOf('.'))
+[string] $archiveName = $baseName + (Get-Date).ToString('yyyyMMdd') + ".zip"
+
 Write-Host "`nCreating archive: $archiveName"
 
-[string] $newP7b = "CACertificates" + (Get-Date).ToString('yyyyMMdd') + ".p7b"
+[string] $newP7b = $baseName + (Get-Date).ToString('yyyyMMdd') + ".p7b"
 if ($Workdir.EndsWith('\')) {
     $archiveName = $Workdir + $archiveName
     $newP7b = $Workdir + $newP7b
