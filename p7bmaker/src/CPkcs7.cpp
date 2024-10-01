@@ -260,7 +260,7 @@ CPkcs7::createHashFile(const QString &fileName, QString &errorString)
     QByteArray hash = CPkcs7::getHash(fileName);
     bool retVal = !hash.isEmpty();
     if (retVal) {
-        QString baseName = QFileInfo(fileName).baseName(); // filename (wo ext)
+        QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
         QString path = QFileInfo(fileName).path();
         QFile hashFile(QStringLiteral("%1/%2.sha").arg(path, baseName));
         retVal = hashFile.open(QIODevice::WriteOnly);
