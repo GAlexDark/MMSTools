@@ -141,16 +141,17 @@ Param (
 $Workdir = $Workdir.Trim()
 try {
     [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
-	if (!$retVal) {
-		Write-Warning "The work dir $Workdir not found."
-		exit 1
-	}
+    if (!$retVal) {
+        Write-Warning "The work dir $Workdir not found."
+        exit 1
+    }
 } catch {
     Write-Host $err.ErrorRecord -ForegroundColor Red
     exit 1
 }
 
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
+Write-Host "This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721`n" -ForegroundColor Yellow
 Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
