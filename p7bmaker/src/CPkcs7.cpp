@@ -24,11 +24,14 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QCryptographicHash>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 #include <openssl/pem.h>
 #include <openssl/err.h>
 #include "BioByteArray.h"
 
+const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=]"));
 
 QString
 CPkcs7::getOpenSslErrorMessage() const
@@ -111,6 +114,10 @@ CPkcs7::readCertFromFile(const QString &certFileName)
         retVal = !buf.isEmpty();
         file.close();
         if (retVal) {
+            if (isBase64Data(buf)) {
+                // PEM certificate without the start and the end lines
+                buf = QByteArray("-----BEGIN CERTIFICATE-----\n") + buf + QByteArray("\n-----END CERTIFICATE-----");
+            }
             retVal = readCert(buf);
             if (!retVal) {
                 m_errorString = QStringLiteral("Error load certificate: %1").arg(m_errorString);
@@ -120,6 +127,14 @@ CPkcs7::readCertFromFile(const QString &certFileName)
         m_errorString = QStringLiteral("Error load certificate from file '%1': %2").arg(certFileName, file.errorString()) ;
     }
     return retVal;
+}
+
+bool
+CPkcs7::isBase64Data(const QByteArray &data) const
+{
+    //ref: https://www.kuikie.com/snippet/55/cpp-how-to-check-if-a-qstring-is-base64-encoded
+    QRegularExpressionMatch match = rePem.match(data);
+    return !match.hasMatch();
 }
 
 CPkcs7::CPkcs7()
