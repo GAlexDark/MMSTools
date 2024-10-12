@@ -32,6 +32,8 @@
 #include "BioByteArray.h"
 
 const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=]"));
+const QByteArray beginLine("-----BEGIN CERTIFICATE-----\n");
+const QByteArray endLine("\n-----END CERTIFICATE-----");
 
 QString
 CPkcs7::getOpenSslErrorMessage() const
@@ -93,13 +95,15 @@ CPkcs7::readCert(const QByteArray &buf)
 {
     bool retVal = true;
     ERR_clear_error();
-    m_cert.reset(PEM_read_bio_X509(BioByteArray(buf).ro(), nullptr, nullptr, nullptr));
-    if (m_cert.isNull()) {
+
+    if (buf.contains("BEGIN") && buf.contains("END")) {
+        m_cert.reset(PEM_read_bio_X509(BioByteArray(buf).ro(), nullptr, nullptr, nullptr));
+    } else {
         m_cert.reset(d2i_X509_bio(BioByteArray(buf).ro(), nullptr));
-        if (m_cert.isNull()) {
-            m_errorString = getOpenSslErrorMessage();
-            retVal = false;
-        }
+    }
+    if (m_cert.isNull()) {
+        m_errorString = getOpenSslErrorMessage();
+        retVal = false;
     }
     return retVal;
 }
@@ -116,11 +120,11 @@ CPkcs7::readCertFromFile(const QString &certFileName)
         if (retVal) {
             if (isBase64Data(buf)) {
                 // PEM certificate without the start and the end lines
-                buf = QByteArray("-----BEGIN CERTIFICATE-----\n") + buf + QByteArray("\n-----END CERTIFICATE-----");
+                buf = beginLine + buf + endLine;
             }
             retVal = readCert(buf);
             if (!retVal) {
-                m_errorString = QStringLiteral("Error load certificate: %1").arg(m_errorString);
+                m_errorString = QStringLiteral("Error load certificate %1: %2").arg(certFileName, m_errorString);
             }
         }
     } else {
