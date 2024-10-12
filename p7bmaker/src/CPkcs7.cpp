@@ -130,7 +130,7 @@ CPkcs7::readCertFromFile(const QString &certFileName)
 }
 
 bool
-CPkcs7::isBase64Data(const QByteArray &data)
+CPkcs7::isBase64Data(const QByteArray &data) const
 {
     //ref: https://www.kuikie.com/snippet/55/cpp-how-to-check-if-a-qstring-is-base64-encoded
     QRegularExpressionMatch match = rePem.match(data);
