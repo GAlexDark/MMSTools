@@ -52,6 +52,7 @@ private:
     bool getCertsFromStore();
     bool readCert(const QByteArray &buf);
     bool readCertFromFile(const QString &certFileName);
+    bool isBase64Data(const QByteArray &data);
 
     struct bioFree
     {
