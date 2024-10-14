@@ -64,6 +64,10 @@ Param (
 )
 
 $Workdir = $Workdir.Trim()
+if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
+    (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
+    $Workdir = $PSScriptRoot
+}
 try {
     $isWorkDirExists = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
 } catch {

@@ -131,7 +131,7 @@ Param (
 
     [Parameter (Mandatory=$false, Position=1,
     HelpMessage="Enable flag when the script run in the Corporate Network.")]
-    [switch]$UseProxy = $false,
+    [switch] $UseProxy = $false,
 
     [Parameter (Mandatory=$false, Position=2,
     HelpMessage="Enter the actual Download Url.")]
@@ -139,6 +139,10 @@ Param (
 )
 
 $Workdir = $Workdir.Trim()
+if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
+    (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
+    $Workdir = $PSScriptRoot
+}
 try {
     [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
     if (!$retVal) {
