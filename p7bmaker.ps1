@@ -139,10 +139,6 @@ Param (
 )
 
 $Workdir = $Workdir.Trim()
-if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
-    (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
-    $Workdir = $PSScriptRoot
-}
 try {
     [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
     if (!$retVal) {
@@ -300,38 +296,6 @@ function Get-DownloadFile {
     return $retVal
 }
 
-function Start-ProcessWithOutput {
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $FilePath,
-        [Parameter()]
-        [string[]] $ArgumentsList
-     )
-
-    begin {
-        [string] $tmp = [System.IO.Path]::GetTempFileName()
-        try {
-            $readJob = Start-Job -ScriptBlock { param( $Path ) Get-Content -Path $Path -Wait -Encoding UTF8 } -ArgumentList $tmp  -ErrorAction Stop -ErrorVariable err
-            $process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentsList -RedirectStandardOutput $tmp -Wait -NoNewWindow -PassThru -ErrorAction Stop -ErrorVariable err
-        } catch {
-            Write-Error $err
-            exit 1
-        }
-    }
-
-    process {
-        do {
-            $readJob | Receive-Job | Write-Output
-        } while (-not $process.HasExited)
-    }
-
-    end {
-        $readJob | Remove-Job -Force
-        Remove-Item -Path $tmp -Force
-     }
-}
-
 if ($Workdir.EndsWith('\')) {
     $maskP7b = $Workdir + "*.p7b"
     $maskSha = $Workdir + "*.sha"
@@ -412,7 +376,7 @@ if (-not $retVal) {
 
 Write-Output "`nStarting $pathToExecute...`n"
 
-Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-l $WorkDir --silent"
+Start-Process -FilePath "B:\MMSTools\p7bmaker.exe" -ArgumentList "-l $WorkDir --silent" -Wait -NoNewWindow
 
 #create archive
 [string] $baseName = $download_url.Substring($download_url.LastIndexOf('/') + 1)
