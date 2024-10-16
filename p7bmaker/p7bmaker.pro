@@ -49,15 +49,13 @@ HEADERS += \
   ../Common/Core/elcUtils.h \
   ../Common/Core/MMSTypes.h \
   src/CP7bMakerCmdLineParser.h \
-  src/CPkcs7.h \
-  src/BioByteArray.h
+  src/CPkcs7.h
 
 SOURCES += \
   ../Common/Core/CBasicCmdLineParser.cpp \
   ../Common/Core/elcUtils.cpp \
   src/CP7bMakerCmdLineParser.cpp \
   src/CPkcs7.cpp \
-  src/BioByteArray.cpp \
   src/main.cpp
 
 include(../deployment.pri)

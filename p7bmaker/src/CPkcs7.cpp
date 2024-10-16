@@ -29,7 +29,6 @@
 
 #include <openssl/pem.h>
 #include <openssl/err.h>
-#include "BioByteArray.h"
 
 const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=]"));
 const QByteArray beginLine("-----BEGIN CERTIFICATE-----\n");
@@ -96,10 +95,13 @@ CPkcs7::readCert(const QByteArray &buf)
     bool retVal = true;
     ERR_clear_error();
 
+    QScopedPointer<BIO, bioFree> pBuf;
+    const void* data = buf.constData();
+    pBuf.reset(BIO_new_mem_buf(data, buf.length()));
     if (buf.contains("BEGIN") && buf.contains("END")) {
-        m_cert.reset(PEM_read_bio_X509(BioByteArray(buf).ro(), nullptr, nullptr, nullptr));
+        m_cert.reset(PEM_read_bio_X509(pBuf.data(), nullptr, nullptr, nullptr));
     } else {
-        m_cert.reset(d2i_X509_bio(BioByteArray(buf).ro(), nullptr));
+        m_cert.reset(d2i_X509_bio(pBuf.data(), nullptr));
     }
     if (m_cert.isNull()) {
         m_errorString = getOpenSslErrorMessage();
