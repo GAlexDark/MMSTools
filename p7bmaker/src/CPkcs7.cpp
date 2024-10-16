@@ -226,7 +226,6 @@ CPkcs7::saveStore(const QString &fileName)
 {
     bool retVal = !m_pkcs7Store.isNull();
     if (retVal) {
-        //BioByteArray buf;
         QScopedPointer<BIO, bioFree> buf(BIO_new(BIO_s_mem()));
         ERR_clear_error();
         int res = i2d_PKCS7_bio(buf.data(), m_pkcs7Store.data());
