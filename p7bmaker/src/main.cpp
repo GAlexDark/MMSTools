@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     if (!cmd.isSilent()) {
         QString description(QStringLiteral("p7b file maker Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-        description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1 and use the BioByteArray Class from the XCA Project: https://github.com/chris2511/xca.\n"));
+        description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1.\n"));
         consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
         consoleOut.outToConsole(QLatin1String("p7b file maker Utility starting...\n"));
     }
