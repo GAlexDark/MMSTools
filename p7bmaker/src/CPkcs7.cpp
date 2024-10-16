@@ -226,19 +226,26 @@ CPkcs7::saveStore(const QString &fileName)
 {
     bool retVal = !m_pkcs7Store.isNull();
     if (retVal) {
-        BioByteArray buf;
+        //BioByteArray buf;
+        QScopedPointer<BIO, bioFree> buf(BIO_new(BIO_s_mem()));
         ERR_clear_error();
-        int res = i2d_PKCS7_bio(buf, m_pkcs7Store.data());
+        int res = i2d_PKCS7_bio(buf.data(), m_pkcs7Store.data());
         if (res > 0) {
             QFile file(fileName);
             retVal = file.open(QIODevice::WriteOnly);
             if (retVal) {
-                res = file.write(buf);
-                if (res == -1) {
-                    m_errorString = QStringLiteral("Error write to file: '%1': %2").arg(fileName, file.errorString());
-                    retVal = false;
+                const char *pBuf = nullptr;
+                int len = BIO_get_mem_data(buf.data(), &pBuf);
+                if (len > 0) {
+                    res = file.write(pBuf, len);
+                    file.close();
+                    if (res == -1) {
+                        m_errorString = QStringLiteral("Error write to file: '%1': %2").arg(fileName, file.errorString());
+                        retVal = false;
+                    }
+                } else {
+                    m_errorString = QStringLiteral("Nothing to save.");
                 }
-                file.close();
             } else {
                 m_errorString = QStringLiteral("Error opening file: '%1': %2").arg(fileName, file.errorString());
             }
