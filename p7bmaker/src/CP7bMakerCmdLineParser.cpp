@@ -31,7 +31,7 @@
 bool
 CP7bMakerCmdLineParser::addOption(const QCoreApplication &app)
 {
-    const QString storeDescription(QLatin1String("The folder path contains one *.p7b file and several *.cer, *.crt files to add."));
+    const QString storeDescription(QLatin1String("The folder path contains one *.p7b file and several *.cer, *.crt, or *.der files to add."));
     const QString silentDescription(QLatin1String("Silent mode"));
 
     QCommandLineOption storeOption(QStringList() << "l" << "localstore", storeDescription, "path");
@@ -93,7 +93,7 @@ CP7bMakerCmdLineParser::getCertsList(QStringList &certsList)
 {
     bool retVal = true;
     if (m_isSearchFolderExists) {
-        QStringList masks = { "*.cer", "*.crt" };
+        QStringList masks = { "*.cer", "*.crt", "*.der" };
         for (const QString &maskItem : masks) {
             certsList.append( elcUtils::getDataSourceList(m_searchFolder, QStringList() << maskItem) );
         }
