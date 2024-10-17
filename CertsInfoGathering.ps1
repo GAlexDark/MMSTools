@@ -26,7 +26,16 @@
  The Certificates Information Gathering PoSH Script
 
 .PARAMETER Path
- Specifies the path to to the folder, contains *.cer, *.crt and *.p7b files.
+ Specifies the path to to the folder, contains *.cer, *.crt, *.pem, and *.p7b files.
+
+.PARAMETER Gui
+ Specifies output certificates information to the GridView.
+
+.PARAMETER PKCS7Only
+ Select only PKCS7 files (default - select all supported files).
+
+.PARAMETER CertsOnly
+ Select only certificate files (default - select all supported files).
 
 .INPUTS
  None. You can't pipe objects to CertsInfoGathering.ps1.
@@ -66,12 +75,18 @@
 [CmdletBinding()]
 Param (
         [Parameter(Mandatory=$true,
-        HelpMessage="Enter the path to the folder, contains *.cer, *.crt, and *.p7b files.")]
+        HelpMessage="Enter the path to the folder, contains *.cer, *.crt, *.pem, and *.p7b files.")]
         [ValidateNotNullOrEmpty()]
         [string] $Path,
         [Parameter(Mandatory=$false,
         HelpMessage="Select GUI or Console Output (default).")]
-        [switch] $Gui = $false
+        [switch] $Gui = $false,
+        [Parameter(Mandatory=$false,
+        HelpMessage="Select only PKCS7 files (default - select all supported files).")]
+        [switch] $PKCS7Only = $false,
+        [Parameter(Mandatory=$false,
+        HelpMessage="Select only certificate files (default - select all supported files).")]
+        [switch] $CertsOnly = $false
 )
 
 [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(0)
@@ -169,8 +184,34 @@ function Get-CertificateInfo {
     return $retVal
 }
 
+function Get-PemCertificate {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $data
+    )
+
+    [string[]] $buf = $data -split "-----END CERTIFICATE-----"
+    [string[]] $retVal = $buf | Where-Object { ($_.Trim().Length -ne 0) -and ($_ -ne $null) }
+    for ($i=0; $i -lt $retVal.count; $i++) {
+        $retVal[$i] = $retVal[$i].Trim()
+        $retVal[$i] = $retVal[$i] + "-----END CERTIFICATE-----"
+    }
+    return $retVal
+}
+
 # CMP - certificate management protocol
-[string[]] $CertificateFileType = ('*.cer','*.crt','*.p7b')
+[string[]] $CertificateFileType = ('*.cer','*.crt','*.p7b', '*.pem')
+if ($PKCS7Only -and $CertsOnly) {
+    $PKCS7Only = $false
+    $CertsOnly = $false
+}
+if ($PKCS7Only) {
+    $CertificateFileType = ('*.p7b','*.pem')
+}
+if ($CertsOnly) {
+    $CertificateFileType = ('*.cer','*.crt','*.pem')
+}
 $certs = Get-ChildItem -Path $Path -Include $CertificateFileType -Recurse
 
 if ($certs) {
@@ -179,11 +220,22 @@ if ($certs) {
     $certs | ForEach-Object {
         [string] $pathToFile = $_.FullName
         [string] $prettyPath = "." + $pathToFile.Substring($Path.Length)
-        if ($pathToFile.EndsWith(".p7b")) {
+        if ($pathToFile.EndsWith(".p7b") -or $pathToFile.EndsWith(".pem")) {
             try {
-                [Byte[]] $bytes = [System.IO.File]::ReadAllBytes($pathToFile)
                 $certsCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-                $certsCollection.Import($bytes)
+                [Byte[]] $bytes = @()
+                if ($pathToFile.EndsWith(".pem")) {
+                    [string] $pemFileContent = Get-Content -Path $pathToFile -Encoding String -ErrorAction Stop
+                    [string[]] $pemCerts = Get-PemCertificate $pemFileContent
+                    for ($i=0; $i -lt $pemCerts.count; $i++) {
+                        $bytes.Clear()
+                        $bytes = $pemCerts[$i].ToCharArray()
+                        $certsCollection.Import($bytes)
+                    }
+                } else {
+                    $bytes = [System.IO.File]::ReadAllBytes($pathToFile)
+                    $certsCollection.Import($bytes)
+                }
                 $certsCollection | ForEach-Object {
                     $certsInfo += Get-CertificateInfo $_
                     $certsInfo[$certsInfo.count - 1].'Path To The File' = $prettyPath
