@@ -151,7 +151,6 @@ try {
 }
 
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
-Write-Host "This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721`n" -ForegroundColor Yellow
 Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
@@ -249,11 +248,11 @@ function Get-DownloadFile {
     if ($UseProxy) {
         $handler = New-Object System.Net.Http.HttpClientHandler
         $handler.UseDefaultCredentials = $true
-		if ([string]::IsNullOrEmpty($proxyName)) {
-			$handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
-		} else {
-			$handler.Proxy = New-Object System.Net.WebProxy($proxyName)
-		}
+        if ([string]::IsNullOrEmpty($proxyName)) {
+            $handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
+        } else {
+            $handler.Proxy = New-Object System.Net.WebProxy($proxyName)
+        }
         $handler.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials
         $httpClient = New-Object System.Net.Http.HttpClient($handler)
     } else {
@@ -314,19 +313,24 @@ if ($Workdir.EndsWith('\')) {
 $certs = Get-ChildItem -Path $Workdir -Filter *.cer
 if ($certs) {
     $currentDate = Get-Date
-    try {
-        $certs | ForEach-Object {
-            $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
-            $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
+    $certs | ForEach-Object {
+        try {
+            $certItem = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $_.FullName
+            [string] $certSN = $certItem.SerialNumber
+            [datetime] $certValidTo = $certItem.NotAfter
             if ($currentDate -gt $certValidTo) {
                 Write-Warning "The certificate SN=$certSN expired!"
                 $newName = $_.FullName + ".expired"
                 Rename-Item -Path $_.FullName -NewName $newName -ErrorAction Stop
             }
+        } catch {
+            Write-Error $PSItem
+            exit 1
+        } finally {
+            if ($certItem) {
+                $certItem.Dispose()
+            }
         }
-    } catch {
-        Write-Error $PSItem
-        exit 1
     }
 } else {
     Write-Host "The certificates is not found!" -ForegroundColor Red
