@@ -28,6 +28,10 @@ private:
     QString m_internalIP;
     QDateTime m_timestampTZ;
 
+    void test_failedAuth(const QString &fileName);
+
+    void test_successAuth_wALL_ips();
+
 private slots:
     void initTestCase();
     void initTestCaseEng();
@@ -85,104 +89,82 @@ void CEventLogParserTest::initTestCaseEng()
                            m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
 }
 
-void CEventLogParserTest::test_successAuth_wALL_ipsUkrLang() {
-    qDebug() << "Testcase: Success auth with all IPs (internal + external)";
-
-    initTestCase();
-
+void CEventLogParserTest::test_successAuth_wALL_ips()
+{
     QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_timestampISO8601, QString("2023-05-09T11:19:57.36Z"));
     QCOMPARE(m_requestID, QString("edbfa4ea24038861"));
-    QCOMPARE(m_type, QString("Вхід користувача - успішно"));
     QCOMPARE(m_details, QString("username: mr_data,\n  type: PASSWORD,\n  ip address: 192.0.2.211, 10.10.10.10"));
     QCOMPARE(m_username1, QString("mr_data"));
     QCOMPARE(m_authType, QString("PASSWORD"));
     QCOMPARE(m_externalIP, QString("192.0.2.211"));
     QCOMPARE(m_internalIP, QString("10.10.10.10"));
     QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
+}
+
+void CEventLogParserTest::test_successAuth_wALL_ipsUkrLang() {
+    qDebug() << "Testcase: Success auth with all IPs (internal + external)";
+
+    initTestCase();
+    test_successAuth_wALL_ips();
+
+    QCOMPARE(m_type, QString("Вхід користувача - успішно"));
 }
 
 void CEventLogParserTest::test_successAuth_wALL_ipsEngLang() {
     qDebug() << "Testcase: Success auth with all IPs (internal + external)";
 
     initTestCaseEng();
+    test_successAuth_wALL_ips();
 
-    QCOMPARE(m_username, QString("mr_data"));
-    QCOMPARE(m_timestampISO8601, QString("2023-05-09T11:19:57.36Z"));
-    QCOMPARE(m_requestID, QString("edbfa4ea24038861"));
     QCOMPARE(m_type, QString("User login - successful"));
-    QCOMPARE(m_details, QString("username: mr_data,\n  type: PASSWORD,\n  ip address: 192.0.2.211, 10.10.10.10"));
-    QCOMPARE(m_username1, QString("mr_data"));
+}
+
+void CEventLogParserTest::test_failedAuth(const QString &fileName)
+{
+    QFile file(fileName);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
+    QVERIFY(retVal);
+    QByteArray buf = file.readAll();
+    QVERIFY(!buf.isEmpty());
+    file.close();
+
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
+    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
+                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
+
+    QCOMPARE(m_username, QString());
+    QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:25:46.717Z"));
+    QCOMPARE(m_requestID, QString("693d40a5f9e0e2ec"));
+    QCOMPARE(m_details, QString("type: PASSWORD\n  ip address: 10.10.10.10"));
+    QCOMPARE(m_username1, QString());
     QCOMPARE(m_authType, QString("PASSWORD"));
-    QCOMPARE(m_externalIP, QString("192.0.2.211"));
+    QCOMPARE(m_externalIP, QString());
     QCOMPARE(m_internalIP, QString("10.10.10.10"));
-    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-09T14:19:57.360"));
+    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
 }
 
 void CEventLogParserTest::test_failedAuthUkrLang() {
     qDebug() << "Testcase: Failed auth";
 
     initTestCase(); // for checking empty fields
+    test_failedAuth(SRCDIR"data/testcase_failed.csv");
 
-    QFile file(SRCDIR"data/testcase_failed.csv");
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    bool retVal = file.open(QIODeviceBase::ReadOnly);
-#else
-    bool retVal = file.open(QIODevice::ReadOnly);
-#endif
-    QVERIFY(retVal);
-    QByteArray buf = file.readAll();
-    QVERIFY(!buf.isEmpty());
-    file.close();
-
-    retVal = m_parser.parse(buf);
-    QVERIFY(retVal);
-    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
-                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
-
-    QCOMPARE(m_username, QString());
-    QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:25:46.717Z"));
-    QCOMPARE(m_requestID, QString("693d40a5f9e0e2ec"));
     QCOMPARE(m_type, QString("Вхід користувача - невдало"));
-    QCOMPARE(m_details, QString("type: PASSWORD\n  ip address: 10.10.10.10"));
-    QCOMPARE(m_username1, QString());
-    QCOMPARE(m_authType, QString("PASSWORD"));
-    QCOMPARE(m_externalIP, QString());
-    QCOMPARE(m_internalIP, QString("10.10.10.10"));
-    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
 }
 
 void CEventLogParserTest::test_failedAuthEngLang() {
     qDebug() << "Testcase: Failed auth";
 
     initTestCase(); // for checking empty fields
+    test_failedAuth(SRCDIR"data/testcase_failed_engLang.csv");
 
-    QFile file(SRCDIR"data/testcase_failed_engLang.csv");
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    bool retVal = file.open(QIODeviceBase::ReadOnly);
-#else
-    bool retVal = file.open(QIODevice::ReadOnly);
-#endif
-    QVERIFY(retVal);
-    QByteArray buf = file.readAll();
-    QVERIFY(!buf.isEmpty());
-    file.close();
-
-    retVal = m_parser.parse(buf);
-    QVERIFY(retVal);
-    m_parser.getParsedData(m_username, m_timestampISO8601, m_requestID, m_type, m_details,
-                           m_username1, m_authType, m_externalIP, m_internalIP, m_timestampTZ);
-
-    QCOMPARE(m_username, QString());
-    QCOMPARE(m_timestampISO8601, QString("2023-05-23T10:25:46.717Z"));
-    QCOMPARE(m_requestID, QString("693d40a5f9e0e2ec"));
     QCOMPARE(m_type, QString("User login - unsuccessful"));
-    QCOMPARE(m_details, QString("type: PASSWORD\n  ip address: 10.10.10.10"));
-    QCOMPARE(m_username1, QString());
-    QCOMPARE(m_authType, QString("PASSWORD"));
-    QCOMPARE(m_externalIP, QString());
-    QCOMPARE(m_internalIP, QString("10.10.10.10"));
-    QCOMPARE(m_timestampTZ.toString(Qt::ISODateWithMs), QString("2023-05-23T13:25:46.717"));
 }
 
 void CEventLogParserTest::test_successAuth_wINTERNAL_ips() {
