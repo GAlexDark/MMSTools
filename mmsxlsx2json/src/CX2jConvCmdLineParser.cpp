@@ -102,14 +102,12 @@ CX2jConvCmdLineParser::getReportName() const
         retVal = retVal + QLatin1String(".json");
     }
 
-    if ((retVal.indexOf('/') == -1) || (retVal.indexOf('\\') == -1)) {
-        // if m_filesList.isEmpty() == true, we returns utility directory as path for the report file
-        // otherwise - returns path to the first data file
+    if ((retVal.indexOf('/') == -1) && (retVal.indexOf('\\') == -1)) {
         retVal = m_path.filePath(retVal);
+    } else {
+        retVal = QDir::fromNativeSeparators(retVal);
+        retVal.replace(QLatin1String("//"), QLatin1String("/"));
     }
-    retVal = QDir::fromNativeSeparators(retVal);
-    retVal.replace(QLatin1String("//"), QLatin1String("/"));
-
     return retVal;
 }
 

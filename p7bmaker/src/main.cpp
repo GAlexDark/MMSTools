@@ -22,6 +22,7 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QDate>
+#include <QDir>
 
 #include "CPkcs7.h"
 #include "CConsoleOutput.h"
@@ -35,8 +36,8 @@ getP7bResultFileName(const QString &fileName)
     QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
     QString path = QFileInfo(fileName).path();
     QDate now = QDate::currentDate();
-    QString retVal = QStringLiteral("%1/%2%3.p7b").arg(path, baseName, now.toString(QLatin1String("yyyyMMdd")));
-    return retVal.replace("//", "/");
+    QString p7bFileName = QStringLiteral("%1%2.p7b").arg(baseName, now.toString(QLatin1String("yyyyMMdd")));
+    return QDir(path).filePath(p7bFileName);
 }
 
 int main(int argc, char *argv[])

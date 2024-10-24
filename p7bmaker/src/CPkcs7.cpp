@@ -23,6 +23,7 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QCryptographicHash>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -289,12 +290,11 @@ CPkcs7::createHashFile(const QString &fileName, QString &errorString)
     if (retVal) {
         QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
         QString path = QFileInfo(fileName).path();
-        QFile hashFile(QStringLiteral("%1/%2.sha").arg(path, baseName));
+        QFile hashFile(QDir(path).filePath(baseName + ".sha"));
         retVal = hashFile.open(QIODevice::WriteOnly);
         if (retVal) {
             QTextStream stream(&hashFile);
-            QString file = QFileInfo(fileName).fileName(); // filename.ext
-            stream << QStringLiteral("%1 *%2").arg(hash.toHex(), file);
+            stream << QStringLiteral("%1 *%2").arg(hash.toHex(), QFileInfo(fileName).fileName()); // filename.ext
             hashFile.close();
         } else {
             errorString = QStringLiteral("Error! Could not create hash file: %1").arg(hashFile.errorString());
