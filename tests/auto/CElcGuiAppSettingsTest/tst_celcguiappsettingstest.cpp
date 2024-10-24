@@ -3,8 +3,6 @@
 
 #include "CElcGuiAppSettings.h"
 
-// add necessary includes here
-
 const QString fileName = QLatin1String("EventLogConverter.ini");
 const QString filePath = QStringLiteral(SRCDIR"data");
 

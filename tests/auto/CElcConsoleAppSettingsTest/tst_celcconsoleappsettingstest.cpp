@@ -4,8 +4,6 @@
 
 #include "CElcConsoleAppSettings.h"
 
-// add necessary includes here
-
 inline const QString fileName = QLatin1String("EventLogConverterc.ini");
 inline const QString filePath = QStringLiteral(SRCDIR"data");
 

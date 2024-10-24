@@ -5,8 +5,6 @@
 
 #include "CEventLogParser.h"
 
-// add necessary includes here
-
 class CEventLogParserTest : public QObject
 {
     Q_OBJECT
