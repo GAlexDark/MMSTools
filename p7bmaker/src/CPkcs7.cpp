@@ -31,7 +31,7 @@
 #include <openssl/pem.h>
 #include <openssl/err.h>
 
-const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=]"));
+const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=\r\n]"));
 const QByteArray beginLine("-----BEGIN CERTIFICATE-----\n");
 const QByteArray endLine("\n-----END CERTIFICATE-----");
 
@@ -117,7 +117,7 @@ CPkcs7::readCertFromFile(const QString &certFileName)
     QFile file(certFileName);
     bool retVal = file.open(QIODevice::ReadOnly);
     if (retVal) {
-        QByteArray buf(file.readAll());
+        QByteArray buf(file.readAll().trimmed());
         retVal = !buf.isEmpty();
         file.close();
         if (retVal) {
