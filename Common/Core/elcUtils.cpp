@@ -31,6 +31,7 @@
 
 #ifdef Q_OS_WIN
 #include "windows.h"
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 #endif
 
 const int defaultStorageBlockSize = 32768;
@@ -230,21 +231,39 @@ elcUtils::expandEnvironmentStrings(QString &path)
 }
 
 bool
+elcUtils::isFolderWritable(const QString &path)
+{
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup++; // turn checking on
+#endif
+    bool retVal = QFileInfo(path).isWritable();
+#ifdef Q_OS_WIN
+    qt_ntfs_permission_lookup--; // turn it off again
+#endif
+    return retVal;
+}
+
+bool
 elcUtils::mkPath(const QString &dirPath, QString &errorString)
 {
-    QFileInfo fi(dirPath);
-    bool retVal=fi.permission(QFile::WriteUser);
+    QDir dir(dirPath);
+    bool retVal = dir.exists();
     if (retVal) {
-        QDir dir;
-        retVal = dir.exists(dirPath);
+        retVal = isFolderWritable(dirPath);
         if (!retVal) {
+            errorString = QStringLiteral("Access denied");
+        }
+    } else {
+        QString path = QFileInfo(dirPath).absolutePath();
+        retVal = isFolderWritable(path);
+        if (retVal) {
             retVal = dir.mkpath(dirPath);
             if (!retVal) {
                 errorString = QStringLiteral("Error create directory path");
             }
+        } else {
+            errorString = QStringLiteral("Access denied");
         }
-    } else {
-        errorString = QStringLiteral("Access denied");
     }
     return retVal;
 }

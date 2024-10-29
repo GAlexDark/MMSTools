@@ -43,6 +43,7 @@ namespace elcUtils
     bool isRdsMode(quint32 &errorCode);
 #endif
     void expandEnvironmentStrings(QString &path);
+    bool isFolderWritable(const QString &path);
     bool mkPath(const QString &dirPath, QString &errorString);
     QStringList getDataSourceList(const QString &path, const QStringList &mask);
     QString getFileErrorMessage(const QFile::FileError error);
