@@ -207,20 +207,26 @@ convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputM
             }
             if (retVal) {
                 if (!recordsArray->isEmpty()) {
-                    QFile jsonFile(fileName);
-                    retVal = jsonFile.open(QIODevice::WriteOnly);
+                    QString path = QFileInfo(fileName).absolutePath();
+                    retVal = elcUtils::isFolderWritable(path);
                     if (retVal) {
-                        QJsonDocument jsonResult(*recordsArray);
-                        QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
-                        retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
+                        QFile jsonFile(fileName);
+                        retVal = jsonFile.open(QIODevice::WriteOnly);
                         if (retVal) {
-                            msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 1)).arg(fileName);
+                            QJsonDocument jsonResult(*recordsArray);
+                            QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
+                            retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
+                            if (retVal) {
+                                msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 1)).arg(fileName);
+                            } else {
+                                msgString = QLatin1String("Error save result to the file '%1':").arg(fileName, jsonFile.errorString());
+                            }
+                            jsonFile.close();
                         } else {
-                            msgString = QLatin1String("Error save result to the file '%1':").arg(fileName, jsonFile.errorString());
+                            msgString = QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString());
                         }
-                        jsonFile.close();
                     } else {
-                        msgString = QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString());
+                        msgString = QLatin1String("You don't have write permissions to this folder: %1").arg(path);
                     }
                 } else {
                     msgString = QLatin1String("Nothing to save.");
