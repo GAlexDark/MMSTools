@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScopedPointer>
+#include <QFileInfo>
 
 #include "CElcGuiAppSettings.h"
 #include "MMSTypes.h"
@@ -394,34 +395,40 @@ MainWindow::generateReportClick()
                                                         m_lastDir,
                                                         tr("Excel (*.xlsx)"));
         if (!reportName.isEmpty()) {
-            setInfoText(tr("The report will be created here: %1").arg(reportName));
-
-            setInfoText(tr("Generating report..."));
-            setStateText(tr("Generating report"));
-            QCoreApplication::processEvents();
-
-            const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-            bool showMilliseconds = settings.getShowMilliseconds();
-            CSVThreadReportBuilder report;
-            bool retVal = report.init(m_logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+            QString path = QFileInfo(reportName).absolutePath();
+            bool retVal = elcUtils::isFolderWritable(path);
             if (retVal) {
-                report.start();
+                setInfoText(tr("The report will be created here: %1").arg(reportName));
 
-                setInfoText(tr("wait..."));
-                elcUtils::waitForEndThread(&report, 100);
-                retVal = report.getStatus();
-            }
-            QCoreApplication::processEvents();
-            excludedUsers.clear();
-            includedUsers.clear();
-            if (retVal) {
-                setInfoText(tr("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
-                setStateText(tr("Report created"));
+                setInfoText(tr("Generating report..."));
+                setStateText(tr("Generating report"));
+                QCoreApplication::processEvents();
+
+                const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
+                bool showMilliseconds = settings.getShowMilliseconds();
+                CSVThreadReportBuilder report;
+                retVal = report.init(m_logId, m_dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+                if (retVal) {
+                    report.start();
+
+                    setInfoText(tr("wait..."));
+                    elcUtils::waitForEndThread(&report, 100);
+                    retVal = report.getStatus();
+                }
+                QCoreApplication::processEvents();
+                excludedUsers.clear();
+                includedUsers.clear();
+                if (retVal) {
+                    setInfoText(tr("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
+                    setStateText(tr("Report created"));
+                } else {
+                    setInfoText(tr("Error generate report: %1").arg(report.errorString()));
+                    setStateText(tr("Error"));
+                }
             } else {
-                setInfoText(tr("Error generate report: %1").arg(report.errorString()));
-                setStateText(tr("Error"));
+                setInfoText(tr("You don't have write permissions to this folder: %1").arg(path));
+                setStateText(tr("Warning"));
             }
-
         } else {
             setInfoText(tr("Report name is empty"));
             setStateText(tr("Ready"));

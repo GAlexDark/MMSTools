@@ -166,41 +166,47 @@ int main(int argc, char *argv[])
 
     if (runningMode != RunningMode::RUNNINGMODE_IMPORT_ONLY && runningMode != RunningMode::RUNNINGMODE_CLEAN_DB) {
         QString reportName = cmd.getReportName();
-
-        QStringList excludedUsers;
-        QStringList includedUsers;
-        if (!cmd.getExcludedUserNames(excludedUsers)) {
-            consoleOut.outToConsole(cmd.errorString());
-            return 1;
-        }
-
-        if (!cmd.getIncludedUserNames(includedUsers)) {
-            consoleOut.outToConsole(cmd.errorString());
-            return 1;
-        }
-
-        CReportManager::instance().init();
-        consoleOut.outToConsole(QLatin1String("Start generating the report..."));
-
-        bool showMilliseconds = settings.getShowMilliseconds();
-        CSVThreadReportBuilder report;
-        quint16 logID = 1;
-        bool retVal = report.init(logID, dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+        QString path = QFileInfo(reportName).absolutePath();
+        bool retVal = elcUtils::isFolderWritable(path);
         if (retVal) {
-            report.start();
+            QStringList excludedUsers;
+            QStringList includedUsers;
+            if (!cmd.getExcludedUserNames(excludedUsers)) {
+                consoleOut.outToConsole(cmd.errorString());
+                return 1;
+            }
 
-            consoleOut.outToConsole(QLatin1String("wait..."));
-            elcUtils::waitForEndThread(&report, 100);
-            retVal = report.getStatus();
-        }
-        QCoreApplication::processEvents();
+            if (!cmd.getIncludedUserNames(includedUsers)) {
+                consoleOut.outToConsole(cmd.errorString());
+                return 1;
+            }
 
-        excludedUsers.clear();
-        includedUsers.clear();
-        if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
+            CReportManager::instance().init();
+            consoleOut.outToConsole(QLatin1String("Start generating the report..."));
+
+            bool showMilliseconds = settings.getShowMilliseconds();
+            CSVThreadReportBuilder report;
+            quint16 logID = 1;
+            retVal = report.init(logID, dbName, reportName, &excludedUsers, &includedUsers, showMilliseconds);
+            if (retVal) {
+                report.start();
+
+                consoleOut.outToConsole(QLatin1String("wait..."));
+                elcUtils::waitForEndThread(&report, 100);
+                retVal = report.getStatus();
+            }
+            QCoreApplication::processEvents();
+
+            excludedUsers.clear();
+            includedUsers.clear();
+            if (retVal) {
+                consoleOut.outToConsole(QStringLiteral("Report generating finished.\nThe report was saved in the %1 file.").arg(reportName));
+            } else {
+                consoleOut.outToConsole(QStringLiteral("Error generate report: %1").arg(report.errorString()));
+                return 1;
+            }
         } else {
-            consoleOut.outToConsole(QStringLiteral("Error generate report: %1").arg(report.errorString()));
+            consoleOut.outToConsole(QStringLiteral("You don't have write permissions to this folder: %1").arg(path));
             return 1;
         }
     }
