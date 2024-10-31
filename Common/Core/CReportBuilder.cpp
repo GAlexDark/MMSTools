@@ -41,6 +41,41 @@ CReportBuilder::configureDb(const QString &dbFileName)
     return retVal;
 }
 
+bool
+CReportBuilder::connectToDatabase(const QString &dbFileName)
+{
+    bool retVal = m_db.init(dbFileName);
+    if (retVal) {
+        retVal = m_db.open();
+        if (retVal) {
+            retVal = configureDb(dbFileName);
+            if (!retVal) {
+                m_errorString = m_db.errorString();
+            }
+        }
+    }
+    return retVal;
+}
+
+bool
+CReportBuilder::initReport(const QString &reportName, const bool showMilliseconds)
+{
+    QStringList tables = m_report->sources();
+    bool retVal = !tables.isEmpty();
+    if (retVal) {
+        QString table;
+        retVal = m_db.checkTables(tables, table);
+        if (retVal) {
+            m_report->init(&m_db, reportName, showMilliseconds);
+        } else {
+            m_errorString = QStringLiteral("The table '%1' not found. The report cannot create results.").arg(table);
+        }
+    } else {
+        m_errorString = QStringLiteral("List of tables not found. The report cannot check them.");
+    }
+    return retVal;
+}
+
 CReportBuilder::CReportBuilder()
 {
     m_errorString.clear();
@@ -69,36 +104,15 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
     if (retVal) {
         m_report = reportManager.getInstance(logID);
         Q_CHECK_PTR(m_report);
-        retVal = m_db.init(dbFileName);
+        retVal = connectToDatabase(dbFileName);
         if (retVal) {
-            retVal = m_db.open();
-            if (retVal) {
-                retVal = configureDb(dbFileName);
-            }
-        }
-        if (retVal) {
-            QStringList tables = m_report->sources();
-            if (!tables.isEmpty()) {
-                QString table;
-                retVal = m_db.checkTables(tables, table);
-                if (retVal) {
-                    m_report->init(&m_db, reportName, showMilliseconds);
-                } else {
-                    m_errorString = QStringLiteral("The table '%1' not found. The report cannot create results.").arg(table);
-                }
-            } else {
-                m_errorString = QStringLiteral("List of tables not found. The report cannot check them.");
-            }
+            retVal = initReport(reportName, showMilliseconds);
         } else {
-            m_errorString = m_db.errorString();
-        }
-        if (!retVal) {
             m_db.close();
         }
     } else {
         m_errorString = QStringLiteral("The report not found");
     }
-
     return retVal;
 }
 

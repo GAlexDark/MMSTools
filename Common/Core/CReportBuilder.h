@@ -43,6 +43,8 @@ private:
     CReportBuilder(const CReportBuilder&) = delete;
     CReportBuilder& operator=(CReportBuilder&) = delete;
     bool configureDb(const QString &dbFileName);
+    bool connectToDatabase(const QString &dbFileName);
+    bool initReport(const QString &reportName, const bool showMilliseconds);
 
     CSqliteDatabase  m_db;
     pBasicReport    m_report = nullptr; // don't use the 'detele' operator, the ReportManager manage resources

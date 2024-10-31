@@ -36,43 +36,6 @@ const QString authFailedEn("User login - unsuccessful");
 
 //=================================================================================
 
-void
-CEventLogParser::getPreviousSuccessData()
-{
-    m_username1 = m_prevValueUSLD.username;
-    m_authType = m_prevValueUSLD.authType;
-    m_internalip = m_prevValueUSLD.internalIp;
-    m_externalip = m_prevValueUSLD.externalIp;
-}
-
-void
-CEventLogParser::setPreviousSuccessData()
-{
-    m_prevValueUSLD.details = m_details;
-    m_prevValueUSLD.username = m_username1;
-    m_prevValueUSLD.authType = m_authType;
-    m_prevValueUSLD.internalIp = m_internalip;
-    m_prevValueUSLD.externalIp = m_externalip;
-}
-
-void
-CEventLogParser::getPreviousFailedData()
-{
-    m_username1.clear();
-    m_authType = m_prevValueUFLD.authType;
-    m_internalip = m_prevValueUFLD.internalIp;
-    m_externalip = m_prevValueUFLD.externalIp;
-}
-
-void
-CEventLogParser::setPreviousFailedData()
-{
-    m_prevValueUFLD.details = m_details;
-    m_prevValueUFLD.authType = m_authType;
-    m_prevValueUFLD.internalIp = m_internalip;
-    m_prevValueUFLD.externalIp = m_externalip;
-}
-
 bool
 CEventLogParser::parseUserSuccessLogonDetails()
 {
@@ -111,11 +74,18 @@ CEventLogParser::userSuccessLogonDetails()
 {
     bool retVal = true;
     if (QString::compare(m_prevValueUSLD.details, m_details, Qt::CaseInsensitive) == 0) {
-        getPreviousSuccessData();
+        m_username1 = m_prevValueUSLD.username;
+        m_authType = m_prevValueUSLD.authType;
+        m_internalip = m_prevValueUSLD.internalIp;
+        m_externalip = m_prevValueUSLD.externalIp;
     } else {
         retVal = parseUserSuccessLogonDetails();
         if (retVal) {
-            setPreviousSuccessData();
+            m_prevValueUSLD.details = m_details;
+            m_prevValueUSLD.username = m_username1;
+            m_prevValueUSLD.authType = m_authType;
+            m_prevValueUSLD.internalIp = m_internalip;
+            m_prevValueUSLD.externalIp = m_externalip;
         }
     }
     return retVal;
@@ -126,11 +96,17 @@ CEventLogParser::userFailedLogonDetails()
 {
     bool retVal = true;
     if (QString::compare(m_prevValueUFLD.details, m_details, Qt::CaseInsensitive) == 0) {
-        getPreviousFailedData();
+        m_username1.clear();
+        m_authType = m_prevValueUFLD.authType;
+        m_internalip = m_prevValueUFLD.internalIp;
+        m_externalip = m_prevValueUFLD.externalIp;
     } else {
         retVal = parseUserFailedLogonDetails();
         if (retVal) {
-            setPreviousFailedData();
+            m_prevValueUFLD.details = m_details;
+            m_prevValueUFLD.authType = m_authType;
+            m_prevValueUFLD.internalIp = m_internalip;
+            m_prevValueUFLD.externalIp = m_externalip;
         }
     }
     return retVal;
