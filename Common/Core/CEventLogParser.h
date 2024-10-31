@@ -58,8 +58,14 @@ public:
     mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 private:
+    void getPreviousSuccessData();
+    void setPreviousSuccessData();
+    void getPreviousFailedData();
+    void setPreviousFailedData();
     bool parseUserSuccessLogonDetails();
     bool parseUserFailedLogonDetails();
+    bool userSuccessLogonDetails();
+    bool userFailedLogonDetails();
     bool parseUserLogonDetails();
 
     struct userSuccessLogonDetails_t
