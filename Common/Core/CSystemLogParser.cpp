@@ -143,34 +143,22 @@ CSystemLogParser::parseGateInfo()
 {
     bool retVal = m_message.startsWith(gate);
     if (retVal) {
+        m_username1.clear();
+        m_role.clear();
+        m_companyname.clear();
         if (m_message.indexOf(automaticallyOpened) != -1) {
-            m_username1.clear();
-            m_role.clear();
-            m_companyname.clear();
             m_type = gateAutomaticallyOpened;
         } else {
             if (m_message.indexOf(automaticallyClosed) != -1) {
-                m_username1.clear();
-                m_role.clear();
-                m_companyname.clear();
                 m_type = gateAutomaticallyClosed;
             } else {
                 if (m_message.indexOf(reopened) != -1) {
-                    m_username1.clear();
-                    m_role.clear();
-                    m_companyname.clear();
                     m_type = gateReopened;
                 } else {
                     if (m_message.indexOf(opened) != -1) {
-                        m_username1.clear();
-                        m_role.clear();
-                        m_companyname.clear();
                         m_type = gateOpened;
                     } else {
                         if (m_message.indexOf(closed) != -1) {
-                            m_username1.clear();
-                            m_role.clear();
-                            m_companyname.clear();
                             m_type = gateClosed;
                         } else {
                             retVal = false;

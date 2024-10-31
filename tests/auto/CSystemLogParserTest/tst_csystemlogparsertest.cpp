@@ -23,6 +23,7 @@ private:
     QString m_role;
     QString m_companyname;
 
+    void test_other(const QString &fileName);
 
 private slots:
     void initTestCase();
@@ -94,10 +95,9 @@ CSystemLogParserTest::test_userRoleCompany()
     QCOMPARE(m_companyname, QString("TEST"));
 }
 
-void
-CSystemLogParserTest::test_other1()
+void CSystemLogParserTest::test_other(const QString &fileName)
 {
-    QFile file(SRCDIR"data/testcase_other1.csv");
+    QFile file(fileName);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
 #else
@@ -114,8 +114,6 @@ CSystemLogParserTest::test_other1()
                            m_role, m_companyname);
 
     QCOMPARE(m_severity, QString("INFO"));
-    QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-07-14T16:43:20"));
-    QCOMPARE(m_message, QString("file processing finished. file: long_long_filename.xml)"));
     QCOMPARE(m_username, QString());
     QCOMPARE(m_username1, QString());
     QCOMPARE(m_role, QString());
@@ -123,31 +121,21 @@ CSystemLogParserTest::test_other1()
 }
 
 void
+CSystemLogParserTest::test_other1()
+{
+    test_other(SRCDIR"data/testcase_other1.csv");
+
+    QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-07-14T16:43:20"));
+    QCOMPARE(m_message, QString("file processing finished. file: long_long_filename.xml)"));
+}
+
+void
 CSystemLogParserTest::test_other2()
 {
-    QFile file(SRCDIR"data/testcase_other2.csv");
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    bool retVal = file.open(QIODeviceBase::ReadOnly);
-#else
-    bool retVal = file.open(QIODevice::ReadOnly);
-#endif
-    QVERIFY(retVal);
-    QByteArray buf = file.readAll();
-    QVERIFY(!buf.isEmpty());
-    file.close();
+    test_other(SRCDIR"data/testcase_other2.csv");
 
-    retVal = m_parser.parse(buf);
-    QVERIFY(retVal);
-    m_parser.getParsedData(m_severity, m_timestamp, m_message, m_username, m_username1,
-                           m_role, m_companyname);
-
-    QCOMPARE(m_severity, QString("INFO"));
     QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-07-14T16:43:17"));
     QCOMPARE(m_message, QString("file processing started ... (file: long_long_filename.xml)"));
-    QCOMPARE(m_username, QString());
-    QCOMPARE(m_username1, QString());
-    QCOMPARE(m_role, QString());
-    QCOMPARE(m_companyname, QString());
 }
 
 QTEST_APPLESS_MAIN(CSystemLogParserTest)

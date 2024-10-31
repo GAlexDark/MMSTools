@@ -23,15 +23,15 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QCryptographicHash>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
 #include <openssl/pem.h>
 #include <openssl/err.h>
-#include "BioByteArray.h"
 
-const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=]"));
+const QRegularExpression rePem(QLatin1String("[^a-zA-Z0-9+/=\r\n]"));
 const QByteArray beginLine("-----BEGIN CERTIFICATE-----\n");
 const QByteArray endLine("\n-----END CERTIFICATE-----");
 
@@ -96,10 +96,13 @@ CPkcs7::readCert(const QByteArray &buf)
     bool retVal = true;
     ERR_clear_error();
 
+    QScopedPointer<BIO, bioFree> pBuf;
+    const void* data = buf.constData();
+    pBuf.reset(BIO_new_mem_buf(data, buf.length()));
     if (buf.contains("BEGIN") && buf.contains("END")) {
-        m_cert.reset(PEM_read_bio_X509(BioByteArray(buf).ro(), nullptr, nullptr, nullptr));
+        m_cert.reset(PEM_read_bio_X509(pBuf.data(), nullptr, nullptr, nullptr));
     } else {
-        m_cert.reset(d2i_X509_bio(BioByteArray(buf).ro(), nullptr));
+        m_cert.reset(d2i_X509_bio(pBuf.data(), nullptr));
     }
     if (m_cert.isNull()) {
         m_errorString = getOpenSslErrorMessage();
@@ -114,7 +117,7 @@ CPkcs7::readCertFromFile(const QString &certFileName)
     QFile file(certFileName);
     bool retVal = file.open(QIODevice::ReadOnly);
     if (retVal) {
-        QByteArray buf(file.readAll());
+        QByteArray buf(file.readAll().trimmed());
         retVal = !buf.isEmpty();
         file.close();
         if (retVal) {
@@ -226,19 +229,25 @@ CPkcs7::saveStore(const QString &fileName)
 {
     bool retVal = !m_pkcs7Store.isNull();
     if (retVal) {
-        BioByteArray buf;
+        QScopedPointer<BIO, bioFree> buf(BIO_new(BIO_s_mem()));
         ERR_clear_error();
-        int res = i2d_PKCS7_bio(buf, m_pkcs7Store.data());
+        int res = i2d_PKCS7_bio(buf.data(), m_pkcs7Store.data());
         if (res > 0) {
             QFile file(fileName);
             retVal = file.open(QIODevice::WriteOnly);
             if (retVal) {
-                res = file.write(buf);
-                if (res == -1) {
-                    m_errorString = QStringLiteral("Error write to file: '%1': %2").arg(fileName, file.errorString());
-                    retVal = false;
+                const char *pBuf = nullptr;
+                int len = BIO_get_mem_data(buf.data(), &pBuf);
+                if (len > 0) {
+                    res = file.write(pBuf, len);
+                    file.close();
+                    if (res == -1) {
+                        m_errorString = QStringLiteral("Error write to file: '%1': %2").arg(fileName, file.errorString());
+                        retVal = false;
+                    }
+                } else {
+                    m_errorString = QStringLiteral("Nothing to save.");
                 }
-                file.close();
             } else {
                 m_errorString = QStringLiteral("Error opening file: '%1': %2").arg(fileName, file.errorString());
             }
@@ -281,12 +290,11 @@ CPkcs7::createHashFile(const QString &fileName, QString &errorString)
     if (retVal) {
         QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
         QString path = QFileInfo(fileName).path();
-        QFile hashFile(QStringLiteral("%1/%2.sha").arg(path, baseName));
+        QFile hashFile(QDir(path).filePath(baseName + ".sha"));
         retVal = hashFile.open(QIODevice::WriteOnly);
         if (retVal) {
             QTextStream stream(&hashFile);
-            QString file = QFileInfo(fileName).fileName(); // filename.ext
-            stream << QStringLiteral("%1 *%2").arg(hash.toHex(), file);
+            stream << QStringLiteral("%1 *%2").arg(hash.toHex(), QFileInfo(fileName).fileName()); // filename.ext
             hashFile.close();
         } else {
             errorString = QStringLiteral("Error! Could not create hash file: %1").arg(hashFile.errorString());

@@ -60,6 +60,8 @@ public:
 private:
     bool parseUserSuccessLogonDetails();
     bool parseUserFailedLogonDetails();
+    bool userSuccessLogonDetails();
+    bool userFailedLogonDetails();
     bool parseUserLogonDetails();
 
     struct userSuccessLogonDetails_t

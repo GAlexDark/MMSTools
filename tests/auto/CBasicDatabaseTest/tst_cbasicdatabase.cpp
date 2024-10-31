@@ -5,8 +5,6 @@
 #include "CSqliteDatabase.h"
 #include "DBStrings.h"
 
-// add necessary includes here
-
 const int recordCount = 51;
 
 const QString selectCount(QLatin1String("select count() from eventlog;"));

@@ -189,15 +189,15 @@ CElcCmdLineParser::getDataFilesList(QStringList &fileList)
         }
     }
     if (retVal && m_isPath) {
-        QString searchFolder(m_parser.value("path"));
+        QString searchFolder = m_parser.value("path").trimmed();
         QFileInfo sf(searchFolder);
         QDir dir = sf.absoluteDir();
-        QString mask = sf.fileName().trimmed();
-        if (mask.isEmpty()) {
-            mask = QLatin1String("*.csv"); // default mask
-        }
         if (dir.exists()) {
             searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
+            QString mask = sf.fileName().trimmed();
+            if (mask.isEmpty()) {
+                mask = QLatin1String("*.csv"); // default mask
+            }
             fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
         } else {
             setErrorString(QStringLiteral("Cannot find the directory %1.").arg(searchFolder));
@@ -219,24 +219,27 @@ CElcCmdLineParser::getReportName() const
 {
     QString retVal;
     if (m_isReportName) {
-        retVal = m_parser.value("report");
+        retVal = m_parser.value("report").trimmed();
     } else {
         QDateTime now = QDateTime::currentDateTime();
         retVal = QLatin1String("%1_report.xlsx").arg(now.toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
     }
 
-    if (!retVal.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
-        retVal = retVal + QLatin1String(".xlsx");
+    if (retVal.endsWith(QLatin1String(".xls"), Qt::CaseInsensitive)) {
+        retVal = retVal.toLower() + 'x';
+    } else {
+        if (!retVal.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
+            retVal = retVal + QLatin1String(".xlsx");
+        }
     }
 
-    if ((retVal.indexOf('/') == -1) || (retVal.indexOf('\\') == -1)) {
-        // if m_filesList.isEmpty() == true, we returns utility directory as path for the report file
-        // otherwise - returns path to the first data file
+    if ((retVal.indexOf('/') == -1) && (retVal.indexOf('\\') == -1)) {
         QString filePath = m_filesList.isEmpty() ? QFileInfo(retVal).absolutePath() : QFileInfo(m_filesList.at(0)).absolutePath();
         retVal = QDir(filePath).filePath(retVal);
+    } else {
+        retVal = QDir::fromNativeSeparators(retVal);
+        retVal.replace(QLatin1String("//"), QLatin1String("/"));
     }
-    retVal = QDir::fromNativeSeparators(retVal);
-    retVal.replace(QLatin1String("//"), QLatin1String("/"));
 
     return retVal;
 }

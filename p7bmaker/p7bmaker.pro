@@ -49,15 +49,13 @@ HEADERS += \
   ../Common/Core/elcUtils.h \
   ../Common/Core/MMSTypes.h \
   src/CP7bMakerCmdLineParser.h \
-  src/CPkcs7.h \
-  src/BioByteArray.h
+  src/CPkcs7.h
 
 SOURCES += \
   ../Common/Core/CBasicCmdLineParser.cpp \
   ../Common/Core/elcUtils.cpp \
   src/CP7bMakerCmdLineParser.cpp \
   src/CPkcs7.cpp \
-  src/BioByteArray.cpp \
   src/main.cpp
 
 include(../deployment.pri)
@@ -68,7 +66,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 0
-BUILD_VER = 4
+BUILD_VER = 6
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

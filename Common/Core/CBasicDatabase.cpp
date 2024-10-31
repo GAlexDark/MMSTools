@@ -66,6 +66,18 @@ CBasicDatabase::_exec()
     return retVal;
 }
 
+void CBasicDatabase::_connectToDatabase(const QString &dbDriverName, const QString &connectionString)
+{
+    m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
+    m_isInited = m_db.isValid();
+    if (m_isInited) {
+        m_db.setDatabaseName(connectionString);
+    } else {
+        QSqlError error = m_db.lastError();
+        m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
+    }
+}
+
 /*********************************************************************
  *
  *  Public functions
@@ -263,14 +275,7 @@ CBasicDatabase::init(const QString &dbDriverName, const QString &connectionStrin
                 m_errorString = QStringLiteral("The DB driver name is empty");
             } else {
                 // соединяемся с базой данных
-                m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
-                m_isInited = m_db.isValid();
-                if (m_isInited) {
-                    m_db.setDatabaseName(connectionString);
-                } else {
-                    QSqlError error = m_db.lastError();
-                    m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
-                }
+                _connectToDatabase(dbDriverName, connectionString)                ;
             }
         }
     }

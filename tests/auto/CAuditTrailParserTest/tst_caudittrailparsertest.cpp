@@ -28,6 +28,8 @@ private:
     QString     m_internalip;
     QString     m_externalip;
 
+    void test_testdata1(const QString &fileName);
+
 private slots:
     void initTestCase();
     void test_parsePerson();
@@ -105,10 +107,9 @@ CAuditTrailParserTest::test_userLoginSuccess()
     QCOMPARE(m_externalip, QString());
 }
 
-void
-CAuditTrailParserTest::test_dispatchBySystem()
+void CAuditTrailParserTest::test_testdata1(const QString &fileName)
 {
-    QFile file(SRCDIR"data/testcase_dispatchBySystem.csv");
+    QFile file(fileName);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool retVal = file.open(QIODeviceBase::ReadOnly);
 #else
@@ -125,46 +126,32 @@ CAuditTrailParserTest::test_dispatchBySystem()
                            m_internalip, m_externalip);
 
     QCOMPARE(m_status, QString("Succeeded"));
-    QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-03-22T18:07:16"));
-    QCOMPARE(m_method, QString("com.smart.eventmonitor.planned.ISEMPlannedEventMonitorUseCases.dispatchBySystem"));
     QCOMPARE(m_username, QString("mr_data"));
     QCOMPARE(m_role, QString("Test Manager"));
     QCOMPARE(m_companyname, QString("TEST"));
-    QCOMPARE(m_attributes, QString("UID: 1000001"));
     QCOMPARE(m_username1, QString());
     QCOMPARE(m_internalip, QString("10.10.10.10"));
     QCOMPARE(m_externalip, QString());
 }
 
 void
+CAuditTrailParserTest::test_dispatchBySystem()
+{
+    test_testdata1(SRCDIR"data/testcase_dispatchBySystem.csv");
+
+    QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-03-22T18:07:16"));
+    QCOMPARE(m_method, QString("com.smart.eventmonitor.planned.ISEMPlannedEventMonitorUseCases.dispatchBySystem"));
+    QCOMPARE(m_attributes, QString("UID: 1000001"));
+}
+
+void
 CAuditTrailParserTest::test_doFileUpload()
 {
-    QFile file(SRCDIR"data/testcase_doFileUpload.csv");
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    bool retVal = file.open(QIODeviceBase::ReadOnly);
-#else
-    bool retVal = file.open(QIODevice::ReadOnly);
-#endif
-    QVERIFY(retVal);
-    QByteArray buf = file.readAll();
-    QVERIFY(!buf.isEmpty());
-    file.close();
+    test_testdata1(SRCDIR"data/testcase_doFileUpload.csv");
 
-    retVal = m_parser.parse(buf);
-    QVERIFY(retVal);
-    m_parser.getParsedData(m_status, m_timestamp, m_method, m_username, m_role, m_companyname, m_attributes, m_username1,
-                           m_internalip, m_externalip);
-
-    QCOMPARE(m_status, QString("Succeeded"));
     QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-03-22T18:07:24"));
     QCOMPARE(m_method, QString("doFileUpload"));
-    QCOMPARE(m_username, QString("mr_data"));
-    QCOMPARE(m_role, QString("Test Manager"));
-    QCOMPARE(m_companyname, QString("TEST"));
     QCOMPARE(m_attributes, QString("very_very_long_filename.xml;java.io.ByteArrayInputStream@5007a705;uk;[ReturnMessageBean(0,web.ess.answer,A01,null,null)]"));
-    QCOMPARE(m_username1, QString());
-    QCOMPARE(m_internalip, QString("10.10.10.10"));
-    QCOMPARE(m_externalip, QString());
 }
 
 void

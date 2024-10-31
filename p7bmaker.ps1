@@ -131,7 +131,7 @@ Param (
 
     [Parameter (Mandatory=$false, Position=1,
     HelpMessage="Enable flag when the script run in the Corporate Network.")]
-    [switch]$UseProxy = $false,
+    [switch] $UseProxy = $false,
 
     [Parameter (Mandatory=$false, Position=2,
     HelpMessage="Enter the actual Download Url.")]
@@ -139,6 +139,10 @@ Param (
 )
 
 $Workdir = $Workdir.Trim()
+if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
+    (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
+    $Workdir = $PSScriptRoot
+}
 try {
     [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
     if (!$retVal) {
@@ -151,7 +155,6 @@ try {
 }
 
 Write-Host "p7b file maker PoSH Script Version 1.0`nCopyright (C) 2024 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
-Write-Host "This script used the function Start-ProcessWithOutput() by Tomas Madajevas: https://medium.com/@tomas.madajevas/retrieving-executables-output-in-powershell-68e91bdee721`n" -ForegroundColor Yellow
 Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 #**************************************************************************************
 #
@@ -193,16 +196,19 @@ function Get-DomainFromUrl {
         [string] $baseUrl
     )
 
-    [string] $baseUrl = $baseUrl.Substring(0, $baseUrl.LastIndexOf("/") + 1)
-    [string] $baseSlash = $baseUrl.IndexOf("/", $baseUrl.IndexOf("://") + 3)
+    $url = [System.Uri]$baseUrl
+    return $url.Host
+}
 
-    [string] $retVal = ""
-    if($baseSlash -ge 0) {
-        $retVal = $baseUrl.Substring(0, $baseSlash) + '/'
-    } else {
-        $retVal = $baseUrl
-    }
-    return $retVal
+function Get-FileNameFromUrl {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $baseUrl
+    )
+
+    $url = [System.Uri]$baseUrl
+    return $url.Segments[-1]
 }
 
 function Test-CheckDnsName {
@@ -213,11 +219,9 @@ function Test-CheckDnsName {
     )
 
     [bool] $retVal = $true;
-    [int] $startIndex = $Domain.IndexOf("://")
-    [string] $name = $Domain.Substring($startIndex + 3, $Domain.LastIndexOf("/") - $startIndex - 3)
     try {
-        $dnsRecord = Resolve-DnsName -Name $name -DnsOnly -ErrorAction Stop
-        Write-Host "OK - The domain name '$name' was resolved to the IP address: $($dnsRecord.IPAddress -join ',')" -ForegroundColor green
+        $dnsRecord = Resolve-DnsName -Name $Domain -DnsOnly -ErrorAction Stop
+        Write-Host "OK - The domain name '$Domain' was resolved to the IP address: $($dnsRecord.IPAddress -join ',')" -ForegroundColor green
     } catch {
         $errMessage = $PSItem.Exception.Message
         Write-Host "Error resolve host $errMessage" -ForegroundColor Red
@@ -238,22 +242,18 @@ function Get-DownloadFile {
         [string] $SavePath
     )
 
-    [string] $fileName = $DownloadUrl.Substring($DownloadUrl.LastIndexOf('/') + 1)
-    if ($SavePath.EndsWith('\')) {
-        $fileName = $SavePath + $fileName
-    } else {
-        $fileName = $SavePath + '\' + $fileName
-    }
+    $fileName = Get-FileNameFromUrl $DownloadUrl
+    $fileName = Join-Path -Path $SavePath -ChildPath $fileName
 
     Add-Type -AssemblyName System.Net.Http
     if ($UseProxy) {
         $handler = New-Object System.Net.Http.HttpClientHandler
         $handler.UseDefaultCredentials = $true
-		if ([string]::IsNullOrEmpty($proxyName)) {
-			$handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
-		} else {
-			$handler.Proxy = New-Object System.Net.WebProxy($proxyName)
-		}
+        if ([string]::IsNullOrEmpty($proxyName)) {
+            $handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
+        } else {
+            $handler.Proxy = New-Object System.Net.WebProxy($proxyName)
+        }
         $handler.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials
         $httpClient = New-Object System.Net.Http.HttpClient($handler)
     } else {
@@ -296,69 +296,34 @@ function Get-DownloadFile {
     return $retVal
 }
 
-function Start-ProcessWithOutput {
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $FilePath,
-        [Parameter()]
-        [string[]] $ArgumentsList
-     )
-
-    begin {
-        [string] $tmp = [System.IO.Path]::GetTempFileName()
-        try {
-            $readJob = Start-Job -ScriptBlock { param( $Path ) Get-Content -Path $Path -Wait -Encoding UTF8 } -ArgumentList $tmp  -ErrorAction Stop -ErrorVariable err
-            $process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentsList -RedirectStandardOutput $tmp -Wait -NoNewWindow -PassThru -ErrorAction Stop -ErrorVariable err
-        } catch {
-            Write-Error $err
-            exit 1
-        }
-    }
-
-    process {
-        do {
-            $readJob | Receive-Job | Write-Output
-        } while (-not $process.HasExited)
-    }
-
-    end {
-        $readJob | Remove-Job -Force
-        Remove-Item -Path $tmp -Force
-     }
-}
-
-if ($Workdir.EndsWith('\')) {
-    $maskP7b = $Workdir + "*.p7b"
-    $maskSha = $Workdir + "*.sha"
-    $maskZip = $Workdir + "*.zip"
-    $maskCer = $Workdir + "*.cer"
-    $newDir = $Workdir + (Get-Date).ToString('yyyyMMdd')
-} else {
-    $maskP7b = $Workdir + "\*.p7b"
-    $maskSha = $Workdir + "\*.sha"
-    $maskZip = $Workdir + "\*.zip"
-    $maskCer = $Workdir + "\*.cer"
-    $newDir = $Workdir + "\" + (Get-Date).ToString('yyyyMMdd')
-}
-
 #Checking certs
-$certs = Get-ChildItem -Path $Workdir -Filter *.cer
+try {
+    $certs = Get-ChildItem -Path $Workdir -Filter *.cer -ErrorAction Stop
+} catch {
+    Write-Error $PSItem
+    exit 1
+}
+
 if ($certs) {
     $currentDate = Get-Date
-    try {
-        $certs | ForEach-Object {
-            $certSN = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).SerialNumber
-            $certValidTo = ([System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_.FullName)).NotAfter
+    $certs | ForEach-Object {
+        try {
+            $certItem = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $_.FullName
+            [string] $certSN = $certItem.SerialNumber
+            [datetime] $certValidTo = $certItem.NotAfter
             if ($currentDate -gt $certValidTo) {
                 Write-Warning "The certificate SN=$certSN expired!"
                 $newName = $_.FullName + ".expired"
                 Rename-Item -Path $_.FullName -NewName $newName -ErrorAction Stop
             }
+        } catch {
+            Write-Error $PSItem
+            exit 1
+        } finally {
+            if ($certItem) {
+                $certItem.Dispose()
+            }
         }
-    } catch {
-        Write-Error $PSItem
-        exit 1
     }
 } else {
     Write-Host "The certificates is not found!" -ForegroundColor Red
@@ -366,15 +331,18 @@ if ($certs) {
 }
 
 #Removing exists p7b and sha files
+$maskP7b = Join-Path -Path $Workdir -ChildPath "*.p7b"
 [bool] $retVal = Remove-File $maskP7b
 if (-not $retVal) {
     exit 1
 }
+$maskSha = Join-Path -Path $Workdir -ChildPath "*.sha"
 $retVal = Remove-File $maskSha
 if (-not $retVal) {
     exit 1
 }
 #remove previsions zip archives
+$maskZip = Join-Path -Path $Workdir -ChildPath "*.zip"
 $retVal = Remove-File $maskZip
 if (-not $retVal) {
     exit 1
@@ -399,7 +367,7 @@ if (-not $retVal) {
 }
 
 # Let's start creating a p7b container with the necessary certificates
-$pathToExecute = $PSScriptRoot + "\p7bmaker.exe"
+$pathToExecute = Join-Path -Path $PSScriptRoot -ChildPath "p7bmaker.exe"
 $retVal = Test-Path -Path $pathToExecute
 if (-not $retVal) {
     Write-Host "The executable file p7bmaker.exe not found" -ForegroundColor Red
@@ -408,23 +376,19 @@ if (-not $retVal) {
 
 Write-Output "`nStarting $pathToExecute...`n"
 
-Start-ProcessWithOutput -FilePath $pathToExecute -ArgumentsList "-l $WorkDir --silent"
+Start-Process -FilePath $pathToExecute -ArgumentList "-l $WorkDir --silent" -Wait -NoNewWindow
 
 #create archive
-[string] $baseName = $download_url.Substring($download_url.LastIndexOf('/') + 1)
+[string] $baseName = Get-FileNameFromUrl $download_url
 $baseName = $baseName.Substring(0, $baseName.LastIndexOf('.'))
 [string] $archiveName = $baseName + (Get-Date).ToString('yyyyMMdd') + ".zip"
 
 Write-Host "`nCreating archive: $archiveName"
 
 [string] $newP7b = $baseName + (Get-Date).ToString('yyyyMMdd') + ".p7b"
-if ($Workdir.EndsWith('\')) {
-    $archiveName = $Workdir + $archiveName
-    $newP7b = $Workdir + $newP7b
-} else {
-    $archiveName = $Workdir + "\" + $archiveName
-    $newP7b = $Workdir + "\" + $newP7b
-}
+$newP7b = Join-Path -Path $Workdir -ChildPath $newP7b
+$archiveName = Join-Path -Path $Workdir -ChildPath $archiveName
+
 try {
     Compress-Archive -Path $newP7b,$maskSha -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction stop
 } catch {
@@ -433,6 +397,7 @@ try {
 }
 
 #create the new folder and copy files to it
+$newDir = Join-Path -Path $Workdir -ChildPath (Get-Date).ToString('yyyyMMdd')
 Write-Host "Delete the $newDir folder if it exists"
 $retVal = Remove-File $newDir
 if (-not $retVal) {
@@ -440,12 +405,17 @@ if (-not $retVal) {
 }
 
 Write-Host "Creating the $newDir folder and copy files to it"
+$maskCer = Join-Path -Path $Workdir -ChildPath "*.cer"
+$maskCrt = Join-Path -Path $Workdir -ChildPath "*.crt"
+$maskDer = Join-Path -Path $Workdir -ChildPath "*.der"
 try {
     New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
     Copy-Item -Path $maskP7b -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $maskSha -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $archiveName -Destination $newDir -Force -ErrorAction Stop
     Copy-Item -Path $maskCer -Destination $newDir -Force -ErrorAction Stop
+    Copy-Item -Path $maskCrt -Destination $newDir -Force -ErrorAction Stop
+    Copy-Item -Path $maskDer -Destination $newDir -Force -ErrorAction Stop
 } catch {
     Write-Error $PSItem
     exit 1

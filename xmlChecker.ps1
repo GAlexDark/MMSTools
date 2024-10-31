@@ -47,6 +47,10 @@ Param (
 )
 
 $FilePath = $FilePath.Trim()
+if ((($FilePath.Length -eq 1) -and ($FilePath -eq ".")) -or
+    (($FilePath.Length -eq 2) -and ($FilePath -eq ".\"))) {
+    $FilePath = $PSScriptRoot
+}
 try {
     [bool] $retVal = Test-Path -Path $FilePath -ErrorAction Stop -ErrorVariable err
 	if (!$retVal) {

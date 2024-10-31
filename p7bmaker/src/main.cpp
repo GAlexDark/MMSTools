@@ -22,6 +22,7 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QDate>
+#include <QDir>
 
 #include "CPkcs7.h"
 #include "CConsoleOutput.h"
@@ -35,8 +36,8 @@ getP7bResultFileName(const QString &fileName)
     QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
     QString path = QFileInfo(fileName).path();
     QDate now = QDate::currentDate();
-    QString retVal = QStringLiteral("%1/%2%3.p7b").arg(path, baseName, now.toString(QLatin1String("yyyyMMdd")));
-    return retVal.replace("//", "/");
+    QString p7bFileName = QStringLiteral("%1%2.p7b").arg(baseName, now.toString(QLatin1String("yyyyMMdd")));
+    return QDir(path).filePath(p7bFileName);
 }
 
 int main(int argc, char *argv[])
@@ -58,7 +59,7 @@ int main(int argc, char *argv[])
 
     if (!cmd.isSilent()) {
         QString description(QStringLiteral("p7b file maker Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-        description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1 and use the BioByteArray Class from the XCA Project: https://github.com/chris2511/xca.\n"));
+        description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1.\n"));
         consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
         consoleOut.outToConsole(QLatin1String("p7b file maker Utility starting...\n"));
     }
@@ -105,33 +106,38 @@ int main(int argc, char *argv[])
     consoleOut.outToConsole(QStringLiteral("The number of certificates in the container after adding: %1.\n").arg(p7bStore.size()));
 
     QString dest = getP7bResultFileName(source);
-    retVal = p7bStore.saveStore(dest);
+    QString path = QFileInfo(dest).absolutePath();
+    retVal = elcUtils::isFolderWritable(path);
     if (retVal) {
-        consoleOut.outToConsole(QStringLiteral("File '%1' saved successfully.\n").arg(dest));
+        retVal = p7bStore.saveStore(dest);
+        if (retVal) {
+            consoleOut.outToConsole(QStringLiteral("File '%1' saved successfully.\n").arg(dest));
+        } else {
+            consoleOut.outToConsole(QStringLiteral("Error save p7b file: %1.").arg(p7bStore.errorString()));
+            return 1;
+        }
+
+        consoleOut.outToConsole("Calculating result p7b file hash:");
+        QByteArray hash = CPkcs7::getHash(dest).toHex();
+        if (!hash.isEmpty()) {
+            consoleOut.outToConsole(QStringLiteral("SHA-1 hash: %1.\n").arg(hash));
+        } else {
+            consoleOut.outToConsole(QStringLiteral("Error calculate hash."));
+            return 1;
+        }
+
+        consoleOut.outToConsole(QStringLiteral("Creating hash File."));
+        QString errorString;
+        retVal = CPkcs7::createHashFile(dest, errorString);
+        if (retVal) {
+            consoleOut.outToConsole(QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest.replace("p7b", "sha")));
+        } else {
+            consoleOut.outToConsole(errorString);
+        }
+        consoleOut.outToConsole("DONE");
     } else {
-        consoleOut.outToConsole(QStringLiteral("Error save p7b file: %1.").arg(p7bStore.errorString()));
+        consoleOut.outToConsole(QStringLiteral("You don't have write permissions to this folder: %1").arg(path));
         return 1;
     }
-
-    consoleOut.outToConsole("Calculating result p7b file hash:");
-    QByteArray hash = CPkcs7::getHash(dest).toHex();
-    if (!hash.isEmpty()) {
-        consoleOut.outToConsole(QStringLiteral("SHA-1 hash: %1.\n").arg(hash));
-    } else {
-        consoleOut.outToConsole(QStringLiteral("Error calculate hash."));
-        return 1;
-    }
-
-    consoleOut.outToConsole(QStringLiteral("Creating hash File."));
-    QString errorString;
-    retVal = CPkcs7::createHashFile(dest, errorString);
-    if (retVal) {
-        consoleOut.outToConsole(QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest.replace("p7b", "sha")));
-    } else {
-        consoleOut.outToConsole(errorString);
-    }
-
-    consoleOut.outToConsole("DONE");
-
     return retVal ? 0 : 1;
 }

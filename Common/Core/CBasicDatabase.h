@@ -84,6 +84,7 @@ private:
     void _deinit();
     bool _exec(const QString &query);
     bool _exec();
+    void _connectToDatabase(const QString &dbDriverName, const QString &connectionString);
 
 protected:
 /*!
