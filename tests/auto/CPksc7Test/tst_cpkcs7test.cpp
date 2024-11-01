@@ -21,6 +21,7 @@ private slots:
     void test_readBadPemCert_woRN();
     void test_readDerCert();
     void test_getCertsCount();
+    void test_readP7b();
 };
 
 void
@@ -84,6 +85,20 @@ CPkcs7Test::test_getCertsCount()
     qDebug() << "Get the certificates count";
     int certsCount = m_store.size();
     QCOMPARE(certsCount, 5);
+}
+
+void
+CPkcs7Test::test_readP7b()
+{
+    qDebug() << "Read the P7B container";
+    bool retVal = m_store.readStore(SRCDIR"data/testp7b.p7b");
+    if (!retVal) {
+        qDebug() << QStringLiteral("Error read p7b file: %1.").arg(m_store.errorString());
+    }
+    QVERIFY(retVal);
+
+    int certsCount = m_store.size();
+    QCOMPARE(certsCount, 3);
 }
 
 QTEST_APPLESS_MAIN(CPkcs7Test)
