@@ -12,9 +12,9 @@ repos:
       - id: check-yaml
       - id: destroyed-symlinks
       - id: end-of-file-fixer
-        exclude: \.cer$
+        exclude: \.(cer|crt|p7b|pem)$
       - id: mixed-line-ending
-        exclude: \.cer$
+        exclude: \.(cer|crt|p7b|pem)$
       - id: trailing-whitespace
         exclude: \.(md|csv)$
   - repo: meta
