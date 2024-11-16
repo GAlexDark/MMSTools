@@ -375,8 +375,11 @@ if (-not $retVal) {
 }
 
 Write-Output "`nStarting $pathToExecute...`n"
-
-Start-Process -FilePath $pathToExecute -ArgumentList "-l $WorkDir --silent" -Wait -NoNewWindow
+$processInfo = Start-Process -FilePath $pathToExecute -ArgumentList "-l $WorkDir --silent" -Wait -NoNewWindow -PassThru
+if ($processInfo.ExitCode -ne 0) {
+    Write-Host "The $pathToExecute returned an error." red
+	exit 1
+}
 
 #create archive
 [string] $baseName = Get-FileNameFromUrl $download_url

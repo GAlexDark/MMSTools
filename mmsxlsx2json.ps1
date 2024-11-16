@@ -98,7 +98,10 @@ try {
 foreach ($item in $foundItems) {
     $fileName = '"' + $item.FullName + '"'
     Write-Output "Target file: $fileName"
-    Start-Process -FilePath $pathToExecute -ArgumentList "-i $fileName -m compact --silent" -Wait -NoNewWindow
+    $processInfo = Start-Process -FilePath $pathToExecute -ArgumentList "-i $fileName -m compact --silent" -Wait -NoNewWindow -PassThru
+    if ($processInfo.ExitCode -ne 0) {
+        Write-Host "The $pathToExecute returned an error." red
+    }
 }
 
 Write-Host "DONE" -ForegroundColor green
