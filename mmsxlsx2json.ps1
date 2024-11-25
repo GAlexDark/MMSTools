@@ -100,7 +100,7 @@ foreach ($item in $foundItems) {
     Write-Output "Target file: $fileName"
     $processInfo = Start-Process -FilePath $pathToExecute -ArgumentList "-i $fileName -m compact --silent" -Wait -NoNewWindow -PassThru
     if ($processInfo.ExitCode -ne 0) {
-        Write-Host "The $pathToExecute returned an error." red
+        Write-Host "The $pathToExecute returned an error." -ForegroundColor red
     }
 }
 
