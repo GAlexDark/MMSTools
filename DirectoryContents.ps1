@@ -9,7 +9,7 @@
 
 .COPYRIGHT 2024 Oleksii Gaienko. All rights reserved.
 
-.TAGS DirectoryListener
+.TAGS DirectoryContents
 
 .LICENSEURI https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -34,7 +34,12 @@
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string] $EnvFileName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string] $OutputDir,
 
     [Parameter(Mandatory=$false)]
     [switch] $Advanced = $false
@@ -54,20 +59,20 @@ Write-Host "The $EnvFileName is not found" -ForegroundColor Red
 [string] $proxyPort = $PROXY_PORT
 
 [string] $remoteHost = $REMOTE_HOST
+[int] $remotePort = $REMOTE_PORT
 [string] $remotePath = $REMOTE_PATH
 
 [string] $userName = $($env:sshUserName)
 [string] $userPassword = $($env:sshPassword)
 [string] $SshHostKeyFingerprint = $($env:sshHostKeyFingerprint)
 
-[string] $localStorage = $LOCAL_STORAGE
 [string] $archiveStorage = $ARCHIVE_STORAGE
 
 [string] $dateTimeFormat = $DATETIME_FORMAT
 #=========================================================================
 
 try {
-    Remove-Item -Path ($LocalStorage.Replace('*', '*.json')) -ErrorAction Stop
+    Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.json") -ErrorAction Stop
     [string] $assemblyPath = if ($env:WINSCP_PATH) { $env:WINSCP_PATH } else { $PSScriptRoot }
     $assemblyPath = Join-Path -Path $assemblyPath -ChildPath "WinSCPnet.dll"
     $retVal = Test-Path -Path $assemblyPath
@@ -80,8 +85,9 @@ try {
 
     # Setup session options
     $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
-        Protocol = [WinSCP.Protocol]::Scp
+        Protocol = [WinSCP.Protocol]::Sftp
         HostName = $remoteHost
+        PortNumber = $remotePort
         UserName = $userName
         Password = $userPassword
         SshHostKeyFingerprint = $SshHostKeyFingerprint
@@ -126,10 +132,10 @@ try {
             $registry += $registryItem
         }
         if ($registry) {
-            $registry | Format-Table -AutoSize
+            #$registry | Format-Table -AutoSize
             [string] $registryFileName = "registry" + (Get-Date).ToString('yyyyMMddHHmmss') + ".json"
-            $registryFileName = Join-Path -Path ($localStorage.Replace('*', '')) -ChildPath $registryFileName
-            $registry | ConvertTo-Json | Out-File $registryFileName
+            $registryFileName = Join-Path -Path $OutputDir -ChildPath $registryFileName
+            $registry | ConvertTo-Json -Compress | Out-File $registryFileName
             Write-Host "List of files and directories received`nTotal $($count) files."
             Copy-Item -Path $registryFileName -Destination $archiveStorage -ErrorAction Stop
         } else {

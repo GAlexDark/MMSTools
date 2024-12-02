@@ -34,7 +34,12 @@
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory=$true)]
-    [string] $EnvFileName
+    [ValidateNotNullOrEmpty()]
+    [string] $EnvFileName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string] $OutputDir
 
 #    [Parameter (Mandatory=$true
 #    HelpMessage="Issue Date")]
@@ -138,7 +143,12 @@ function Copy-P7sFile {
         if ($LocalStorage.EndsWith('*')) {
             $LocalStorage = $LocalStorage.Replace('*','')
         }
-        Get-ChildItem -Path $LocalStorage -Include "*.p7s" -Recurse -ErrorAction Stop | Copy-Item -Destination $newDir -ErrorAction Stop
+        $p7sFiles = Get-ChildItem -Path $LocalStorage -Include "*.p7s" -Recurse -ErrorAction Stop
+        if ($p7sFiles) {
+            Copy-Item -Path $p7sFiles -Destination $newDir -ErrorAction Stop
+        } else {
+            Write-Host "No P7S files found."
+        }
     } catch {
         $retVal = $false
         Write-Error $PSItem
@@ -164,15 +174,16 @@ function Upload-File {
         [bool] $retVal = Test-Path -Path $assemblyPath
         if (-not $retVal) {
             Write-Host "The WinSCPnet.dll library is not found" -ForegroundColor Red
-            return $false
+            exit 1
         }
         # Load WinSCP .NET assembly
         Add-Type -Path $assemblyPath
 
         # Setup session options
         $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
-            Protocol = [WinSCP.Protocol]::Scp
+            Protocol = [WinSCP.Protocol]::Sftp
             HostName = $remoteHost
+            PortNumber = $remotePort
             UserName = $userName
             Password = $userPassword
             SshHostKeyFingerprint = $SshHostKeyFingerprint
@@ -241,6 +252,7 @@ Write-Host "The $EnvFileName is not found" -ForegroundColor Red
 [string] $proxyPort = $PROXY_PORT
 
 [string] $remoteHost = $REMOTE_HOST
+[int] $remotePort = $REMOTE_PORT
 [string] $remotePath = $REMOTE_PATH + '*'
 
 [string] $userName = $($env:sshUserName)
@@ -261,7 +273,7 @@ try {
     #    throw "The arguments is incorrect."
     #}
 
-    Remove-Item -Path ($LocalStorage.Replace('*', '*.json')) -ErrorAction Stop
+    Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.json") -ErrorAction Stop
 
     [bool] $retVal = Copy-P7sFile -LocalStorage $localStorage -ArchiveStorage $archiveStorage
     if (-not $retVal) {
@@ -277,7 +289,7 @@ try {
 
         $registryFileName = "Hashes" + (Get-Date).ToString('yyyyMMddHHmmss') + ".json"
         $registryFileName = Join-Path -Path $archiveStorage -ChildPath $registryFileName
-        $res.FileHashInfo | ConvertTo-Json | Out-File $registryFileName
+        $res.FileHashInfo | ConvertTo-Json -Compress | Out-File $registryFileName
     } else {
         throw "No Hashes"
     }
@@ -292,7 +304,7 @@ try {
         throw "Upload files canceled."
     }
     if($registryFileName) {
-        Copy-Item -Path $registryFileName -Destination ($localStorage.Replace('*', '')) -ErrorAction Stop
+        Copy-Item -Path $registryFileName -Destination $OutputDir -ErrorAction Stop
     }
 } catch {
     $exitCode = 1
