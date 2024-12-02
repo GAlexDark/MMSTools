@@ -186,7 +186,6 @@ function Upload-File {
             PortNumber = $remotePort
             UserName = $userName
             Password = $userPassword
-            SshHostKeyFingerprint = $SshHostKeyFingerprint
         }
         if (![string]::IsNullOrEmpty($proxyName) -and ![string]::IsNullOrEmpty($proxyPort) ) {
             $sessionOptions.AddRawSettings("ProxyMethod", "3")
@@ -198,6 +197,7 @@ function Upload-File {
 
         $session = New-Object WinSCP.Session
         try {
+            $sessionOptions.SshHostKeyFingerprint = $session.ScanFingerprint($sessionOptions, "SHA-256")
             # Connect
             Write-Host "Connect to the $($sessionOptions.HostName)"
             $session.Open($sessionOptions)
