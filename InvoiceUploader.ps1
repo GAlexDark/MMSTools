@@ -170,14 +170,14 @@ function Upload-File {
 
     try {
         [string] $assemblyPath = if ($env:WINSCP_PATH) { $env:WINSCP_PATH } else { $PSScriptRoot }
-        $assemblyPath = Join-Path -Path $assemblyPath -ChildPath "WinSCPnet.dll"
-        [bool] $retVal = Test-Path -Path $assemblyPath
+        $assemblyPath = Join-Path -Path $assemblyPath -ChildPath "WinSCPnet.dll" -ErrorAction Stop
+        [bool] $retVal = Test-Path -Path $assemblyPath -ErrorAction Stop
         if (-not $retVal) {
             Write-Host "The WinSCPnet.dll library is not found" -ForegroundColor Red
             exit 1
         }
         # Load WinSCP .NET assembly
-        Add-Type -Path $assemblyPath
+        Add-Type -Path $assemblyPath -ErrorAction Stop
 
         # Setup session options
         $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
@@ -192,7 +192,7 @@ function Upload-File {
             $sessionOptions.AddRawSettings("ProxyHost", $proxyName)
             $sessionOptions.AddRawSettings("ProxyPort", $proxyPort)
         } else {
-            Write-Host "The Proxy is not using (The settings is not present)." -ForegroundColor Yellow
+            Write-Host "The Proxy is not using (The settings is not present).`n" -ForegroundColor Yellow
         }
 
         $session = New-Object WinSCP.Session
@@ -203,7 +203,7 @@ function Upload-File {
             $session.Open($sessionOptions)
             Write-Host "Connection to the $($sessionOptions.HostName) succeeded"
 
-            Write-Host "Start upload files"
+            Write-Host "`nStart upload files.`n"
             $transferResult = $session.PutFiles($LocalStorage, $remotePath, $true)
             # Throw on any error
             $transferResult.Check()
@@ -214,12 +214,16 @@ function Upload-File {
             if ($LocalStorage.EndsWith('*')) {
                 $pathLenght = $LocalStorage.Length - 1
             }
+            $console = $Host.UI.RawUI
+            $buffer = $console.BufferSize
+            $buffer.Width = '400'
+            $console.BufferSize = $buffer
             foreach ($transfer in $transferResult.Transfers) {
                 Write-Host "Upload of the $($transfer.FileName.Substring($pathLenght).Replace('\', '/')) file succeeded." -ForegroundColor Green
                 # the .Replace('\', '/') for the pretty unification with the SHA hashes output
                 $count++
             }
-            Write-Host "Upload completed`nTotal $($count) files saved."
+            Write-Host "Upload completed`nTotal $($count) files uploaded."
         } finally {
             # Disconnect, clean up
             $session.Dispose()
@@ -231,65 +235,116 @@ function Upload-File {
     return $retVal
 }
 
-#=========================================================================
-# Stages:
-# -1. Clear localStorage
-# 1/0. Download from SP (internal/external tools)
-# 2. copy p7s files to the archive
-# 3. Calc hashes
-# 4. Upload to the /mms/invoices
-#=========================================================================
-#Mapping env variables
-$EnvFileName = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName
-[bool] $retVal = Test-Path -Path $EnvFileName
-if (-not $retVal) {
-Write-Host "The $EnvFileName is not found" -ForegroundColor Red
-    exit 1
-}
-
-. $EnvFileName
-[string] $proxyName = $PROXY_NAME
-[string] $proxyPort = $PROXY_PORT
-
-[string] $remoteHost = $REMOTE_HOST
-[int] $remotePort = $REMOTE_PORT
-[string] $remotePath = $REMOTE_PATH + '*'
-
-[string] $userName = $($env:sshUserName)
-[string] $userPassword = $($env:sshPassword)
-[string] $SshHostKeyFingerprint = $($env:sshHostKeyFingerprint)
-
-[string] $localStorage = $LOCAL_STORAGE
-[string] $archiveStorage = $ARCHIVE_STORAGE
-
-[string] $dateTimeFormat = $DATETIME_FORMAT
-
-#=========================================================================
-
-[int] $exitCode = 0
 try {
+    $EnvFileName = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
+    [bool] $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
+    if (-not $retVal) {
+        Write-Host "`nThe '$EnvFileName' file is not found.`n" -ForegroundColor Red
+        exit 1
+    }
+    $retVal = Test-Path -Path $OutputDir -ErrorAction Stop
+    if (-not $retVal) {
+        Write-Host "`nThe OutputDir '$OutputDir' is not exists.`n" -ForegroundColor Red
+        exit 1
+    }
+
+    #Mapping env variables
+    . $EnvFileName
+    [string] $proxyName = $PROXY_NAME
+    [string] $proxyPort = $PROXY_PORT
+
+    [string] $remoteHost = $REMOTE_HOST
+    [int] $remotePort = $REMOTE_PORT
+    [string] $remotePath = $REMOTE_PATH + '*'
+
+    [string] $userName = $($env:sshUserName)
+    [string] $userPassword = $($env:sshPassword)
+
+    [string] $localStorage = $LOCAL_STORAGE
+    [string] $archiveStorage = $ARCHIVE_STORAGE
+
+    [string] $dateTimeFormat = $DATETIME_FORMAT
+
+    if ([string]::IsNullOrEmpty($remoteHost)) {
+        Write-Host "The 'remoteHost' value is not set" -ForegroundColor Red
+        exit 1
+    }
+    if ($remotePort -eq 0) {
+        Write-Host `n
+        Write-Warning "The 'remotePort' value is not set. Using the default value.`n"
+    } elseif (($remotePort -lt 0) -and ($remotePort -le 65535)) {
+        Write-Host "The 'remotePort' value is wrong: $remotePort" -ForegroundColor Red
+        exit 1
+    }
+    if ([string]::IsNullOrEmpty($remotePath)) {
+        Write-Host "The 'remotePath' value is not set" -ForegroundColor Red
+        exit 1
+    }
+    if ([string]::IsNullOrEmpty($userName)) {
+        Write-Host "The 'userName' value is not set" -ForegroundColor Red
+        exit 1
+    }
+    if ([string]::IsNullOrEmpty($userPassword)) {
+        Write-Host "The 'userPassword' value is not set" -ForegroundColor Red
+        exit 1
+    }
+    if ([string]::IsNullOrEmpty($localStorage)) {
+        Write-Host "The 'localStorage' value is not set" -ForegroundColor Red
+        exit 1
+    } else {
+        [string] $buf = if ($localStorage.EndsWith('*')) { $localStorage.Replace('*', '') } else { $localStorage }
+        $retVal = Test-Path -Path $buf -ErrorAction Stop
+        if (-not $retVal) {
+            Write-Host "`nThe '$localStorage' directory is not exists.`n" -ForegroundColor Red
+            exit 1
+        }
+    }
+    if ([string]::IsNullOrEmpty($archiveStorage)) {
+        Write-Host "The 'archiveStorage' value is not set" -ForegroundColor Red
+        exit 1
+    } else {
+        $retVal = Test-Path -Path $archiveStorage -ErrorAction Stop
+        if (-not $retVal) {
+            Write-Host "`nThe '$archiveStorage' directory is not exists.`n" -ForegroundColor Red
+            exit 1
+        }
+    }
+    if ([string]::IsNullOrEmpty($dateTimeFormat)) {
+        Write-Host "The 'dateTimeFormat' value is not set" -ForegroundColor Red
+        exit 1
+    }
+
+#=========================================================================
+
+    [int] $exitCode = 0
+
     #[bool] $retVal = Check-InputParams -IssueDateFolder $IssueDateFolder -SystemWideClearingId $SystemWideClearingId
     #if (-not $retVal) {
     #    throw "The arguments is incorrect."
     #}
-
-    Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.json") -ErrorAction Stop
 
     [bool] $retVal = Copy-P7sFile -LocalStorage $localStorage -ArchiveStorage $archiveStorage
     if (-not $retVal) {
         throw "Error copy P7B files"
     }
 
+    Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.json") -ErrorAction Stop
     [string] $registryFileName = ""
     $res = Calc-ShaHash -LocalStorage $localStorage
     if ($res.Status) {
-        Write-Host "SHA256 hashes:" -ForegroundColor Green
+        Write-Host "`nSHA256 hashes:" -ForegroundColor Green
+
+        $console = $Host.UI.RawUI
+        $buffer = $console.BufferSize
+        $buffer.Width = '400'
+        $console.BufferSize = $buffer
         $res.FileHashInfo | Format-Table -AutoSize
-        Write-Host "Total $($res.FileHashInfo.count) files`n"
+        Write-Host "Total $($res.FileHashInfo.count) files.`n"
 
         $registryFileName = "Hashes" + (Get-Date).ToString('yyyyMMddHHmmss') + ".json"
-        $registryFileName = Join-Path -Path $archiveStorage -ChildPath $registryFileName
+        $registryFileName = Join-Path -Path $archiveStorage -ChildPath $registryFileName -ErrorAction Stop
         $res.FileHashInfo | ConvertTo-Json -Compress | Out-File $registryFileName
+        Copy-Item -Path $registryFileName -Destination $OutputDir -ErrorAction Stop
     } else {
         throw "No Hashes"
     }
@@ -302,9 +357,6 @@ try {
     $retVal = Upload-File -LocalStorage $LocalStorage -remotePath $remotePath
     if (-not $retVal) {
         throw "Upload files canceled."
-    }
-    if($registryFileName) {
-        Copy-Item -Path $registryFileName -Destination $OutputDir -ErrorAction Stop
     }
 } catch {
     $exitCode = 1
