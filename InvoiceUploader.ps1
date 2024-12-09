@@ -33,60 +33,22 @@
 
 [CmdletBinding()]
 Param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,
+    HelpMessage="Enter the configuration file name.")]
     [ValidateNotNullOrEmpty()]
     [string] $EnvFileName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,
+    HelpMessage = "Enter the path to the folder were will be saved data files.")]
     [ValidateNotNullOrEmpty()]
-    [string] $OutputDir
+    [string] $OutputDir,
 
-#    [Parameter (Mandatory=$true
-#    HelpMessage="Issue Date")]
-#    [string] $IssueDateFolder,
-
-#    [Parameter (Mandatory=$false
-#    HelpMessage="System Wide Clearing ID")]
-#    [string] $SystemWideClearingId
+    [Parameter(Mandatory=$false,
+    HelpMessage = "Enter the path to the data file")]
+    [string] $DataFile
 )
 
 #=========================================================================
-
-function Check-InputParams {
-    [OutputType([bool])]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $IssueDateFolder,
-
-        [Parameter(Mandatory = $true)]
-        [string] $SystemWideClearingId
-    )
-
-    $IssueDateFolder = $IssueDateFolder.Trim()
-    $SystemWideClearingId = $SystemWideClearingId.Trim()
-
-    [bool] $retVal = $true
-    if (($IssueDateFolder.Length -eq 0) -and ($SystemWideClearingId.Length -eq 0)) {
-        Write-Host "Error: The 'IssueDateFolder' and 'SystemWideClearingId' arguments are empty." -ForegroundColor Red
-        $retVal = $false
-    }
-
-    if ($IssueDateFolder.Length -eq 0) {
-        Write-Host "Error: The 'IssueDateFolder' argument is empty." -ForegroundColor Red
-    } elseif ($IssueDateFolder -notmatch "^\d{8}$") {
-        Write-Host "Error: The 'IssueDateFolder' contains nondigit chars"
-        $retVal = $false
-    }
-
-    if ($SystemWideClearingId.Length -ne 0) {
-        if ($SystemWideClearingId -notmatch "^\d{4}-\d{2}-\d{2}-V\d{1}$") {
-            Write-Host "Error: The 'IssueDateFolder' has wrong format"
-            $retVal = $false
-        }
-    }
-
-    return $retVal
-}
 
 function Calc-ShaHash {
     param (
@@ -95,7 +57,6 @@ function Calc-ShaHash {
         [string] $LocalStorage
     )
 
-    [String[]] $fileTypes = ('*.pdf','*.p7s','*.xlsx','*.xls')
     [bool] $res = $true
     try {
         [array] $retVal = @()
@@ -105,7 +66,7 @@ function Calc-ShaHash {
         $files = Get-ChildItem -Path $LocalStorage -Include $fileTypes -Recurse -ErrorAction Stop
         if ($files) {
             $files | ForEach-Object {
-                [string] $pathToFile = $_.FullName.Replace('\', '/') # the replase for the pretty json format
+                [string] $pathToFile = $_.FullName.Replace('\', '/') # the replase for the pretty json format output
                 $fileHash = [PSCustomObject]@{
                     'File Name' = "." + $pathToFile.Substring($LocalStorage.Length)
                     'Last Write Time' = (Get-ItemProperty -Path $pathToFile).LastWriteTime.ToString($dateTimeFormat)
@@ -115,7 +76,7 @@ function Calc-ShaHash {
             }
         } else {
             $res = $false
-            Write-Host "No any *.xlsx, *.pdf and *.p7s files found." -ForegroundColor Red
+            Write-Host "No any *.xlsx and/or *.p7s files found." -ForegroundColor Red
         }
     } catch {
         $res = $false
@@ -125,14 +86,14 @@ function Calc-ShaHash {
     return @{Status = $res; FileHashInfo = $retVal}
 }
 
-function Copy-P7sFile {
+function Copy-File {
     [OutputType([bool])]
     param (
-        [Parameter(Mandatory = $true, Position=0)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string] $LocalStorage,
 
-        [Parameter(Mandatory = $true, Position=1)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string] $ArchiveStorage
     )
@@ -143,11 +104,11 @@ function Copy-P7sFile {
         if ($LocalStorage.EndsWith('*')) {
             $LocalStorage = $LocalStorage.Replace('*','')
         }
-        $p7sFiles = Get-ChildItem -Path $LocalStorage -Include "*.p7s" -Recurse -ErrorAction Stop
+        $p7sFiles = Get-ChildItem -Path $LocalStorage -Include $fileTypes -Recurse -ErrorAction Stop
         if ($p7sFiles) {
             Copy-Item -Path $p7sFiles -Destination $newDir -ErrorAction Stop
         } else {
-            Write-Host "No P7S files found."
+            Write-Host "No any *.xlsx and/or *.p7s files found."
         }
     } catch {
         $retVal = $false
@@ -159,13 +120,16 @@ function Copy-P7sFile {
 function Upload-File {
     [OutputType([bool])]
     param (
-        [Parameter(Mandatory = $true, Position=0)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string] $LocalStorage,
 
-        [Parameter(Mandatory = $true, Position=1)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $remotePath
+        [string] $remotePath,
+
+        [Parameter(Mandatory = $false)]
+        [array] $UploadData
     )
 
     try {
@@ -204,24 +168,32 @@ function Upload-File {
             Write-Host "Connection to the $($sessionOptions.HostName) succeeded"
 
             Write-Host "`nStart upload files.`n"
-            $transferResult = $session.PutFiles($LocalStorage, $remotePath, $true)
-            # Throw on any error
-            $transferResult.Check()
+            $console = $Host.UI.RawUI
+            $buffer = $console.BufferSize
+            $buffer.Width = '400'
+            $console.BufferSize = $buffer
 
-            # Print results
             [int] $count = 0
             [int] $pathLenght = 0
             if ($LocalStorage.EndsWith('*')) {
                 $pathLenght = $LocalStorage.Length - 1
             }
-            $console = $Host.UI.RawUI
-            $buffer = $console.BufferSize
-            $buffer.Width = '400'
-            $console.BufferSize = $buffer
-            foreach ($transfer in $transferResult.Transfers) {
-                Write-Host "Upload of the $($transfer.FileName.Substring($pathLenght).Replace('\', '/')) file succeeded." -ForegroundColor Green
-                # the .Replace('\', '/') for the pretty unification with the SHA hashes output
-                $count++
+            if ($UploadData) {
+                foreach($item in $UploadData) {
+                    [string] $source = $item.Source
+                    $session.PutFiles($source, $item.Destination, $true).Check()
+                    Write-Host "The file $($source.Substring($pathLenght).Replace('\', '/')) was uploaded successfully." -ForegroundColor Green
+                    $count++
+                }
+            } else {
+                $transferResult = $session.PutFiles($LocalStorage, $remotePath, $true)
+                # Throw on any error
+                $transferResult.Check()
+                # Print results
+                foreach ($transfer in $transferResult.Transfers) {
+                    Write-Host "The file $($transfer.FileName.Substring($pathLenght).Replace('\', '/')) was uploaded successfully." -ForegroundColor Green
+                    $count++
+                }
             }
             Write-Host "Upload completed`nTotal $($count) files uploaded."
         } finally {
@@ -235,21 +207,75 @@ function Upload-File {
     return $retVal
 }
 
+function Create-UploadData {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $LocalStorage,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]] $RemoteFilePaths,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $RemotePath
+    )
+
 try {
-    $EnvFileName = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
-    [bool] $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
-    if (-not $retVal) {
-        Write-Host "`nThe '$EnvFileName' file is not found.`n" -ForegroundColor Red
-        exit 1
+    [bool] $res = $true
+    [array] $retVal = @()
+    $files = Get-ChildItem -Path $LocalStorage.Replace('*', '') -Include $fileTypes -Recurse -ErrorAction Stop
+    [int] $length = $LocalStorage.Length - 1
+    if ($files) {
+        $files | ForEach-Object {
+            [string] $fileName = $_.FullName.substring($length)
+            [string] $pattern = "/" + $fileName + "$"
+            [string[]] $buf = $RemoteFilePaths | Select-String -Pattern $pattern -ErrorAction Stop
+            if ($buf.Count -eq 1) {
+                $destonation = $buf[0].Replace($fileName, '*')
+                $uploadDataItem = [PSCustomObject]@{
+                    'Source' = $_
+                    'Destination' = $RemotePath + $destonation
+                }
+                $retVal += $uploadDataItem
+            } else {
+                Write-Warning "No or Multiple matches found for the source '$fileName'`nThis source removed from the local storage."
+                Remove-Item -Path $_.FullName -ErrorAction Stop
+            }
+        } #for
+    } else {
+        $res = $false
+        Write-Host "No any *.xlsx and/or *.p7s files found."
     }
+} catch {
+    $res = $false
+    Write-Error $PSItem
+}
+    return @{Status = $res; UploadData = $retVal}
+}
+
+try {
+    [int] $exitCode = 0
+    [bool] $retVal = $true
+
+    $EnvFileName = $EnvFileName.Trim()
+    if ([string]::IsNullOrEmpty($EnvFileName)) {
+        throw "The 'EnvFileName' value is not set"
+    }
+    $EnvFileNamePath = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
+    $retVal = Test-Path -Path $EnvFileNamePath -ErrorAction Stop
+    if (-not $retVal) {
+        throw "The '$EnvFileName' file is not found."
+    }
+
     $retVal = Test-Path -Path $OutputDir -ErrorAction Stop
     if (-not $retVal) {
-        Write-Host "`nThe OutputDir '$OutputDir' is not exists.`n" -ForegroundColor Red
-        exit 1
+        throw "The OutputDir '$OutputDir' is not exists."
     }
 
     #Mapping env variables
-    . $EnvFileName
+    . $EnvFileNamePath
     [string] $proxyName = $PROXY_NAME
     [string] $proxyPort = $PROXY_PORT
 
@@ -264,68 +290,54 @@ try {
     [string] $archiveStorage = $ARCHIVE_STORAGE
 
     [string] $dateTimeFormat = $DATETIME_FORMAT
+    [String[]] $fileTypes = $FILE_TYPES
 
     if ([string]::IsNullOrEmpty($remoteHost)) {
-        Write-Host "The 'remoteHost' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'remoteHost' value is not set"
     }
     if ($remotePort -eq 0) {
-        Write-Host `n
-        Write-Warning "The 'remotePort' value is not set. Using the default value.`n"
+        Write-Warning "`nThe 'remotePort' value is not set. Using the default value.`n"
     } elseif (($remotePort -lt 0) -and ($remotePort -le 65535)) {
-        Write-Host "The 'remotePort' value is wrong: $remotePort" -ForegroundColor Red
-        exit 1
+        throw "The 'remotePort' value is wrong: $remotePort"
     }
     if ([string]::IsNullOrEmpty($remotePath)) {
-        Write-Host "The 'remotePath' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'remotePath' value is not set"
     }
     if ([string]::IsNullOrEmpty($userName)) {
-        Write-Host "The 'userName' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'userName' value is not set"
     }
     if ([string]::IsNullOrEmpty($userPassword)) {
-        Write-Host "The 'userPassword' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'userPassword' value is not set"
     }
     if ([string]::IsNullOrEmpty($localStorage)) {
-        Write-Host "The 'localStorage' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'localStorage' value is not set"
     } else {
         [string] $buf = if ($localStorage.EndsWith('*')) { $localStorage.Replace('*', '') } else { $localStorage }
         $retVal = Test-Path -Path $buf -ErrorAction Stop
         if (-not $retVal) {
-            Write-Host "`nThe '$localStorage' directory is not exists.`n" -ForegroundColor Red
-            exit 1
+            throw "The '$localStorage' directory is not exists."
         }
     }
     if ([string]::IsNullOrEmpty($archiveStorage)) {
-        Write-Host "The 'archiveStorage' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'archiveStorage' value is not set"
     } else {
         $retVal = Test-Path -Path $archiveStorage -ErrorAction Stop
         if (-not $retVal) {
-            Write-Host "`nThe '$archiveStorage' directory is not exists.`n" -ForegroundColor Red
-            exit 1
+            throw "The '$archiveStorage' directory is not exists."
         }
     }
     if ([string]::IsNullOrEmpty($dateTimeFormat)) {
-        Write-Host "The 'dateTimeFormat' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'dateTimeFormat' value is not set"
+    }
+    if ($fileTypes.Count -eq 0) {
+        throw "The 'fileTypes' value is not set"
     }
 
 #=========================================================================
 
-    [int] $exitCode = 0
-
-    #[bool] $retVal = Check-InputParams -IssueDateFolder $IssueDateFolder -SystemWideClearingId $SystemWideClearingId
-    #if (-not $retVal) {
-    #    throw "The arguments is incorrect."
-    #}
-
-    [bool] $retVal = Copy-P7sFile -LocalStorage $localStorage -ArchiveStorage $archiveStorage
+    $retVal = Copy-File -LocalStorage $localStorage -ArchiveStorage $archiveStorage
     if (-not $retVal) {
-        throw "Error copy P7B files"
+        throw "Error copy files."
     }
 
     Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.json") -ErrorAction Stop
@@ -349,12 +361,42 @@ try {
         throw "No Hashes"
     }
 
+    [array] $uploadData = @()
+    if (-not [string]::IsNullOrEmpty($DataFile)) {
+        [string] $slaveScript = Join-Path -Path $PSScriptRoot -ChildPath "DirectoryContents.ps1" -ErrorAction Stop
+        $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
+        if (-not $retVal) {
+            throw "The 'DirectoryContents.ps1' file is not found."
+        }
+
+        . $slaveScript -EnvFileName $EnvFileName -OutputDir $DataFile -Slave
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error getting list of the files and directories."
+        }
+
+        $DataFile = Join-Path -Path $DataFile -ChildPath "registry.json" -ErrorAction Stop
+        $retVal = Test-Path -Path $DataFile -ErrorAction Stop
+        if (-not $retVal) {
+            throw "The 'registry.json' file is not found."
+        }
+        $jsonData = Get-Content -Path $DataFile -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        [string[]] $remoteFilePaths = $jsonData.'File Name'
+
+        $res1 = Create-UploadData -LocalStorage $localStorage -RemoteFilePaths $remoteFilePaths -RemotePath $remotePath
+        if ($res1.Status) {
+            $uploadData = $res1.UploadData
+        } else {
+            throw "Error get upload data."
+        }
+    }
+
     # If script must build upload path
     #$remotePath = $remotePath.Replace("*", $IssueDateFolder + "/*")
     #if ($SystemWideClearingId.Length -ne 0) {
     #    $remotePath = $remotePath.Remove("*", $SystemWideClearingId + "/*")
     #}
-    $retVal = Upload-File -LocalStorage $LocalStorage -remotePath $remotePath
+
+    $retVal = Upload-File -LocalStorage $LocalStorage -remotePath $remotePath -UploadData $uploadData
     if (-not $retVal) {
         throw "Upload files canceled."
     }

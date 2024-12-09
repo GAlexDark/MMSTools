@@ -33,26 +33,43 @@
 
 [CmdletBinding()]
 Param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,
+    HelpMessage="Enter the configuration file name.")]
     [ValidateNotNullOrEmpty()]
     [string] $EnvFileName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,
+    HelpMessage = "Enter the path to the folder were will be saved data files.")]
     [ValidateNotNullOrEmpty()]
     [string] $OutputDir,
 
-    [Parameter(Mandatory=$false)]
-    [switch] $Advanced = $false
+    [Parameter(Mandatory=$false,
+    HelpMessage = "Select to add additional data to the data files.")]
+    [switch] $Advanced = $false,
+
+    [Parameter(Mandatory=$false,
+    HelpMessage = "Select to change to the Slave mode.")]
+    [switch] $Slave = $false
 )
 
 #=========================================================================
 try {
+    if ($Slave) {
+        $Advanced = $false
+    }
+
+    $EnvFileName = $EnvFileName.Trim()
+    if ([string]::IsNullOrEmpty($EnvFileName)) {
+        Write-Host "The 'EnvFileName' value is not set" -ForegroundColor Red
+        exit 1
+    }
     $EnvFileName = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
     [bool] $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
     if (-not $retVal) {
         Write-Host "`nThe '$EnvFileName' file is not found.`n" -ForegroundColor Red
         exit 1
     }
+
     $retVal = Test-Path -Path $OutputDir -ErrorAction Stop
     if (-not $retVal) {
         Write-Host "`nThe OutputDir '$OutputDir' is not exists.`n" -ForegroundColor Red
@@ -177,20 +194,25 @@ try {
         Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.csv") -ErrorAction Stop
 
         if ($registry) {
-            Write-Host "`nList of files and directories received.`n"
-            $console = $Host.UI.RawUI
-            $buffer = $console.BufferSize
-            $buffer.Width = '400'
-            $console.BufferSize = $buffer
-            $registry | Format-Table -AutoSize
-            Write-Host "Total $($count) files."
+            if (-not $Slave) {
+                Write-Host "`nList of files and directories received.`n"
+                $console = $Host.UI.RawUI
+                $buffer = $console.BufferSize
+                $buffer.Width = '400'
+                $console.BufferSize = $buffer
+                $registry | Format-Table -AutoSize
 
-            [string] $registryFileName = "registry" + (Get-Date).ToString('yyyyMMddHHmmss') + ".json"
+                Write-Host "Total $($count) files."
+            }
+
+            [string] $registryFileName = if ($Slave) { "registry.json" } else { "registry" + (Get-Date).ToString('yyyyMMddHHmmss') + ".json" }
             $registryFileName = Join-Path -Path $OutputDir -ChildPath $registryFileName -ErrorAction Stop
             $registry | ConvertTo-Json -Compress | Out-File $registryFileName
-            Copy-Item -Path $registryFileName -Destination $archiveStorage -ErrorAction Stop
 
-            $registry | ConvertTo-Csv -Delimiter ';' | Out-File -encoding UTF8 -filepath (Join-Path -Path $OutputDir -ChildPath "fileslist.csv" -ErrorAction Stop)
+            if (-not $Slave) {
+                Copy-Item -Path $registryFileName -Destination $archiveStorage -ErrorAction Stop
+                $registry | ConvertTo-Csv -Delimiter ';' | Out-File -encoding UTF8 -filepath (Join-Path -Path $OutputDir -ChildPath "fileslist.csv" -ErrorAction Stop)
+            }
         } else {
             Write-Host "No files found."
         }
