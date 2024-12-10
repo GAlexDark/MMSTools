@@ -54,26 +54,24 @@ Param (
 
 #=========================================================================
 try {
+    [int] $exitCode = 0
     if ($Slave) {
         $Advanced = $false
     }
 
     $EnvFileName = $EnvFileName.Trim()
     if ([string]::IsNullOrEmpty($EnvFileName)) {
-        Write-Host "The 'EnvFileName' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'EnvFileName' value is not set."
     }
     $EnvFileName = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
     [bool] $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
     if (-not $retVal) {
-        Write-Host "`nThe '$EnvFileName' file is not found.`n" -ForegroundColor Red
-        exit 1
+        throw "`nThe '$EnvFileName' file is not found.`n"
     }
 
     $retVal = Test-Path -Path $OutputDir -ErrorAction Stop
     if (-not $retVal) {
-        Write-Host "`nThe OutputDir '$OutputDir' is not exists.`n" -ForegroundColor Red
-        exit 1
+        throw "`nThe OutputDir '$OutputDir' is not exists.`n"
     }
 
     #Mapping env variables
@@ -92,41 +90,33 @@ try {
     [string] $dateTimeFormat = $DATETIME_FORMAT
 
     if ([string]::IsNullOrEmpty($remoteHost)) {
-        Write-Host "The 'remoteHost' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'remoteHost' value is not set."
     }
     if ($remotePort -eq 0) {
         Write-Host `n
         Write-Warning "The 'remotePort' value is not set. Using the default value.`n"
     } elseif (($remotePort -lt 0) -and ($remotePort -le 65535)) {
-        Write-Host "The 'remotePort' value is wrong: $remotePort" -ForegroundColor Red
-        exit 1
+        throw "The 'remotePort' value is wrong: $remotePort."
     }
     if ([string]::IsNullOrEmpty($remotePath)) {
-        Write-Host "The 'remotePath' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'remotePath' value is not set."
     }
     if ([string]::IsNullOrEmpty($userName)) {
-        Write-Host "The 'userName' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'userName' value is not set."
     }
     if ([string]::IsNullOrEmpty($userPassword)) {
-        Write-Host "The 'userPassword' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'userPassword' value is not set."
     }
     if ([string]::IsNullOrEmpty($archiveStorage)) {
-        Write-Host "The 'archiveStorage' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'archiveStorage' value is not set."
     } else {
         $retVal = Test-Path -Path $archiveStorage -ErrorAction Stop
         if (-not $retVal) {
-            Write-Host "`nThe '$archiveStorage' directory is not exists.`n" -ForegroundColor Red
-            exit 1
+            throw "`nThe '$archiveStorage' directory is not exists.`n"
         }
     }
     if ([string]::IsNullOrEmpty($dateTimeFormat)) {
-        Write-Host "The 'dateTimeFormat' value is not set" -ForegroundColor Red
-        exit 1
+        throw "The 'dateTimeFormat' value is not set."
     }
 
     #=========================================================================
@@ -135,8 +125,7 @@ try {
     $assemblyPath = Join-Path -Path $assemblyPath -ChildPath "WinSCPnet.dll" -ErrorAction Stop
     $retVal = Test-Path -Path $assemblyPath -ErrorAction Stop
     if (-not $retVal) {
-        Write-Host "The WinSCPnet.dll library is not found" -ForegroundColor Red
-        exit 1
+        throw "The WinSCPnet.dll library is not found."
     }
     # Load WinSCP .NET assembly
     Add-Type -Path $assemblyPath -ErrorAction Stop
@@ -161,11 +150,12 @@ try {
     try {
         $sessionOptions.SshHostKeyFingerprint = $session.ScanFingerprint($sessionOptions, "SHA-256")
         # Connect
-        Write-Host "Connect to the $remoteHost"
+        Write-Host "Connect to the $remoteHost."
         $session.Open($sessionOptions)
-        Write-Host "Connection to the $remoteHost succeeded"
+        Write-Host "Connection to the $remoteHost succeeded."
 
-        Write-Host "`nStarting to get a list of the files and the directories in the $remotePath" -ForegroundColor Yellow
+        [string] $buf = if ($Slave) { "remote host" } else { $remotePath }
+        Write-Host "`nStarting to get a list of the files and the directories in the $buf." -ForegroundColor Yellow
         $filesInfo = $session.EnumerateRemoteFiles($remotePath, "*.*", [WinSCP.EnumerationOptions]::AllDirectories)
 
         # Print results
@@ -221,8 +211,8 @@ try {
         $session.Dispose()
     }
 } catch {
-    Write-Error $PSItem
-    exit 1
+    $exitCode = 1
+    Write-Host $PSItem -ForegroundColor Red
 }
 
-exit 0
+exit $exitCode

@@ -99,16 +99,17 @@ function Copy-File {
     )
     [bool] $retVal = $true
     try {
-        [string] $newDir = Join-Path -Path $ArchiveStorage -ChildPath (Get-Date).ToString('yyyyMMddHHmmss') -ErrorAction Stop
-        New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
         if ($LocalStorage.EndsWith('*')) {
             $LocalStorage = $LocalStorage.Replace('*','')
         }
         $p7sFiles = Get-ChildItem -Path $LocalStorage -Include $fileTypes -Recurse -ErrorAction Stop
         if ($p7sFiles) {
+            [string] $newDir = Join-Path -Path $ArchiveStorage -ChildPath (Get-Date).ToString('yyyyMMddHHmmss') -ErrorAction Stop
+            New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
             Copy-Item -Path $p7sFiles -Destination $newDir -ErrorAction Stop
         } else {
-            Write-Host "No any *.xlsx and/or *.p7s files found."
+            $retVal = $false
+            Write-Host "No any *.xlsx and/or *.p7s files found." -ForegroundColor Red
         }
     } catch {
         $retVal = $false
@@ -156,7 +157,7 @@ function Upload-File {
             $sessionOptions.AddRawSettings("ProxyHost", $proxyName)
             $sessionOptions.AddRawSettings("ProxyPort", $proxyPort)
         } else {
-            Write-Host "The Proxy is not using (The settings is not present).`n" -ForegroundColor Yellow
+            Write-Host "`nThe Proxy is not using (The settings is not present).`n" -ForegroundColor Yellow
         }
 
         $session = New-Object WinSCP.Session
@@ -358,7 +359,7 @@ try {
         $res.FileHashInfo | ConvertTo-Json -Compress | Out-File $registryFileName
         Copy-Item -Path $registryFileName -Destination $OutputDir -ErrorAction Stop
     } else {
-        throw "No Hashes"
+        throw "Error calculating hashes."
     }
 
     [array] $uploadData = @()
@@ -386,15 +387,9 @@ try {
         if ($res1.Status) {
             $uploadData = $res1.UploadData
         } else {
-            throw "Error get upload data."
+            throw "Error retrieving data for upload."
         }
     }
-
-    # If script must build upload path
-    #$remotePath = $remotePath.Replace("*", $IssueDateFolder + "/*")
-    #if ($SystemWideClearingId.Length -ne 0) {
-    #    $remotePath = $remotePath.Remove("*", $SystemWideClearingId + "/*")
-    #}
 
     $retVal = Upload-File -LocalStorage $LocalStorage -remotePath $remotePath -UploadData $uploadData
     if (-not $retVal) {
@@ -404,7 +399,5 @@ try {
     $exitCode = 1
     Write-Host $PSItem -ForegroundColor Red
 }
-
-#=========================================================================
 
 exit $exitCode
