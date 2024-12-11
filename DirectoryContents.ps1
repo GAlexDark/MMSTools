@@ -184,8 +184,8 @@ try {
         Remove-Item -Path (Join-Path -Path $OutputDir -ChildPath "*.csv") -ErrorAction Stop
 
         if ($registry) {
+            Write-Host "`nList of the files and directories received.`n"
             if (-not $Slave) {
-                Write-Host "`nList of files and directories received.`n"
                 $console = $Host.UI.RawUI
                 $buffer = $console.BufferSize
                 $buffer.Width = '400'
