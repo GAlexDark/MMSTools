@@ -365,7 +365,7 @@ try {
     [array] $uploadData = @()
     if (-not [string]::IsNullOrEmpty($DataFile)) {
         [string] $slaveScript = Join-Path -Path $PSScriptRoot -ChildPath "DirectoryContents.ps1" -ErrorAction Stop
-        $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
+        $retVal = Test-Path -Path $slaveScripts -ErrorAction Stop
         if (-not $retVal) {
             throw "The 'DirectoryContents.ps1' file is not found."
         }
