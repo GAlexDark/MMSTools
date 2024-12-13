@@ -33,6 +33,7 @@ CP7bMakerCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString storeDescription(QLatin1String("The folder path contains one *.p7b file and several *.cer, *.crt, or *.der files to add."));
     const QString silentDescription(QLatin1String("Silent mode"));
+    const QString outputFormatDescription(QLatin1String("Outpur format: ASN1 or PEM (ASN1 by default)"));
 
     QCommandLineOption storeOption(QStringList() << "l" << "localstore", storeDescription, "path");
     bool retVal = m_parser.addOption(storeOption);
@@ -40,9 +41,14 @@ CP7bMakerCmdLineParser::addOption(const QCoreApplication &app)
         QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
         retVal = m_parser.addOption(silentOption);
         if (retVal) {
-            m_parser.process(app);
-            m_isStore = m_parser.isSet(storeOption);
-            m_isSilent = m_parser.isSet(silentOption);
+            QCommandLineOption outputFormatOption(QStringList() << "o" << "output", outputFormatDescription, "format");
+            retVal = m_parser.addOption(outputFormatOption);
+            if (retVal) {
+                m_parser.process(app);
+                m_isStore = m_parser.isSet(storeOption);
+                m_isSilent = m_parser.isSet(silentOption);
+                m_isOutputFormat = m_parser.isSet(outputFormatOption);
+            }
         }
     }
     if (!retVal) {
@@ -100,6 +106,21 @@ CP7bMakerCmdLineParser::getCertsList(QStringList &certsList)
 
     if (!retVal) {
         certsList.removeDuplicates();
+    }
+    return retVal;
+}
+
+QString
+CP7bMakerCmdLineParser::getOutputFormat()
+{
+    QString retVal;
+    if (m_isOutputFormat) {
+        retVal = m_parser.value("output").trimmed().toUpper();
+        if (QString::compare(retVal, "PEM", Qt::CaseInsensitive) != 0) {
+            retVal = "ASN1";
+        }
+    } else {
+        retVal = "ASN1";
     }
     return retVal;
 }

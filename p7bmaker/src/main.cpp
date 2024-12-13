@@ -109,7 +109,10 @@ int main(int argc, char *argv[])
     QString path = QFileInfo(dest).absolutePath();
     retVal = elcUtils::isFolderWritable(path);
     if (retVal) {
-        retVal = p7bStore.saveStore(dest);
+        QString outputFormat = cmd.getOutputFormat();
+        consoleOut.outToConsole(QStringLiteral("Output format: %1").arg(outputFormat));
+        OUTPUT_FORMAT of = outputFormat == "ASN1" ? OUTPUT_FORMAT::FORMAT_ASN1 : OUTPUT_FORMAT::FORMAT_PEM;
+        retVal = p7bStore.saveStore(dest, of);
         if (retVal) {
             consoleOut.outToConsole(QStringLiteral("File '%1' saved successfully.\n").arg(dest));
         } else {
