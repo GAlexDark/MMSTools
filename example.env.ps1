@@ -13,3 +13,5 @@
 
 [string] $DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss"
 [string[]] $FILE_TYPES = ('*.p7s','*.xlsx')
+
+[string] $DB_NAME = "example.db"
