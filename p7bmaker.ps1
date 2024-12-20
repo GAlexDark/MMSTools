@@ -124,33 +124,38 @@
 
 [CmdletBinding()]
 Param (
-    [Parameter (Mandatory=$true, Position=0,
+    [Parameter (Mandatory=$true,
     HelpMessage="Enter the path to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.")]
     [ValidateNotNullOrEmpty()]
     [string] $Workdir,
 
-    [Parameter (Mandatory=$false, Position=1,
+    [Parameter (Mandatory=$false,
     HelpMessage="Enable flag when the script run in the Corporate Network.")]
     [switch] $UseProxy = $false,
 
-    [Parameter (Mandatory=$false, Position=2,
+    [Parameter (Mandatory=$false,
     HelpMessage="Enter the actual Download Url.")]
-    [string] $Url
-)
+    [string] $Url,
 
+    [Parameter (Mandatory=$false,
+    HelpMessage="Enable flag when the script must upload p7b to the Vault.")]
+    [switch] $Upload = $false
+)
+$Upload = $true
 $Workdir = $Workdir.Trim()
 if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
     (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
     $Workdir = $PSScriptRoot
 }
+
 try {
-    [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop -ErrorVariable err
+    [bool] $retVal = Test-Path -Path $Workdir -ErrorAction Stop
     if (!$retVal) {
         Write-Warning "The work dir $Workdir not found."
         exit 1
     }
 } catch {
-    Write-Host $err.ErrorRecord -ForegroundColor Red
+    Write-Host $PSItem.ErrorRecord -ForegroundColor Red
     exit 1
 }
 
@@ -170,22 +175,24 @@ function Remove-File {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [Alias('FullName')]
-        [string] $FileName
+        [string] $Path,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]] $Extensions
     )
 
-    [bool] $retVal = Test-Path -Path $FileName
-    if ($retVal) {
-        try {
-            Remove-Item -Path $FileName -Force -Recurse -ErrorAction Stop -ErrorVariable err
-        } catch {
-            Write-Host $err.ErrorRecord -ForegroundColor Red
-            $retVal = $false
+    try {
+        [bool] $retVal = Test-Path -Path $Path -ErrorAction Stop
+        if ($retVal) {
+            Remove-Item -Path (Join-Path -Path $Path -ChildPath '*' -ErrorAction Stop) -Include $Extensions -Force -ErrorAction Stop
+        } else {
+            Write-Host "The path '$Path' is not found" -ForegroundColor Red
         }
-    } else {
-        $retVal = $true
+    } catch {
+        $retVal = $false
+        Write-Host $PSItem.ErrorRecord -ForegroundColor Red
     }
-
     return $retVal
 }
 
@@ -242,26 +249,26 @@ function Get-DownloadFile {
         [string] $SavePath
     )
 
-    $fileName = Get-FileNameFromUrl $DownloadUrl
-    $fileName = Join-Path -Path $SavePath -ChildPath $fileName
-
-    Add-Type -AssemblyName System.Net.Http
-    if ($UseProxy) {
-        $handler = New-Object System.Net.Http.HttpClientHandler
-        $handler.UseDefaultCredentials = $true
-        if ([string]::IsNullOrEmpty($proxyName)) {
-            $handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
-        } else {
-            $handler.Proxy = New-Object System.Net.WebProxy($proxyName)
-        }
-        $handler.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials
-        $httpClient = New-Object System.Net.Http.HttpClient($handler)
-    } else {
-        $httpClient = New-Object System.Net.Http.HttpClient
-    }
-
-    [bool] $retVal = $false
     try {
+        $fileName = Get-FileNameFromUrl $DownloadUrl
+        $fileName = Join-Path -Path $SavePath -ChildPath $fileName -ErrorAction Stop
+
+        Add-Type -AssemblyName System.Net.Http -ErrorAction Stop
+        if ($UseProxy) {
+            $handler = New-Object System.Net.Http.HttpClientHandler
+            $handler.UseDefaultCredentials = $true
+            if ([string]::IsNullOrEmpty($proxyName)) {
+                $handler.Proxy = [System.Net.WebRequest]::DefaultWebProxy
+            } else {
+                $handler.Proxy = New-Object System.Net.WebProxy($proxyName)
+            }
+            $handler.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials
+            $httpClient = New-Object System.Net.Http.HttpClient($handler)
+        } else {
+            $httpClient = New-Object System.Net.Http.HttpClient
+        }
+
+        [bool] $retVal = $false
         $httpClient.DefaultRequestHeaders.add('User-Agent', $userAgent)
         $response = $httpClient.GetAsync($DownloadUrl)
         $response.Wait()
@@ -330,20 +337,9 @@ if ($certs) {
     exit 1
 }
 
-#Removing exists p7b and sha files
-$maskP7b = Join-Path -Path $Workdir -ChildPath "*.p7b"
-[bool] $retVal = Remove-File $maskP7b
-if (-not $retVal) {
-    exit 1
-}
-$maskSha = Join-Path -Path $Workdir -ChildPath "*.sha"
-$retVal = Remove-File $maskSha
-if (-not $retVal) {
-    exit 1
-}
-#remove previsions zip archives
-$maskZip = Join-Path -Path $Workdir -ChildPath "*.zip"
-$retVal = Remove-File $maskZip
+#Removing existing p7b, sha, base64, and zip files
+[string[]] $ext = ('*.p7b','*.sha','*.zip','*.base64')
+[bool] $retVal = Remove-File -Path $Workdir -Extensions $ext
 if (-not $retVal) {
     exit 1
 }
@@ -359,70 +355,87 @@ if (-not $retVal) {
     exit 1
 }
 
-#Download and save CACertificates.p7b file
-Write-Output "`nStarting download the CACertificates.p7b file from the '$download_url' Url.`n"
-$retVal = Get-DownloadFile $download_url $WorkDir
+#Download and save *.p7b file
+Write-Output "`nStarting download the P7B file from the '$download_url' Url.`n"
+$retVal = Get-DownloadFile -DownloadUrl $download_url -SavePath $WorkDir
 if (-not $retVal) {
     exit 1
 }
 
 # Let's start creating a p7b container with the necessary certificates
 $pathToExecute = Join-Path -Path $PSScriptRoot -ChildPath "p7bmaker.exe"
-$retVal = Test-Path -Path $pathToExecute
+$retVal = Test-Path -Path $pathToExecute -ErrorAction Stop
 if (-not $retVal) {
     Write-Host "The executable file p7bmaker.exe not found" -ForegroundColor Red
     exit 1
 }
 
 Write-Output "`nStarting $pathToExecute...`n"
-$processInfo = Start-Process -FilePath $pathToExecute -ArgumentList "-l $WorkDir --silent" -Wait -NoNewWindow -PassThru
+$argsList = if ($Upload) { "-l $WorkDir --silent -o PEM" } else { "-l $WorkDir --silent" }
+$processInfo = Start-Process -FilePath $pathToExecute -ArgumentList $argsList -Wait -NoNewWindow -PassThru
 if ($processInfo.ExitCode -ne 0) {
     Write-Error "The $pathToExecute returned an error."
 	exit 1
 }
 
-#create archive
+#create filenames
 [string] $baseName = Get-FileNameFromUrl $download_url
 $baseName = $baseName.Substring(0, $baseName.LastIndexOf('.'))
-[string] $archiveName = $baseName + (Get-Date).ToString('yyyyMMdd') + ".zip"
+[string] $ts = (Get-Date).ToString('yyyyMMdd')
+
+[string] $archiveName = $baseName + $ts + ".zip"
+$archiveName = Join-Path -Path $Workdir -ChildPath $archiveName -ErrorAction Stop
+
+[string] $newP7b = $baseName + $ts + ".p7b"
+$newP7b = Join-Path -Path $Workdir -ChildPath $newP7b -ErrorAction Stop
+
+[string] $newSha = $baseName + $ts + ".sha"
+$newSha = Join-Path -Path $Workdir -ChildPath $newSha -ErrorAction Stop
+
+[string] $newBase64 = $baseName + $ts + ".base64"
+$newBase64 = Join-Path -Path $Workdir -ChildPath $newBase64 -ErrorAction Stop
+[string] $newBase64Sha = $newBase64 + ".sha"
+
+#create .base64, if needed
+if ($Upload) {
+    $content = Get-Content -Path $newP7b -ErrorAction Stop
+    if ($content) {
+        ($content | Where-Object { $_ -notlike "*BEGIN PKCS7*" -and $_ -notlike "*END PKCS7*" }) -join '' | Out-File -FilePath $newBase64 -Encoding utf8 -NoNewline -ErrorAction Stop
+        $base64Hash = (Get-FileHash $newBase64 -Algorithm SHA1).Hash
+        $base64Hash + " *" + $newBase64.Substring($Workdir.Length + 1) | Out-File -FilePath $newBase64Sha -Encoding utf8 -ErrorAction Stop
+    } else {
+        Write-Host "Error read the $newP7b file!" -ForegroundColor Red
+    }
+}
 
 Write-Host "`nCreating archive: $archiveName"
-
-[string] $newP7b = $baseName + (Get-Date).ToString('yyyyMMdd') + ".p7b"
-$newP7b = Join-Path -Path $Workdir -ChildPath $newP7b
-$archiveName = Join-Path -Path $Workdir -ChildPath $archiveName
-
+[string[]] $sources = if ($Upload) { $newBase64,$newBase64Sha } else { $newP7b,$newSha }
 try {
-    Compress-Archive -Path $newP7b,$maskSha -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction stop
+    Compress-Archive -Path $sources -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction Stop
 } catch {
     Write-Error $PSItem
     exit 1
 }
 
 #create the new folder and copy files to it
-$newDir = Join-Path -Path $Workdir -ChildPath (Get-Date).ToString('yyyyMMdd')
-Write-Host "Delete the $newDir folder if it exists"
-$retVal = Remove-File $newDir
-if (-not $retVal) {
-    exit 1
+$newDir = Join-Path -Path $Workdir -ChildPath $ts -ErrorAction Stop
+$retVal = Test-Path -Path $newDir -ErrorAction Stop
+if ($retVal) {
+    $newDir = $newDir + '_' + (Get-Date).ToString("HHmmss")
 }
 
 Write-Host "Creating the $newDir folder and copy files to it"
-$maskCer = Join-Path -Path $Workdir -ChildPath "*.cer"
-$maskCrt = Join-Path -Path $Workdir -ChildPath "*.crt"
-$maskDer = Join-Path -Path $Workdir -ChildPath "*.der"
 try {
     New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
-    Copy-Item -Path $maskP7b -Destination $newDir -Force -ErrorAction Stop
-    Copy-Item -Path $maskSha -Destination $newDir -Force -ErrorAction Stop
+    $ext = ('*.p7b','*.sha','*.cer','*.crt','*.der','*.base64')
+    Copy-Item -Path (Join-Path -Path $Workdir -ChildPath '*' -ErrorAction Stop) -Destination $newDir -Include $ext -Force -ErrorAction Stop
     Copy-Item -Path $archiveName -Destination $newDir -Force -ErrorAction Stop
-    Copy-Item -Path $maskCer -Destination $newDir -Force -ErrorAction Stop
-    Copy-Item -Path $maskCrt -Destination $newDir -Force -ErrorAction Stop
-    Copy-Item -Path $maskDer -Destination $newDir -Force -ErrorAction Stop
 } catch {
     Write-Error $PSItem
     exit 1
 }
+
+#ToDo: Upload code will be here
 
 Write-Host "DONE" -ForegroundColor Green
 
