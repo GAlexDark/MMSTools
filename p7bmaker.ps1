@@ -30,7 +30,7 @@
  Specifies the path to to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.
 
 .PARAMETER Url
- Specifies the download URL.
+ Specifies the download URL. Attention! If the URL value contains ?d=, it must have the ?d=* format (include *)!
 
 .INPUTS
  None. You can't pipe objects to p7bmaker.ps1.
@@ -164,7 +164,7 @@ Write-Host "Attention! Check the CACertificates.p7b download URL periodically an
 #**************************************************************************************
 #
 # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
- [string] $download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b"
+ [string] $download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b?d=*"
 #
 #**************************************************************************************
 [string] $userAgent = "p7bmaker PoSH downloader module/1.0"
@@ -270,6 +270,13 @@ function Get-DownloadFile {
 
         [bool] $retVal = $false
         $httpClient.DefaultRequestHeaders.add('User-Agent', $userAgent)
+        if (-not $DownloadUrl.Contains("?d=")) {
+            $DownloadUrl = $DownloadUrl + "?d=" + (Get-Date).ToString('ddMMyyyy')
+        } else {
+            if ($DownloadUrl.Contains("?d=*")) {
+                $DownloadUrl = $DownloadUrl.Replace("*", (Get-Date).ToString('ddMMyyyy'))
+            }
+        }
         $response = $httpClient.GetAsync($DownloadUrl)
         $response.Wait()
         $result = $response.Result
