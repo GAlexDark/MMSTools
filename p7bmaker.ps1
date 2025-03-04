@@ -139,9 +139,14 @@ Param (
 
     [Parameter (Mandatory=$false,
     HelpMessage="Enable flag when the script must upload p7b to the Vault.")]
-    [switch] $Upload = $false
+    [switch] $Upload = $false,
+
+    [Parameter (Mandatory=$false,
+    HelpMessage="Enter the datestamp.")]
+    [ValidatePattern("^[0-9]{8}$")]
+    [string] $DateStamp
 )
-$Upload = $true
+
 $Workdir = $Workdir.Trim()
 if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
     (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
@@ -164,7 +169,8 @@ Write-Host "Attention! Check the CACertificates.p7b download URL periodically an
 #**************************************************************************************
 #
 # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
- [string] $download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b?d=*"
+# [string] $download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b?d="
+ [string] $download_url = "https://iit.com.ua/download/productfiles/CACertificates.p7b"
 #
 #**************************************************************************************
 [string] $userAgent = "p7bmaker PoSH downloader module/1.0"
@@ -238,6 +244,21 @@ function Test-CheckDnsName {
     return $retVal
 }
 
+function Test-CheckQuery {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $baseUrl
+    )
+
+    $url = [System.Uri]$baseUrl
+    [bool] $retVal = $true
+    if ($url.Query.Length -eq 0) {
+        $retVal = $false
+    }
+    return $retVal
+}
+
 function Get-DownloadFile {
     param (
         [Parameter(Mandatory = $true)]
@@ -270,13 +291,6 @@ function Get-DownloadFile {
 
         [bool] $retVal = $false
         $httpClient.DefaultRequestHeaders.add('User-Agent', $userAgent)
-        if (-not $DownloadUrl.Contains("?d=")) {
-            $DownloadUrl = $DownloadUrl + "?d=" + (Get-Date).ToString('ddMMyyyy')
-        } else {
-            if ($DownloadUrl.Contains("?d=*")) {
-                $DownloadUrl = $DownloadUrl.Replace("*", (Get-Date).ToString('ddMMyyyy'))
-            }
-        }
         $response = $httpClient.GetAsync($DownloadUrl)
         $response.Wait()
         $result = $response.Result
@@ -304,6 +318,9 @@ function Get-DownloadFile {
         }
         if ($null -ne $handler) {
             $handler.Dispose()
+        }
+        if ($null -ne $outputFileStream) {
+            $outputFileStream.Dispose()
         }
     }
 
@@ -356,6 +373,24 @@ if (-not [string]::IsNullOrEmpty($Url)) {
     $download_url = $Url.Trim()
     Write-Host "The value of the 'download_url' was changed with the value from the Url argument...`n" -ForegroundColor Yellow
 }
+
+#$retVal = Test-CheckQuery $download_url
+#if ($retVal) {
+#    if ($download_url.EndsWith("?d=")) {
+#        if ($DateStamp.Length -eq 0) {
+#            $download_url = $download_url + (Get-Date).ToString('ddMMyyyy')
+#        } else {
+#            $download_url = $download_url + $DateStamp
+#        }
+#    }
+#} else {
+#    if ($DateStamp.Length -eq 0) {
+#        $download_url = $download_url + "?d=" +(Get-Date).ToString('ddMMyyyy')
+#    } else {
+#        $download_url = $download_url + "?d=" + $DateStamp
+#    }
+#}
+
 [string] $domain = Get-DomainFromUrl $download_url
 $retVal = Test-CheckDnsName $domain
 if (-not $retVal) {
@@ -407,7 +442,7 @@ $newBase64 = Join-Path -Path $Workdir -ChildPath $newBase64 -ErrorAction Stop
 if ($Upload) {
     $content = Get-Content -Path $newP7b -ErrorAction Stop
     if ($content) {
-        ($content | Where-Object { $_ -notlike "*BEGIN PKCS7*" -and $_ -notlike "*END PKCS7*" }) -join '' | Out-File -FilePath $newBase64 -Encoding utf8 -NoNewline -ErrorAction Stop
+        ($content | Where-Object { $_ -notlike "*BEGIN PKCS7*" -and $_ -notlike "*END PKCS7*" }) -join '' | Out-File -FilePath $newBase64 -Encoding ascii -NoNewline -ErrorAction Stop
         $base64Hash = (Get-FileHash $newBase64 -Algorithm SHA1).Hash
         $base64Hash + " *" + $newBase64.Substring($Workdir.Length + 1) | Out-File -FilePath $newBase64Sha -Encoding utf8 -ErrorAction Stop
     } else {
