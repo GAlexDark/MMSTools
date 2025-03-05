@@ -279,7 +279,11 @@ function Test-CheckURL {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $CheckedUrl
+        [string] $CheckedUrl,
+
+		[Parameter(Mandatory = $false)]
+		[ValidateNotNullOrEmpty()]
+		[bool] $IsUsingProxy = $true
     )
 
     [bool] $retVal = $true
@@ -292,7 +296,7 @@ function Test-CheckURL {
             SkipCertificateCheck = $true
             Headers = @{ "Cache-Control" = "no-cache" }
         }
-        if ($UseProxy) {
+        if ($UseProxy -and $IsUsingProxy) {
             $proxy = New-Object System.Net.WebProxy
             if ([string]::IsNullOrEmpty($proxyName)) {
                 $proxy = [System.Net.WebRequest]::DefaultWebProxy
@@ -481,13 +485,6 @@ try {
         throw "Error resolve host $domain"
     }
 
-    if ($UseProxy -and -not [string]::IsNullOrEmpty($proxyName)) {
-        $retVal = Test-CheckDnsName $proxyName
-        if (-not $retVal) {
-            throw "Error check $proxyName"
-        }
-    }
-
     $retVal = Test-CheckURL -CheckedUrl $download_url
     if (-not $retVal) {
         throw "Error connect to the $download_url"
@@ -554,6 +551,7 @@ try {
             if ([string]::IsNullOrEmpty($userName)) {
                 throw "The 'userName' value is not set"
             }
+
             if ([string]::IsNullOrEmpty($userPassword)) {
                 throw "The 'userPassword' value is not set"
             }
@@ -572,7 +570,7 @@ try {
             [string] $apiPath = "v1/cryptography/data/certificate/$secretName"
             [string] $metadataPath = "v1/cryptography/metadata/certificate/$secretName"
 
-            $retVal = Test-CheckURL -CheckedUrl $vaultAddress
+            $retVal = Test-CheckURL -CheckedUrl $vaultAddress -IsUsingProxy $false
             if (-not $retVal) {
                 throw "The Vault $vaultAddress checking error"
             }
