@@ -52,7 +52,7 @@
  Attension! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
 
  OK - The domain name 'demosite.local' was resolved to the IP address: [hidden as minor]
- OK - The  URL available.
+ OK - The 'https://demosite.local/download/CACertificates.p7b' URL available.
 
  Starting download the P7B file from the 'https://demosite.local/download/CACertificates.p7b' Url.
 
@@ -82,7 +82,7 @@
  DONE
  OK - The hash file 'B:\workdir\CACertificates20240917.base64.sha' was successfully created.
  OK - The hash file 'B:\workdir\key-6.dat.base64.sha' was successfully created.
- OK - The  URL available.
+ OK - The 'http://vault.local:8200' URL available.
 
  Checking the Vault Endpoint status...
  OK - The Vault is available.
@@ -122,7 +122,7 @@
  The value of the 'download_url' was changed with the value from the Url argument...
 
  OK - The domain name 'demosite.local' was resolved to the IP address: [hidden as minor]
- OK - The  URL available.
+ OK - The 'https://demosite.local/download_new/CACertificates.p7b' URL available.
 
  Starting download the P7B file from the 'https://demosite.local/download_new/CACertificates.p7b' Url.
 
@@ -152,7 +152,7 @@
  DONE
  OK - The hash file 'B:\workdir\CACertificates20240917.base64.sha' was successfully created.
  OK - The hash file 'B:\workdir\key-6.dat.base64.sha' was successfully created.
- OK - The  URL available.
+ OK - The 'http://vault.local:8200' URL available.
 
  Checking the Vault Endpoint status...
  OK - The Vault is available.
@@ -334,7 +334,7 @@ try {
         throw "Error resolve host $domain"
     }
 
-    $retVal = Test-CheckURL -CheckedUrl $download_url
+    $retVal = Test-CheckURL -Url $download_url
     if (-not $retVal) {
         throw "Error connect to the $download_url"
     }
@@ -441,7 +441,7 @@ try {
         [string] $apiPath = "v1/cryptography/data/certificate/$secretName"
         [string] $metadataPath = "v1/cryptography/metadata/certificate/$secretName"
 
-        $retVal = Test-CheckURL -CheckedUrl $vaultAddress -IsUsingProxy $false
+        $retVal = Test-CheckURL -Url $vaultAddress -IsUsingProxy $false
         if (-not $retVal) {
             throw "The Vault $vaultAddress checking error"
         }

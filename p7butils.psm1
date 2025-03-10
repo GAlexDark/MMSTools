@@ -81,18 +81,18 @@ function Test-CheckURL {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $CheckedUrl,
+        [string] $Url,
 
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [bool] $IsUsingProxy = $true
+		[Parameter(Mandatory = $false)]
+		[ValidateNotNullOrEmpty()]
+		[bool] $IsUsingProxy = $true
     )
 
     [bool] $retVal = $true
     try {
         $params = @{
             Method = 'Head'
-            Uri = $CheckedUrl
+            Uri = $Url
             UserAgent = $userAgent
             UseBasicParsing = $true
             SkipCertificateCheck = $true
@@ -111,9 +111,11 @@ function Test-CheckURL {
         }
         $result = Invoke-WebRequest @params
         if ($result.StatusCode -eq 200) {
-            Write-Host "OK - The $DownloadUrl URL available." -ForegroundColor Green
+            [string] $pattern = [string]::Format("OK - The '{0}' URL available.", $Url)
+            Write-Host $pattern -ForegroundColor Green
         } else {
-            Write-Host "Error connect to the $Url. Error code: $($result.StatusCode)" -ForegroundColor Red
+            [string] $pattern = [string]::Format("Error connect to the '{0}'. Error code: {1}.", $Url, $result.StatusCode)
+            Write-Host $pattern -ForegroundColor Red
             $retVal = $false
         }
     } catch {
@@ -194,8 +196,7 @@ function Get-ShaHashFile {
         [string] $name = (Split-Path -Path $FileName -Leaf -ErrorAction Stop)
         $hash + " *" + $name | Out-File -FilePath $hashFile -Encoding utf8 -ErrorAction Stop
         Write-Host "OK - The hash file '$hashFile' was successfully created." -ForegroundColor Green
-    }
-    catch {
+    } catch {
         Write-Host $PSItem -ForegroundColor Red
         $retVal = $false
     }

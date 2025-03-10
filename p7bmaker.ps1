@@ -48,7 +48,7 @@
  None. p7bmaker.ps1 doesn't generate any output.
 
 .EXAMPLE
- PS> .\p7bmaker.ps1 -Workdir B:\certdata
+ PS> .\p7bmaker.ps1 -EnvFileName test.ps1 -Workdir B:\certdata -Upload
  p7b file maker PoSH Script Version 2.0
  Copyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info
  This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
@@ -56,7 +56,11 @@
  Attension! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
 
  OK - The domain name 'demosite.local' was resolved to the IP address: [hidden as minor]
- OK - The file was successfully saved in B:\certdata
+ OK - The 'https://demosite.local/download/CACertificates.p7b' URL available.
+
+ Starting download the P7B file from the 'https://demosite.local/download/CACertificates.p7b' Url.
+
+ OK - The file was successfully saved in the B:\certdata folder.
 
  Starting B:\MMSTools\p7bmaker.exe...
 
@@ -80,9 +84,11 @@
  The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
 
  DONE
- OK - The  URL exists.
+ OK - The hash file 'B:\certdata\CACertificates20240917.base64.sha' was successfully created.
+ OK - The 'http://vault.local:8200' URL available.
+
  Checking the Vault status...
- The Vault is available.
+ OK - The Vault is available.
 
  Connect to the Vault...
  Connected.
@@ -104,12 +110,12 @@
  The data was uploaded successfully.
 
  Creating archive: CACertificates20240917.zip
- Delete the B:\certdata\20240917 folder if it exists
  Creating the B:\certdata\20240917 folder and copy files to it
+
  DONE
 
 .EXAMPLE
- PS> .\p7bmaker.ps1 -Workdir B:\certdata -Url "https://demosite.local/download_new/CACertificates.p7b"
+ PS> .\p7bmaker.ps1 -EnvFileName test.ps1 -Workdir B:\certdata -Url "https://demosite.local/download_new/CACertificates.p7b" -Upload
  p7b file maker PoSH Script Version 2.0
  Copyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info
  This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
@@ -119,7 +125,11 @@
  The value of the 'download_url' was changed with the value from the Url argument...
 
  OK - The domain name 'demosite.local' was resolved to the IP address: [hidden as minor]
- OK - The file was successfully saved in B:\certdata\
+ OK - The 'https://demosite.local/download_new/CACertificates.p7b' URL available.
+
+ Starting download the P7B file from the 'https://demosite.local/download_new/CACertificates.p7b' Url.
+
+ OK - The file was successfully saved in the B:\certdata\ folder.
 
  Starting B:\MMSTools\p7bmaker.exe...
 
@@ -143,9 +153,11 @@
  The hash file 'B:/certdata/CACertificates20240917.sha' saved successfully.
 
  DONE
- OK - The  URL exists.
+ OK - The hash file 'B:\certdata\CACertificates20240917.base64.sha' was successfully created.
+ OK - The  URL available.
+
  Checking the Vault status...
- The Vault is available.
+ OK - The 'http://vault.local:8200' URL available.
 
  Connect to the Vault...
  Connected.
@@ -167,8 +179,8 @@
  The data was uploaded successfully.
 
  Creating archive: CACertificates20240917.zip
- Delete the B:\certdata\20240917 folder if it exists
  Creating the B:\certdata\20240917 folder and copy files to it
+
  DONE
 
 #>
@@ -317,7 +329,7 @@ try {
         throw "Error resolve host $domain"
     }
 
-    $retVal = Test-CheckURL -CheckedUrl $download_url
+    $retVal = Test-CheckURL -Url $download_url
     if (-not $retVal) {
         throw "Error connect to the $download_url"
     }
@@ -410,7 +422,7 @@ try {
             [string] $apiPath = "v1/cryptography/data/certificate/$secretName"
             [string] $metadataPath = "v1/cryptography/metadata/certificate/$secretName"
 
-            $retVal = Test-CheckURL -CheckedUrl $vaultAddress -IsUsingProxy $false
+            $retVal = Test-CheckURL -Url $vaultAddress -IsUsingProxy $false
             if (-not $retVal) {
                 throw "The Vault $vaultAddress checking error"
             }
@@ -429,7 +441,7 @@ try {
             if (-not $sealed -and -not $initialized) {
                 throw "Vault is not initialized."
             }
-            Write-Host "Ok - The Vault is available.`n" -ForegroundColor Green
+            Write-Host "OK - The Vault is available.`n" -ForegroundColor Green
 
             Write-Host "Connect to the Vault..."
             $postParams = @{"password"="$userPassword"} | ConvertTo-Json -ErrorAction Stop
