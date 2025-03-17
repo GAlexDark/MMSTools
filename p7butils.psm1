@@ -27,10 +27,10 @@ function Get-DomainFromUrl {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $baseUrl
+        [string] $BaseUrl
     )
 
-    $url = [System.Uri]$baseUrl
+    $url = [System.Uri]$BaseUrl
     return $url.Host
 }
 
@@ -38,10 +38,10 @@ function Get-FileNameFromUrl {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $baseUrl
+        [string] $BaseUrl
     )
 
-    $url = [System.Uri]$baseUrl
+    $url = [System.Uri]$BaseUrl
     return $url.Segments[-1]
 }
 
@@ -69,10 +69,10 @@ function Test-CheckQuery {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $baseUrl
+        [string] $BaseUrl
     )
 
-    $url = [System.Uri]$baseUrl
+    $url = [System.Uri]$BaseUrl
     [bool] $retVal = if ($url.Query.Length -eq 0) { $false } else { $true }
     return $retVal
 }
@@ -148,7 +148,7 @@ function Get-DownloadFile {
 
     [bool] $retVal = $true
     try {
-        $fileName = [System.IO.Path]::GetFileName($DownloadUrl)
+        $fileName = Get-FileNameFromUrl -BaseUrl $DownloadUrl
         $fileName = Join-Path -Path $SavePath -ChildPath $fileName -ErrorAction Stop
 
         $params = @{
