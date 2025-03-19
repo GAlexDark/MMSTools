@@ -133,7 +133,12 @@ int main(int argc, char *argv[])
         QString errorString;
         retVal = CPkcs7::createHashFile(dest, errorString);
         if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest.replace(".p7b", ".sha")));
+            QString buf = QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest);
+            int lastIndex = buf.lastIndexOf("p7b");
+            if (lastIndex != -1) {
+                buf.replace(lastIndex, 3, "sha");
+            }
+            consoleOut.outToConsole(buf);
         } else {
             consoleOut.outToConsole(errorString);
         }
