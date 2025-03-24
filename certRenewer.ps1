@@ -35,7 +35,10 @@
  Specifies the flag when the script must download the p7b file over the Corporate Firewall.
 
 .PARAMETER Url
- Specifies the download URL. Attention! If the URL value contains ?d=, it must have the ?d=* format (include *)!
+ Specifies the download URL. Attention! The URL value must not contains the '?d=' parameter!
+
+.PARAMETER DateStamp
+ Specifies the datestamp from the IIT letter. If the '01011970' value was set, this parameter was ignored.
 
 .INPUTS
  None. You can't pipe objects to certRenewer.ps1.
@@ -217,11 +220,17 @@ Param (
 )
 
 [int] $exitCode = 0
+
 try {
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
 	$ErrorView = "NormalView"
 	$PSStyle.OutputRendering = "PlainText"
+
+	[string] $timeStamp = (Get-Date -ErrorAction Stop).ToString('yyyyMMddHHmmss')
+	if (![string]::IsNullOrEmpty($timeStamp)) {
+		Write-Host "`nID: $timeStamp"
+	}
 
     $assemblyPath = Join-Path -Path $PSScriptRoot -ChildPath "p7butils.psm1" -ErrorAction Stop
     [bool] $retVal = Test-Path -Path $assemblyPath -ErrorAction Stop
@@ -238,10 +247,10 @@ try {
     }
 
     $Workdir = $Workdir.Trim()
-    if ((($Workdir.Length -eq 1) -and ($Workdir -eq ".")) -or
-        (($Workdir.Length -eq 2) -and ($Workdir -eq ".\"))) {
-        $Workdir = $PSScriptRoot
+    if ($Path -eq "." -or $Path -eq ".\") {
+        $Path = $PSScriptRoot
     }
+
     $retVal = Test-Path -Path $Workdir -ErrorAction Stop
     if (!$retVal) {
         throw "The work dir $Workdir not found."
@@ -259,7 +268,6 @@ try {
 
     #**************************************************************************************
     # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
-    #[string] $download_url = "https://demosite.local/download/CACertificates.p7b?d="
     [string] $download_url = "https://demosite.local/download/CACertificates.p7b"
     #
     #**************************************************************************************
@@ -311,22 +319,9 @@ try {
         Write-Host "The value of the 'download_url' was changed with the value from the Url argument...`n" -ForegroundColor Yellow
     }
 
-#    $retVal = Test-CheckQuery $download_url
-#    if ($retVal) {
-#        if ($download_url.EndsWith("?d=")) {
-#            if ($DateStamp.Length -eq 0) {
-#                $download_url = $download_url + (Get-Date -ErrorAction Stop).ToString('ddMMyyyy')
-#            } else {
-#                $download_url = $download_url + $DateStamp
-#            }
-#        }
-#    } else {
-#        if ($DateStamp.Length -eq 0) {
-#            $download_url = $download_url + "?d=" +(Get-Date -ErrorAction Stop).ToString('ddMMyyyy')
-#        } else {
-#            $download_url = $download_url + "?d=" + $DateStamp
-#        }
-#    }
+    if (-not [string]::IsNullOrEmpty($DateStamp) -and $DateStamp -ne "01011970") {
+        $download_url = $download_url + "?d=" + $DateStamp
+    }
 
     [string] $domain = Get-DomainFromUrl $download_url
     $retVal = Test-CheckDnsName $domain
@@ -514,12 +509,7 @@ try {
     Compress-Archive -Path $sources -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction stop
 
     #create the new folder and copy files to it
-    [string] $newDir = Join-Path -Path $Workdir -ChildPath ($ts + "_renew") -ErrorAction Stop
-    $retVal = Test-Path -Path $newDir -ErrorAction Stop
-    if ($retVal) {
-        $newDir = [string]::Format("{0}_{1}_renew", $ts, (Get-Date -ErrorAction Stop).ToString("HHmmss"))
-        $newDir = Join-Path -Path $Workdir -ChildPath $newDir -ErrorAction Stop
-    }
+    [string] $newDir = Join-Path -Path $Workdir -ChildPath ($timeStamp + "_renew") -ErrorAction Stop
 
     Write-Host "Creating the $newDir folder and copy files to it"
     New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
@@ -538,5 +528,9 @@ try {
 }
 
 Write-Host "`nDONE" -ForegroundColor Green
+
+if (![string]::IsNullOrEmpty($timeStamp)) {
+	Write-Host "`nID: $timeStamp"
+}
 
 exit $exitCode
