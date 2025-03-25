@@ -76,8 +76,8 @@ try {
     [int] $remotePort = $REMOTE_PORT
     [string] $remotePath = $REMOTE_PATH
 
-    [string] $userName = "galex" #$($env:sshUserName)
-    [string] $userPassword = "467-80-20" #$($env:sshPassword)
+    [string] $userName = $($env:sshUserName)
+    [string] $userPassword = $($env:sshPassword)
 
     [string] $archiveStorage = $ARCHIVE_STORAGE
     [string] $dateTimeFormat = $DATETIME_FORMAT
