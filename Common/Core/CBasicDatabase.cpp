@@ -28,14 +28,13 @@ void
 CBasicDatabase::_deinit()
 {
     if (m_isInited) {
-/***************************
- * This sourse code fixed a standard QSqlDatabase bug:
- *   QSqlDatabasePrivate::removeDatabase connection is still in use, all queries will cease to work.
- **************************/
+        /***************************
+         * This source code fixes a standard QSqlDatabase bug:
+         * QSqlDatabasePrivate::removeDatabase connection is still in use, all queries will cease to work.
+         **************************/
         const QString connectionName = m_db.connectionName();
         m_db = QSqlDatabase();
         QSqlDatabase::removeDatabase(connectionName);
-
         m_isInited = false;
     }
 }
@@ -45,58 +44,44 @@ CBasicDatabase::_exec(const QString &query)
 {
     m_SQLRes->clear();
     m_SQLRes->setForwardOnly(true); // ускорение для ::next()
-    bool retVal = m_SQLRes->exec(query);
-    if (!retVal) {
-        QSqlError error = m_SQLRes->lastError();
-        m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
+    if (!m_SQLRes->exec(query)) {
+        m_errorString = QStringLiteral("SQL execution error: %1").arg(m_SQLRes->lastError().text());
+        return false;
     }
-    return retVal;
+    return true;
 }
 
 bool
 CBasicDatabase::_exec()
 {
-    bool retVal = m_SQLRes->exec();
-    if (!retVal) {
-        QSqlError error = m_SQLRes->lastError();
-        m_errorString = QStringLiteral("SQL execution error: %1").arg(error.text());
-    } else {
-        m_SQLRes->finish();
+    if (!m_SQLRes->exec()) {
+        m_errorString = QStringLiteral("SQL execution error: %1").arg(m_SQLRes->lastError().text());
+        return false;
     }
-    return retVal;
+    m_SQLRes->finish();
+    return true;
 }
 
-void CBasicDatabase::_connectToDatabase(const QString &dbDriverName, const QString &connectionString)
+void
+CBasicDatabase::_connectToDatabase(const QString &dbDriverName, const QString &connectionString)
 {
     m_db = QSqlDatabase::addDatabase(dbDriverName, m_connectionName);
     m_isInited = m_db.isValid();
     if (m_isInited) {
         m_db.setDatabaseName(connectionString);
     } else {
-        QSqlError error = m_db.lastError();
-        m_errorString = QStringLiteral("Error loading DB driver: %1").arg(error.text());
+        m_errorString = QStringLiteral("Error loading DB driver: %1").arg(m_db.lastError().text());
     }
 }
 
-/*********************************************************************
- *
- *  Public functions
- *
- ********************************************************************/
-
 CBasicDatabase::CBasicDatabase(const QString &connectionName)
-    : m_connectionName(connectionName)
+    : m_connectionName(connectionName.isEmpty() ? QUuid::createUuid().toString() : connectionName)
 {
-    if (m_connectionName.isEmpty()) {
-        QUuid guid = QUuid::createUuid();
-        m_connectionName = guid.toString();
-    }
 }
 
 CBasicDatabase::CBasicDatabase()
+    : m_connectionName(QUuid::createUuid().toString())
 {
-    QUuid guid = QUuid::createUuid();
-    m_connectionName = guid.toString();
 }
 
 CBasicDatabase::~CBasicDatabase()
@@ -107,22 +92,20 @@ CBasicDatabase::~CBasicDatabase()
 bool
 CBasicDatabase::open()
 {
-    bool retVal = true;
-    if (!m_db.isOpen()) {
-        retVal = m_db.open();
-        if (retVal) {
-            m_SQLRes.reset(new QSqlQuery(m_db));
-            Q_CHECK_PTR(m_SQLRes);
-            if (!m_SQLRes) {
-                m_errorString = QStringLiteral("Fatal SQL Query Error.");
-                retVal = false;
-            }
-        } else {
-            QSqlError error = m_db.lastError();
-            m_errorString = QStringLiteral("Error open DB file: %1").arg(error.text());
+    if (m_db.isOpen()) return true;
+
+    if (m_db.open()) {
+        m_SQLRes.reset(new QSqlQuery(m_db));
+        Q_CHECK_PTR(m_SQLRes);
+        if (!m_SQLRes) {
+            m_errorString = QStringLiteral("Fatal SQL Query Error.");
+            return false;
         }
+        return true;
     }
-    return retVal;
+
+    m_errorString = QStringLiteral("Error open DB file: %1").arg(m_db.lastError().text());
+    return false;
 }
 
 void
@@ -149,8 +132,7 @@ CBasicDatabase::beginTransaction()
 {
     m_isBeginTransaction = m_db.transaction();
     if (!m_isBeginTransaction) {
-        QSqlError error = m_db.lastError();
-        m_errorString = QStringLiteral("Transaction Error: %1").arg(error.text());
+        m_errorString = QStringLiteral("Transaction Error: %1").arg(m_db.lastError().text());
     }
     return m_isBeginTransaction;
 }
@@ -158,104 +140,88 @@ CBasicDatabase::beginTransaction()
 bool
 CBasicDatabase::commitTransaction()
 {
-    bool retVal = true;
-    if (m_isBeginTransaction) {
-        if (m_SQLRes && m_SQLRes->isActive()) {
-            m_SQLRes->finish();
-        }
+    if (!m_isBeginTransaction) return true;
 
-        retVal = m_db.commit();
-        if (retVal) {
-            m_isBeginTransaction = false;
-        } else {
-            QSqlError error = m_db.lastError();
-            m_errorString = QStringLiteral("Transaction Error. Commit status: %1").arg(error.text());
-        }
+    if (m_SQLRes && m_SQLRes->isActive()) {
+        m_SQLRes->finish();
     }
-    return retVal;
+
+    if (m_db.commit()) {
+        m_isBeginTransaction = false;
+        return true;
+    }
+
+    m_errorString = QStringLiteral("Transaction Error. Commit status: %1").arg(m_db.lastError().text());
+    return false;
 }
 
 bool
 CBasicDatabase::rollbackTransaction()
 {
-    bool retVal = true;
-    if (m_isBeginTransaction) {
-        retVal = m_db.rollback();
-        if (!retVal) {
-            QSqlError error = m_db.lastError();
-            m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(error.text());
-        }
-        m_isBeginTransaction = false;
+    if (!m_isBeginTransaction) return true;
+
+    if (!m_db.rollback()) {
+        m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(m_db.lastError().text());
+        return false;
     }
-    return retVal;
+
+    m_isBeginTransaction = false;
+    return true;
 }
 
 bool
 CBasicDatabase::prepareRequest(const QString &query)
 {
     m_SQLRes->clear();
-    bool retVal = m_SQLRes->prepare(query);
-    if (!retVal) {
-        QSqlError error = m_SQLRes->lastError();
-        m_errorString = QStringLiteral("SQL prepare error: %1").arg(error.text());
+    if (!m_SQLRes->prepare(query)) {
+        m_errorString = QStringLiteral("SQL prepare error: %1").arg(m_SQLRes->lastError().text());
+        return false;
     }
-    return retVal;
+    return true;
 }
 
 bool
 CBasicDatabase::execRequest(pDataItem data)
 {
     Q_CHECK_PTR(data);
-    auto itStart = data->begin();
-    auto itEnd = data->end();
-
-    while (itStart != itEnd) {
-        m_SQLRes->bindValue (itStart.key(), itStart.value());
-        ++itStart;
+    for (auto it = data->cbegin(); it != data->cend(); ++it) {
+        m_SQLRes->bindValue(it.key(), it.value());
     }
-
-    bool retVal = _exec();
-    return retVal;
+    return _exec();
 }
 
 bool
 CBasicDatabase::insertToDB(const QString &query, pDataItem data)
 {
     Q_CHECK_PTR(data);
-    bool retVal = prepareRequest(query);
-    if (retVal) {
-        retVal = execRequest(data);
-    }
-    return retVal;
+    if (!prepareRequest(query)) return false;
+    return execRequest(data);
 }
 
 dataList_t
 CBasicDatabase::findInDB(const QString &query, bool addColumnHeaders)
 {
     dataList_t retVal;
-    bool hasResult = exec(query);
-    if (hasResult) {
-        QStringList item;
-
+    if (exec(query)) {
         QSqlRecord rec = m_SQLRes->record();
         int columnCount = rec.count();
+        QStringList item;
         if (addColumnHeaders) {
-            for (int i = 0; i < columnCount; i++) {
+            for (int i = 0; i < columnCount; ++i) {
                 item.append(rec.fieldName(i));
             }
             retVal.append(item);
         }
-
-        while(m_SQLRes->next()) {
-            item.clear();
-            for (int i = 0; i < columnCount; i++) {
+        item.clear();
+        while (m_SQLRes->next()) {
+            for (int i = 0; i < columnCount; ++i) {
                 item.append(m_SQLRes->value(i).toString().trimmed());
             }
             retVal.append(item);
         }
         m_SQLRes->finish();
     }
-    return hasResult ? retVal : dataList_t();
+    return retVal;
 }
 
 bool
@@ -267,17 +233,15 @@ CBasicDatabase::exec(const QString &query)
 bool
 CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
 {
-    if (!m_isInited) {
-        if (connectionString.isEmpty()) {
-            m_errorString = QStringLiteral("Empty connection string");
-        } else {
-            if (dbDriverName.isEmpty()) {
-                m_errorString = QStringLiteral("The DB driver name is empty");
-            } else {
-                // соединяемся с базой данных
-                _connectToDatabase(dbDriverName, connectionString)                ;
-            }
-        }
+    if (m_isInited) return true;
+
+    if (connectionString.isEmpty()) {
+        m_errorString = QStringLiteral("Empty connection string");
+    } else if (dbDriverName.isEmpty()) {
+        m_errorString = QStringLiteral("The DB driver name is empty");
+    } else {
+        // connecting with the DB
+        _connectToDatabase(dbDriverName, connectionString);
     }
     return m_isInited;
 }
@@ -287,6 +251,7 @@ CBasicDatabase::setUserName(const QString &name)
 {
     m_db.setUserName(name);
 }
+
 void
 CBasicDatabase::setPassword(const QString &password)
 {

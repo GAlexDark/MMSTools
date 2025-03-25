@@ -76,7 +76,6 @@ private:
 
     bool            m_isInited = false; //флаг подключения к БД. True - connected, false - not connected
     QString         m_connectionName; //Уникальное имя соединения
-    int             m_ErrorCode = 0; //Код ошибки
     QString         m_errorString;
 
     bool            m_isBeginTransaction = false;
