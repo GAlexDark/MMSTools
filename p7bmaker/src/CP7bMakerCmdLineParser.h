@@ -32,7 +32,7 @@ public:
     bool getP7bFileName(QStringList &p7bFileName);
     bool getCertsList(QStringList &certsList);
     bool isSilent() const { return m_isSilent; };
-    QString getOutputFormat();
+    QString getOutputFormat() const;
 
 private:
     bool addOption(const QCoreApplication &app) override;

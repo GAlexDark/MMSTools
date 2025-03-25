@@ -111,16 +111,14 @@ CP7bMakerCmdLineParser::getCertsList(QStringList &certsList)
 }
 
 QString
-CP7bMakerCmdLineParser::getOutputFormat()
+CP7bMakerCmdLineParser::getOutputFormat() const
 {
-    QString retVal;
+    QString retVal = "ASN1";
     if (m_isOutputFormat) {
         retVal = m_parser.value("output").trimmed().toUpper();
         if (QString::compare(retVal, "PEM", Qt::CaseInsensitive) != 0) {
             retVal = "ASN1";
         }
-    } else {
-        retVal = "ASN1";
     }
     return retVal;
 }
