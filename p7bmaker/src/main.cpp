@@ -109,7 +109,10 @@ int main(int argc, char *argv[])
     QString path = QFileInfo(dest).absolutePath();
     retVal = elcUtils::isFolderWritable(path);
     if (retVal) {
-        retVal = p7bStore.saveStore(dest);
+        QString outputFormat = cmd.getOutputFormat();
+        consoleOut.outToConsole(QStringLiteral("Output format: %1").arg(outputFormat));
+        OUTPUT_FORMAT of = outputFormat == "ASN1" ? OUTPUT_FORMAT::FORMAT_ASN1 : OUTPUT_FORMAT::FORMAT_PEM;
+        retVal = p7bStore.saveStore(dest, of);
         if (retVal) {
             consoleOut.outToConsole(QStringLiteral("File '%1' saved successfully.\n").arg(dest));
         } else {
@@ -130,7 +133,12 @@ int main(int argc, char *argv[])
         QString errorString;
         retVal = CPkcs7::createHashFile(dest, errorString);
         if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest.replace("p7b", "sha")));
+            QString buf = QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest);
+            int lastIndex = buf.lastIndexOf("p7b");
+            if (lastIndex != -1) {
+                buf.replace(lastIndex, 3, "sha");
+            }
+            consoleOut.outToConsole(buf);
         } else {
             consoleOut.outToConsole(errorString);
         }

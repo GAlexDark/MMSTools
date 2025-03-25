@@ -184,22 +184,6 @@ function Get-CertificateInfo {
     return $retVal
 }
 
-function Get-PemCertificate {
-    param (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string] $data
-    )
-
-    [string[]] $buf = $data -split "-----END CERTIFICATE-----"
-    [string[]] $retVal = $buf | Where-Object { ($_.Trim().Length -ne 0) -and ($_ -ne $null) }
-    for ($i=0; $i -lt $retVal.count; $i++) {
-        $retVal[$i] = $retVal[$i].Trim()
-        $retVal[$i] = $retVal[$i] + "-----END CERTIFICATE-----"
-    }
-    return $retVal
-}
-
 # CMP - certificate management protocol
 [string[]] $CertificateFileType = ('*.cer','*.crt','*.p7b', '*.pem')
 if ($PKCS7Only -and $CertsOnly) {
@@ -212,30 +196,33 @@ if ($PKCS7Only) {
 if ($CertsOnly) {
     $CertificateFileType = ('*.cer','*.crt','*.pem')
 }
-$certs = Get-ChildItem -Path $Path -Include $CertificateFileType -Recurse
-
+$certs = Get-ChildItem -Path $Path -Include $CertificateFileType -Recurse -ErrorAction Stop
 if ($certs) {
     [array] $certsInfo = @()
 
     $certs | ForEach-Object {
         [string] $pathToFile = $_.FullName
         [string] $prettyPath = "." + $pathToFile.Substring($Path.Length)
-        if ($pathToFile.EndsWith(".p7b") -or $pathToFile.EndsWith(".pem")) {
+        $extension = (Get-Item -Path $pathToFile).Extension
+        if ($extension -eq ".p7b" -or $extension -eq ".pem") {
             try {
                 $certsCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
                 [Byte[]] $bytes = @()
-                if ($pathToFile.EndsWith(".pem")) {
-                    [string] $pemFileContent = Get-Content -Path $pathToFile -Encoding String -ErrorAction Stop
-                    [string[]] $pemCerts = Get-PemCertificate $pemFileContent
-                    for ($i=0; $i -lt $pemCerts.count; $i++) {
-                        $bytes.Clear()
-                        $bytes = $pemCerts[$i].ToCharArray()
-                        $certsCollection.Import($bytes)
+                if ($extension -eq ".pem") {
+                    [string] $pemFileContent = Get-Content -Path $pathToFile -Raw -ErrorAction Stop
+                    $certificates = $pemFileContent -split "(?<=-----END CERTIFICATE-----)"
+                    $certificates = $certificates | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+
+                    foreach ($cert in $certificates) {
+                        $bytes = [System.Text.Encoding]::ASCII.GetBytes($cert)
+                        $x509Cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+                        $x509Cert.Import($bytes)
+                        $certsCollection.Add($x509Cert) | Out-Null
                     }
-                } else {
+                } else { # p7b file
                     $bytes = [System.IO.File]::ReadAllBytes($pathToFile)
                     $certsCollection.Import($bytes)
-                }
+                } # if (pem)
                 $certsCollection | ForEach-Object {
                     $certsInfo += Get-CertificateInfo $_
                     $certsInfo[$certsInfo.count - 1].'Path To The File' = $prettyPath
@@ -243,6 +230,7 @@ if ($certs) {
             } catch {
                 Write-Error $PSItem
             } finally {
+                $bytes.Clear()
                 if ($certsCollection) {
                     $certsCollection.Dispose()
                 }
@@ -250,8 +238,8 @@ if ($certs) {
         } else {
             $certsInfo += Get-CertificateInfo $pathToFile
             $certsInfo[$certsInfo.count - 1].'Path To The File' = $prettyPath
-        }
-    }
+        } # if (p7b) or (pem)
+    } # foreach
 
     if ($Gui) {
         $certsInfo |  Out-GridView -Title "Certificates Information Gathering PoSH Script" -PassThru | Export-Csv -Path .\CertificatesInfo.csv -Delimiter "`t" -Encoding UTF8

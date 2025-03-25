@@ -225,13 +225,18 @@ CPkcs7::appendCerts(const QStringList &filesList)
 }
 
 bool
-CPkcs7::saveStore(const QString &fileName)
+CPkcs7::saveStore(const QString &fileName, const OUTPUT_FORMAT outputFormat)
 {
     bool retVal = !m_pkcs7Store.isNull();
     if (retVal) {
         QScopedPointer<BIO, bioFree> buf(BIO_new(BIO_s_mem()));
         ERR_clear_error();
-        int res = i2d_PKCS7_bio(buf.data(), m_pkcs7Store.data());
+        int res = 0;
+        if (outputFormat == OUTPUT_FORMAT::FORMAT_ASN1) {
+            res = i2d_PKCS7_bio(buf.data(), m_pkcs7Store.data());
+        } else {
+            res = PEM_write_bio_PKCS7(buf.data(), m_pkcs7Store.data());
+        }
         if (res > 0) {
             QFile file(fileName);
             retVal = file.open(QIODevice::WriteOnly);
@@ -252,7 +257,7 @@ CPkcs7::saveStore(const QString &fileName)
                 m_errorString = QStringLiteral("Error opening file: '%1': %2").arg(fileName, file.errorString());
             }
         } else {
-            m_errorString = QStringLiteral("Error decoding write data: %1").arg(getOpenSslErrorMessage());
+            m_errorString = QStringLiteral("Error decoding pkcs7 data: %1").arg(getOpenSslErrorMessage());
             retVal = false;
         }
     } else {
