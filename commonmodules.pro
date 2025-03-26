@@ -7,6 +7,7 @@ HEADERS += \
     ../Common/Core/DBStrings.h \
     ../Common/Core/CElcCommonSettings.h \
     ../Common/Core/CEventLogParser.h \
+    ../Common/Core/CEventLogParser2.h \
     ../Common/Core/CAuditTrailParser.h \
     ../Common/Core/CSystemLogParser.h \
     ../Common/Core/CEventLogReport.h \
@@ -30,6 +31,7 @@ SOURCES += \
     ../Common/Core/CBasicSettings.cpp \
     ../Common/Core/CElcCommonSettings.cpp \
     ../Common/Core/CEventLogParser.cpp \
+    ../Common/Core/CEventLogParser2.cpp \
     ../Common/Core/CAuditTrailParser.cpp \
     ../Common/Core/CSystemLogParser.cpp \
     ../Common/Core/CEventLogReport.cpp \
