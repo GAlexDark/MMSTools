@@ -23,17 +23,16 @@
 
 bool
 CSqliteDatabase::truncateDB(const QString &connectionString, QString &errorString,
-                            qsizetype tablesCount, const QStringList &tablesNames)
+                            const QStringList &tablesNames, const QStringList &updateData)
 {
     CSqliteDatabase db;
     bool retVal = db.init(connectionString);
     if (retVal) {
         retVal = db.open();
-        qsizetype i = 0;
-        while ((i < tablesCount) && retVal) {
-            retVal = db.truncateTable(tablesNames.at(i));
-            ++i;
-        }
+            for (const QString &item : tablesNames) {
+                retVal = db.truncateTable(item, updateData);
+                if (!retVal) break;
+            }
         if (retVal) {
             retVal = db.optimizeDatabaseSize();
         }
@@ -60,7 +59,7 @@ CSqliteDatabase::optimizeDatabaseSize()
 }
 
 bool
-CSqliteDatabase::truncateTable(const QString &tableName)
+CSqliteDatabase::truncateTable(const QString &tableName, const QStringList &updateData)
 {
     sqlQueryFinish();
     bool retVal = false;
@@ -69,8 +68,20 @@ CSqliteDatabase::truncateTable(const QString &tableName)
     if (!res.isEmpty()) {
         retVal = exec(QLatin1String("DROP TABLE IF EXISTS [%1];").arg(tableName));
         if (retVal) {
-            const QString buffer = res.at(0).at(0).toLatin1();
-            retVal = exec(buffer);
+            QString buffer;
+            if (updateData.isEmpty()) {
+                buffer = res.at(0).at(0).toLatin1();
+            } else {
+                QStringList buf = updateData.filter(tableName);
+                if (buf.size() == 1) {
+                    buffer = buf[0];
+                } else {
+                    retVal = false;
+                }
+            }
+            if (retVal) {
+                retVal = exec(buffer);
+            }
         }
     } else {
         retVal = true; // the table does not exists and will be created later
