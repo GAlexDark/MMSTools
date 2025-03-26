@@ -103,9 +103,8 @@ int main(int argc, char *argv[])
         if (comb1) {
             consoleOut.outToConsole(QLatin1String("Starting cleaning database..."));
             const CParserManager &parserManager = CParserManager::instance();
-            qsizetype count = parserManager.getItemCount();
             QStringList tables = parserManager.getTablesList();
-            if (!CSqliteDatabase::truncateDB(dbName, errorString, count, tables)) {
+            if (!CSqliteDatabase::truncateDB(dbName, errorString, tables)) {
                 consoleOut.outToConsole(QLatin1String("Cannot clean database: %1").arg(errorString));
                 return 1;
             }
