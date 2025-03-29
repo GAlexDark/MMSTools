@@ -84,7 +84,7 @@ CSqliteDatabase::truncateTable(const QString &tableName, const QStringList &upda
             }
         }
     } else {
-        retVal = true; // the table does not exists and will be created later
+        retVal = true; // the table does not exist and will be created later
     }
 
     return retVal;

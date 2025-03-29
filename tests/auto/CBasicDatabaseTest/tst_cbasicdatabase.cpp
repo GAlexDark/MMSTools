@@ -140,7 +140,7 @@ void CBasicDatabaseTest::test_findInDBvar3()
 void CBasicDatabaseTest::test_getValues()
 {
     int count = 0;
-    bool retVal = m_fakeDB.exec("select * from eventlog where rowid=1;");
+    bool retVal = m_fakeDB.exec("select username, timestampISO8601, requestid, type, details, username1, authtype, externalip, internalip, timestamp from eventlog where rowid=1;");
     QVERIFY(retVal);
 
     while (m_fakeDB.isNext()) {

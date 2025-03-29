@@ -27,53 +27,44 @@
 bool
 CReportBuilder::configureDb(const QString &dbFileName)
 {
-    bool retVal = true;
-    int blockSize = elcUtils::getStorageBlockSize(dbFileName);
-    QStringList pragmaItems;
-    pragmaItems.append(pragmaUTF8);
-    pragmaItems.append(pragmaPageSize.arg(blockSize));
+    const int blockSize = elcUtils::getStorageBlockSize(dbFileName);
+    const QStringList pragmaItems = { pragmaUTF8, pragmaPageSize.arg(blockSize) };
     for (const QString &item : pragmaItems) {
-        retVal = m_db.exec(item);
-        if (!retVal) {
-            break;
+        if (!m_db.exec(item)) {
+            return false;
         }
     }
-    return retVal;
+    return true;
 }
 
 bool
 CReportBuilder::connectToDatabase(const QString &dbFileName)
 {
-    bool retVal = m_db.init(dbFileName);
-    if (retVal) {
-        retVal = m_db.open();
-        if (retVal) {
-            retVal = configureDb(dbFileName);
-            if (!retVal) {
-                m_errorString = m_db.errorString();
-            }
-        }
+    if (!m_db.init(dbFileName) || !m_db.open()) {
+        return false;
     }
-    return retVal;
+    if (!configureDb(dbFileName)) {
+        m_errorString = m_db.errorString();
+        return false;
+    }
+    return true;
 }
 
 bool
 CReportBuilder::initReport(const QString &reportName, const bool showMilliseconds)
 {
-    QStringList tables = m_report->sources();
-    bool retVal = !tables.isEmpty();
-    if (retVal) {
-        QString table;
-        retVal = m_db.checkTables(tables, table);
-        if (retVal) {
-            m_report->init(&m_db, reportName, showMilliseconds);
-        } else {
-            m_errorString = QStringLiteral("The table '%1' not found. The report cannot create results.").arg(table);
-        }
-    } else {
+    const QStringList tables = m_report->sources();
+    if (tables.isEmpty()) {
         m_errorString = QStringLiteral("List of tables not found. The report cannot check them.");
+        return false;
     }
-    return retVal;
+    QString table;
+    if (!m_db.checkTables(tables, table)) {
+        m_errorString = QStringLiteral("The table '%1' not found. The report cannot create results.").arg(table);
+        return false;
+    }
+    m_report->init(&m_db, reportName, showMilliseconds);
+    return true;
 }
 
 CReportBuilder::CReportBuilder()
@@ -94,68 +85,66 @@ CReportBuilder::init(quint16 logID, const QString &dbFileName, const QString &re
                      const QStringList *excludedUsernamesList, const QStringList *includedUsernamesList, const bool showMilliseconds)
 {
     Q_CHECK_PTR(excludedUsernamesList);
-    m_excludedUsernamesList = *excludedUsernamesList;
     Q_CHECK_PTR(includedUsernamesList);
+
+    m_excludedUsernamesList = *excludedUsernamesList;
     m_includedUsernamesList = *includedUsernamesList;
 
     CReportManager &reportManager = CReportManager::instance();
     logID = reportManager.getIdByIndex(logID);
-    bool retVal = (logID != invalidId);
-    if (retVal) {
-        m_report = reportManager.getInstance(logID);
-        Q_CHECK_PTR(m_report);
-        retVal = connectToDatabase(dbFileName);
-        if (retVal) {
-            retVal = initReport(reportName, showMilliseconds);
-        } else {
-            m_db.close();
-        }
-    } else {
+
+    if (logID == invalidId) {
         m_errorString = QStringLiteral("The report not found");
+        return false;
     }
-    return retVal;
+
+    m_report = reportManager.getInstance(logID);
+    Q_CHECK_PTR(m_report);
+
+    if (!connectToDatabase(dbFileName) || !initReport(reportName, showMilliseconds)) {
+        m_db.close();
+        return false;
+    }
+    return true;
 }
 
 bool
 CReportBuilder::generateReport()
 {
-    QString args;
-    args.clear();
-
-    bool retVal = true;
     bool isIncluded = !m_includedUsernamesList.isEmpty();
     bool isExcluded = !m_excludedUsernamesList.isEmpty();
+
     if (isIncluded && isExcluded) {
         m_errorString = QStringLiteral("User exclusion and inclusion lists cannot be specified at the same time.");
-        retVal = false;
-    } else {
-        if (isIncluded || isExcluded) {
-            args.append(QLatin1String("WHERE "));
-            if (isIncluded) {
-                qsizetype size = m_includedUsernamesList.size() - 1;
-                for (qsizetype i = 0; i < size; ++i) {
-                    args.append(QStringLiteral("username='%1' OR ").arg(m_includedUsernamesList.at(i)));
-                } //for
-                args.append(QStringLiteral("username='%1'").arg(m_includedUsernamesList.at(size)));
-            }
-            if (isExcluded) {
-                qsizetype size = m_excludedUsernamesList.size() - 1;
-                for (qsizetype i = 0; i < size; ++i) {
-                    args.append(QStringLiteral("username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
-                } //for
-                args.append(QStringLiteral("username<>'%1'").arg(m_excludedUsernamesList.at(size)));
-            }
-        } // (isIncluded || isExcluded)
+        return false;
+    }
 
-        const QString request = m_report->selectString().arg(args);
-        retVal = m_report->generateReport(request);
-        if (!retVal) {
-            m_errorString = m_report->errorString();
+    QString args;
+    if (isIncluded) {
+        qsizetype size = m_includedUsernamesList.size() - 1;
+        for (qsizetype i = 0; i < size; ++i) {
+            args.append(QStringLiteral("username='%1' OR ").arg(m_includedUsernamesList.at(i)));
         }
-    } // isIncluded && isExcluded
-    m_db.close();
+        args.append(QStringLiteral("username='%1'").arg(m_includedUsernamesList.at(size)));
+        args = "WHERE " + args;
+    } else if (isExcluded) {
+        qsizetype size = m_excludedUsernamesList.size() - 1;
+        for (qsizetype i = 0; i < size; ++i) {
+            args.append(QStringLiteral("username<>'%1' AND ").arg(m_excludedUsernamesList.at(i)));
+        }
+        args.append(QStringLiteral("username<>'%1'").arg(m_excludedUsernamesList.at(size)));
+        args = "WHERE " + args;
+    }
 
-    return retVal;
+    const QString request = m_report->selectString().arg(args);
+    if (!m_report->generateReport(request)) {
+        m_errorString = m_report->errorString();
+        m_db.close();
+        return false;
+    }
+
+    m_db.close();
+    return true;
 }
 
 //----------------------------------------------------------
@@ -173,11 +162,12 @@ CSVThreadReportBuilder::init(quint16 logID, const QString &dbFileName, const QSt
     m_errorString.clear();
     Q_CHECK_PTR(excludedUsernamesList);
     Q_CHECK_PTR(includedUsernamesList);
-    bool retVal = m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList, showMilliseconds);
-    if (!retVal) {
+
+    if (!m_builder.init(logID, dbFileName, reportName, excludedUsernamesList, includedUsernamesList, showMilliseconds)) {
         m_errorString = m_builder.errorString();
+        return false;
     }
-    return retVal;
+    return true;
 }
 
 void

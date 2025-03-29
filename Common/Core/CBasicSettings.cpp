@@ -34,13 +34,9 @@ CBasicSettings::init(const QString& appPath, const QString &fileName, bool isTer
         createDefault(iniFileName);
     }
 
-    bool retVal = true;
     m_settings.reset(new QSettings(iniFileName, QSettings::IniFormat));
     Q_CHECK_PTR(m_settings);
-    if (!m_settings) {
-        retVal = false;
-    }
-    return retVal;
+    return m_settings == nullptr ? false : true;
 }
 
 QVariant

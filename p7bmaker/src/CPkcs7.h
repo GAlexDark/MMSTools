@@ -40,7 +40,7 @@ public:
     ~CPkcs7();
     bool readStore(const QString &fileName);
     bool appendCerts(const QStringList &filesList);
-    bool saveStore(const QString &fileName, const OUTPUT_FORMAT outputFormat);
+    bool saveStore(const QString &fileName, OUTPUT_FORMAT outputFormat);
     int size(); //Returns the number of items in the pkcs7 store
     const QString& errorString() const { return m_errorString; }
 

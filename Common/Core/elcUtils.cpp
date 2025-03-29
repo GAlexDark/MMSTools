@@ -34,52 +34,38 @@
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 #endif
 
-const int defaultStorageBlockSize = 32768;
-const QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
-const QChar comma = QLatin1Char(',');
-const QChar dotComma = QLatin1Char(';');
+namespace {
+    const int defaultStorageBlockSize = 32768;
+    const QRegularExpression envVar(QLatin1String("\\$([A-Za-z0-9_]+)"));
+    const QChar comma = QLatin1Char(',');
+    const QChar dotComma = QLatin1Char(';');
+}
 
 bool
 elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 {
     QRegularExpression mask(pattern);
-    QRegularExpressionMatch match = mask.match(value);
-    return match.hasMatch() ? true : false;
+    return mask.match(value).hasMatch();
 }
 
 QString
 elcUtils::sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue)
 {
-    QString retVal;
-    if (value.isEmpty()) {
-        retVal = defaultValue;
-    } else {
-        retVal = allowedValues.contains(value, Qt::CaseInsensitive) ? value : defaultValue;
-    }
-    return retVal;
+    return value.isEmpty() ? defaultValue : (allowedValues.contains(value, Qt::CaseInsensitive) ? value : defaultValue);
 }
 
 QStringList
 elcUtils::parseValuesList(QString data)
 {
     QStringList retVal;
-    data = data.trimmed();
-    data.replace(QLatin1String(" "), "");
-    if ((data.indexOf(comma) != -1) || (data.indexOf(dotComma) != -1)) {
-        if (data.indexOf(comma) != -1) {
-            data.replace(dotComma, comma);
-            retVal.append(data.split(comma));
-        }
-        if (data.indexOf(dotComma) != -1) {
-            data.replace(comma, dotComma);
-            retVal.append(data.split(dotComma));
-        }
+    data = data.trimmed().replace(QLatin1String(" "), "");
+    if (data.contains(comma) || data.contains(dotComma)) {
+        data.replace(dotComma, comma);
+        retVal = data.split(comma);
         retVal.removeAll(QString());
         retVal.removeDuplicates();
-    } else {
-        if (!data.isEmpty()) {
-            retVal.append(data.trimmed());
-        }
+    } else if (!data.isEmpty()) {
+        retVal.append(data.trimmed());
     }
     return retVal;
 }
@@ -88,8 +74,8 @@ void
 elcUtils::parseValuesList(QStringList &data)
 {
     if (!data.isEmpty()) {
-        QString buf = data.size() > 1 ? data.join(dotComma) : data.at(0).trimmed();
-        if ((buf.indexOf(comma) != -1) || (buf.indexOf(dotComma) != -1)) {
+        QString buf = (data.size() > 1) ? data.join(dotComma) : data.at(0).trimmed();
+        if (buf.contains(comma) || buf.contains(dotComma)) {
             data.clear();
             data.append(parseValuesList(buf));
         }
@@ -100,10 +86,7 @@ int
 elcUtils::getStorageBlockSize(const QString &file)
 {
     QStorageInfo storage(QDir(file).absolutePath());
-    int blockSize = -1;
-    if (storage.isValid()) {
-        blockSize = storage.blockSize();
-    }
+    int blockSize = storage.isValid() ? storage.blockSize() : -1;
     return blockSize == -1 ? defaultStorageBlockSize : blockSize;
 }
 
@@ -132,12 +115,8 @@ elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
     const quint32 messageFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER |
                            FORMAT_MESSAGE_FROM_SYSTEM |
                            FORMAT_MESSAGE_IGNORE_INSERTS;
-    quint32 len = FormatMessage(messageFlags,
-                                NULL,
-                                errorCode,
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                reinterpret_cast<wchar_t*>(&buf),
-                                0, NULL);
+    quint32 len = FormatMessage(messageFlags, NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                reinterpret_cast<wchar_t*>(&buf), 0, NULL);
     if (len > 0) {
         retVal = QString::fromWCharArray(buf);
         LocalFree(buf);
@@ -272,9 +251,8 @@ QStringList
 elcUtils::getDataSourceList(const QString &path, const QStringList &mask)
 {
     QStringList retVal;
-
     QDirIterator it(path, mask, QDir::Files);
-    while(it.hasNext()) {
+    while (it.hasNext()) {
         retVal.append(it.next());
     }
     return retVal;

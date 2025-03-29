@@ -23,8 +23,12 @@
 #include <QMetaObject>
 #include <QMetaClassInfo>
 #include <QMetaType>
+#include <QMap>
+#include <QString>
+#include <QStringList>
 
 #include "CEventLogParser.h"
+#include "CEventLogParser2.h"
 #include "CAuditTrailParser.h"
 #include "CSystemLogParser.h"
 
@@ -43,6 +47,8 @@ CParserManager::init()
     addClassListItem(QLatin1String("CAuditTrailParser")); // ID=2
     qRegisterMetaType<pSystemLogParser>("CSystemLogParser");
     addClassListItem(QLatin1String("CSystemLogParser")); // ID=3
+    qRegisterMetaType<pEventLogParser2>("CEventLogParser2");
+    addClassListItem(QLatin1String("CEventLogParser2")); // ID=4
 
     struct parserData_t
     {
@@ -56,16 +62,14 @@ CParserManager::init()
     QMetaType type;
     QStringList classList = getClassList();
     for (const QString &name : classList) {
-        type = QMetaType::fromName(name.toUtf8());
+        type = QMetaType::fromName(name.toUtf8().constData());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicParser>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
             quint16 id = ptr->parserID();
             addId(id);
 
-            parserNameMap[id].visibleLogName = ptr->visibleLogName();
-            parserNameMap[id].tableName = ptr->tableName();
-            parserNameMap[id].createTableString = ptr->createTable();
+            parserNameMap[id] = {ptr->visibleLogName(), ptr->tableName(), ptr->createTable()};
 
             type.destroy(ptr);
             ptr = nullptr;
@@ -78,4 +82,6 @@ CParserManager::init()
         m_tablesList.append(parserNameMap[i].tableName);
         m_createTableRequestList.append(parserNameMap[i].createTableString);
     }
+    m_tablesList.removeDuplicates();
+    m_createTableRequestList.removeAll("");
 }

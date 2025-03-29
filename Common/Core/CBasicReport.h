@@ -23,6 +23,8 @@
 #define CBASICREPORT_H
 
 #include <QObject>
+#include <QStringList>
+#include <QString>
 
 #include "MMSTypes.h"
 #include "CSqliteDatabase.h"

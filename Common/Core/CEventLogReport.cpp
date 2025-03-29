@@ -21,8 +21,20 @@
 
 #include "CEventLogReport.h"
 #include <QScopedPointer>
-
 #include "DBStrings.h"
+
+namespace {
+    constexpr int colRowNumber = 1;
+    constexpr int colTimestampISO8601 = 2;
+    constexpr int colTimestamp = 3;
+    constexpr int colExternalIP = 4;
+    constexpr int colUsername = 5;
+    constexpr int colType = 6;
+    constexpr int colDetails = 7;
+    constexpr int colAuthType = 8;
+    constexpr int colInternalIP = 9;
+    constexpr int colRequestid = 10;
+}
 
 CEventLogReport::CEventLogReport(QObject *parent)
     : CBasicReport{parent}
@@ -34,95 +46,101 @@ bool
 CEventLogReport::generateReport()
 {
     bool retVal = true;
-    // Set datetime format
-    QDateTime timeStamp;
     QXlsx::Format dateFormat;
     setDateTimeFormat(dateFormat);
 
-    int colRowNumber = 1;
-    int colTimestampISO8601 = 2;
-    int colTimestamp = 3;
-    int colExternalIP = 4;
-    int colUsername = 5;
-    int colType = 6;
-    int colDetails = 7;
-    int colAuthType = 8;
-    int colInternalIP = 9;
-    int colRequestid = 10;
-
     QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
     int row = 1;
-    // Add header
-    QVariant writeValue;
-    try {
-        writeValue = QStringLiteral("№");
-        setReportDataItem(xlsxReport.data(), colRowNumber, row, writeValue);
 
-        writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
-        setReportDataItem(xlsxReport.data(), colTimestampISO8601, row, writeValue);
-        writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-        setReportDataItem(xlsxReport.data(), colTimestamp, row, writeValue);
-        writeValue = QStringLiteral("Зовнішній IP");
-        setReportDataItem(xlsxReport.data(), colExternalIP, row, writeValue);
-        writeValue = QStringLiteral("Ім'я користувача");
-        setReportDataItem(xlsxReport.data(), colUsername, row, writeValue);
-        writeValue = QStringLiteral("Тип");
-        setReportDataItem(xlsxReport.data(), colType, row, writeValue);
-        writeValue = QStringLiteral("Деталі");
-        setReportDataItem(xlsxReport.data(), colDetails, row, writeValue);
-        writeValue = QStringLiteral("Тип авторизації");
-        setReportDataItem(xlsxReport.data(), colAuthType, row, writeValue);
-        writeValue = QStringLiteral("Внутрішній IP");
-        setReportDataItem(xlsxReport.data(), colInternalIP, row, writeValue);
-        writeValue = QStringLiteral("ID запиту");
-        setReportDataItem(xlsxReport.data(), colRequestid, row, writeValue);
+    try {
+        addReportHeader(xlsxReport.data(), row);
         ++row;
+
         bool isDataTooLong;
         int multipartRowCount = getMultipartRowCount() - 1;
+
         while (m_db->isNext()) {
-            setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
-            setReportDataItem(xlsxReport.data(), "timestampISO8601", colTimestampISO8601, row);
-
-            timeStamp = m_db->geValue("timestamp").toDateTime();
-            if (!isShowMilliseconds()) { // set milliseconds 0
-                QTime time = timeStamp.time();
-                time.setHMS(time.hour(), time.minute(), time.second(), 0);
-                timeStamp.setTime(time);
-            }
-            writeValue = timeStamp;
-
-            if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw XlsxError();
-            }
-            setReportDataItem(xlsxReport.data(), "externalip", colExternalIP, row);
-            setReportDataItem(xlsxReport.data(), "username", colUsername, row);
-            setReportDataItem(xlsxReport.data(), "type", colType, row);
-
-            writeValue = checkDetails(m_db->geValue("details").toString(), isDataTooLong);
-            if (!xlsxReport->write(row, colDetails, writeValue) && !isDataTooLong) {
-                throw XlsxError();
-            }
-            setReportDataItem(xlsxReport.data(), "authtype", colAuthType, row);
-            setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
-            setReportDataItem(xlsxReport.data(), "requestid", colRequestid, row);
+            addReportRow(xlsxReport.data(), row, multipartRowCount, dateFormat, isDataTooLong);
             ++row;
 
             if (row > maxRowsCount) {
                 break;
             }
-        } // while
+        }
     } catch (XlsxError &ex) {
         setErrorString(ex.what());
         retVal = false;
     }
-    if (retVal) {
-        const QString fileName = createReportFilename(row);
-        retVal = xlsxReport->saveAs(fileName);
-        if (!retVal) {
-            setErrorString(QStringLiteral("Error save report file"));
+
+    if (row != 2) {
+        if (retVal) {
+            const QString fileName = createReportFilename(row);
+            retVal = xlsxReport->saveAs(fileName);
+            if (!retVal) {
+                setErrorString(QStringLiteral("Error save report file"));
+            }
         }
+    } else {
+        retVal = false;
+        setErrorString(QStringLiteral("Nothing data to save"));
     }
+
     return retVal;
+}
+
+void
+CEventLogReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
+{
+    QVariant writeValue;
+    writeValue = QStringLiteral("№");
+    setReportDataItem(xlsxReport, colRowNumber, row, writeValue);
+
+    writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
+    setReportDataItem(xlsxReport, colTimestampISO8601, row, writeValue);
+    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
+    setReportDataItem(xlsxReport, colTimestamp, row, writeValue);
+    writeValue = QStringLiteral("Зовнішній IP");
+    setReportDataItem(xlsxReport, colExternalIP, row, writeValue);
+    writeValue = QStringLiteral("Ім'я користувача");
+    setReportDataItem(xlsxReport, colUsername, row, writeValue);
+    writeValue = QStringLiteral("Тип");
+    setReportDataItem(xlsxReport, colType, row, writeValue);
+    writeValue = QStringLiteral("Деталі");
+    setReportDataItem(xlsxReport, colDetails, row, writeValue);
+    writeValue = QStringLiteral("Тип авторизації");
+    setReportDataItem(xlsxReport, colAuthType, row, writeValue);
+    writeValue = QStringLiteral("Внутрішній IP");
+    setReportDataItem(xlsxReport, colInternalIP, row, writeValue);
+    writeValue = QStringLiteral("ID запиту");
+    setReportDataItem(xlsxReport, colRequestid, row, writeValue);
+}
+
+void
+CEventLogReport::addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat, bool &isDataTooLong)
+{
+    setReportDataItem(xlsxReport, colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
+    setReportDataItem(xlsxReport, "timestampISO8601", colTimestampISO8601, row);
+
+    QDateTime timeStamp = m_db->geValue("timestamp").toDateTime();
+    if (!isShowMilliseconds()) {
+        QTime time = timeStamp.time();
+        time.setHMS(time.hour(), time.minute(), time.second(), 0);
+        timeStamp.setTime(time);
+    }
+    if (!xlsxReport->write(row, colTimestamp, timeStamp, dateFormat)) {
+        throw XlsxError();
+    }
+    setReportDataItem(xlsxReport, "externalip", colExternalIP, row);
+    setReportDataItem(xlsxReport, "username", colUsername, row);
+    setReportDataItem(xlsxReport, "type", colType, row);
+
+    QVariant writeValue = checkDetails(m_db->geValue("details").toString(), isDataTooLong);
+    if (!xlsxReport->write(row, colDetails, writeValue) && !isDataTooLong) {
+        throw XlsxError();
+    }
+    setReportDataItem(xlsxReport, "authtype", colAuthType, row);
+    setReportDataItem(xlsxReport, "internalip", colInternalIP, row);
+    setReportDataItem(xlsxReport, "requestid", colRequestid, row);
 }
 
 QString

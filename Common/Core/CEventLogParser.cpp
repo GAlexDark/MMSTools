@@ -25,16 +25,16 @@
 #include "DBStrings.h"
 #include "elcUtils.h"
 
-const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
-const QRegularExpression reSuccessLogon(QLatin1String("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$"));
-const QRegularExpression reFailedLogon(QLatin1String("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$"));
+namespace {
+    const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
+    const QRegularExpression reSuccessLogon(QLatin1String("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$"));
+    const QRegularExpression reFailedLogon(QLatin1String("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$"));
 
-const QString authSuccessUk("Вхід користувача - успішно");
-const QString authSuccessEn("User login - successful");
-const QString authFailedUk("Вхід користувача - невдало");
-const QString authFailedEn("User login - unsuccessful");
-
-//=================================================================================
+    const QString authSuccessUk("Вхід користувача - успішно");
+    const QString authSuccessEn("User login - successful");
+    const QString authFailedUk("Вхід користувача - невдало");
+    const QString authFailedEn("User login - unsuccessful");
+}
 
 bool
 CEventLogParser::parseUserSuccessLogonDetails()
@@ -47,7 +47,6 @@ CEventLogParser::parseUserSuccessLogonDetails()
         m_ipaddresses = match.captured(3).trimmed();
         analizeIPAdresses();
     }
-
     return retVal;
 }
 
@@ -119,11 +118,9 @@ CEventLogParser::parseUserLogonDetails()
     if ((QString::compare(m_type, authSuccessUk, Qt::CaseInsensitive) == 0) ||
         (QString::compare(m_type, authSuccessEn, Qt::CaseInsensitive) == 0)) {
         retVal = userSuccessLogonDetails();
-    } else {
-        if ((QString::compare(m_type, authFailedUk, Qt::CaseInsensitive) == 0) ||
-            (QString::compare(m_type, authFailedEn, Qt::CaseInsensitive) == 0)) {
-            retVal = userFailedLogonDetails();
-        }
+    } else if ((QString::compare(m_type, authFailedUk, Qt::CaseInsensitive) == 0) ||
+               (QString::compare(m_type, authFailedEn, Qt::CaseInsensitive) == 0)) {
+        retVal = userFailedLogonDetails();
     }
     return retVal;
 }
@@ -140,7 +137,6 @@ bool
 CEventLogParser::parse(const QString &line)
 {
     m_details = line;
-
     bool retVal = false;
     QRegularExpressionMatch match = reEventLogHeader.match(m_details);
     if (match.hasMatch()) {
@@ -196,7 +192,7 @@ CEventLogParser::checkHeader(const QString &line)
     bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
     Q_ASSERT(retVal);
     QStringList columnsList = columns.split('|');
-    return columnsList.indexOf(line) != -1 ? true : false;
+    return columnsList.contains(line);
 }
 
 QString

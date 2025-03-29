@@ -21,7 +21,10 @@
 
 #include "CReportManager.h"
 #include <QMetaClassInfo>
+#include <QMetaType>
 #include <QMap>
+#include <QString>
+#include <QStringList>
 
 #include "CEventLogReport.h"
 #include "CAuditTrailReport.h"
@@ -51,7 +54,7 @@ CReportManager::init()
     QMetaType type;
     QStringList classList = getClassList();
     for (const QString &name : classList) {
-        type = QMetaType::fromName(name.toUtf8());
+        type = QMetaType::fromName(name.toUtf8().constData());
         if (type.isValid()) {
             ptr = dynamic_cast<pBasicReport>(type.metaObject()->newInstance());
             Q_CHECK_PTR(ptr);
