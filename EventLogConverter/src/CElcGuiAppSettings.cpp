@@ -24,6 +24,7 @@
 #include <QVariant>
 #include <QDateTime>
 
+namespace {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     inline const QVariant nullStringValue = QVariant(QMetaType::fromType<QString>()); // Qt 6 only
     inline const QVariant nullDateTimeValue = QVariant(QMetaType::fromType<QDateTime>());
@@ -31,6 +32,7 @@
     const QVariant nullStringValue = QVariant(QVariant::String);
     const QVariant nullDateTimeValue = QVariant(QVariant::DateTime);
 #endif
+}
 
 CElcGuiAppSettings& CElcGuiAppSettings::instance()
 {

@@ -33,7 +33,7 @@ CP7bMakerCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString storeDescription(QLatin1String("The folder path contains one *.p7b file and several *.cer, *.crt, or *.der files to add."));
     const QString silentDescription(QLatin1String("Silent mode"));
-    const QString outputFormatDescription(QLatin1String("Outpur format: ASN1 or PEM (ASN1 by default)"));
+    const QString outputFormatDescription(QLatin1String("Output format: ASN1 or PEM (ASN1 by default)"));
 
     QCommandLineOption storeOption(QStringList() << "l" << "localstore", storeDescription, "path");
     bool retVal = m_parser.addOption(storeOption);
@@ -62,52 +62,50 @@ CP7bMakerCmdLineParser::checkOption()
 {
     if (!m_isStore) {
         setErrorString(QLatin1String("The <store> argument is missing."));
+        return false;
     }
-    return m_isStore;
+    return true;
 }
 
 bool
 CP7bMakerCmdLineParser::getP7bFileName(QStringList &p7bFileName)
 {
-    bool retVal = true;
-    if (m_isStore) {
-        m_searchFolder = m_parser.value("localstore").trimmed();
-        QDir dir(m_searchFolder);
-        if (dir.exists()) {
-            m_isSearchFolderExists = true;
-            m_searchFolder = dir.absolutePath();
-            QString mask = QLatin1String("*.p7b");
-            p7bFileName.append( elcUtils::getDataSourceList(m_searchFolder, QStringList() << mask) );
-        } else {
-            setErrorString(QStringLiteral("Cannot find the directory %1.").arg(m_searchFolder));
-            retVal = false;
-        }
+    if (!m_isStore) {
+        return false;
     }
 
-    if (retVal) {
-        p7bFileName.removeDuplicates();
+    m_searchFolder = m_parser.value("localstore").trimmed();
+    QDir dir(m_searchFolder);
+
+    if (!dir.exists()) {
+        setErrorString(QStringLiteral("Cannot find the directory %1.").arg(m_searchFolder));
+        return false;
     }
-    return retVal;
+
+    m_isSearchFolderExists = true;
+    m_searchFolder = dir.absolutePath();
+    QString mask = QLatin1String("*.p7b");
+    p7bFileName.append(elcUtils::getDataSourceList(m_searchFolder, QStringList() << mask));
+
+    p7bFileName.removeDuplicates();
+    return true;
 }
 
 bool
 CP7bMakerCmdLineParser::getCertsList(QStringList &certsList)
 {
-    bool retVal = true;
-    if (m_isSearchFolderExists) {
-        QStringList masks = { "*.cer", "*.crt", "*.der" };
-        for (const QString &maskItem : masks) {
-            certsList.append( elcUtils::getDataSourceList(m_searchFolder, QStringList() << maskItem) );
-        }
-    } else {
+    if (!m_isSearchFolderExists) {
         setErrorString(QStringLiteral("Cannot find the directory %1.").arg(m_searchFolder));
-        retVal = false;
+        return false;
     }
 
-    if (!retVal) {
-        certsList.removeDuplicates();
+    QStringList masks = { "*.cer", "*.crt", "*.der" };
+    for (const QString &maskItem : masks) {
+        certsList.append(elcUtils::getDataSourceList(m_searchFolder, QStringList() << maskItem));
     }
-    return retVal;
+
+    certsList.removeDuplicates();
+    return true;
 }
 
 QString

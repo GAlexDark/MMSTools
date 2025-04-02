@@ -17,6 +17,13 @@ repos:
         exclude: \.(cer|crt|p7b|pem)$
       - id: trailing-whitespace
         exclude: \.(md|csv)$
+  - repo: local
+    hooks:
+      - id: check-credentials
+        name: Check credentials in the commits
+        entry: bash D:/QtSDK/Custom_hooks/check_credentials.sh
+        language: system
+        exclude: \.(pro|qm|ts|md|csv|cer|crt|p7b|pem)$
   - repo: meta
     hooks:
       - id: check-hooks-apply

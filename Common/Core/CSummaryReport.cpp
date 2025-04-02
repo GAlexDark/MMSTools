@@ -22,6 +22,20 @@
 #include "CSummaryReport.h"
 #include "DBStrings.h"
 
+namespace summaryReport {
+    constexpr int colRowNumber = 1;
+    constexpr int colTimestamp = 2;
+    constexpr int colUsername = 3;
+    constexpr int colCompanyRole = 4;
+    constexpr int colTypeOrMethod = 5;
+    constexpr int colStatus = 6;
+    constexpr int colDetailsOrAttributes = 7;
+    constexpr int colAuthType = 8;
+    constexpr int colExternalIP = 9;
+    constexpr int colInternalIP = 10;
+    constexpr int colRequestid = 11;
+}
+
 CSummaryReport::CSummaryReport(QObject *parent)
     : CBasicReport{parent}
 {
@@ -32,68 +46,19 @@ bool
 CSummaryReport::generateReport()
 {
     bool retVal = true;
-    // Set datetime format
     QXlsx::Format dateFormat;
     setDateTimeFormat(dateFormat);
 
-    int colRowNumber = 1;
-    int colTimestamp = 2;
-    int colUsername = 3;
-    int colCompanyRole = 4;
-    int colTypeOrMethod = 5;
-    int colStatus = 6;
-    int colDetailsOrAttributes = 7;
-    int colAuthType = 8;
-    int colExternalIP = 9;
-    int colInternalIP = 10;
-    int colRequestid = 11;
-
     QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
     int row = 1;
-    // Add header
-    QVariant writeValue;
-    try {
-        writeValue = QStringLiteral("№");
-        setReportDataItem(xlsxReport.data(), colRowNumber, row, writeValue);
 
-        writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-        setReportDataItem(xlsxReport.data(), colTimestamp, row, writeValue);
-        writeValue = QStringLiteral("Ім'я користувача");
-        setReportDataItem(xlsxReport.data(), colUsername, row, writeValue);
-        writeValue = QStringLiteral("Роль в компанії");
-        setReportDataItem(xlsxReport.data(), colCompanyRole, row, writeValue);
-        writeValue = QStringLiteral("Тип / Метод");
-        setReportDataItem(xlsxReport.data(), colTypeOrMethod, row, writeValue);
-        writeValue = QStringLiteral("Статус / Рівень");
-        setReportDataItem(xlsxReport.data(), colStatus, row, writeValue);
-        writeValue = QStringLiteral("Деталі / Атрибути");
-        setReportDataItem(xlsxReport.data(), colDetailsOrAttributes, row, writeValue);
-        writeValue = QStringLiteral("Тип авторизації");
-        setReportDataItem(xlsxReport.data(), colAuthType, row, writeValue);
-        writeValue = QStringLiteral("Зовнішній IP");
-        setReportDataItem(xlsxReport.data(), colExternalIP, row, writeValue);
-        writeValue = QStringLiteral("Внутрішній IP");
-        setReportDataItem(xlsxReport.data(), colInternalIP, row, writeValue);
-        writeValue = QStringLiteral("ID запиту");
-        setReportDataItem(xlsxReport.data(), colRequestid, row, writeValue);
+    try {
+        addReportHeader(xlsxReport.data(), row);
         ++row;
+
         int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
-            setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
-
-            writeValue = m_db->geValue("timestamp").toDateTime();
-            if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw XlsxError();
-            }
-            setReportDataItem(xlsxReport.data(), "username", colUsername, row);
-            setReportDataItem(xlsxReport.data(), "company_role", colCompanyRole, row);
-            setReportDataItem(xlsxReport.data(), "type_or_method", colTypeOrMethod, row);
-            setReportDataItem(xlsxReport.data(), "status", colStatus, row);
-            setReportDataItem(xlsxReport.data(), "details_or_attributes", colDetailsOrAttributes, row);
-            setReportDataItem(xlsxReport.data(), "authtype", colAuthType, row);
-            setReportDataItem(xlsxReport.data(), "externalip", colExternalIP, row);
-            setReportDataItem(xlsxReport.data(), "internalip", colInternalIP, row);
-            setReportDataItem(xlsxReport.data(), "requestid", colRequestid, row);
+            addReportRow(xlsxReport.data(), row, multipartRowCount, dateFormat);
             ++row;
 
             if (row > maxRowsCount) {
@@ -104,14 +69,69 @@ CSummaryReport::generateReport()
         setErrorString(ex.what());
         retVal = false;
     }
-    if (retVal) {
-        const QString fileName = createReportFilename(row);
-        retVal = xlsxReport->saveAs(fileName);
-        if (!retVal) {
-            setErrorString(QStringLiteral("Error save report file"));
+
+    if (row != 2) {
+        if (retVal) {
+            const QString fileName = createReportFilename(row);
+            retVal = xlsxReport->saveAs(fileName);
+            if (!retVal) {
+                setErrorString(QStringLiteral("Error save report file"));
+            }
         }
+    } else {
+        retVal = false;
+        setErrorString(QStringLiteral("Nothing data to save"));
     }
+
     return retVal;
+}
+
+void
+CSummaryReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
+{
+    QVariant writeValue = QStringLiteral("№");
+    setReportDataItem(xlsxReport, summaryReport::colRowNumber, row, writeValue);
+
+    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
+    setReportDataItem(xlsxReport, summaryReport::colTimestamp, row, writeValue);
+    writeValue = QStringLiteral("Ім'я користувача");
+    setReportDataItem(xlsxReport, summaryReport::colUsername, row, writeValue);
+    writeValue = QStringLiteral("Роль в компанії");
+    setReportDataItem(xlsxReport, summaryReport::colCompanyRole, row, writeValue);
+    writeValue = QStringLiteral("Тип / Метод");
+    setReportDataItem(xlsxReport, summaryReport::colTypeOrMethod, row, writeValue);
+    writeValue = QStringLiteral("Статус / Рівень");
+    setReportDataItem(xlsxReport, summaryReport::colStatus, row, writeValue);
+    writeValue = QStringLiteral("Деталі / Атрибути");
+    setReportDataItem(xlsxReport, summaryReport::colDetailsOrAttributes, row, writeValue);
+    writeValue = QStringLiteral("Тип авторизації");
+    setReportDataItem(xlsxReport, summaryReport::colAuthType, row, writeValue);
+    writeValue = QStringLiteral("Зовнішній IP");
+    setReportDataItem(xlsxReport, summaryReport::colExternalIP, row, writeValue);
+    writeValue = QStringLiteral("Внутрішній IP");
+    setReportDataItem(xlsxReport, summaryReport::colInternalIP, row, writeValue);
+    writeValue = QStringLiteral("ID запиту");
+    setReportDataItem(xlsxReport, summaryReport::colRequestid, row, writeValue);
+}
+
+void
+CSummaryReport::addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat)
+{
+    setReportDataItem(xlsxReport, summaryReport::colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
+
+    QVariant writeValue = m_db->geValue("timestamp").toDateTime();
+    if (!xlsxReport->write(row, summaryReport::colTimestamp, writeValue, dateFormat)) {
+        throw XlsxError();
+    }
+    setReportDataItem(xlsxReport, "username", summaryReport::colUsername, row);
+    setReportDataItem(xlsxReport, "company_role", summaryReport::colCompanyRole, row);
+    setReportDataItem(xlsxReport, "type_or_method", summaryReport::colTypeOrMethod, row);
+    setReportDataItem(xlsxReport, "status", summaryReport::colStatus, row);
+    setReportDataItem(xlsxReport, "details_or_attributes", summaryReport::colDetailsOrAttributes, row);
+    setReportDataItem(xlsxReport, "authtype", summaryReport::colAuthType, row);
+    setReportDataItem(xlsxReport, "externalip", summaryReport::colExternalIP, row);
+    setReportDataItem(xlsxReport, "internalip", summaryReport::colInternalIP, row);
+    setReportDataItem(xlsxReport, "requestid", summaryReport::colRequestid, row);
 }
 
 QString

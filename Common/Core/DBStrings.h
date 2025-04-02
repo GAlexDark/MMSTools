@@ -36,6 +36,7 @@ inline const QString pragmaThreads(QLatin1String("PRAGMA threads = 8;"));
 inline const QString phUsername(QLatin1String(":username"));
 inline const QString phTimestampISO8601(QLatin1String(":timestampISO8601"));
 inline const QString phTimestamp(QLatin1String(":timestamp"));
+inline const QString phSessionID(QLatin1String(":sessionid"));
 inline const QString phRequestID(QLatin1String(":requestid"));
 inline const QString phType(QLatin1String(":type"));
 inline const QString phDetails(QLatin1String(":details"));
@@ -59,9 +60,13 @@ inline const QString phDateToWhichRelated(QLatin1String(":dateToWhichRelated"));
 
 //this query uses autotest
 namespace eventlog {
-    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, timestampISO8601 TEXT NOT NULL, requestid TEXT NOT NULL, type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME NOT NULL, PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);"));
+    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [eventlog] (username TEXT, timestampISO8601 TEXT NOT NULL, sessionid TEXT, requestid TEXT NOT NULL, type TEXT, details TEXT, username1 TEXT, authtype TEXT, externalip TEXT, internalip TEXT, timestamp DATETIME NOT NULL, PRIMARY KEY (timestampISO8601, requestid) ON CONFLICT IGNORE);"));
     inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [eventlog] (username, timestampISO8601, requestid, type, details, timestamp, username1, authtype, externalip, internalip) VALUES (:username, :timestampISO8601, :requestid, :type, :details, :timestamp, :username1, :authtype, :externalip, :internalip)"));
     inline const QString selectData(QLatin1String("SELECT e.timestampISO8601, e.timestamp, e.externalip, e.username, e.type, e.details, e.authtype, e.internalip, e.requestid FROM eventlog e %1 ORDER BY e.timestamp DESC;"));
+}
+
+namespace eventlog2 {
+    inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [eventlog] (username, timestampISO8601, sessionid, requestid, type, details, timestamp, username1, authtype, externalip, internalip) VALUES (:username, :timestampISO8601, :sessionid, :requestid, :type, :details, :timestamp, :username1, :authtype, :externalip, :internalip)"));
 }
 
 namespace audittrail {

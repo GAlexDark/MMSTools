@@ -4,8 +4,8 @@
   #include "Debug.h"
 #endif
 
-const QString sharedMemory_prefix = QLatin1String("_m");
-const QString semaphore_prefix = QLatin1String("_s");
+const QString SHARED_MEMORY_PREFIX = QLatin1String("_m");
+const QString SEMAPHORE_PREFIX = QLatin1String("_s");
 const QString ELC_PID_FILENAME = QLatin1String("PID");
 
 /*
@@ -16,7 +16,7 @@ http://berenger.eu/blog/c-qt-singleapplication-single-app-instance/
 CSingleApplication::CSingleApplication(const QString &id)
     : m_id(id)
 {
-    m_semaphore.reset(new QSystemSemaphore(m_id + semaphore_prefix, 1));
+    m_semaphore.reset(new QSystemSemaphore(m_id + SEMAPHORE_PREFIX, 1));
     Q_CHECK_PTR(m_semaphore);
 }
 
@@ -45,27 +45,29 @@ CSingleApplication::isRunning()
 #endif
         return true;
     }
-    bool isRun = false;
+
+    bool isRunning = false;
+
 #ifndef Q_OS_WIN32
-    // In the linux / unix shared memory is not freed when the application terminates abnormally,
+    // In Linux / Unix shared memory is not freed when the application terminates abnormally,
     // so you need to get rid of the garbage
     {
-        QSharedMemory nix_fix_shared_memory(m_id + sharedMemory_prefix);
-        if(nix_fix_shared_memory.attach()){
-            nix_fix_shared_memory.detach();
+        QSharedMemory nixFixSharedMemory(m_id + SHARED_MEMORY_PREFIX);
+        if (nixFixSharedMemory.attach()) {
+            nixFixSharedMemory.detach();
         }
     }
 #endif
 
     if (!m_sharedMemory) {
-        m_sharedMemory.reset(new QSharedMemory(m_id + sharedMemory_prefix));
+        m_sharedMemory.reset(new QSharedMemory(m_id + SHARED_MEMORY_PREFIX));
         Q_CHECK_PTR(m_sharedMemory);
     }
 
-    if(m_sharedMemory->attach()) {
-        isRun = true;
+    if (m_sharedMemory->attach()) {
+        isRunning = true;
     } else {
-        isRun = false;
+        isRunning = false;
 
 #ifdef QT_DEBUG
         // Analyze error
@@ -75,9 +77,9 @@ CSingleApplication::isRunning()
             __DEBUG( QStringLiteral("CSingleApplication: Create shared memory segment") )
         }
 #endif
-    // Create shared memory segment
+        // Create shared memory segment
         if (!m_sharedMemory->create(segSize)) {
-            isRun = true;
+            isRunning = true;
         }
     }
 
@@ -88,5 +90,5 @@ CSingleApplication::isRunning()
         return true;
     }
 
-    return isRun;
+    return isRunning;
 }

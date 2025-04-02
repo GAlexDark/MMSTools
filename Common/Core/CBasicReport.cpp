@@ -22,20 +22,24 @@
 #include "CBasicReport.h"
 #include <QMetaObject>
 #include <QMetaClassInfo>
+#include <QVariant>
 #include "elcUtils.h"
 
-const QChar eolChar(QLatin1Char('\n'));
-const QChar emptyChar = QChar();
-const QString vs_long(QLatin1String("VALIDATE_SCHEDULES"));
-const QString vs_short(QLatin1String("V_S"));
-const QString std_long(QLatin1String("SEND_TO_DAM"));
-const QString std_short(QLatin1String("S_T_D"));
-const QString doubleSpace(QLatin1String("  ")); //2
-const QString space(QLatin1String(" "));
-const QString doubleQuotes(QLatin1String("\"\""));
-const QString quotes(QLatin1String("\""));
+namespace {
+    const QChar eolChar(QLatin1Char('\n'));
+    const QChar emptyChar = QChar();
+    const QString vs_long(QLatin1String("VALIDATE_SCHEDULES"));
+    const QString vs_short(QLatin1String("V_S"));
+    const QString std_long(QLatin1String("SEND_TO_DAM"));
+    const QString std_short(QLatin1String("S_T_D"));
+    const QString doubleSpace(QLatin1String("  ")); //2
+    const QString space(QLatin1String(" "));
+    const QString doubleQuotes(QLatin1String("\"\""));
+    const QString quotes(QLatin1String("\""));
 
-const qsizetype maxChars = 32767;
+    const qsizetype maxChars = 32767;
+}
+
 
 CBasicReport::CBasicReport(QObject *parent)
     : QObject{parent}

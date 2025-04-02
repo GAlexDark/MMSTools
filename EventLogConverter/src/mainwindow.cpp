@@ -350,9 +350,9 @@ MainWindow::clearDBclick()
 
     QString errorString;
     const CParserManager &parserManager = CParserManager::instance();
-    qsizetype count = parserManager.getItemCount();
     QStringList tables = parserManager.getTablesList();
-    if (CSqliteDatabase::truncateDB(m_dbName, errorString, count, tables)) {
+    QStringList updateData = parserManager.getCreateTableRequestList();
+    if (CSqliteDatabase::truncateDB(m_dbName, errorString, tables, updateData)) {
         setInfoText(tr("Database was cleared"));
         setStateText(tr("Ready"));
     } else {
@@ -376,6 +376,9 @@ MainWindow::generateReportClick()
     QStringList excludedUsers;
     const CReportManager &reportManager = CReportManager::instance();
     QStringList reportsList = reportManager.getVisibleReportsNames();
+    if (!reportManager.checkID(m_logId)) {
+        m_logId = 0;
+    }
     if (showReportOptionsDialog(reportsList, m_logId, includedUsers, excludedUsers)) {
         setInfoText(tr("Additional report filtering settings:"));
         if (includedUsers.isEmpty()) {

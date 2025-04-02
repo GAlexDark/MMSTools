@@ -30,9 +30,9 @@ public:
     bool init(const QString &connectionString);
     bool optimizeDatabaseSize();
 
-    static bool truncateDB(const QString &connectionString, QString &errorString,
-                           qsizetype tablesCount, const QStringList &tablesNames);
-    bool truncateTable(const QString &tableName);
+    static bool truncateDB(const QString &connectionString, QString &errorString, const QStringList &tablesNames,
+                           const QStringList &updateData = QStringList());
+    bool truncateTable(const QString &tableName, const QStringList &updateData = QStringList());
     bool checkTables(const QStringList &tables, QString &tableName);
 };
 

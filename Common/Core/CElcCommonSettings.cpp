@@ -25,29 +25,32 @@
 #include <QDir>
 #include "elcUtils.h"
 
-const QString pvOff("OFF");
-const QString pvNormal("NORMAL");
-const QString pvFull("FULL");
-const QString pvDelete("DELETE");
-const QString pvTruncate("TRUNCATE");
-const QString pvPersist("PERSIST");
-const QString pvMemory("MEMORY");
-const QString pvWal("WAL");
-const QString pvDefault("DEFAULT");
-const QString pvFile("FILE");
-const QString pvExclusive("EXCLUSIVE");
-const QString defaultAllowedChars("a-zA-Z0-9_");
+namespace {
+    const QString pvOff("OFF");
+    const QString pvNormal("NORMAL");
+    const QString pvFull("FULL");
+    const QString pvDelete("DELETE");
+    const QString pvTruncate("TRUNCATE");
+    const QString pvPersist("PERSIST");
+    const QString pvMemory("MEMORY");
+    const QString pvWal("WAL");
+    const QString pvDefault("DEFAULT");
+    const QString pvFile("FILE");
+    const QString pvExclusive("EXCLUSIVE");
+    const QString defaultAllowedChars("a-zA-Z0-9_");
 
-const QStringList plSynchronous = { pvOff, pvNormal, pvFull };
-const QStringList plJournalMode = { pvDelete, pvTruncate, pvPersist, pvMemory, pvWal, pvOff };
-const QStringList plTempStore = { pvDefault, pvFile, pvMemory };
-const QStringList plLockingMode = { pvNormal, pvExclusive };
+    const QStringList plSynchronous = { pvOff, pvNormal, pvFull };
+    const QStringList plJournalMode = { pvDelete, pvTruncate, pvPersist, pvMemory, pvWal, pvOff };
+    const QStringList plTempStore = { pvDefault, pvFile, pvMemory };
+    const QStringList plLockingMode = { pvNormal, pvExclusive };
+}
 
 void
 CElcCommonSettings::createDefault(const QString& iniPath)
 {
     QSettings settings(iniPath, QSettings::IniFormat);
     settings.beginGroup(QLatin1String("SETTINGS"));
+
 #ifdef QT_DEBUG
     QString dbName = QStringLiteral(TEST_SRCDIR"EventLogConverter.db");
 #else
@@ -59,6 +62,7 @@ CElcCommonSettings::createDefault(const QString& iniPath)
     QString dbName = QStringLiteral("$HOME/.local/share/%1/%1.db").arg(fileName);
 #endif
 #endif
+
     settings.setValue(QLatin1String("db_file_name"), dbName);
     settings.setValue(QLatin1String("clear_on_startup"), QLatin1String("yes")); // yes | no
     settings.setValue(QLatin1String("internal_ip_start_octet"), QLatin1String("10."));
@@ -132,7 +136,7 @@ bool
 CElcCommonSettings::getShowMilliseconds() const
 {
     QString buf = getMain(QLatin1String("REPORT/show_milliseconds")).toString().trimmed();
-    return buf.isEmpty() || (QString::compare(buf, QLatin1String("no"), Qt::CaseInsensitive) == 0) ? false : true;
+    return !buf.isEmpty() && (QString::compare(buf, QLatin1String("yes"), Qt::CaseInsensitive) == 0);
 }
 
 QString

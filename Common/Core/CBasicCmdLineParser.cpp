@@ -31,12 +31,8 @@ CBasicCmdLineParser::parseCmdArgs(const QCoreApplication &app)
 {
     m_parser.addHelpOption();
 
-    bool retVal = addOption(app);
-    if (retVal) {
-        retVal = checkOption();
-    }
-
-    return retVal;
+    if (!addOption(app)) return false;
+    return checkOption();
 }
 
 [[noreturn]] void

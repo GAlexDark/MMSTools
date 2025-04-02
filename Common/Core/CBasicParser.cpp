@@ -26,7 +26,7 @@
 void
 CBasicParser::removeQuote(QString &data) const
 {
-    if (!data.isEmpty() && data.startsWith(m_quoteChar) && data.endsWith(m_quoteChar)) {
+    if (data.startsWith(m_quoteChar) && data.endsWith(m_quoteChar)) {
         data = data.sliced(1, data.length() - 2);
     }
 }
@@ -46,11 +46,11 @@ CBasicParser::init(const QString &internalIpFirstOctet)
 void
 CBasicParser::analizeIPAdresses()
 {
-    qsizetype pos = m_ipaddresses.indexOf(',');
+    const qsizetype pos = m_ipaddresses.indexOf(',');
     m_externalip.clear();
     m_internalip.clear();
+    QString buf;
     if (pos != -1) {
-        QString buf;
         m_externalIpList.clear();
         m_internalIpList.clear();
         m_ipAddressList.clear();
@@ -63,19 +63,16 @@ CBasicParser::analizeIPAdresses()
                 m_externalIpList.append(buf);
             }
         }
-        if (!m_externalIpList.isEmpty()) {
-            m_externalip = m_externalIpList.join(", ");
-        }
-        if (!m_internalIpList.isEmpty()) {
-            m_internalip = m_internalIpList.join(", ");
-        }
+        m_externalip = m_externalIpList.join(", ");
+        m_internalip = m_internalIpList.join(", ");
     } else {
-        if (m_ipaddresses.startsWith(m_internalIpFirstOctet)) {
-            m_internalip = m_ipaddresses.trimmed();
+        buf = m_ipaddresses.trimmed();
+        if (buf.startsWith(m_internalIpFirstOctet)) {
+            m_internalip = buf;
         } else {
-            m_externalip = m_ipaddresses.trimmed();
+            m_externalip = buf;
         }
-    } // (pos != -1)
+    }
 }
 
 void

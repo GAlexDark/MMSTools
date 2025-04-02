@@ -34,6 +34,9 @@ public:
     bool generateReport() override;
     QString visibleReportName() override { return QObject::tr("Event Log"); }
     QString selectString() const override;
+private:
+    void addReportHeader(QXlsx::Document *xlsxReport, int row);
+    void addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat, bool &isDataTooLong);
 };
 
 Q_DECLARE_METATYPE(CEventLogReport *);

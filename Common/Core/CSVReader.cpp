@@ -40,39 +40,35 @@ CTextFileReader::checkBOM()
         retVal = false;
         m_errorString = QStringLiteral("Wrong the BOM header. The file must have the UTF-8 BOM 0xef 0xbb 0xbf header.");
     }
-
     return retVal;
 }
 
 qint64
 CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size) const
 {
-  qint64 retVal = -1;
-  if (startPos >= 0) {
-    qint64 index = startPos;
-    qint64 endPos = size - m_eolCharsCount;
-    bool isQuoted = false;
-    bool isSecondPart = false;
+    qint64 retVal = -1;
+    if (startPos >= 0) {
+        qint64 index = startPos;
+        qint64 endPos = size - m_eolCharsCount;
+        bool isQuoted = false;
+        bool isSecondPart = false;
 
-    const char *d = m_buffer->constData();
-    d += index;
+        const char *d = m_buffer->constData() + index;
 
-    while (index <= endPos) {
-      if (*d == m_quoteChar) {
-        isQuoted = !isQuoted;
-      } else {
-        if ((*d == '\n') && !isQuoted) {
-          retVal = isSecondPart ? index - 1 : index;
-          break;
-        } else {
-          isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
+        while (index <= endPos) {
+            if (*d == m_quoteChar) {
+                isQuoted = !isQuoted;
+            } else if ((*d == '\n') && !isQuoted) {
+                retVal = isSecondPart ? index - 1 : index;
+                break;
+            } else {
+                isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
+            }
+            ++d;
+            ++index;
         }
-      }
-      ++d;
-      ++index;
     }
-  }
-  return retVal;
+    return retVal;
 }
 
 bool
@@ -368,8 +364,6 @@ CMmsLogsReader::convertData(const QString &line)
     return retVal;
 }
 
-//--------------------------------------------------------------------------
-
 CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
     : QThread{parent}
 {
@@ -384,8 +378,7 @@ CMmsLogsThreadReader::run()
     QElapsedTimer timer;
     timer.start();
 #endif
-    //-----------------------------------------------------
-    if (m_fileNames.size() > 0 ) {
+    if (!m_fileNames.isEmpty() ) {
         emit sendMessage( tr("Preparing to read the file(s).") );
         QString fileName;
         qsizetype filesCount = m_fileNames.size();
@@ -417,7 +410,7 @@ CMmsLogsThreadReader::run()
         } // while
 
         m_db.close();
-    } // m_fileNames.size()
+    }
 #ifdef QT_DEBUG
     QString msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
     __DEBUG( msg )

@@ -19,14 +19,14 @@
 *
 ****************************************************************************/
 
-#include "CEventLogParser.h"
+#include "CEventLogParser2.h"
 #include <QRegularExpression>
 
 #include "DBStrings.h"
 #include "elcUtils.h"
 
 namespace {
-    const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
+    const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
     const QRegularExpression reSuccessLogon(QLatin1String("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$"));
     const QRegularExpression reFailedLogon(QLatin1String("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$"));
 
@@ -37,7 +37,7 @@ namespace {
 }
 
 bool
-CEventLogParser::parseUserSuccessLogonDetails()
+CEventLogParser2::parseUserSuccessLogonDetails()
 {
     QRegularExpressionMatch match = reSuccessLogon.match(m_details);
     bool retVal = match.hasMatch();
@@ -47,11 +47,12 @@ CEventLogParser::parseUserSuccessLogonDetails()
         m_ipaddresses = match.captured(3).trimmed();
         analizeIPAdresses();
     }
+
     return retVal;
 }
 
 bool
-CEventLogParser::parseUserFailedLogonDetails()
+CEventLogParser2::parseUserFailedLogonDetails()
 {
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
     m_username1.clear();
@@ -69,7 +70,7 @@ CEventLogParser::parseUserFailedLogonDetails()
 }
 
 bool
-CEventLogParser::userSuccessLogonDetails()
+CEventLogParser2::userSuccessLogonDetails()
 {
     bool retVal = true;
     if (QString::compare(m_prevValueUSLD.details, m_details, Qt::CaseInsensitive) == 0) {
@@ -91,7 +92,7 @@ CEventLogParser::userSuccessLogonDetails()
 }
 
 bool
-CEventLogParser::userFailedLogonDetails()
+CEventLogParser2::userFailedLogonDetails()
 {
     bool retVal = true;
     if (QString::compare(m_prevValueUFLD.details, m_details, Qt::CaseInsensitive) == 0) {
@@ -112,7 +113,7 @@ CEventLogParser::userFailedLogonDetails()
 }
 
 bool
-CEventLogParser::parseUserLogonDetails()
+CEventLogParser2::parseUserLogonDetails()
 {
     bool retVal = false;
     if ((QString::compare(m_type, authSuccessUk, Qt::CaseInsensitive) == 0) ||
@@ -125,7 +126,7 @@ CEventLogParser::parseUserLogonDetails()
     return retVal;
 }
 
-CEventLogParser::CEventLogParser(QObject *parent)
+CEventLogParser2::CEventLogParser2(QObject *parent)
     : CBasicParser{parent}
 {
     clearErrorString();
@@ -134,7 +135,7 @@ CEventLogParser::CEventLogParser(QObject *parent)
 }
 
 bool
-CEventLogParser::parse(const QString &line)
+CEventLogParser2::parse(const QString &line)
 {
     m_details = line;
     bool retVal = false;
@@ -143,8 +144,9 @@ CEventLogParser::parse(const QString &line)
         m_header = match.captured(1);
         m_username = match.captured(2);
         m_timestampISO8601 = match.captured(3);
-        m_requestID = match.captured(4);
-        m_type = match.captured(5);
+        m_sessionID = match.captured(4);
+        m_requestID = match.captured(5);
+        m_type = match.captured(6);
 
         m_details = m_details.mid(m_header.length() + 1);
         removeQuote(m_details);
@@ -171,11 +173,12 @@ CEventLogParser::parse(const QString &line)
 }
 
 void
-CEventLogParser::convertData(mms::dataItem_t &data)
+CEventLogParser2::convertData(mms::dataItem_t &data)
 {
     data[phUsername] = m_username;
     data[phTimestampISO8601] = m_timestampISO8601;
     data[phTimestamp] = m_timestamptz;
+    data[phSessionID] = m_sessionID;
     data[phRequestID] = m_requestID;
     data[phType] = m_type;
     data[phDetails] = m_details;
@@ -186,7 +189,7 @@ CEventLogParser::convertData(mms::dataItem_t &data)
 }
 
 bool
-CEventLogParser::checkHeader(const QString &line)
+CEventLogParser2::checkHeader(const QString &line)
 {
     QString columns;
     bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
@@ -196,25 +199,27 @@ CEventLogParser::checkHeader(const QString &line)
 }
 
 QString
-CEventLogParser::insertString() const
+CEventLogParser2::insertString() const
 {
-    return eventlog::insertData;
+    return eventlog2::insertData;
 }
 
 void
-CEventLogParser::getParsedData(QString &username,
-                   QString &timestampISO8601,
-                   QString &requestID,
-                   QString &type,
-                   QString &details,
-                   QString &username1,
-                   QString &authType,
-                   QString &externalIP,
-                   QString &internalIP,
-                   QDateTime &timestampTZ) const
+CEventLogParser2::getParsedData(QString &username,
+                                QString &timestampISO8601,
+                                QString &sessionID,
+                                QString &requestID,
+                                QString &type,
+                                QString &details,
+                                QString &username1,
+                                QString &authType,
+                                QString &externalIP,
+                                QString &internalIP,
+                                QDateTime &timestampTZ) const
 {
     username = m_username;
     timestampISO8601 = m_timestampISO8601;
+    sessionID = m_sessionID;
     requestID = m_requestID;
     type = m_type;
     details = m_details;
@@ -226,7 +231,7 @@ CEventLogParser::getParsedData(QString &username,
 }
 
 QString
-CEventLogParser::createTable() const
+CEventLogParser2::createTable() const
 {
-    return eventlog::createTable;
+    return QString();
 }

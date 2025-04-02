@@ -147,9 +147,8 @@ int main(int argc, char *argv[])
     if (settings.isClearDbOnStartup()) {
         elcUtils::expandEnvironmentStrings(dbName);
         const CParserManager &parserManager = CParserManager::instance();
-        qsizetype count = parserManager.getItemCount();
         QStringList tables = parserManager.getTablesList();
-        if (!CSqliteDatabase::truncateDB(dbName, errorString, count, tables)) {
+        if (!CSqliteDatabase::truncateDB(dbName, errorString, tables)) {
             QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot open database: %1\nDetails: %2").arg(dbName, errorString), QMessageBox::Ok);
             return 1;
         }

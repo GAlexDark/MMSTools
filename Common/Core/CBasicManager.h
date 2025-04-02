@@ -24,6 +24,8 @@
 
 #include <QMetaType>
 #include <QMetaClassInfo>
+#include <QVector>
+#include <QStringList>
 
 const quint16 invalidId = 0xFFFF;
 
@@ -40,14 +42,14 @@ public:
     T getInstance(const quint16 id)
     {
         destroyInstance();
-
         for (const QString &name : m_classList) {
-            m_type = QMetaType::fromName(name.toUtf8());
+            m_type = QMetaType::fromName(name.toUtf8().constData());
             if (m_type.isValid()) {
                 const QMetaObject* mObj = m_type.metaObject();
-                for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); j++) {
+                for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); ++j) {
                     QMetaClassInfo classInfo = mObj->classInfo(j);
-                    if ((QString(classInfo.name()) == QLatin1String("ID")) && (QString(classInfo.value()).toUInt() == id)) {
+                    if (QString(classInfo.name()) == QLatin1String("ID") &&
+                        QString(classInfo.value()).toUInt() == id) {
                         m_instancePtr = dynamic_cast<T>(mObj->newInstance());
                         Q_CHECK_PTR(m_instancePtr);
                         break;
@@ -60,10 +62,10 @@ public:
 
     const QStringList& getClassList() const { return m_classList; }
     qsizetype getItemCount() const { return m_classList.size(); }
-    bool checkID(const quint16 id) const { return m_ids.indexOf(id) != -1 ? true : false; }
+    bool checkID(const quint16 id) const { return m_ids.contains(id); }
     quint16 getIdByIndex(const quint16 index) const
     {
-        return index > 0 && index <= m_ids.size() ?  m_ids.at(index - 1) : invalidId;
+        return index > 0 && index <= m_ids.size() ? m_ids.at(index - 1) : invalidId;
     }
 
 protected:
@@ -85,12 +87,13 @@ protected:
     }
 
 private:
-    CBasicManager(CBasicManager const&) = delete;
-    CBasicManager& operator=(CBasicManager const&) = delete;
+    CBasicManager(const CBasicManager&) = delete;
+    CBasicManager& operator=(const CBasicManager&) = delete;
 
     void destroyInstance()
     {
-        if (m_type.isValid() && (m_instancePtr != nullptr)) {
+        if (m_type.isValid() &&
+            m_instancePtr != nullptr) {
             m_type.destroy(m_instancePtr);
             m_instancePtr = nullptr;
         }
