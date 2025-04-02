@@ -226,7 +226,8 @@ CPkcs7::saveStore(const QString &fileName, OUTPUT_FORMAT outputFormat)
         file.close();
         m_errorString = QStringLiteral("Nothing to save.");
         return false;
-    } else if (file.write(pBuf, len) == -1) {
+    }
+    if (file.write(pBuf, len) == -1) {
         file.close();
         m_errorString = QStringLiteral("Error writing to file: '%1': %2").arg(fileName, file.errorString());
         return false;

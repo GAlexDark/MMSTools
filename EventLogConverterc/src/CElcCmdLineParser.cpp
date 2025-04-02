@@ -30,19 +30,18 @@
 bool
 CElcCmdLineParser::checkData(const QStringList &data)
 {
-    bool retVal = true;
     const CElcConsoleAppSettings &settings = CElcConsoleAppSettings::instance();
     QString defChars = settings.getAllowedChars();
     QRegularExpression mask(QStringLiteral("^([%1,;]+)$").arg(defChars));
-    QRegularExpressionValidator v(mask, nullptr);
+    QRegularExpressionValidator validator(mask, nullptr);
     int pos = 0;
     QString buf = data.join(';');
-    if (v.validate(buf, pos) == QValidator::Invalid) {
+    if (validator.validate(buf, pos) == QValidator::Invalid) {
         setErrorString(QStringLiteral("Invalid character(s) in the usernames: %1\nDefault allowed characters in the usernames: a..z, A..Z, 0..9 and _ (underscore).").arg(buf));
-        retVal = false;
+        return false;
     }
 
-    return retVal;
+    return true;
 }
 
 CElcCmdLineParser::CElcCmdLineParser()
@@ -119,129 +118,114 @@ CElcCmdLineParser::checkOption()
     bool comb3 = m_isImportOnly && m_isCleanDbOnly;
     bool comb4 = m_isReportOnly && m_isCleanDbOnly;
 
-    bool retVal = true;
     if (comb1 || comb2 || comb3 || comb4) {
         setErrorString(error1.arg("--cleandb', '--importonly", "--reportonly"));
-        retVal = false;
-    } else {
-        if (m_isExcluded && m_isIncluded) {
-            setErrorString(error1.arg("--exclude", "--include"));
-            retVal = false;
-        } else {
-            if (!m_isPath && !m_isFiles) {
-                setErrorString(QStringLiteral("The <path> and <files> arguments are missing."));
-                retVal = false;
-            }
-        }
+        return false;
     }
-    return retVal;
+    if (m_isExcluded && m_isIncluded) {
+        setErrorString(error1.arg("--exclude", "--include"));
+        return false;
+    }
+    if (!m_isPath && !m_isFiles) {
+        setErrorString(QStringLiteral("The <path> and <files> arguments are missing."));
+        return false;
+    }
+    return true;
 }
 
 QStringList
 CElcCmdLineParser::excludedUsernames() const
 {
-    QStringList retVal = m_isExcluded ? m_parser.values("exclude") : QStringList();
-    elcUtils::parseValuesList(retVal);
-    return retVal;
+    QStringList usernames = m_isExcluded ? m_parser.values("exclude") : QStringList();
+    elcUtils::parseValuesList(usernames);
+    return usernames;
 }
 
 QStringList
 CElcCmdLineParser::includedUsernames() const
 {
-    QStringList retVal = m_isIncluded ? m_parser.values("include") : QStringList();
-    elcUtils::parseValuesList(retVal);
-    return retVal;
+    QStringList usernames = m_isIncluded ? m_parser.values("include") : QStringList();
+    elcUtils::parseValuesList(usernames);
+    return usernames;
 }
 
 RunningMode
 CElcCmdLineParser::getRunningMode() const
 {
-    RunningMode retVal = RunningMode::RUNNINGMODE_DEFAULT;
     if (m_isCleanDbOnly) {
-        retVal = RunningMode::RUNNINGMODE_CLEAN_DB;
-    } else {
-        if (m_isImportOnly) {
-            retVal = RunningMode::RUNNINGMODE_IMPORT_ONLY;
-        } else {
-            if (m_isReportOnly) {
-                retVal = RunningMode::RUNNINGMODE_REPORT_ONLY;
-            }
-        }
+        return RunningMode::RUNNINGMODE_CLEAN_DB;
     }
-    return retVal;
+    if (m_isImportOnly) {
+        return RunningMode::RUNNINGMODE_IMPORT_ONLY;
+    }
+    if (m_isReportOnly) {
+        return RunningMode::RUNNINGMODE_REPORT_ONLY;
+    }
+    return RunningMode::RUNNINGMODE_DEFAULT;
 }
 
 bool
 CElcCmdLineParser::getDataFilesList(QStringList &fileList)
 {
-    bool retVal = true;
     if (m_isFiles) {
         fileList.append(m_parser.values("files"));
-        QFileInfo fi;
+        QFileInfo fileInfo;
         for (QString &item : fileList) {
-            fi.setFile(item);
-            if (fi.exists() && fi.isFile()) {
-                item = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
+            fileInfo.setFile(item);
+            if (fileInfo.exists() && fileInfo.isFile()) {
+                item = fileInfo.absoluteFilePath(); // The QFileInfo class converts '\\', '//' into '/' in the filepath
             } else {
-                setErrorString(QStringLiteral("The file %1 is corrupted or missing.").arg(fi.fileName()));
-                retVal = false;
+                setErrorString(QStringLiteral("The file %1 is corrupted or missing.").arg(fileInfo.fileName()));
+                return false;
             }
         }
     }
-    if (retVal && m_isPath) {
+    if (m_isPath) {
         QString searchFolder = m_parser.value("path").trimmed();
         QFileInfo sf(searchFolder);
         QDir dir = sf.absoluteDir();
-        if (dir.exists()) {
-            searchFolder = dir.absolutePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
-            QString mask = sf.fileName().trimmed();
-            if (mask.isEmpty()) {
-                mask = QLatin1String("*.csv"); // default mask
-            }
-            fileList.append( elcUtils::getDataSourceList(searchFolder, QStringList() << mask) );
-        } else {
+        if (!dir.exists()) {
             setErrorString(QStringLiteral("Cannot find the directory %1.").arg(searchFolder));
-            retVal = false;
+            return false;
         }
+        searchFolder = dir.absolutePath(); // The QFileInfo class converts '\\', '//' into '/' in the filepath
+        QString mask = sf.fileName().trimmed().isEmpty() ? QLatin1String("*.csv") : sf.fileName().trimmed();
+        fileList.append(elcUtils::getDataSourceList(searchFolder, QStringList() << mask));
     }
 
-    if (retVal) {
+    if (!fileList.isEmpty()) {
         fileList.removeDuplicates();
-        m_filesList.clear();
-        m_filesList.append(fileList);
+        m_filesList = fileList;
     }
 
-    return retVal;
+    return true;
 }
 
 QString
 CElcCmdLineParser::getReportName() const
 {
-    QString retVal;
+    QString reportName;
     if (m_isReportName) {
-        retVal = m_parser.value("report").trimmed();
-    } else {
-        QDateTime now = QDateTime::currentDateTime();
-        retVal = QLatin1String("%1_report.xlsx").arg(now.toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
-    }
-
-    if (retVal.endsWith(QLatin1String(".xls"), Qt::CaseInsensitive)) {
-        retVal = retVal.toLower() + 'x';
-    } else {
-        if (!retVal.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
-            retVal = retVal + QLatin1String(".xlsx");
+        reportName = m_parser.value("report").trimmed();
+        if (reportName.endsWith(QLatin1String(".xls"), Qt::CaseInsensitive)) {
+            reportName = reportName.toLower() + 'x';
+        } else if (!reportName.endsWith(QLatin1String(".xlsx"), Qt::CaseInsensitive)) {
+            reportName += QLatin1String(".xlsx");
         }
-    }
-
-    if ((retVal.indexOf('/') == -1) && (retVal.indexOf('\\') == -1)) {
-        QString filePath = m_filesList.isEmpty() ? QFileInfo(retVal).absolutePath() : QFileInfo(m_filesList.at(0)).absolutePath();
-        retVal = QDir(filePath).filePath(retVal);
     } else {
-        retVal = QDir::fromNativeSeparators(retVal);
-        retVal.replace(QLatin1String("//"), QLatin1String("/"));
+        reportName = QLatin1String("%1_report.xlsx").arg(QDateTime::currentDateTime().toString(QLatin1String("ddMMyyyy-hhmmsszzz")));
     }
 
-    return retVal;
+    if (reportName.indexOf('/') == -1 &&
+        reportName.indexOf('\\') == -1) {
+        QString filePath = m_filesList.isEmpty() ? QFileInfo(reportName).absolutePath() : QFileInfo(m_filesList.at(0)).absolutePath();
+        reportName = QDir(filePath).filePath(reportName);
+    } else {
+        reportName = QDir::fromNativeSeparators(reportName);
+        reportName.replace(QLatin1String("//"), QLatin1String("/"));
+    }
+
+    return reportName;
 }
 
 bool

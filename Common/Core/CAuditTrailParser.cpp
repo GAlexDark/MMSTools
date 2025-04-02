@@ -25,12 +25,14 @@
 #include "DBStrings.h"
 #include "elcUtils.h"
 
-const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
-const QRegularExpression rePersonData(QLatin1String("Person\\s\\[pk=\\d+,\\salias=(.*)\\]"));
-const QRegularExpression reLoadAuditTrail(QLatin1String("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$"));
+namespace {
+    const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
+    const QRegularExpression rePersonData(QLatin1String("Person\\s\\[pk=\\d+,\\salias=(.*)\\]"));
+    const QRegularExpression reLoadAuditTrail(QLatin1String("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$"));
 
-const QString person(QLatin1String("Person ["));
-const QString nullValue(QLatin1String("null"));
+    const QString person(QLatin1String("Person ["));
+    const QString nullValue(QLatin1String("null"));
+}
 
 bool
 CAuditTrailParser::parsePersonDataDetails()

@@ -22,6 +22,17 @@
 #include "CSystemLogReport.h"
 #include "DBStrings.h"
 
+namespace systemLogReport {
+    constexpr int colRowNumber = 1;
+    constexpr int colTimestamp = 2;
+    constexpr int colUsername = 3;
+    constexpr int colRole = 4;
+    constexpr int colCompanyname = 5;
+    constexpr int colType = 6;
+    constexpr int colSeverity = 7;
+    constexpr int colMessage = 8;
+}
+
 CSystemLogReport::CSystemLogReport(QObject *parent)
     : CBasicReport{parent}
 {
@@ -32,57 +43,19 @@ bool
 CSystemLogReport::generateReport()
 {
     bool retVal = true;
-    // Set datetime format
     QXlsx::Format dateFormat;
     setDateTimeFormat(dateFormat);
 
-    int colRowNumber = 1;
-    int colTimestamp = 2;
-    int colUsername = 3;
-    int colRole = 4;
-    int colCompanyname = 5;
-    int colType = 6;
-    int colSeverity = 7;
-    int colMessage = 8;
-
     QScopedPointer<QXlsx::Document> xlsxReport(new QXlsx::Document);
     int row = 1;
-    // Add header
-    QVariant writeValue;
+
     try {
-        writeValue = QStringLiteral("№");
-        setReportDataItem(xlsxReport.data(), colRowNumber, row, writeValue);
-
-        writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-        setReportDataItem(xlsxReport.data(), colTimestamp, row, writeValue);
-        writeValue = QStringLiteral("Ім'я користувача");
-        setReportDataItem(xlsxReport.data(), colUsername, row, writeValue);
-        writeValue = QStringLiteral("Роль");
-        setReportDataItem(xlsxReport.data(), colRole, row, writeValue);
-        writeValue = QStringLiteral("Компанія");
-        setReportDataItem(xlsxReport.data(), colCompanyname, row, writeValue);
-        writeValue = QStringLiteral("Тип");
-        setReportDataItem(xlsxReport.data(), colType, row, writeValue);
-        writeValue = QStringLiteral("Рівень");
-        setReportDataItem(xlsxReport.data(), colSeverity, row, writeValue);
-        writeValue = QStringLiteral("Повідомлення");
-        setReportDataItem(xlsxReport.data(), colMessage, row, writeValue);
-
+        addReportHeader(xlsxReport.data(), row);
         ++row;
+
         int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
-            setReportDataItem(xlsxReport.data(), colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
-
-            writeValue = m_db->geValue("timestamp").toDateTime();
-            if (!xlsxReport->write(row, colTimestamp, writeValue, dateFormat)) {
-                throw XlsxError();
-            }
-            setReportDataItem(xlsxReport.data(), "username1", colUsername, row);
-            setReportDataItem(xlsxReport.data(), "role", colRole, row);
-            setReportDataItem(xlsxReport.data(), "companyname", colCompanyname, row);
-            setReportDataItem(xlsxReport.data(), "type", colType, row);
-            setReportDataItem(xlsxReport.data(), "severity", colSeverity, row);
-            setReportDataItem(xlsxReport.data(), "message", colMessage, row);
+            addReportRow(xlsxReport.data(), row, multipartRowCount, dateFormat);
             ++row;
             if (row > maxRowsCount) {
                 break;
@@ -92,14 +65,60 @@ CSystemLogReport::generateReport()
         setErrorString(ex.what());
         retVal = false;
     }
-    if (retVal) {
-        const QString fileName = createReportFilename(row);
-        retVal = xlsxReport->saveAs(fileName);
-        if (!retVal) {
-            setErrorString(QStringLiteral("Error save report file"));
+
+    if (row != 2) {
+        if (retVal) {
+            const QString fileName = createReportFilename(row);
+            retVal = xlsxReport->saveAs(fileName);
+            if (!retVal) {
+                setErrorString(QStringLiteral("Error save report file"));
+            }
         }
+    } else {
+        retVal = false;
+        setErrorString(QStringLiteral("Nothing data to save"));
     }
+
     return retVal;
+}
+
+void
+CSystemLogReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
+{
+    QVariant writeValue = QStringLiteral("№");
+    setReportDataItem(xlsxReport, systemLogReport::colRowNumber, row, writeValue);
+
+    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
+    setReportDataItem(xlsxReport, systemLogReport::colTimestamp, row, writeValue);
+    writeValue = QStringLiteral("Ім'я користувача");
+    setReportDataItem(xlsxReport, systemLogReport::colUsername, row, writeValue);
+    writeValue = QStringLiteral("Роль");
+    setReportDataItem(xlsxReport, systemLogReport::colRole, row, writeValue);
+    writeValue = QStringLiteral("Компанія");
+    setReportDataItem(xlsxReport, systemLogReport::colCompanyname, row, writeValue);
+    writeValue = QStringLiteral("Тип");
+    setReportDataItem(xlsxReport, systemLogReport::colType, row, writeValue);
+    writeValue = QStringLiteral("Рівень");
+    setReportDataItem(xlsxReport, systemLogReport::colSeverity, row, writeValue);
+    writeValue = QStringLiteral("Повідомлення");
+    setReportDataItem(xlsxReport, systemLogReport::colMessage, row, writeValue);
+}
+
+void
+CSystemLogReport::addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat)
+{
+    setReportDataItem(xlsxReport, systemLogReport::colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
+
+    QVariant writeValue = m_db->geValue("timestamp").toDateTime();
+    if (!xlsxReport->write(row, systemLogReport::colTimestamp, writeValue, dateFormat)) {
+        throw XlsxError();
+    }
+    setReportDataItem(xlsxReport, "username1", systemLogReport::colUsername, row);
+    setReportDataItem(xlsxReport, "role", systemLogReport::colRole, row);
+    setReportDataItem(xlsxReport, "companyname", systemLogReport::colCompanyname, row);
+    setReportDataItem(xlsxReport, "type", systemLogReport::colType, row);
+    setReportDataItem(xlsxReport, "severity", systemLogReport::colSeverity, row);
+    setReportDataItem(xlsxReport, "message", systemLogReport::colMessage, row);
 }
 
 QString

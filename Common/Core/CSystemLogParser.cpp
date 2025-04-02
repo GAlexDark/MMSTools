@@ -25,36 +25,38 @@
 #include "DBStrings.h"
 #include "elcUtils.h"
 
-const QRegularExpression reSystemLogHeader(QLatin1String("^(.*?);(.*?);(.*?);(.*?)"));
-const QRegularExpression reUserData1(QLatin1String("^User\\s\"(.*?)\".*?\"(.*?)\".*?\"(.*?)\""));
-const QRegularExpression reUserData2(QLatin1String("^User\\s\"(.*?)\""));
+namespace {
+    const QRegularExpression reSystemLogHeader(QLatin1String("^(.*?);(.*?);(.*?);(.*?)"));
+    const QRegularExpression reUserData1(QLatin1String("^User\\s\"(.*?)\".*?\"(.*?)\".*?\"(.*?)\""));
+    const QRegularExpression reUserData2(QLatin1String("^User\\s\"(.*?)\""));
 
-const QString nullValue(QLatin1String("null"));
-const QString user(QLatin1String("User "));
-const QString usingRole(QLatin1String("Using role"));
-const QString loginSuccess(QLatin1String("User login - successful"));
-const QString email(QLatin1String("Email"));
-const QString received(QLatin1String("received"));
-const QString processed(QLatin1String("processed"));
-const QString emailReceived(QLatin1String("Email - received"));
-const QString emailProcessed(QLatin1String("Email - processed"));
-const QString fileProcessing(QLatin1String("file processing"));
-const QString started(QLatin1String("started"));
-const QString finished(QLatin1String("finished"));
-const QString fileProcessingStarted(QLatin1String("File processing - started"));
-const QString fileProcessingFinished(QLatin1String("File processing - finished"));
+    const QString nullValue(QLatin1String("null"));
+    const QString user(QLatin1String("User "));
+    const QString usingRole(QLatin1String("Using role"));
+    const QString loginSuccess(QLatin1String("User login - successful"));
+    const QString email(QLatin1String("Email"));
+    const QString received(QLatin1String("received"));
+    const QString processed(QLatin1String("processed"));
+    const QString emailReceived(QLatin1String("Email - received"));
+    const QString emailProcessed(QLatin1String("Email - processed"));
+    const QString fileProcessing(QLatin1String("file processing"));
+    const QString started(QLatin1String("started"));
+    const QString finished(QLatin1String("finished"));
+    const QString fileProcessingStarted(QLatin1String("File processing - started"));
+    const QString fileProcessingFinished(QLatin1String("File processing - finished"));
 
-const QString gate(QLatin1String("Gate"));
-const QString gateAutomaticallyOpened(QLatin1String("Gate - automatically opened"));
-const QString gateAutomaticallyClosed(QLatin1String("Gate - automatically closed"));
-const QString gateReopened(QLatin1String("Gate - reopened"));
-const QString gateOpened(QLatin1String("Gate - opened"));
-const QString gateClosed(QLatin1String("Gate - closed"));
-const QString automaticallyOpened(QLatin1String("automatically opened"));
-const QString automaticallyClosed(QLatin1String("automatically closed"));
-const QString opened(QLatin1String("opened"));
-const QString reopened(QLatin1String("reopened"));
-const QString closed(QLatin1String("closed"));
+    const QString gate(QLatin1String("Gate"));
+    const QString gateAutomaticallyOpened(QLatin1String("Gate - automatically opened"));
+    const QString gateAutomaticallyClosed(QLatin1String("Gate - automatically closed"));
+    const QString gateReopened(QLatin1String("Gate - reopened"));
+    const QString gateOpened(QLatin1String("Gate - opened"));
+    const QString gateClosed(QLatin1String("Gate - closed"));
+    const QString automaticallyOpened(QLatin1String("automatically opened"));
+    const QString automaticallyClosed(QLatin1String("automatically closed"));
+    const QString opened(QLatin1String("opened"));
+    const QString reopened(QLatin1String("reopened"));
+    const QString closed(QLatin1String("closed"));
+}
 
 CSystemLogParser::CSystemLogParser(QObject *parent)
     : CBasicParser{parent}

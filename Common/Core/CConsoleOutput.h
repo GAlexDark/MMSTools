@@ -24,6 +24,7 @@
 
 #include <QTextStream>
 #include <QObject>
+#include <QMutex>
 
 #ifdef Q_OS_WIN32
   #include <windows.h>
@@ -49,6 +50,7 @@ public:
     outToConsole(const QString &msg) const
     {
         if (!msg.isEmpty()) {
+            QMutexLocker locker(&mutex);
             QTextStream cout(stdout);
             cout << msg << '\n';
             cout.flush();
@@ -60,6 +62,8 @@ public slots:
     {
         outToConsole(msg);
     }
+private:
+    mutable QMutex mutex;
 };
 
 
