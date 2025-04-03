@@ -181,7 +181,7 @@ CBasicDatabase::prepareRequest(const QString &query)
 }
 
 bool
-CBasicDatabase::execRequest(pDataItem data)
+CBasicDatabase::execRequest(const pDataItem data)
 {
     Q_CHECK_PTR(data);
     for (auto it = data->cbegin(); it != data->cend(); ++it) {

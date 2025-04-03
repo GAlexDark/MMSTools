@@ -56,12 +56,12 @@ CAuditTrailReport::generateReport()
 
         int multipartRowCount = getMultipartRowCount() - 1;
         while (m_db->isNext()) {
-            setReportDataItem(xlsxReport.data(), auditTrailReport::colRowNumber, row, QVariant::fromValue(multipartRowCount + row));
+            addReportRow(xlsxReport.data(), row, multipartRowCount, dateFormat);
             ++row;
             if (row > maxRowsCount) {
                 break;
             }
-        } // while
+        }
     } catch (XlsxError &ex) {
         setErrorString(ex.what());
         retVal = false;
@@ -75,7 +75,7 @@ CAuditTrailReport::generateReport()
                 setErrorString(QStringLiteral("Error save report file"));
             }
         }
-    }  else {
+    } else {
         retVal = false;
         setErrorString(QStringLiteral("Nothing data to save"));
     }
@@ -86,25 +86,21 @@ CAuditTrailReport::generateReport()
 void
 CAuditTrailReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
 {
-    QVariant writeValue = QStringLiteral("№");
-    setReportDataItem(xlsxReport, auditTrailReport::colRowNumber, row, writeValue);
+    const QStringList headers = {
+        QStringLiteral("№"),
+        QStringLiteral("Відмітка часу (за Київським часом)"),
+        QStringLiteral("Ім'я користувача"),
+        QStringLiteral("Роль"),
+        QStringLiteral("Компанія"),
+        QStringLiteral("Метод"),
+        QStringLiteral("Статус"),
+        QStringLiteral("Атрибути"),
+        QStringLiteral("Внутрішній IP")
+    };
 
-    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-    setReportDataItem(xlsxReport, auditTrailReport::colTimestamp, row, writeValue);
-    writeValue = QStringLiteral("Ім'я користувача");
-    setReportDataItem(xlsxReport, auditTrailReport::colUsername, row, writeValue);
-    writeValue = QStringLiteral("Роль");
-    setReportDataItem(xlsxReport, auditTrailReport::colRole, row, writeValue);
-    writeValue = QStringLiteral("Компанія");
-    setReportDataItem(xlsxReport, auditTrailReport::colCompanyname, row, writeValue);
-    writeValue = QStringLiteral("Метод");
-    setReportDataItem(xlsxReport, auditTrailReport::colMethod, row, writeValue);
-    writeValue = QStringLiteral("Статус");
-    setReportDataItem(xlsxReport, auditTrailReport::colStatus, row, writeValue);
-    writeValue = QStringLiteral("Атрибути");
-    setReportDataItem(xlsxReport, auditTrailReport::colAttributes, row, writeValue);
-    writeValue = QStringLiteral("Внутрішній IP");
-    setReportDataItem(xlsxReport, auditTrailReport::colInternalIP, row, writeValue);
+    for (int col = auditTrailReport::colRowNumber; col <= auditTrailReport::colInternalIP; ++col) {
+        setReportDataItem(xlsxReport, col, row, headers[col - 1]);
+    }
 }
 
 void
@@ -116,13 +112,20 @@ CAuditTrailReport::addReportRow(QXlsx::Document *xlsxReport, int row, int multip
     if (!xlsxReport->write(row, auditTrailReport::colTimestamp, writeValue, dateFormat)) {
         throw XlsxError();
     }
-    setReportDataItem(xlsxReport, "username", auditTrailReport::colUsername, row);
-    setReportDataItem(xlsxReport, "role", auditTrailReport::colRole, row);
-    setReportDataItem(xlsxReport, "companyname", auditTrailReport::colCompanyname, row);
-    setReportDataItem(xlsxReport, "method", auditTrailReport::colMethod, row);
-    setReportDataItem(xlsxReport, "status", auditTrailReport::colStatus, row);
-    setReportDataItem(xlsxReport, "attributes", auditTrailReport::colAttributes, row);
-    setReportDataItem(xlsxReport, "internalip", auditTrailReport::colInternalIP, row);
+
+    const QMap<int, QString> colMapping = {
+        {auditTrailReport::colUsername, "username"},
+        {auditTrailReport::colRole, "role"},
+        {auditTrailReport::colCompanyname, "companyname"},
+        {auditTrailReport::colMethod, "method"},
+        {auditTrailReport::colStatus, "status"},
+        {auditTrailReport::colAttributes, "attributes"},
+        {auditTrailReport::colInternalIP, "internalip"}
+    };
+
+    for (auto it = colMapping.begin(); it != colMapping.end(); ++it) {
+        setReportDataItem(xlsxReport, it.value(), it.key(), row);
+    }
 }
 
 QString

@@ -91,27 +91,22 @@ CEventLogReport::generateReport()
 void
 CEventLogReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
 {
-    QVariant writeValue = QStringLiteral("№");
-    setReportDataItem(xlsxReport, eventLogReport::colRowNumber, row, writeValue);
+    const QStringList headers = {
+        QStringLiteral("№"),
+        QStringLiteral("Відмітка часу (часовий пояс - UTC)"),
+        QStringLiteral("Відмітка часу (за Київським часом)"),
+        QStringLiteral("Зовнішній IP"),
+        QStringLiteral("Ім'я користувача"),
+        QStringLiteral("Тип"),
+        QStringLiteral("Деталі"),
+        QStringLiteral("Тип авторизації"),
+        QStringLiteral("Внутрішній IP"),
+        QStringLiteral("ID запиту")
+    };
 
-    writeValue = QStringLiteral("Відмітка часу (часовий пояс - UTC)");
-    setReportDataItem(xlsxReport, eventLogReport::colTimestampISO8601, row, writeValue);
-    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-    setReportDataItem(xlsxReport, eventLogReport::colTimestamp, row, writeValue);
-    writeValue = QStringLiteral("Зовнішній IP");
-    setReportDataItem(xlsxReport, eventLogReport::colExternalIP, row, writeValue);
-    writeValue = QStringLiteral("Ім'я користувача");
-    setReportDataItem(xlsxReport, eventLogReport::colUsername, row, writeValue);
-    writeValue = QStringLiteral("Тип");
-    setReportDataItem(xlsxReport, eventLogReport::colType, row, writeValue);
-    writeValue = QStringLiteral("Деталі");
-    setReportDataItem(xlsxReport, eventLogReport::colDetails, row, writeValue);
-    writeValue = QStringLiteral("Тип авторизації");
-    setReportDataItem(xlsxReport, eventLogReport::colAuthType, row, writeValue);
-    writeValue = QStringLiteral("Внутрішній IP");
-    setReportDataItem(xlsxReport, eventLogReport::colInternalIP, row, writeValue);
-    writeValue = QStringLiteral("ID запиту");
-    setReportDataItem(xlsxReport, eventLogReport::colRequestid, row, writeValue);
+    for (int col = eventLogReport::colRowNumber; col <= eventLogReport::colRequestid; ++col) {
+        setReportDataItem(xlsxReport, col, row, headers[col - 1]);
+    }
 }
 
 void

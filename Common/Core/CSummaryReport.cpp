@@ -89,29 +89,23 @@ CSummaryReport::generateReport()
 void
 CSummaryReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
 {
-    QVariant writeValue = QStringLiteral("№");
-    setReportDataItem(xlsxReport, summaryReport::colRowNumber, row, writeValue);
+    const QStringList headers = {
+        QStringLiteral("№"),
+        QStringLiteral("Відмітка часу (за Київським часом)"),
+        QStringLiteral("Ім'я користувача"),
+        QStringLiteral("Роль в компанії"),
+        QStringLiteral("Тип / Метод"),
+        QStringLiteral("Статус / Рівень"),
+        QStringLiteral("Деталі / Атрибути"),
+        QStringLiteral("Тип авторизації"),
+        QStringLiteral("Зовнішній IP"),
+        QStringLiteral("Внутрішній IP"),
+        QStringLiteral("ID запиту")
+    };
 
-    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-    setReportDataItem(xlsxReport, summaryReport::colTimestamp, row, writeValue);
-    writeValue = QStringLiteral("Ім'я користувача");
-    setReportDataItem(xlsxReport, summaryReport::colUsername, row, writeValue);
-    writeValue = QStringLiteral("Роль в компанії");
-    setReportDataItem(xlsxReport, summaryReport::colCompanyRole, row, writeValue);
-    writeValue = QStringLiteral("Тип / Метод");
-    setReportDataItem(xlsxReport, summaryReport::colTypeOrMethod, row, writeValue);
-    writeValue = QStringLiteral("Статус / Рівень");
-    setReportDataItem(xlsxReport, summaryReport::colStatus, row, writeValue);
-    writeValue = QStringLiteral("Деталі / Атрибути");
-    setReportDataItem(xlsxReport, summaryReport::colDetailsOrAttributes, row, writeValue);
-    writeValue = QStringLiteral("Тип авторизації");
-    setReportDataItem(xlsxReport, summaryReport::colAuthType, row, writeValue);
-    writeValue = QStringLiteral("Зовнішній IP");
-    setReportDataItem(xlsxReport, summaryReport::colExternalIP, row, writeValue);
-    writeValue = QStringLiteral("Внутрішній IP");
-    setReportDataItem(xlsxReport, summaryReport::colInternalIP, row, writeValue);
-    writeValue = QStringLiteral("ID запиту");
-    setReportDataItem(xlsxReport, summaryReport::colRequestid, row, writeValue);
+    for (int col = summaryReport::colRowNumber; col <= summaryReport::colRequestid; ++col) {
+        setReportDataItem(xlsxReport, col, row, headers[col - 1]);
+    }
 }
 
 void
@@ -123,15 +117,22 @@ CSummaryReport::addReportRow(QXlsx::Document *xlsxReport, int row, int multipart
     if (!xlsxReport->write(row, summaryReport::colTimestamp, writeValue, dateFormat)) {
         throw XlsxError();
     }
-    setReportDataItem(xlsxReport, "username", summaryReport::colUsername, row);
-    setReportDataItem(xlsxReport, "company_role", summaryReport::colCompanyRole, row);
-    setReportDataItem(xlsxReport, "type_or_method", summaryReport::colTypeOrMethod, row);
-    setReportDataItem(xlsxReport, "status", summaryReport::colStatus, row);
-    setReportDataItem(xlsxReport, "details_or_attributes", summaryReport::colDetailsOrAttributes, row);
-    setReportDataItem(xlsxReport, "authtype", summaryReport::colAuthType, row);
-    setReportDataItem(xlsxReport, "externalip", summaryReport::colExternalIP, row);
-    setReportDataItem(xlsxReport, "internalip", summaryReport::colInternalIP, row);
-    setReportDataItem(xlsxReport, "requestid", summaryReport::colRequestid, row);
+
+    const QMap<int, QString> colMapping = {
+        {summaryReport::colUsername, "username"},
+        {summaryReport::colCompanyRole, "company_role"},
+        {summaryReport::colTypeOrMethod, "type_or_method"},
+        {summaryReport::colStatus, "status"},
+        {summaryReport::colDetailsOrAttributes, "details_or_attributes"},
+        {summaryReport::colAuthType, "authtype"},
+        {summaryReport::colExternalIP, "externalip"},
+        {summaryReport::colInternalIP, "internalip"},
+        {summaryReport::colRequestid, "requestid"}
+    };
+
+    for (auto it = colMapping.begin(); it != colMapping.end(); ++it) {
+        setReportDataItem(xlsxReport, it.value(), it.key(), row);
+    }
 }
 
 QString

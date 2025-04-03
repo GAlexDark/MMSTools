@@ -55,7 +55,7 @@ public:
 
     // add info in the DB
     bool prepareRequest(const QString &query);
-    bool execRequest(pDataItem data);
+    bool execRequest(const pDataItem data);
 
     bool insertToDB(const QString &query, pDataItem data);
     // search info in the DB

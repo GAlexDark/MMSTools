@@ -62,7 +62,7 @@ CTextFileReader::indexOfEol(const qint64 startPos, const qint64 size) const
                 retVal = isSecondPart ? index - 1 : index;
                 break;
             } else {
-                isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted ? true : false;
+                isSecondPart = (m_eolCharsCount == 2) && (*d == '\r') && !isQuoted;
             }
             ++d;
             ++index;
@@ -95,45 +95,41 @@ bool CTextFileReader::readSmallFile() {
    * use sliced() instead in new code, because it is faster.
    */
 
-    bool retVal = true;
     qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
-    m_file.close();
 
-    if (bytesRead > 0) {
-        retVal = checkBOM();
-        if (retVal) {
-            QString line;
-            bool isEOF = false;
-            qint64 prevPosition = 3;
-            qint64 nextPosition;
-            m_lineNumber = 0;
-
-            if (m_isHeaders) {
-                retVal = readColumnNames(bytesRead, isEOF, prevPosition);
-            }
-
-            while (!isEOF && retVal) {
-                nextPosition = indexOfEol(prevPosition, bytesRead);
-                line.clear();
-                if (nextPosition != -1) {
-                    line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
-                    retVal = convertData(line);
-                    prevPosition = nextPosition + m_eolCharsCount;
-                } else {
-                    if (prevPosition < bytesRead) {
-                        // The line don't have the EOL
-                        line = m_buffer->sliced(prevPosition, bytesRead - prevPosition);
-                        retVal = convertData(line);
-                    }
-                    // prevPosition == bufferSize - The line is empty or/and the EOF
-                    isEOF = true;
-                }
-                m_lineNumber++;
-            } // internal while
-        }
-    } else {
-        retVal = false;
+    if (bytesRead <= 0) {
         m_errorString = QStringLiteral("Error reading file: %1");
+        return false;
+    }
+    if (!checkBOM()) return false;
+
+    bool isEOF = false;
+    qint64 prevPosition = 3;
+    if (m_isHeaders) {
+        if (!readColumnNames(bytesRead, isEOF, prevPosition)) return false;
+    }
+
+    bool retVal = true;
+    QString line;
+    qint64 nextPosition;
+    m_lineNumber = 0;
+    while (!isEOF && retVal) {
+        nextPosition = indexOfEol(prevPosition, bytesRead);
+        line.clear();
+        if (nextPosition != -1) {
+            line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
+            retVal = convertData(line);
+            prevPosition = nextPosition + m_eolCharsCount;
+        } else {
+            if (prevPosition < bytesRead) {
+                // The line don't have the EOL
+                line = m_buffer->sliced(prevPosition, bytesRead - prevPosition);
+                retVal = convertData(line);
+            }
+            // prevPosition == bufferSize - The line is empty or/and the EOF
+            isEOF = true;
+        }
+        m_lineNumber++;
     }
 
     return retVal;
@@ -143,59 +139,58 @@ bool
 CTextFileReader::readLargeFile()
 {
     qint64 bufferOffset = 0;
-    bool retVal = true;
     m_file.seek(bufferOffset);
 
     qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
-    if (bytesRead > 0) {
-        retVal = checkBOM();
-        if (retVal) {
-            QString line;
-            bool isEOF = false;
-            qint64 prevPosition = 3;
-            qint64 nextPosition;
-            m_lineNumber = 0;
+    if (bytesRead <= 0) {
+        m_errorString = QStringLiteral("Error reading file: %1");
+        return false;
+    }
+    if (!checkBOM()) return false;
 
-            if (m_isHeaders) {
-                retVal = readColumnNames(bytesRead, isEOF, prevPosition);
+    bool isEOF = false;
+    qint64 prevPosition = 3;
+    if (m_isHeaders) {
+        if (!readColumnNames(bytesRead, isEOF, prevPosition)) return false;
+    }
+
+    bool retVal = true;
+    QString line;
+    qint64 nextPosition;
+    m_lineNumber = 0;
+    while (!isEOF && retVal) {
+        do {
+            nextPosition = indexOfEol(prevPosition, bytesRead);
+            if (nextPosition != -1) {
+                line.clear();
+                line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
+                prevPosition = nextPosition + m_eolCharsCount;
+                retVal = convertData(line);
+                m_lineNumber++;
             }
+        } while ((nextPosition != -1) && retVal);
 
-            while (!isEOF && retVal) {
-                do {
-                    nextPosition = indexOfEol(prevPosition, bytesRead);
-                    if (nextPosition != -1) {
-                        line.clear();
-                        line = m_buffer->sliced(prevPosition, nextPosition - prevPosition);
-                        prevPosition = nextPosition + m_eolCharsCount;
-                        retVal = convertData(line);
-                        m_lineNumber++;
-                    }
-                } while ((nextPosition != -1) && retVal);
-
-                if (bytesRead == defMaxFileSize) {
-                    bufferOffset += prevPosition;
-                    prevPosition = 0;
-                    m_file.seek(bufferOffset);
-                    memset(m_buffer->data(), 0, m_buffer->size());
-                    bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
-                    if (bytesRead <= 0) {
-                        isEOF = true;
-                    }
-                } else {
-                    //This is last record in the file
-                    if (prevPosition != bytesRead) {
-                        line.clear();
-                        line = m_buffer->sliced(prevPosition, bytesRead - prevPosition);
-                        retVal = convertData(line);
-                        m_lineNumber++;
-                    }
-                    isEOF = true;
-                }
-            } //while
+        if (bytesRead == defMaxFileSize) {
+            bufferOffset += prevPosition;
+            prevPosition = 0;
+            m_file.seek(bufferOffset);
+            memset(m_buffer->data(), 0, m_buffer->size());
+            bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
+            if (bytesRead <= 0) {
+                isEOF = true;
+            }
+        } else {
+            //This is last record in the file
+            if (prevPosition != bytesRead) {
+                line.clear();
+                line = m_buffer->sliced(prevPosition, bytesRead - prevPosition);
+                retVal = convertData(line);
+                m_lineNumber++;
+            }
+            isEOF = true;
         }
-    } //bytesRead > 0
+    }
 
-    m_file.close();
     return retVal;
 }
 
@@ -238,6 +233,7 @@ CTextFileReader::read()
     if (retVal) {
         memset(m_buffer->data(), 0, defMaxFileSize);
         retVal = size <= defMaxFileSize ? readSmallFile() : readLargeFile();
+        m_file.close();
     } else {
         m_errorString = m_file.errorString();
     }
@@ -350,18 +346,17 @@ bool
 CMmsLogsReader::convertData(const QString &line)
 {
     Q_CHECK_PTR(m_parser);
-    bool retVal = m_parser->parse(line);
-    if (retVal) {
-        m_parser->convertData(m_data);
-        retVal = m_db.execRequest(&m_data);
-        m_data.clear();
-        if (!retVal) {
-            setErrorString(m_db.errorString());
-        }
-    } else {
+    if (!m_parser->parse(line)) {
         setErrorString(QStringLiteral("Parsing error at line number %1: %2").arg(getLineNumber()).arg(line));
+        return false;
     }
-    return retVal;
+    mms::dataItem_t data;
+    m_parser->convertData(data);
+    if (!m_db.execRequest(&data)) {
+        setErrorString(m_db.errorString());
+        return false;
+    }
+    return true;
 }
 
 CMmsLogsThreadReader::CMmsLogsThreadReader(QObject *parent)
@@ -378,39 +373,38 @@ CMmsLogsThreadReader::run()
     QElapsedTimer timer;
     timer.start();
 #endif
-    if (!m_fileNames.isEmpty() ) {
-        emit sendMessage( tr("Preparing to read the file(s).") );
-        QString fileName;
-        qsizetype filesCount = m_fileNames.size();
-        qsizetype i = 0;
-        m_retVal = true;
-        while ((i < filesCount) && m_retVal) {
-            m_retVal = m_db.beginTransaction();
+    if (m_fileNames.isEmpty() ) return;
+
+    emit sendMessage( tr("Preparing to read the file(s).") );
+    QString fileName;
+    qsizetype filesCount = m_fileNames.size();
+    qsizetype i = 0;
+    m_retVal = true;
+    while ((i < filesCount) && m_retVal) {
+        m_retVal = m_db.beginTransaction();
+        if (m_retVal) {
+            m_retVal = m_db.prepareRequest(insertString());
+        }
+        if (!m_retVal) {
+            setErrorString(m_db.errorString());
+        } else {
+            fileName = m_fileNames.at(i);
+            emit sendMessage( tr("Reading of the file %1 has started.").arg(fileName) );
+            setFileName(fileName);
+            m_retVal = read();
             if (m_retVal) {
-                m_retVal = m_db.prepareRequest(insertString());
-            }
-            if (!m_retVal) {
-                setErrorString(m_db.errorString());
-            } else {
-                fileName = m_fileNames.at(i);
-                emit sendMessage( tr("Reading of the file %1 has started.").arg(fileName) );
-                setFileName(fileName);
-                m_retVal = read();
-                if (m_retVal) {
-                    m_retVal = m_db.commitTransaction();
-                    if (!m_retVal) {
-                        setErrorString(m_db.errorString());
-                    }
+                m_retVal = m_db.commitTransaction();
+                if (!m_retVal) {
+                    setErrorString(m_db.errorString());
                 }
             }
-            QString msg = m_retVal ? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
-            emit sendMessage( msg );
+        }
+        QString msg = m_retVal ? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
+        emit sendMessage( msg );
 
-            ++i;
-        } // while
-
-        m_db.close();
+        ++i;
     }
+    m_db.close();
 #ifdef QT_DEBUG
     QString msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
     __DEBUG( msg )
