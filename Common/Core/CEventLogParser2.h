@@ -40,7 +40,6 @@ public:
     Q_INVOKABLE explicit CEventLogParser2(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(QMap<QString, QVariant> &data) override;
-    bool checkHeader(const QString &line) override;
     QString insertString() const override;
     void getParsedData(QString &username,
                        QString &timestampISO8601,

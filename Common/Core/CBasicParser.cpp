@@ -43,6 +43,16 @@ CBasicParser::init(const QString &internalIpFirstOctet)
     m_internalIpFirstOctet = internalIpFirstOctet;
 }
 
+bool
+CBasicParser::checkHeader(const QString &line)
+{
+    QString columns;
+    bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
+    Q_ASSERT(retVal);
+    const QStringList columnsList = columns.split('|');
+    return columnsList.contains(line);
+}
+
 void
 CBasicParser::analizeIPAdresses()
 {

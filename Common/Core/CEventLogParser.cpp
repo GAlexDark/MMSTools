@@ -185,16 +185,6 @@ CEventLogParser::convertData(QMap<QString, QVariant> &data)
     data[phInternalip] = m_internalip;
 }
 
-bool
-CEventLogParser::checkHeader(const QString &line)
-{
-    QString columns;
-    bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
-    Q_ASSERT(retVal);
-    QStringList columnsList = columns.split('|');
-    return columnsList.contains(line);
-}
-
 QString
 CEventLogParser::insertString() const
 {

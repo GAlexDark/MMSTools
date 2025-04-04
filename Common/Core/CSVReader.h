@@ -55,6 +55,7 @@ private:
 
     bool checkBOM();
     bool readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &prevPosition);
+    bool startRead(qint64 &bytesRead, qint64 &prevPosition, bool &isEof);
     bool readLargeFile();
     bool readSmallFile();
 
