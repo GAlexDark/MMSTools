@@ -62,11 +62,11 @@ CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
 bool
 CX2jConvCmdLineParser::checkOption()
 {
-    bool retVal = m_isImport && m_isMode;
-    if (!retVal) {
+    if (!m_isImport && m_isMode) {
         setErrorString(QLatin1String("The <input> or <mode> arguments are missing."));
+        return false;
     }
-    return retVal;
+    return true;
 }
 
 bool
@@ -101,7 +101,6 @@ CX2jConvCmdLineParser::getReportName() const
     if (!retVal.endsWith(QLatin1String(".json"), Qt::CaseInsensitive)) {
         retVal = retVal + QLatin1String(".json");
     }
-
     if ((retVal.indexOf('/') == -1) && (retVal.indexOf('\\') == -1)) {
         retVal = m_path.filePath(retVal);
     } else {

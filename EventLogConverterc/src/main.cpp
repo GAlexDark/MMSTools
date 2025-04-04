@@ -22,7 +22,6 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 
-#include "MMSTypes.h"
 #include "CSVReader.h"
 #include "CReportBuilder.h"
 #include "CElcConsoleAppSettings.h"
@@ -127,7 +126,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        mms::pragmaList_t pragmaList;
+        QMap<QString, QString> pragmaList;
         pragmaList["synchronous"] = settings.getSynchronousType();
         pragmaList["journal_mode"] = settings.getJournalModeType();
         pragmaList["temp_store"] = settings.getTempStore();

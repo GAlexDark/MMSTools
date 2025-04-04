@@ -101,12 +101,15 @@ bool CTextFileReader::readSmallFile() {
         m_errorString = QStringLiteral("Error reading file: %1");
         return false;
     }
-    if (!checkBOM()) return false;
-
+    if (!checkBOM()) {
+        return false;
+    }
     bool isEOF = false;
     qint64 prevPosition = 3;
     if (m_isHeaders) {
-        if (!readColumnNames(bytesRead, isEOF, prevPosition)) return false;
+        if (!readColumnNames(bytesRead, isEOF, prevPosition)) {
+            return false;
+        }
     }
 
     bool retVal = true;
@@ -146,12 +149,15 @@ CTextFileReader::readLargeFile()
         m_errorString = QStringLiteral("Error reading file: %1");
         return false;
     }
-    if (!checkBOM()) return false;
-
+    if (!checkBOM()) {
+        return false;
+    }
     bool isEOF = false;
     qint64 prevPosition = 3;
     if (m_isHeaders) {
-        if (!readColumnNames(bytesRead, isEOF, prevPosition)) return false;
+        if (!readColumnNames(bytesRead, isEOF, prevPosition)) {
+            return false;
+        }
     }
 
     bool retVal = true;
@@ -243,7 +249,7 @@ CTextFileReader::read()
 //--------------------------------------------------------------------------
 
 bool
-CMmsLogsReader::initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList)
+CMmsLogsReader::initDB(const QString &dbFileName, const QMap<QString, QString> *pragmaList)
 {
     bool retVal = m_db.init(dbFileName);
     if (retVal) {
@@ -315,7 +321,7 @@ CMmsLogsReader::~CMmsLogsReader()
 
 bool
 CMmsLogsReader::init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders, const QString &internalIpFirstOctet,
-                     const mms::pragmaList_t *pragmaList)
+                     const QMap<QString, QString> *pragmaList)
 {
     CParserManager &parserManager = CParserManager::instance();
     m_parser = nullptr;
@@ -350,7 +356,7 @@ CMmsLogsReader::convertData(const QString &line)
         setErrorString(QStringLiteral("Parsing error at line number %1: %2").arg(getLineNumber()).arg(line));
         return false;
     }
-    mms::dataItem_t data;
+    QMap<QString, QVariant> data;
     m_parser->convertData(data);
     if (!m_db.execRequest(&data)) {
         setErrorString(m_db.errorString());
@@ -373,40 +379,43 @@ CMmsLogsThreadReader::run()
     QElapsedTimer timer;
     timer.start();
 #endif
-    if (m_fileNames.isEmpty() ) return;
+    if (m_fileNames.isEmpty() ) {
+        return;
+    }
 
     emit sendMessage( tr("Preparing to read the file(s).") );
     QString fileName;
-    qsizetype filesCount = m_fileNames.size();
+    QString msg;
     qsizetype i = 0;
+    qsizetype filesCount = m_fileNames.size();
     m_retVal = true;
     while ((i < filesCount) && m_retVal) {
-        m_retVal = m_db.beginTransaction();
-        if (m_retVal) {
-            m_retVal = m_db.prepareRequest(insertString());
-        }
-        if (!m_retVal) {
-            setErrorString(m_db.errorString());
-        } else {
+        try {
             fileName = m_fileNames.at(i);
+            if (!m_db.beginTransaction() || !m_db.prepareRequest(insertString())) {
+                setErrorString(m_db.errorString());
+                throw MmsLogsReaderError(tr("The file %1 was not read").arg(fileName));
+            }
             emit sendMessage( tr("Reading of the file %1 has started.").arg(fileName) );
             setFileName(fileName);
-            m_retVal = read();
-            if (m_retVal) {
-                m_retVal = m_db.commitTransaction();
-                if (!m_retVal) {
-                    setErrorString(m_db.errorString());
-                }
+            if (!read()) {
+                throw MmsLogsReaderError(tr("The file %1 was not read").arg(fileName));
             }
+            if (!m_db.commitTransaction()) {
+                setErrorString(m_db.errorString());
+                throw MmsLogsReaderError(tr("The file %1 was not read").arg(fileName));
+            }
+            msg = tr("The file %1 was read").arg(fileName);
+        } catch (const MmsLogsReaderError &ex) {
+            msg = ex.what();
+            m_retVal = false;
         }
-        QString msg = m_retVal ? tr("The file %1 was read").arg(fileName) : tr("The file %1 was not read").arg(fileName);
         emit sendMessage( msg );
-
         ++i;
     }
     m_db.close();
 #ifdef QT_DEBUG
-    QString msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
+    msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
     __DEBUG( msg )
 #endif
 }

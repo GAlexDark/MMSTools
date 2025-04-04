@@ -26,22 +26,27 @@ CSqliteDatabase::truncateDB(const QString &connectionString, QString &errorStrin
                             const QStringList &tablesNames, const QStringList &updateData)
 {
     CSqliteDatabase db;
-    bool retVal = db.init(connectionString);
-    if (retVal) {
-        retVal = db.open();
-        for (const QString &item : tablesNames) {
-            retVal = db.truncateTable(item, updateData);
-            if (!retVal) break;
-        }
-        if (retVal) {
-            retVal = db.optimizeDatabaseSize();
-        }
-        db.close();
+    if (!db.init(connectionString)) {
+        errorString = db.errorString();
+        return false;
     }
-
+    if (!db.open()) {
+        errorString = db.errorString();
+        return false;
+    }
+    bool retVal = true;
+    for (const QString &item : tablesNames) {
+        retVal = db.truncateTable(item, updateData);
+        if (!retVal) break;
+    }
+    if (retVal) {
+        retVal = db.optimizeDatabaseSize();
+    }
     if (!retVal) {
         errorString = db.errorString();
     }
+    db.close();
+
     return retVal;
 }
 

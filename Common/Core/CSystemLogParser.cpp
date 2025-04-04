@@ -69,8 +69,9 @@ CSystemLogParser::CSystemLogParser(QObject *parent)
 bool
 CSystemLogParser::parseUserData()
 {
-    if (!m_message.startsWith(user)) return false;
-
+    if (!m_message.startsWith(user)) {
+        return false;
+    }
     QRegularExpressionMatch match1 = reUserData1.match(m_message);
     if (match1.hasMatch()) {
         m_username1 = match1.captured(1);
@@ -94,8 +95,9 @@ CSystemLogParser::parseUserData()
 bool
 CSystemLogParser::parseEmailMessages()
 {
-    if (!m_message.startsWith(email)) return false;
-
+    if (!m_message.startsWith(email)) {
+        return false;
+    }
     if (m_message.contains(received)) {
         m_type = emailReceived;
     } else if (m_message.contains(processed)) {
@@ -112,8 +114,9 @@ CSystemLogParser::parseEmailMessages()
 bool
 CSystemLogParser::parseFileInfo()
 {
-    if (!m_message.startsWith(fileProcessing)) return false;
-
+    if (!m_message.startsWith(fileProcessing)) {
+        return false;
+    }
     if (m_message.contains(started)) {
         m_type = fileProcessingStarted;
     } else if (m_message.contains(finished)) {
@@ -130,8 +133,9 @@ CSystemLogParser::parseFileInfo()
 bool
 CSystemLogParser::parseGateInfo()
 {
-    if (!m_message.startsWith(gate)) return false;
-
+    if (!m_message.startsWith(gate)) {
+        return false;
+    }
     m_username1.clear();
     m_role.clear();
     m_companyname.clear();
@@ -191,7 +195,7 @@ CSystemLogParser::parse(const QString& line)
 }
 
 void
-CSystemLogParser::convertData(mms::dataItem_t &data)
+CSystemLogParser::convertData(QMap<QString, QVariant> &data)
 {
     data[phSeverity] = m_severity;
     data[phTimestamp] = m_timestamp;

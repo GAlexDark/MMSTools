@@ -125,7 +125,7 @@ CAuditTrailParser::parse(const QString& line)
 }
 
 void
-CAuditTrailParser::convertData(mms::dataItem_t &data)
+CAuditTrailParser::convertData(QMap<QString, QVariant> &data)
 {
     data[phStatus] = m_status;
     data[phTimestamp] = m_timestamp;

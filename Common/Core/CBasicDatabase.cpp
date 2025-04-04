@@ -92,8 +92,9 @@ CBasicDatabase::~CBasicDatabase()
 bool
 CBasicDatabase::open()
 {
-    if (m_db.isOpen()) return true;
-
+    if (m_db.isOpen()) {
+        return true;
+    }
     if (m_db.open()) {
         m_SQLRes.reset(new QSqlQuery(m_db));
         Q_CHECK_PTR(m_SQLRes);
@@ -140,8 +141,9 @@ CBasicDatabase::beginTransaction()
 bool
 CBasicDatabase::commitTransaction()
 {
-    if (!m_isBeginTransaction) return true;
-
+    if (!m_isBeginTransaction) {
+        return true;
+    }
     if (m_SQLRes && m_SQLRes->isActive()) {
         m_SQLRes->finish();
     }
@@ -158,8 +160,9 @@ CBasicDatabase::commitTransaction()
 bool
 CBasicDatabase::rollbackTransaction()
 {
-    if (!m_isBeginTransaction) return true;
-
+    if (!m_isBeginTransaction) {
+        return true;
+    }
     if (!m_db.rollback()) {
         m_errorString = QStringLiteral("Transaction Error. Rollback status: %1").arg(m_db.lastError().text());
         return false;
@@ -181,7 +184,7 @@ CBasicDatabase::prepareRequest(const QString &query)
 }
 
 bool
-CBasicDatabase::execRequest(const pDataItem data)
+CBasicDatabase::execRequest(const QMap<QString, QVariant> *data)
 {
     Q_CHECK_PTR(data);
     for (auto it = data->cbegin(); it != data->cend(); ++it) {
@@ -191,10 +194,12 @@ CBasicDatabase::execRequest(const pDataItem data)
 }
 
 bool
-CBasicDatabase::insertToDB(const QString &query, pDataItem data)
+CBasicDatabase::insertToDB(const QString &query, QMap<QString, QVariant> *data)
 {
     Q_CHECK_PTR(data);
-    if (!prepareRequest(query)) return false;
+    if (!prepareRequest(query)) {
+        return false;
+    }
     return execRequest(data);
 }
 
@@ -233,8 +238,9 @@ CBasicDatabase::exec(const QString &query)
 bool
 CBasicDatabase::init(const QString &dbDriverName, const QString &connectionString)
 {
-    if (m_isInited) return true;
-
+    if (m_isInited) {
+        return true;
+    }
     if (connectionString.isEmpty()) {
         m_errorString = QStringLiteral("Empty connection string");
     } else if (dbDriverName.isEmpty()) {

@@ -55,7 +55,7 @@ CBasicParser::analizeIPAdresses()
         m_internalIpList.clear();
         m_ipAddressList.clear();
         m_ipAddressList = m_ipaddresses.split(',');
-        for (const QString &item : m_ipAddressList) {
+        for (const QString &item : std::as_const(m_ipAddressList)) {
             buf = item.trimmed();
             if (buf.startsWith(m_internalIpFirstOctet)) {
                 m_internalIpList.append(buf);

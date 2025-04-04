@@ -173,7 +173,7 @@ CEventLogParser2::parse(const QString &line)
 }
 
 void
-CEventLogParser2::convertData(mms::dataItem_t &data)
+CEventLogParser2::convertData(QMap<QString, QVariant> &data)
 {
     data[phUsername] = m_username;
     data[phTimestampISO8601] = m_timestampISO8601;

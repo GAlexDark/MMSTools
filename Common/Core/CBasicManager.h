@@ -42,7 +42,7 @@ public:
     T getInstance(const quint16 id)
     {
         destroyInstance();
-        for (const QString &name : m_classList) {
+        for (const QString &name : std::as_const(m_classList)) {
             m_type = QMetaType::fromName(name.toUtf8().constData());
             if (m_type.isValid()) {
                 const QMetaObject* mObj = m_type.metaObject();

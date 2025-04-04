@@ -34,7 +34,7 @@ public:
     const QString& errorString() const { return m_errorString; }
 
     virtual bool parse(const QString& line) = 0;
-    virtual void convertData(mms::dataItem_t &data) = 0;
+    virtual void convertData(QMap<QString, QVariant> &data) = 0;
     virtual bool checkHeader(const QString &line) = 0;
     virtual QString insertString() const = 0;
     virtual QString createTable() const = 0;
