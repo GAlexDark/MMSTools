@@ -51,7 +51,11 @@ elcUtils::sanitizeValue(const QString &pattern, const QString &value)
 QString
 elcUtils::sanitizeValue(const QString &value, const QStringList &allowedValues, const QString &defaultValue)
 {
-    return value.isEmpty() ? defaultValue : (allowedValues.contains(value, Qt::CaseInsensitive) ? value : defaultValue);
+    if (value.isEmpty()) {
+        return defaultValue;
+    } else {
+        return allowedValues.contains(value, Qt::CaseInsensitive) ? value : defaultValue;
+    }
 }
 
 QStringList

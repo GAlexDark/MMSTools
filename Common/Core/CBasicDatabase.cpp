@@ -194,7 +194,7 @@ CBasicDatabase::execRequest(const QMap<QString, QVariant> *data)
 }
 
 bool
-CBasicDatabase::insertToDB(const QString &query, QMap<QString, QVariant> *data)
+CBasicDatabase::insertToDB(const QString &query, const QMap<QString, QVariant> *data)
 {
     Q_CHECK_PTR(data);
     if (!prepareRequest(query)) {

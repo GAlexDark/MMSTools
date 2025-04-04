@@ -112,8 +112,7 @@ private:
 class MmsLogsReaderError : public mms::MmsCommonException
 {
 public:
-    explicit MmsLogsReaderError(const QString &text) noexcept
-        : MmsCommonException(text) {}
+    using MmsCommonException::MmsCommonException;
 };
 
 #endif // CSVREADER_H
