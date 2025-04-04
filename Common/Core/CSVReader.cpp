@@ -98,7 +98,7 @@ bool CTextFileReader::readSmallFile() {
     qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
 
     if (bytesRead <= 0) {
-        m_errorString = QStringLiteral("Error reading file: %1");
+        m_errorString = QStringLiteral("Error reading file: %1").arg(m_fileName);
         return false;
     }
     if (!checkBOM()) {
@@ -146,7 +146,7 @@ CTextFileReader::readLargeFile()
 
     qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
     if (bytesRead <= 0) {
-        m_errorString = QStringLiteral("Error reading file: %1");
+        m_errorString = QStringLiteral("Error reading file: %1").arg(m_fileName);
         return false;
     }
     if (!checkBOM()) {
