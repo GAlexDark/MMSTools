@@ -207,15 +207,6 @@ CSystemLogParser::convertData(QMap<QString, QVariant> &data)
     data[phType] = m_type;
 }
 
-bool
-CSystemLogParser::checkHeader(const QString &line)
-{
-    QString columns;
-    bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
-    Q_ASSERT(retVal);
-    return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0;
-}
-
 QString
 CSystemLogParser::insertString() const
 {

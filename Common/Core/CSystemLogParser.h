@@ -41,7 +41,6 @@ public:
     Q_INVOKABLE explicit CSystemLogParser(QObject *parent = nullptr);
     bool parse(const QString& line) override;
     void convertData(QMap<QString, QVariant> &data) override;
-    bool checkHeader(const QString &line) override;
     QString insertString() const override;
     void getParsedData(QString &severity,
                        QDateTime &timestamp,

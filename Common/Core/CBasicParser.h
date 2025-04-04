@@ -31,11 +31,11 @@ class CBasicParser : public QObject
 public:
     explicit CBasicParser(QObject *parent = nullptr);
     void init(const QString &internalIpFirstOctet);
+    bool checkHeader(const QString &line);
     const QString& errorString() const { return m_errorString; }
 
     virtual bool parse(const QString& line) = 0;
     virtual void convertData(QMap<QString, QVariant> &data) = 0;
-    virtual bool checkHeader(const QString &line) = 0;
     virtual QString insertString() const = 0;
     virtual QString createTable() const = 0;
     virtual QString visibleLogName() = 0;

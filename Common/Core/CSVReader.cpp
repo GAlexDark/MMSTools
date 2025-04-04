@@ -89,14 +89,11 @@ CTextFileReader::readColumnNames(const qint64 bytesRead, bool &isEOF, qint64 &pr
     }
     return retVal;
 }
-bool CTextFileReader::readSmallFile() {
-    /*
-   * If you know that pos and len cannot be out of bounds,
-   * use sliced() instead in new code, because it is faster.
-   */
 
-    qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
-
+bool
+CTextFileReader::startRead(qint64 &bytesRead, qint64 &prevPosition, bool &isEof)
+{
+    bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
     if (bytesRead <= 0) {
         m_errorString = QStringLiteral("Error reading file: %1").arg(m_fileName);
         return false;
@@ -104,15 +101,26 @@ bool CTextFileReader::readSmallFile() {
     if (!checkBOM()) {
         return false;
     }
-    bool isEOF = false;
-    qint64 prevPosition = 3;
+    isEof = false;
+    prevPosition = 3;
     if (m_isHeaders) {
-        if (!readColumnNames(bytesRead, isEOF, prevPosition)) {
+        if (!readColumnNames(bytesRead, isEof, prevPosition)) {
             return false;
         }
     }
+    return true;
+}
 
-    bool retVal = true;
+bool CTextFileReader::readSmallFile() {
+    /*
+   * If you know that pos and len cannot be out of bounds,
+   * use sliced() instead in new code, because it is faster.
+   */
+    qint64 bytesRead;
+    qint64 prevPosition;
+    bool isEOF;
+    bool retVal = startRead(bytesRead, prevPosition, isEOF);
+
     QString line;
     qint64 nextPosition;
     m_lineNumber = 0;
@@ -144,27 +152,14 @@ CTextFileReader::readLargeFile()
     qint64 bufferOffset = 0;
     m_file.seek(bufferOffset);
 
-    qint64 bytesRead = m_file.read(m_buffer->data(), defMaxFileSize);
-    if (bytesRead <= 0) {
-        m_errorString = QStringLiteral("Error reading file: %1").arg(m_fileName);
-        return false;
-    }
-    if (!checkBOM()) {
-        return false;
-    }
-    bool isEOF = false;
-    qint64 prevPosition = 3;
-    if (m_isHeaders) {
-        if (!readColumnNames(bytesRead, isEOF, prevPosition)) {
-            return false;
-        }
-    }
-
-    bool retVal = true;
+    qint64 bytesRead;
+    qint64 prevPosition;
+    bool isEOF;
+    bool retVal = startRead(bytesRead, prevPosition, isEOF);
     QString line;
     qint64 nextPosition;
     m_lineNumber = 0;
-    while (!isEOF && retVal) {
+    while (retVal && !isEOF) {
         do {
             nextPosition = indexOfEol(prevPosition, bytesRead);
             if (nextPosition != -1) {
