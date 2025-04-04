@@ -29,7 +29,7 @@ CReportBuilder::configureDb(const QString &dbFileName)
 {
     const int blockSize = elcUtils::getStorageBlockSize(dbFileName);
     const QStringList pragmaItems = { pragmaUTF8, pragmaPageSize.arg(blockSize) };
-    for (const QString &item : std::as_const(pragmaItems)) {
+    for (const QString &item : pragmaItems) {
         if (!m_db.exec(item)) {
             return false;
         }
