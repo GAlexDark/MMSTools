@@ -120,7 +120,7 @@ elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
                            FORMAT_MESSAGE_FROM_SYSTEM |
                            FORMAT_MESSAGE_IGNORE_INSERTS;
     quint32 len = FormatMessage(messageFlags, NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                reinterpret_cast<LPWSTR>(&buf), 0, NULL);
+                                reinterpret_cast<wchar_t*>(&buf), 0, NULL);
     if (len > 0) {
         retVal = QString::fromWCharArray(buf);
         LocalFree(buf);
