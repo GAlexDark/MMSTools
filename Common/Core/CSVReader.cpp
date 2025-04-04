@@ -101,10 +101,8 @@ CTextFileReader::startRead(qint64 &bytesRead, qint64 &prevPosition, bool &isEof)
     if (!checkBOM()) {
         return false;
     }
-    if (m_isHeaders) {
-        if (!readColumnNames(bytesRead, isEof, prevPosition)) {
-            return false;
-        }
+    if (m_isHeaders && !readColumnNames(bytesRead, isEof, prevPosition)) {
+        return false;
     }
     return true;
 }
