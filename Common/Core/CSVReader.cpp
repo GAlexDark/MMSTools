@@ -101,8 +101,6 @@ CTextFileReader::startRead(qint64 &bytesRead, qint64 &prevPosition, bool &isEof)
     if (!checkBOM()) {
         return false;
     }
-    isEof = false;
-    prevPosition = 3;
     if (m_isHeaders) {
         if (!readColumnNames(bytesRead, isEof, prevPosition)) {
             return false;
@@ -117,8 +115,8 @@ bool CTextFileReader::readSmallFile() {
    * use sliced() instead in new code, because it is faster.
    */
     qint64 bytesRead;
-    qint64 prevPosition;
-    bool isEOF;
+    qint64 prevPosition = 3;
+    bool isEOF = false;
     bool retVal = startRead(bytesRead, prevPosition, isEOF);
 
     QString line;
@@ -153,8 +151,8 @@ CTextFileReader::readLargeFile()
     m_file.seek(bufferOffset);
 
     qint64 bytesRead;
-    qint64 prevPosition;
-    bool isEOF;
+    qint64 prevPosition = 3;
+    bool isEOF = false;
     bool retVal = startRead(bytesRead, prevPosition, isEOF);
     QString line;
     qint64 nextPosition;
