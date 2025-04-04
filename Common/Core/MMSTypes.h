@@ -45,6 +45,8 @@ namespace mms {
         QScopedPointer<char> m_message;
 
     public:
+        using std::exception::exception;
+
         explicit MmsCommonException(const QString &text) noexcept
         {
             try {

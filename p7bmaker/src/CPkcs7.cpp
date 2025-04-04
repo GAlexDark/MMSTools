@@ -192,7 +192,7 @@ CPkcs7::appendCerts(const QStringList &filesList)
         }
     }
 
-    for (const QString &fileName : filesList) {
+    for (const QString &fileName : std::as_const(filesList)) {
         if (!readCertFromFile(fileName) || PKCS7_add_certificate(m_pkcs7Store.data(), m_cert.data()) <= 0) {
             m_errorString = QStringLiteral("Error adding certificate from file '%1' to store: %2").arg(fileName, getOpenSslErrorMessage());
             return false;

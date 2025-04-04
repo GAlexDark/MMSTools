@@ -42,18 +42,20 @@ public:
     T getInstance(const quint16 id)
     {
         destroyInstance();
+
         for (const QString &name : std::as_const(m_classList)) {
             m_type = QMetaType::fromName(name.toUtf8().constData());
-            if (m_type.isValid()) {
-                const QMetaObject* mObj = m_type.metaObject();
-                for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); ++j) {
-                    QMetaClassInfo classInfo = mObj->classInfo(j);
-                    if (QString(classInfo.name()) == QLatin1String("ID") &&
-                        QString(classInfo.value()).toUInt() == id) {
-                        m_instancePtr = dynamic_cast<T>(mObj->newInstance());
-                        Q_CHECK_PTR(m_instancePtr);
-                        break;
-                    }
+            if (!m_type.isValid()) {
+                continue;
+            }
+            const QMetaObject* mObj = m_type.metaObject();
+            for (int j = mObj->classInfoOffset(); j < mObj->classInfoCount(); ++j) {
+                QMetaClassInfo classInfo = mObj->classInfo(j);
+                if (QString(classInfo.name()) == QLatin1String("ID") &&
+                    QString(classInfo.value()).toUInt() == id) {
+                    m_instancePtr = dynamic_cast<T>(mObj->newInstance());
+                    Q_CHECK_PTR(m_instancePtr);
+                    break;
                 }
             }
         }
