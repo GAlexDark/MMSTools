@@ -69,162 +69,133 @@ CSystemLogParser::CSystemLogParser(QObject *parent)
 bool
 CSystemLogParser::parseUserData()
 {
-    bool retVal = m_message.startsWith(user);
-    if (retVal) {
-        QRegularExpressionMatch match1 = reUserData1.match(m_message);
-        if (match1.hasMatch()) {
-            m_username1 = match1.captured(1);
-            m_role = match1.captured(2);
-            m_companyname = match1.captured(3);
-            m_type = usingRole;
+    if (!m_message.startsWith(user)) {
+        return false;
+    }
+    QRegularExpressionMatch match1 = reUserData1.match(m_message);
+    if (match1.hasMatch()) {
+        m_username1 = match1.captured(1);
+        m_role = match1.captured(2);
+        m_companyname = match1.captured(3);
+        m_type = usingRole;
+    } else {
+        QRegularExpressionMatch match2 = reUserData2.match(m_message);
+        if (match2.hasMatch()) {
+            m_username1 = match2.captured(1);
+            m_role.clear();
+            m_companyname.clear();
+            m_type = loginSuccess;
         } else {
-            QRegularExpressionMatch match2 = reUserData2.match(m_message);
-            if (match2.hasMatch()) {
-                m_username1 = match2.captured(1);
-                m_role.clear();
-                m_companyname.clear();
-                m_type = loginSuccess;
-            } else {
-                retVal = false;
-            }
+            return false;
         }
     }
-    return retVal;
+    return true;
 }
 
 bool
 CSystemLogParser::parseEmailMessages()
 {
-    bool retVal = m_message.startsWith(email);
-    if (retVal) {
-        if (m_message.indexOf(received) != -1) {
-            m_username1.clear();
-            m_role.clear();
-            m_companyname.clear();
-            m_type = emailReceived;
-        } else {
-            if (m_message.indexOf(processed) != -1) {
-                m_username1.clear();
-                m_role.clear();
-                m_companyname.clear();
-                m_type = emailProcessed;
-            } else {
-                retVal = false;
-            }
-        }
+    if (!m_message.startsWith(email)) {
+        return false;
     }
-    return retVal;
+    if (m_message.contains(received)) {
+        m_type = emailReceived;
+    } else if (m_message.contains(processed)) {
+        m_type = emailProcessed;
+    } else {
+        return false;
+    }
+    m_username1.clear();
+    m_role.clear();
+    m_companyname.clear();
+    return true;
 }
 
 bool
 CSystemLogParser::parseFileInfo()
 {
-    bool retVal = m_message.startsWith(fileProcessing);
-    if (retVal) {
-        if (m_message.indexOf(started) != -1) {
-            m_username1.clear();
-            m_role.clear();
-            m_companyname.clear();
-            m_type = fileProcessingStarted;
-        } else {
-            if (m_message.indexOf(finished) != -1) {
-                m_username1.clear();
-                m_role.clear();
-                m_companyname.clear();
-                m_type = fileProcessingFinished;
-            } else {
-                retVal = false;
-            }
-        }
+    if (!m_message.startsWith(fileProcessing)) {
+        return false;
     }
-    return retVal;
+    if (m_message.contains(started)) {
+        m_type = fileProcessingStarted;
+    } else if (m_message.contains(finished)) {
+        m_type = fileProcessingFinished;
+    } else {
+        return false;
+    }
+    m_username1.clear();
+    m_role.clear();
+    m_companyname.clear();
+    return true;
 }
 
 bool
 CSystemLogParser::parseGateInfo()
 {
-    bool retVal = m_message.startsWith(gate);
-    if (retVal) {
-        m_username1.clear();
-        m_role.clear();
-        m_companyname.clear();
-        if (m_message.indexOf(automaticallyOpened) != -1) {
-            m_type = gateAutomaticallyOpened;
-        } else {
-            if (m_message.indexOf(automaticallyClosed) != -1) {
-                m_type = gateAutomaticallyClosed;
-            } else {
-                if (m_message.indexOf(reopened) != -1) {
-                    m_type = gateReopened;
-                } else {
-                    if (m_message.indexOf(opened) != -1) {
-                        m_type = gateOpened;
-                    } else {
-                        if (m_message.indexOf(closed) != -1) {
-                            m_type = gateClosed;
-                        } else {
-                            retVal = false;
-                        }
-                    }
-                }
-            }
-        }
+    if (!m_message.startsWith(gate)) {
+        return false;
     }
-    return retVal;
+    m_username1.clear();
+    m_role.clear();
+    m_companyname.clear();
+    if (m_message.contains(automaticallyOpened)) {
+        m_type = gateAutomaticallyOpened;
+    } else if (m_message.contains(automaticallyClosed)) {
+        m_type = gateAutomaticallyClosed;
+    } else if (m_message.contains(reopened)) {
+        m_type = gateReopened;
+    } else if (m_message.contains(opened)) {
+        m_type = gateOpened;
+    } else if (m_message.contains(closed)) {
+        m_type = gateClosed;
+    } else {
+        return false;
+    }
+    return true;
 }
 
 bool
 CSystemLogParser::parseMessage()
 {
-    bool retVal = parseUserData();
-    if (!retVal) {
-        retVal = parseEmailMessages();
-        if (!retVal) {
-            retVal = parseFileInfo();
-            if (!retVal) {
-                retVal = parseGateInfo();
-            }
-        }
-    }
-    return retVal;
+    return parseUserData() || parseEmailMessages() || parseFileInfo() || parseGateInfo();
 }
 
 bool
 CSystemLogParser::parse(const QString& line)
 {
-    bool retVal = false;
     QString buf(line);
-    if (buf.indexOf("&quot;") != -1) {
-        buf.replace(QLatin1String("&quot;"), QLatin1String("\""));
-    }
+    buf.replace(QLatin1String("&quot;"), QLatin1String("\""));
+
     QRegularExpressionMatch match = reSystemLogHeader.match(buf);
-    if (match.hasMatch()) {
-        m_severity = match.captured(1);
-        QString timestamp = match.captured(2);
-        m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
-        if (m_timestamp.isValid()) {
-            retVal = true;
-        } else {
-            m_timestamp = QDateTime();
-            setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
-        }
-        m_message = match.captured(3);
-        removeQuote(m_message);
-        if (!parseMessage()) {
-            m_username1.clear();
-            m_role.clear();
-            m_companyname.clear();
-            m_type.clear();
-        }
-        m_username = match.captured(4);
-    } else {
+    if (!match.hasMatch()) {
         setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(line));
+        return false;
     }
-    return retVal;
+
+    m_severity = match.captured(1);
+    QString timestamp = match.captured(2);
+    m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
+    if (!m_timestamp.isValid()) {
+        m_timestamp = QDateTime();
+        setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
+        return false;
+    }
+
+    m_message = match.captured(3);
+    removeQuote(m_message);
+    if (!parseMessage()) {
+        m_username1.clear();
+        m_role.clear();
+        m_companyname.clear();
+        m_type.clear();
+    }
+    m_username = match.captured(4);
+    return true;
 }
 
 void
-CSystemLogParser::convertData(mms::dataItem_t &data)
+CSystemLogParser::convertData(QMap<QString, QVariant> &data)
 {
     data[phSeverity] = m_severity;
     data[phTimestamp] = m_timestamp;
@@ -242,7 +213,7 @@ CSystemLogParser::checkHeader(const QString &line)
     QString columns;
     bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
     Q_ASSERT(retVal);
-    return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0 ? true : false;
+    return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0;
 }
 
 QString

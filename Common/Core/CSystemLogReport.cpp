@@ -85,23 +85,20 @@ CSystemLogReport::generateReport()
 void
 CSystemLogReport::addReportHeader(QXlsx::Document *xlsxReport, int row)
 {
-    QVariant writeValue = QStringLiteral("№");
-    setReportDataItem(xlsxReport, systemLogReport::colRowNumber, row, writeValue);
+    const QStringList headers = {
+        QStringLiteral("№"),
+        QStringLiteral("Відмітка часу (за Київським часом)"),
+        QStringLiteral("Ім'я користувача"),
+        QStringLiteral("Роль"),
+        QStringLiteral("Компанія"),
+        QStringLiteral("Тип"),
+        QStringLiteral("Рівень"),
+        QStringLiteral("Повідомлення")
+    };
 
-    writeValue = QStringLiteral("Відмітка часу (за Київським часом)");
-    setReportDataItem(xlsxReport, systemLogReport::colTimestamp, row, writeValue);
-    writeValue = QStringLiteral("Ім'я користувача");
-    setReportDataItem(xlsxReport, systemLogReport::colUsername, row, writeValue);
-    writeValue = QStringLiteral("Роль");
-    setReportDataItem(xlsxReport, systemLogReport::colRole, row, writeValue);
-    writeValue = QStringLiteral("Компанія");
-    setReportDataItem(xlsxReport, systemLogReport::colCompanyname, row, writeValue);
-    writeValue = QStringLiteral("Тип");
-    setReportDataItem(xlsxReport, systemLogReport::colType, row, writeValue);
-    writeValue = QStringLiteral("Рівень");
-    setReportDataItem(xlsxReport, systemLogReport::colSeverity, row, writeValue);
-    writeValue = QStringLiteral("Повідомлення");
-    setReportDataItem(xlsxReport, systemLogReport::colMessage, row, writeValue);
+    for (int col = systemLogReport::colRowNumber; col <= systemLogReport::colMessage; ++col) {
+        setReportDataItem(xlsxReport, col, row, headers[col - 1]);
+    }
 }
 
 void
@@ -113,12 +110,19 @@ CSystemLogReport::addReportRow(QXlsx::Document *xlsxReport, int row, int multipa
     if (!xlsxReport->write(row, systemLogReport::colTimestamp, writeValue, dateFormat)) {
         throw XlsxError();
     }
-    setReportDataItem(xlsxReport, "username1", systemLogReport::colUsername, row);
-    setReportDataItem(xlsxReport, "role", systemLogReport::colRole, row);
-    setReportDataItem(xlsxReport, "companyname", systemLogReport::colCompanyname, row);
-    setReportDataItem(xlsxReport, "type", systemLogReport::colType, row);
-    setReportDataItem(xlsxReport, "severity", systemLogReport::colSeverity, row);
-    setReportDataItem(xlsxReport, "message", systemLogReport::colMessage, row);
+
+    const QMap<int, QString> colMapping = {
+        {systemLogReport::colUsername, "username1"},
+        {systemLogReport::colRole, "role"},
+        {systemLogReport::colCompanyname, "companyname"},
+        {systemLogReport::colType, "type"},
+        {systemLogReport::colSeverity, "severity"},
+        {systemLogReport::colMessage, "message"}
+    };
+
+    for (auto it = colMapping.begin(); it != colMapping.end(); ++it) {
+        setReportDataItem(xlsxReport, it.value(), it.key(), row);
+    }
 }
 
 QString

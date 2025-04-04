@@ -38,7 +38,7 @@ bool
 CAuditTrailParser::parsePersonDataDetails()
 {
     bool retVal = false;
-    qsizetype firstPos = m_attributes.indexOf(person, 0);
+    qsizetype firstPos = m_attributes.indexOf(person);
     if (firstPos != -1) {
         qsizetype lastPos = m_attributes.indexOf(QLatin1Char(']'), firstPos);
         QString alias = m_attributes.sliced(firstPos, lastPos - firstPos + 1).trimmed();
@@ -58,12 +58,11 @@ CAuditTrailParser::parseLoadAuditTrail()
     QRegularExpressionMatch match = reLoadAuditTrail.match(m_attributes);
     if (match.hasMatch()) {
         m_username1 = match.captured(1);
-        if (QString::compare(m_username1, nullValue, Qt::CaseInsensitive) == 0) {
+        if (m_username1.compare(nullValue, Qt::CaseInsensitive) == 0) {
             m_username1.clear();
         }
         retVal = true;
     }
-
     return retVal;
 }
 
@@ -95,18 +94,19 @@ CAuditTrailParser::parse(const QString& line)
         m_companyname = match.captured(6);
 
         m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
-        if (m_timestamp.isValid()) {
-            retVal = true;
-        } else {
+        if (!m_timestamp.isValid()) {
             m_timestamp = QDateTime();
             setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
+        } else {
+            retVal = true;
         }
+
         qsizetype posStart = m_username.indexOf(QLatin1Char('('));
         qsizetype posEnd = m_username.indexOf(QLatin1Char(')'), posStart + 1) - posStart - 1;
         m_role = m_username.sliced(posStart + 1, posEnd).trimmed();
-        m_username.resize(posStart -1);
+        m_username.resize(posStart - 1);
 
-        // parsing Attributes && IpAddress
+        // Parsing Attributes & IpAddress
         m_attributes = line.mid(m_header.length());
         posStart = m_attributes.lastIndexOf(m_delimiterChar);
         m_ipaddresses = m_attributes.mid(posStart + 1);
@@ -114,7 +114,7 @@ CAuditTrailParser::parse(const QString& line)
         m_attributes.resize(posStart);
         removeQuote(m_attributes);
 
-        // parse m_attributes
+        // Parse m_attributes
         if (!parseAttributesDetails()) {
             m_username1.clear();
         }
@@ -125,7 +125,7 @@ CAuditTrailParser::parse(const QString& line)
 }
 
 void
-CAuditTrailParser::convertData(mms::dataItem_t &data)
+CAuditTrailParser::convertData(QMap<QString, QVariant> &data)
 {
     data[phStatus] = m_status;
     data[phTimestamp] = m_timestamp;
@@ -145,7 +145,7 @@ CAuditTrailParser::checkHeader(const QString &line)
     QString columns;
     bool retVal = elcUtils::getMetaClassInfo(this, "columns", columns);
     Q_ASSERT(retVal);
-    return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0 ? true : false;
+    return QString::compare(columns, line.trimmed(), Qt::CaseInsensitive) == 0;
 }
 
 QString

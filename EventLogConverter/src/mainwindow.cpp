@@ -299,7 +299,7 @@ MainWindow::convertEventLogClick()
         const CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
         QString internalIpFirstOctet = settings.getInternalIpStartOctet();
         if (!internalIpFirstOctet.isEmpty()) {
-            mms::pragmaList_t pragmaList;
+            QMap<QString, QString> pragmaList;
             pragmaList[QLatin1String("synchronous")] = settings.getSynchronousType();
             pragmaList[QLatin1String("journal_mode")] = settings.getJournalModeType();
             pragmaList[QLatin1String("temp_store")] = settings.getTempStore();

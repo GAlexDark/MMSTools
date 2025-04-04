@@ -26,22 +26,27 @@ CSqliteDatabase::truncateDB(const QString &connectionString, QString &errorStrin
                             const QStringList &tablesNames, const QStringList &updateData)
 {
     CSqliteDatabase db;
-    bool retVal = db.init(connectionString);
-    if (retVal) {
-        retVal = db.open();
-            for (const QString &item : tablesNames) {
-                retVal = db.truncateTable(item, updateData);
-                if (!retVal) break;
-            }
-        if (retVal) {
-            retVal = db.optimizeDatabaseSize();
-        }
-        db.close();
+    if (!db.init(connectionString)) {
+        errorString = db.errorString();
+        return false;
     }
-
+    if (!db.open()) {
+        errorString = db.errorString();
+        return false;
+    }
+    bool retVal = true;
+    for (const QString &item : tablesNames) {
+        retVal = db.truncateTable(item, updateData);
+        if (!retVal) break;
+    }
+    if (retVal) {
+        retVal = db.optimizeDatabaseSize();
+    }
     if (!retVal) {
         errorString = db.errorString();
     }
+    db.close();
+
     return retVal;
 }
 
@@ -62,29 +67,28 @@ bool
 CSqliteDatabase::truncateTable(const QString &tableName, const QStringList &updateData)
 {
     sqlQueryFinish();
-    bool retVal = false;
     const QString req = QLatin1String("SELECT sql FROM sqlite_master WHERE name = '%1';");
     dataList_t res = findInDB(req.arg(tableName), false);
-    if (!res.isEmpty()) {
-        retVal = exec(QLatin1String("DROP TABLE IF EXISTS [%1];").arg(tableName));
-        if (retVal) {
-            QString buffer;
-            if (updateData.isEmpty()) {
-                buffer = res.at(0).at(0).toLatin1();
-            } else {
-                QStringList buf = updateData.filter(tableName);
-                if (buf.size() == 1) {
-                    buffer = buf[0];
-                } else {
-                    retVal = false;
-                }
-            }
-            if (retVal) {
-                retVal = exec(buffer);
-            }
-        }
+    if (res.isEmpty()) {
+        return true; // the table does not exist and will be created later
+    }
+    if (!exec(QLatin1String("DROP TABLE IF EXISTS [%1];").arg(tableName))) {
+        return false;
+    }
+    QString buffer;
+    bool retVal = true;
+    if (updateData.isEmpty()) {
+        buffer = res.at(0).at(0).toLatin1();
     } else {
-        retVal = true; // the table does not exist and will be created later
+        QStringList buf = updateData.filter(tableName);
+        if (buf.size() == 1) {
+            buffer = buf[0];
+        } else {
+            retVal = false;
+        }
+    }
+    if (retVal) {
+        retVal = exec(buffer);
     }
 
     return retVal;
@@ -93,15 +97,13 @@ CSqliteDatabase::truncateTable(const QString &tableName, const QStringList &upda
 bool
 CSqliteDatabase::checkTables(const QStringList &tables, QString &tableName)
 {
-    bool retVal = true;
     const QString req = QLatin1String("SELECT sql FROM sqlite_master WHERE name = '%1';");
     for (const QString &item : tables) {
         tableName = item;
         dataList_t res = findInDB(req.arg(tableName), false);
         if (res.isEmpty()) {
-            retVal = false;
-            break;
+            return false;
         }
     }
-    return retVal;
+    return true;
 }

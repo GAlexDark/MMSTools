@@ -30,9 +30,9 @@
 #include <QList>
 #include <QScopedPointer>
 
-#include "MMSTypes.h"
+//#include "MMSTypes.h"
 
-using pDataItem = mms::dataItem_t *;
+//using pDataItem = mms::dataItem_t *;
 using dataList_t = QList<QStringList>;
 
 class CBasicDatabase
@@ -55,9 +55,9 @@ public:
 
     // add info in the DB
     bool prepareRequest(const QString &query);
-    bool execRequest(pDataItem data);
+    bool execRequest(const QMap<QString, QVariant> *data);
 
-    bool insertToDB(const QString &query, pDataItem data);
+    bool insertToDB(const QString &query, QMap<QString, QVariant> *data);
     // search info in the DB
     dataList_t findInDB(const QString &query, bool addColumnHeaders = true);
 

@@ -76,7 +76,7 @@ class CMmsLogsReader: public CTextFileReader
 public:
     ~CMmsLogsReader() override;
     bool init(const quint16 logId, const QString &dbFileName, bool dataHasHeaders,
-              const QString &internalIpFirstOctet, const mms::pragmaList_t *pragmaList);
+              const QString &internalIpFirstOctet, const QMap<QString, QString> *pragmaList);
 
     bool checkHeader(const QString &line) override;
     bool convertData(const QString &line) override;
@@ -84,8 +84,7 @@ public:
 
 private:
     pBasicParser    m_parser = nullptr; // don't use the 'detele' operator, the ParserManager manage resources
-    mms::dataItem_t      m_data;
-    bool initDB(const QString &dbFileName, const mms::pragmaList_t *pragmaList);
+    bool initDB(const QString &dbFileName, const QMap<QString, QString> *pragmaList);
 
 protected:
     CSqliteDatabase  m_db;
@@ -107,6 +106,13 @@ signals:
 private:
     bool m_retVal = false;
     QStringList m_fileNames;
+};
+
+class MmsLogsReaderError : public mms::MmsCommonException
+{
+public:
+    explicit MmsLogsReaderError(const QString &text) noexcept
+        : MmsCommonException(text) {}
 };
 
 #endif // CSVREADER_H
