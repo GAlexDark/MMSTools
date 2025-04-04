@@ -38,20 +38,17 @@ initTranslation(QTranslator *translator, const QApplication *qa, const QStringLi
     QString locales = setlocale(LC_ALL, nullptr);
     if (locales.contains(QLatin1String("ru_RU"))) {
         QLocale::setDefault(QLocale::Russian);
-    } else {
-        if (locales.contains(QLatin1String("uk_UA"))) {
-            QLocale::setDefault(QLocale::Ukrainian);
-        }
+    } else if (locales.contains(QLatin1String("uk_UA"))) {
+        QLocale::setDefault(QLocale::Ukrainian);
     }
 #endif
 
     if (list.contains(QLatin1String("--russian"), Qt::CaseSensitive)) {
         QLocale::setDefault(QLocale::Russian);
-    } else {
-        if (list.contains(QLatin1String("--ukrainian"), Qt::CaseSensitive)) {
-            QLocale::setDefault(QLocale::Ukrainian);
-        }
+    } else if (list.contains(QLatin1String("--ukrainian"), Qt::CaseSensitive)) {
+        QLocale::setDefault(QLocale::Ukrainian);
     }
+
 #if QT_VERSION == QT_VERSION_CHECK(6, 3, 2)
     bool retVal = translator->load(QLocale(), fileName, QLatin1String("_"), QLatin1String(":/i18n"));
     if (retVal) {
@@ -60,7 +57,8 @@ initTranslation(QTranslator *translator, const QApplication *qa, const QStringLi
     if (!retVal) {
         QLocale loc;
         QStringList lang = loc.uiLanguages();
-        if ( (lang.contains(QLatin1String("uk-UA"), Qt::CaseInsensitive)) || (lang.contains(QLatin1String("ru-RU"), Qt::CaseInsensitive)) ) {
+        if (lang.contains(QLatin1String("uk-UA"), Qt::CaseInsensitive) ||
+            lang.contains(QLatin1String("ru-RU"), Qt::CaseInsensitive) ) {
             QMessageBox::warning(nullptr, "Warning", "Error loading localization resources.");
         }
     }
@@ -73,7 +71,7 @@ void
 createConfigInfo(const QString &appName, const QStringList &list, QString &path, QString &fileName, bool &isRdsMode)
 {
 #ifdef Q_OS_WIN
-    fileName = QLatin1String("%1.ini").arg(appName);
+    fileName = QStringLiteral("%1.ini").arg(appName);
     quint32 errorCode = 0;
     isRdsMode = elcUtils::isRdsMode(errorCode);
     if (errorCode != 0) {
@@ -85,7 +83,7 @@ createConfigInfo(const QString &appName, const QStringList &list, QString &path,
         path = QStringLiteral("%AppData%/%1").arg(appName); // %SystemDrive%:/Users/%UserName%/AppData/Roaming/%1
     }
 #else
-    fileName = QLatin1String("%1.conf").arg(appName);
+    fileName = QStringLiteral("%1.conf").arg(appName);
     isRdsMode = false;
 #endif
 }
@@ -98,12 +96,12 @@ int main(int argc, char *argv[])
         argsList.append(argv[i]);
     }
 
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime( BUILD_DATE )));
+    QCoreApplication::setApplicationVersion(QStringLiteral("%1 tag %2 %3").arg(BUILD_VER, BUILD_GIT, elcUtils::getFormattedDateTime(BUILD_DATE)));
     QString appName = QCoreApplication::applicationName();
 #ifdef Q_OS_WIN
     QString appPath = QApplication::applicationDirPath();
 #else
-    QString appPath = QLatin1String("$HOME/.config/%1").arg(appName);
+    QString appPath = QStringLiteral("$HOME/.config/%1").arg(appName);
 #endif
 
     QTranslator translator;
@@ -112,14 +110,15 @@ int main(int argc, char *argv[])
     CSingleApplication sa(QLatin1String("elcw_instance"));
     if (sa.isRunning()) {
         QMessageBox::information(nullptr, QObject::tr("Information"),
-                                 QObject::tr("The another copy of the Utility is still running. Please close it."),
+                                 QObject::tr("Another copy of the Utility is still running. Please close it."),
                                  QMessageBox::Ok);
         return 1;
     }
+
     QString iniFile;
     QString errorString;
     bool isRdsMode;
-    createConfigInfo(appName, argsList, appPath,iniFile, isRdsMode);
+    createConfigInfo(appName, argsList, appPath, iniFile, isRdsMode);
     elcUtils::expandEnvironmentStrings(appPath);
     if (!elcUtils::mkPath(appPath, errorString)) {
         QMessageBox::critical(nullptr, QObject::tr("Error"), QObject::tr("Cannot create folder: %1\nDetails: %2").arg(appPath, errorString), QMessageBox::Ok);
@@ -130,13 +129,14 @@ int main(int argc, char *argv[])
         return 1;
     }
     CParserManager::instance().init();
-    //get path to the DB
+
+    // Get path to the DB
     CElcGuiAppSettings &settings = CElcGuiAppSettings::instance();
-    QString dbName =  settings.getDbFileName();
+    QString dbName = settings.getDbFileName();
     if (dbName.isEmpty()) {
         dbName = QStringLiteral("%1/%2.db").arg(appPath, appName);
         settings.setMain(QLatin1String("SETTINGS"), QLatin1String("db_file_name"), dbName);
-        QMessageBox::warning(nullptr, QObject::tr("Warning") ,QObject::tr("Unable to get database file name.\nThe database file will be created on the default path."), QMessageBox::Ok);
+        QMessageBox::warning(nullptr, QObject::tr("Warning"), QObject::tr("Unable to get database file name.\nThe database file will be created on the default path."), QMessageBox::Ok);
     }
     elcUtils::expandEnvironmentStrings(dbName);
     QString dbPath = QFileInfo(dbName).absolutePath();
