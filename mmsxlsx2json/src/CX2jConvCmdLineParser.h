@@ -27,6 +27,7 @@
 #include <QString>
 
 #include "CBasicCmdLineParser.h"
+#include "MMSTypes.h"
 
 enum class OutputMode { OUTPUTMODE_INDENTED, OUTPUTMODE_COMPACT };
 
@@ -48,6 +49,12 @@ private:
     bool m_isSilent = false;
     QDir m_path;
     QString m_baseName;
+};
+
+class X2jConvCmdLineParser : public mms::MmsCommonException
+{
+public:
+    using MmsCommonException::MmsCommonException;
 };
 
 #endif // CX2JCONVCMDLINEPARSER_H

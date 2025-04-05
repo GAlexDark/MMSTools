@@ -32,29 +32,32 @@ bool
 CP7bMakerCmdLineParser::addOption(const QCoreApplication &app)
 {
     const QString storeDescription(QLatin1String("The folder path contains one *.p7b file and several *.cer, *.crt, or *.der files to add."));
-    const QString silentDescription(QLatin1String("Silent mode"));
-    const QString outputFormatDescription(QLatin1String("Output format: ASN1 or PEM (ASN1 by default)"));
-
     QCommandLineOption storeOption(QStringList() << "l" << "localstore", storeDescription, "path");
-    bool retVal = m_parser.addOption(storeOption);
-    if (retVal) {
-        QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
-        retVal = m_parser.addOption(silentOption);
-        if (retVal) {
-            QCommandLineOption outputFormatOption(QStringList() << "o" << "output", outputFormatDescription, "format");
-            retVal = m_parser.addOption(outputFormatOption);
-            if (retVal) {
-                m_parser.process(app);
-                m_isStore = m_parser.isSet(storeOption);
-                m_isSilent = m_parser.isSet(silentOption);
-                m_isOutputFormat = m_parser.isSet(outputFormatOption);
-            }
-        }
+    if (!m_parser.addOption(storeOption)) {
+        setErrorString(QLatin1String("The fatal error has occurred. The program will be closed."));
+        return false;
     }
-    if (!retVal) {
-        setErrorString(QLatin1String("The fatal error has occurredd. The program will be closed."));
+
+    const QString silentDescription(QLatin1String("Silent mode"));
+    QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
+    if (!m_parser.addOption(silentOption)) {
+        setErrorString(QLatin1String("The fatal error has occurred. The program will be closed."));
+        return false;
     }
-    return retVal;
+
+    const QString outputFormatDescription(QLatin1String("Output format: ASN1 or PEM (ASN1 by default)"));
+    QCommandLineOption outputFormatOption(QStringList() << "o" << "output", outputFormatDescription, "format");
+    if (!m_parser.addOption(outputFormatOption)) {
+        setErrorString(QLatin1String("The fatal error has occurred. The program will be closed."));
+        return false;
+    }
+
+    m_parser.process(app);
+    m_isStore = m_parser.isSet(storeOption);
+    m_isSilent = m_parser.isSet(silentOption);
+    m_isOutputFormat = m_parser.isSet(outputFormatOption);
+
+    return true;
 }
 
 bool

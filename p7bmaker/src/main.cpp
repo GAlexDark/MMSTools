@@ -29,15 +29,13 @@
 #include "elcUtils.h"
 #include "CP7bMakerCmdLineParser.h"
 
-
 QString
 getP7bResultFileName(const QString &fileName)
 {
     QString baseName = QFileInfo(fileName).completeBaseName(); // filename (wo ext)
     QString path = QFileInfo(fileName).path();
     QDate now = QDate::currentDate();
-    QString p7bFileName = QStringLiteral("%1%2.p7b").arg(baseName, now.toString(QLatin1String("yyyyMMdd")));
-    return QDir(path).filePath(p7bFileName);
+    return QDir(path).filePath(QStringLiteral("%1%2.p7b").arg(baseName, now.toString(QLatin1String("yyyyMMdd"))));
 }
 
 int main(int argc, char *argv[])
@@ -51,6 +49,7 @@ int main(int argc, char *argv[])
         consoleOut.outToConsole(cmd.errorString());
         return 1;
     }
+
     if (argc == 1) {
         consoleOut.outToConsole(QLatin1String("The arguments are missing."));
         cmd.showHelpAndExit();
@@ -58,10 +57,15 @@ int main(int argc, char *argv[])
     }
 
     if (!cmd.isSilent()) {
-        QString description(QStringLiteral("p7b file maker Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-        description.append(QStringLiteral("This program use the Qt version %2, OpenSSL version 3.3.1.\n"));
-        consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
-        consoleOut.outToConsole(QLatin1String("p7b file maker Utility starting...\n"));
+        QString description = QStringLiteral("The p7b file maker Utility Version %1\n"
+                                             "Copyright (C) 2024 Oleksii Gaienko, %3\n"
+                                             "This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. "
+                                             "For more details, see the GNU General Public License.\n"
+                                             "This program uses the Qt version %2, OpenSSL version 3.3.1.\n")
+                              .arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT);
+
+        consoleOut.outToConsole(description);
+        consoleOut.outToConsole(QLatin1String("The p7b file maker Utility starting...\n"));
     }
 
     QStringList p7bFiles;
@@ -69,20 +73,22 @@ int main(int argc, char *argv[])
         consoleOut.outToConsole(cmd.errorString());
         return 1;
     }
+
     if (p7bFiles.size() != 1) {
         consoleOut.outToConsole(QStringLiteral("The file p7b not found or multiple p7b files found."));
         return 1;
     }
+
     const QString source = p7bFiles.at(0);
     CPkcs7 p7bStore;
     consoleOut.outToConsole(QStringLiteral("Start reading p7b file '%1'.").arg(source));
-    bool retVal = p7bStore.readStore(source);
-    if (retVal) {
-        consoleOut.outToConsole(QStringLiteral("The p7b file '%1' was read successful.\n").arg(source));
-    } else {
+
+    if (!p7bStore.readStore(source)) {
         consoleOut.outToConsole(QStringLiteral("Error read p7b file: %1.").arg(p7bStore.errorString()));
         return 1;
     }
+
+    consoleOut.outToConsole(QStringLiteral("The p7b file '%1' was read successfully.\n").arg(source));
     consoleOut.outToConsole(QStringLiteral("The number of certificates in the container before adding: %1.\n").arg(p7bStore.size()));
 
     QStringList certsList;
@@ -96,56 +102,57 @@ int main(int argc, char *argv[])
     }
     consoleOut.outToConsole(QStringLiteral("The %1 certificates found.").arg(QString::number(certsList.size())));
     consoleOut.outToConsole(QStringLiteral("Start adding certificates."));
-    retVal = p7bStore.appendCerts(certsList);
-    if (retVal) {
-        consoleOut.outToConsole("The certificates were added successful.\n");
-    } else {
+
+    if (!p7bStore.appendCerts(certsList)) {
         consoleOut.outToConsole(QStringLiteral("Error adding certs to p7b store: %1.").arg(p7bStore.errorString()));
         return 1;
     }
+
+    consoleOut.outToConsole("The certificates were added successfully.\n");
     consoleOut.outToConsole(QStringLiteral("The number of certificates in the container after adding: %1.\n").arg(p7bStore.size()));
 
     QString dest = getP7bResultFileName(source);
     QString path = QFileInfo(dest).absolutePath();
-    retVal = elcUtils::isFolderWritable(path);
-    if (retVal) {
-        QString outputFormat = cmd.getOutputFormat();
-        consoleOut.outToConsole(QStringLiteral("Output format: %1").arg(outputFormat));
-        OUTPUT_FORMAT of = outputFormat == "ASN1" ? OUTPUT_FORMAT::FORMAT_ASN1 : OUTPUT_FORMAT::FORMAT_PEM;
-        retVal = p7bStore.saveStore(dest, of);
-        if (retVal) {
-            consoleOut.outToConsole(QStringLiteral("File '%1' saved successfully.\n").arg(dest));
-        } else {
-            consoleOut.outToConsole(QStringLiteral("Error save p7b file: %1.").arg(p7bStore.errorString()));
-            return 1;
-        }
-
-        consoleOut.outToConsole("Calculating result p7b file hash:");
-        QByteArray hash = CPkcs7::getHash(dest).toHex();
-        if (!hash.isEmpty()) {
-            consoleOut.outToConsole(QStringLiteral("SHA-1 hash: %1.\n").arg(hash));
-        } else {
-            consoleOut.outToConsole(QStringLiteral("Error calculate hash."));
-            return 1;
-        }
-
-        consoleOut.outToConsole(QStringLiteral("Creating hash File."));
-        QString errorString;
-        retVal = CPkcs7::createHashFile(dest, errorString);
-        if (retVal) {
-            QString buf = QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest);
-            int lastIndex = buf.lastIndexOf("p7b");
-            if (lastIndex != -1) {
-                buf.replace(lastIndex, 3, "sha");
-            }
-            consoleOut.outToConsole(buf);
-        } else {
-            consoleOut.outToConsole(errorString);
-        }
-        consoleOut.outToConsole("DONE");
-    } else {
+    if (!elcUtils::isFolderWritable(path)) {
         consoleOut.outToConsole(QStringLiteral("You don't have write permissions to this folder: %1").arg(path));
         return 1;
     }
-    return retVal ? 0 : 1;
+
+    QString outputFormat = cmd.getOutputFormat();
+    consoleOut.outToConsole(QStringLiteral("Output format: %1").arg(outputFormat));
+    OUTPUT_FORMAT of = outputFormat == "ASN1" ? OUTPUT_FORMAT::FORMAT_ASN1 : OUTPUT_FORMAT::FORMAT_PEM;
+
+    if (!p7bStore.saveStore(dest, of)) {
+        consoleOut.outToConsole(QStringLiteral("Error save p7b file: %1.").arg(p7bStore.errorString()));
+        return 1;
+    }
+
+    consoleOut.outToConsole(QStringLiteral("File '%1' saved successfully.\n").arg(dest));
+    consoleOut.outToConsole("Calculating result p7b file hash:");
+
+    QByteArray hash = CPkcs7::getHash(dest).toHex();
+    if (hash.isEmpty()) {
+        consoleOut.outToConsole(QStringLiteral("Error calculate hash."));
+        return 1;
+    }
+
+    consoleOut.outToConsole(QStringLiteral("SHA-1 hash: %1.\n").arg(hash));
+    consoleOut.outToConsole(QStringLiteral("Creating hash File."));
+
+    QString errorString;
+    if (!CPkcs7::createHashFile(dest, errorString)) {
+        consoleOut.outToConsole(errorString);
+        return 1;
+    }
+
+    QString buf = QStringLiteral("The hash file '%1' saved successfully.\n").arg(dest);
+    int lastIndex = buf.lastIndexOf("p7b");
+    if (lastIndex != -1) {
+        buf.replace(lastIndex, 3, "sha");
+    }
+
+    consoleOut.outToConsole(buf);
+    consoleOut.outToConsole("DONE");
+
+    return 0;
 }

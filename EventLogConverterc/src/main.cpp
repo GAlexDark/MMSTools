@@ -41,9 +41,14 @@ int main(int argc, char *argv[])
     QString appPath = QCoreApplication::applicationDirPath();
 
     CConsoleOutput consoleOut;
-    QString description(QStringLiteral("MMS Event Log Conversion Utility Version %1\nCopyright (C) 2023 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-    description.append(QStringLiteral("This program use Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
-    consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
+    QString description = QStringLiteral("The MMS Event Log Conversion Utility Version %1\n"
+                                         "Copyright (C) 2024 Oleksii Gaienko, %3\n"
+                                         "This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. "
+                                         "For more details, see the GNU General Public License.\n"
+                                         "This program uses Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n")
+                          .arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT);
+
+    consoleOut.outToConsole(description);
 
     CSingleApplication sa(QLatin1String("elcc_instance"));
     if (sa.isRunning()) {
