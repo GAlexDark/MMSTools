@@ -72,7 +72,7 @@ toDouble(const QVariant &value, bool &isOk)
     QString buf = toString(value, isOk); //for correct conversion of values ​​like 10,000.00
     if (isOk) {
         QLocale c(QLocale::C);
-        if ((buf.indexOf('.') == -1) && buf.indexOf(',') != -1 ) {
+        if ((buf.indexOf('.') == -1) && buf.indexOf(',') != -1) {
             buf.replace(',', '.');
         }
         retVal = c.toDouble(buf, &isOk);
@@ -119,8 +119,7 @@ checkHeader(const QXlsx::Document &value)
 class jsonConvError : public mms::MmsCommonException
 {
 public:
-    explicit jsonConvError(const QString &text) noexcept
-        : mms::MmsCommonException(text) {}
+    using MmsCommonException::MmsCommonException;
 };
 
 void
@@ -260,10 +259,15 @@ int main(int argc, char *argv[])
     }
 
     if (!cmd.isSilent()) {
-        QString description(QStringLiteral("MMS XLSX to JSON Conversion Utility Version %1\nCopyright (C) 2024 Oleksii Gaienko, %3\nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.\n\n"));
-        description.append(QStringLiteral("This program use Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n"));
-        consoleOut.outToConsole(description.arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT));
-        consoleOut.outToConsole(QLatin1String("MMS XLSX to JSON Conversion Utility starting...\n"));
+        QString description = QStringLiteral("The MMS XLSX to JSON Conversion Utility Version %1\n"
+                                             "Copyright (C) 2024 Oleksii Gaienko, %3\n"
+                                             "This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. "
+                                             "For more details, see the GNU General Public License.\n"
+                                             "This program uses Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n")
+                              .arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT);
+
+        consoleOut.outToConsole(description);
+        consoleOut.outToConsole(QLatin1String("The MMS XLSX to JSON Conversion Utility starting...\n"));
     }
 
     QString fileName;
@@ -274,33 +278,34 @@ int main(int argc, char *argv[])
 
     QXlsx::Document dataSource(fileName);
     bool retVal = dataSource.load();
-    if (retVal) {
-        fileName = cmd.getReportName();
-        OutputMode mode = cmd.getOutputMode();
-        QString msgString;
-        qsizetype sheetCount = dataSource.sheetNames().size();
-        if (sheetCount > 1) {
-            QString currentSheetName;
-            QString fileNameWithSheet;
-            for (int sheetIndexNumber = 0; sheetIndexNumber < sheetCount; ++sheetIndexNumber) {
-                currentSheetName = dataSource.sheetNames().at(sheetIndexNumber);
-                fileNameWithSheet = fileName;
-                fileNameWithSheet.replace(QLatin1String(".json"), QStringLiteral(".%1.json").arg(currentSheetName));
-                retVal = dataSource.selectSheet(sheetIndexNumber);
-                if (retVal) {
-                    retVal = convertSheet(dataSource, fileNameWithSheet, mode, msgString);
-                    consoleOut.outToConsole(QStringLiteral("Worksheet '%1': %2").arg(currentSheetName, msgString));
-                } else {
-                    consoleOut.outToConsole(QStringLiteral("Worksheet select error."));
-                    break;
-                }
-            } //for
-        } else {
-            retVal = convertSheet(dataSource, fileName, mode, msgString);
-            consoleOut.outToConsole(msgString);
-        }
-    } else {
+    if (!retVal) {
         consoleOut.outToConsole(QLatin1String("Error load xlsx file %1").arg(fileName));
+        return 1;
+    }
+
+    fileName = cmd.getReportName();
+    OutputMode mode = cmd.getOutputMode();
+    QString msgString;
+    qsizetype sheetCount = dataSource.sheetNames().size();
+    if (sheetCount > 1) {
+        QString currentSheetName;
+        QString fileNameWithSheet;
+        for (int sheetIndexNumber = 0; sheetIndexNumber < sheetCount; ++sheetIndexNumber) {
+            currentSheetName = dataSource.sheetNames().at(sheetIndexNumber);
+            fileNameWithSheet = fileName;
+            fileNameWithSheet.replace(QLatin1String(".json"), QStringLiteral(".%1.json").arg(currentSheetName));
+            retVal = dataSource.selectSheet(sheetIndexNumber);
+            if (retVal) {
+                retVal = convertSheet(dataSource, fileNameWithSheet, mode, msgString);
+                consoleOut.outToConsole(QStringLiteral("Worksheet '%1': %2").arg(currentSheetName, msgString));
+            } else {
+                consoleOut.outToConsole(QStringLiteral("Worksheet select error."));
+                break;
+            }
+        } // for
+    } else {
+        retVal = convertSheet(dataSource, fileName, mode, msgString);
+        consoleOut.outToConsole(msgString);
     }
     consoleOut.outToConsole("DONE");
 
