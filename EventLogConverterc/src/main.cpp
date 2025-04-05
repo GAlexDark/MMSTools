@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
                                          "Copyright (C) 2024 Oleksii Gaienko, %3\n"
                                          "This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. "
                                          "For more details, see the GNU General Public License.\n"
-                                         "This program use Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n")
+                                         "This program uses Qt version %2 and QXlsx library: https://github.com/QtExcel/QXlsx.\n")
                           .arg(QCoreApplication::applicationVersion(), QT_VER, CONTACT);
 
     consoleOut.outToConsole(description);
