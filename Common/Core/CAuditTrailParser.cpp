@@ -144,7 +144,7 @@ CAuditTrailParser::insertString() const
 {
     return audittrail::insertData;
 }
-
+#ifdef QT_DEBUG
 void
 CAuditTrailParser::getParsedData(QString &status,
                                 QDateTime &timestamp,
@@ -168,7 +168,7 @@ CAuditTrailParser::getParsedData(QString &status,
     internalip = m_internalip;
     externalip = m_externalip;
 }
-
+#endif
 QString
 CAuditTrailParser::createTable() const
 {

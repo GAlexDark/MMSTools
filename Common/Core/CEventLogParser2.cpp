@@ -197,7 +197,7 @@ CEventLogParser2::insertString() const
 {
     return eventlog2::insertData;
 }
-
+#ifdef QT_DEBUG
 void
 CEventLogParser2::getParsedData(QString &username,
                                 QString &timestampISO8601,
@@ -223,7 +223,7 @@ CEventLogParser2::getParsedData(QString &username,
     internalIP = m_internalip;
     timestampTZ = m_timestamptz;
 }
-
+#endif
 QString
 CEventLogParser2::createTable() const
 {

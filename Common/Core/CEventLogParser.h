@@ -22,7 +22,10 @@
 #ifndef CEVENTLOGPARSER_H
 #define CEVENTLOGPARSER_H
 
+#include <QString>
 #include <QDateTime>
+#include <QMap>
+#include <QVariant>
 
 #include "CBasicParser.h"
 
@@ -41,6 +44,7 @@ public:
     bool parse(const QString& line) override;
     void convertData(QMap<QString, QVariant> &data) override;
     QString insertString() const override;
+#ifdef QT_DEBUG
     void getParsedData(QString &username,
                        QString &timestampISO8601,
                        QString &requestID,
@@ -51,7 +55,7 @@ public:
                        QString &externalIP,
                        QString &internalIP,
                        QDateTime &timestampTZ) const;
-
+#endif
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
     mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }

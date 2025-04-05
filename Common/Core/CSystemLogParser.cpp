@@ -212,7 +212,7 @@ CSystemLogParser::insertString() const
 {
     return systemlog::insertData;
 }
-
+#ifdef QT_DEBUG
 void
 CSystemLogParser::getParsedData(QString &severity,
                                 QDateTime &timestamp,
@@ -230,7 +230,7 @@ CSystemLogParser::getParsedData(QString &severity,
     role = m_role;
     companyname = m_companyname;
 }
-
+#endif
 QString
 CSystemLogParser::createTable() const
 {
