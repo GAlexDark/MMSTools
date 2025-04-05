@@ -23,7 +23,6 @@
 #include <QRegularExpression>
 
 #include "DBStrings.h"
-#include "elcUtils.h"
 
 namespace {
     const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
@@ -40,14 +39,14 @@ bool
 CEventLogParser::parseUserSuccessLogonDetails()
 {
     QRegularExpressionMatch match = reSuccessLogon.match(m_details);
-    bool retVal = match.hasMatch();
-    if (retVal) {
-        m_username1 = match.captured(1).trimmed();
-        m_authType = match.captured(2).trimmed();
-        m_ipaddresses = match.captured(3).trimmed();
-        analizeIPAdresses();
+    if (!match.hasMatch()) {
+        return false;
     }
-    return retVal;
+    m_username1 = match.captured(1).trimmed();
+    m_authType = match.captured(2).trimmed();
+    m_ipaddresses = match.captured(3).trimmed();
+    analizeIPAdresses();
+    return true;
 }
 
 bool
@@ -137,35 +136,36 @@ bool
 CEventLogParser::parse(const QString &line)
 {
     m_details = line;
-    bool retVal = false;
     QRegularExpressionMatch match = reEventLogHeader.match(m_details);
     if (match.hasMatch()) {
-        m_header = match.captured(1);
-        m_username = match.captured(2);
-        m_timestampISO8601 = match.captured(3);
-        m_requestID = match.captured(4);
-        m_type = match.captured(5);
-
-        m_details = m_details.mid(m_header.length() + 1);
-        removeQuote(m_details);
-
-        m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
-        if (m_timestamp.isValid()) {
-            m_timestamp.setTimeSpec(Qt::UTC);
-            m_timestamptz = m_timestamp.toLocalTime();
-            retVal = true;
-        } else {
-            m_timestamptz = QDateTime();
-            setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(m_timestampISO8601));
-        }
-        if (!parseUserLogonDetails()) {
-            m_username1.clear();
-            m_authType.clear();
-            m_externalip.clear();
-            m_internalip.clear();
-        }
-    } else {
         setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(m_details));
+        return false;
+    }
+
+    m_header = match.captured(1);
+    m_username = match.captured(2);
+    m_timestampISO8601 = match.captured(3);
+    m_requestID = match.captured(4);
+    m_type = match.captured(5);
+
+    m_details = m_details.mid(m_header.length() + 1);
+    removeQuote(m_details);
+
+    bool retVal = true;
+    m_timestamp = QDateTime::fromString(m_timestampISO8601, Qt::ISODateWithMs);
+    if (m_timestamp.isValid()) {
+        m_timestamp.setTimeSpec(Qt::UTC);
+        m_timestamptz = m_timestamp.toLocalTime();
+    } else {
+        m_timestamptz = QDateTime();
+        setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(m_timestampISO8601));
+        retVal = false;
+    }
+    if (!parseUserLogonDetails()) {
+        m_username1.clear();
+        m_authType.clear();
+        m_externalip.clear();
+        m_internalip.clear();
     }
     return retVal;
 }
