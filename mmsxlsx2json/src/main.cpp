@@ -32,14 +32,15 @@
 #include "CX2jConvCmdLineParser.h"
 #include "MMSTypes.h"
 
-const QString errorMsg = QStringLiteral("Error at line %1: The '%2' value '%3' is wrong!\n");
-const QString DataSend = QLatin1String("dataSend");
-const QString DebtCredit = QLatin1String("debtCredit");
-const QString DebtDebit = QLatin1String("debtDebit");
-const QString PaymentSumCredit = QLatin1String("paymentSumCredit");
-const QString PaymentSumDebit = QLatin1String("paymentSumDebit");
-const QString ReportNumber = QLatin1String("reportNumber");
-
+namespace {
+    const QString errorMsg = QStringLiteral("Error at line %1: The '%2' value '%3' is wrong!\n");
+    const QString DataSend = QLatin1String("dataSend");
+    const QString DebtCredit = QLatin1String("debtCredit");
+    const QString DebtDebit = QLatin1String("debtDebit");
+    const QString PaymentSumCredit = QLatin1String("paymentSumCredit");
+    const QString PaymentSumDebit = QLatin1String("paymentSumDebit");
+    const QString ReportNumber = QLatin1String("reportNumber");
+}
 
 QString
 toString(const QVariant &value, bool &isOk)

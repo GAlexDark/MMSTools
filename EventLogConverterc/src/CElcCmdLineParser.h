@@ -27,6 +27,7 @@
 #include <QStringList>
 
 #include "CBasicCmdLineParser.h"
+#include "MMSTypes.h"
 
 enum class RunningMode { RUNNINGMODE_DEFAULT, RUNNINGMODE_IMPORT_ONLY, RUNNINGMODE_REPORT_ONLY, RUNNINGMODE_CLEAN_DB };
 
@@ -45,19 +46,25 @@ private:
     QStringList excludedUsernames() const;
     QStringList includedUsernames() const;
 
-    bool                m_isPath = false;
-    bool                m_isFiles = false;
-    bool                m_isReportName = false;
-    bool                m_isExcluded = false;
-    bool                m_isIncluded = false;
-    bool                m_isImportOnly = false;
-    bool                m_isReportOnly = false;
-    bool                m_isCleanDbOnly = false;
-    QStringList         m_filesList;
+    bool        m_isPath = false;
+    bool        m_isFiles = false;
+    bool        m_isReportName = false;
+    bool        m_isExcluded = false;
+    bool        m_isIncluded = false;
+    bool        m_isImportOnly = false;
+    bool        m_isReportOnly = false;
+    bool        m_isCleanDbOnly = false;
+    QStringList m_filesList;
 
     bool checkData(const QStringList &data);
     bool addOption(const QCoreApplication &app) override;
     bool checkOption() override;
+};
+
+class ElcCmdLineParserError : public mms::MmsCommonException
+{
+public:
+    using MmsCommonException::MmsCommonException;
 };
 
 #endif // CELCCMDLINEPARSER_H

@@ -27,36 +27,41 @@
 bool
 CX2jConvCmdLineParser::addOption(const QCoreApplication &app)
 {
-    const QString importDescription(QLatin1String("The path to the XLSX file for conversion to the JSON. Usage:\n-i file or\n--input file"));
-    const QString outputDescription(QLatin1String("The path to the directory and name of the JSON output file. Usege:\n-o file or\n--output file"));
-    const QString modeDescription(QLatin1String("This value defines the format of the JSON byte array produced when converting:\nindented - defines a human-readable output,\ncompact - defines a compact output.\nUsage:\n-m indented or\n-m compact"));
-    const QString silentDescription(QLatin1String("Silent mode"));
-
-    QCommandLineOption importOption(QStringList() << "i" << "input", importDescription, "file");
-    bool retVal = m_parser.addOption(importOption);
-    if (retVal) {
-        QCommandLineOption outputOption(QStringList() << "o" << "output", outputDescription, "file");
-        retVal = m_parser.addOption(outputOption);
-        if (retVal) {
-            QCommandLineOption modeOption(QStringList() << "m" << "mode", modeDescription, "mode");
-            retVal = m_parser.addOption(modeOption);
-            if (retVal) {
-                QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
-                retVal = m_parser.addOption(silentOption);
-                if (retVal) {
-                    m_parser.process(app);
-                    m_isImport = m_parser.isSet(importOption);
-                    m_isOutput = m_parser.isSet(outputOption);
-                    m_isMode = m_parser.isSet(modeOption);
-                    m_isSilent = m_parser.isSet(silentOption);
-                }
-            }
+    try {
+        const QString importDescription(QLatin1String("The path to the XLSX file for conversion to the JSON. Usage:\n-i file or\n--input file"));
+        QCommandLineOption importOption(QStringList() << "i" << "input", importDescription, "file");
+        if (!m_parser.addOption(importOption)) {
+            throw X2jConvCmdLineParser(QLatin1String("The fatal error has occurred. The program will be closed."));
         }
+
+        const QString outputDescription(QLatin1String("The path to the directory and name of the JSON output file. Usage:\n-o file or\n--output file"));
+        QCommandLineOption outputOption(QStringList() << "o" << "output", outputDescription, "file");
+        if (!m_parser.addOption(outputOption)) {
+            throw X2jConvCmdLineParser(QLatin1String("The fatal error has occurred. The program will be closed."));
+        }
+
+        const QString modeDescription(QLatin1String("This value defines the format of the JSON byte array produced when converting:\nindented - defines a human-readable output,\ncompact - defines a compact output.\nUsage:\n-m indented or\n-m compact"));
+        QCommandLineOption modeOption(QStringList() << "m" << "mode", modeDescription, "mode");
+        if (!m_parser.addOption(modeOption)) {
+            throw X2jConvCmdLineParser(QLatin1String("The fatal error has occurred. The program will be closed."));
+        }
+
+        const QString silentDescription(QLatin1String("Silent mode"));
+        QCommandLineOption silentOption(QStringList() << "silent", silentDescription);
+        if (!m_parser.addOption(silentOption)) {
+            throw X2jConvCmdLineParser(QLatin1String("The fatal error has occurred. The program will be closed."));
+        }
+
+        m_parser.process(app);
+        m_isImport = m_parser.isSet(importOption);
+        m_isOutput = m_parser.isSet(outputOption);
+        m_isMode = m_parser.isSet(modeOption);
+        m_isSilent = m_parser.isSet(silentOption);
+    } catch (const X2jConvCmdLineParser &ex) {
+        setErrorString(ex.what());
+        return false;
     }
-    if (!retVal) {
-        setErrorString(QLatin1String("The fatal error has occurredd. The program will be closed."));
-    }
-    return retVal;
+    return true;
 }
 
 bool
@@ -72,26 +77,26 @@ CX2jConvCmdLineParser::checkOption()
 bool
 CX2jConvCmdLineParser::getDataFile(QString &fileName)
 {
-    bool retVal = m_isImport;
-    if (retVal) {
-        fileName = m_parser.value("input");
-        QFileInfo fi(fileName);
-        if (fi.exists() && fi.isFile()) {
-            if (QString::compare(fi.suffix(), QLatin1String("xlsx"), Qt::CaseInsensitive) == 0) {
-                fileName = fi.absoluteFilePath(); //The QFileInfo class convert '\\', '//' into '/' in the filepath
-                m_path = fi.absoluteDir();
-                m_baseName = fi.baseName();
-            } else {
-                setErrorString(QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName()));
-                retVal = false;
-            }
-        } else {
-            setErrorString(QLatin1String("The file %1 is corrupted or missing.").arg(fi.fileName()));
-            retVal = false;
-        }
+    if (!m_isImport) {
+        return false;
+    }
+    fileName = m_parser.value("input");
+    QFileInfo fi(fileName);
+    if (!fi.exists() || !fi.isFile()) {
+        setErrorString(QLatin1String("The file %1 is corrupted or missing.").arg(fi.fileName()));
+        return false;
     }
 
-    return retVal;
+    if (QString::compare(fi.suffix(), QLatin1String("xlsx"), Qt::CaseInsensitive) != 0) {
+        setErrorString(QLatin1String("The file %1 has the wrong extension.").arg(fi.fileName()));
+        return false;
+    }
+
+    fileName = fi.absoluteFilePath(); // The QFileInfo class converts '\\', '//' into '/' in the filepath
+    m_path = fi.absoluteDir();
+    m_baseName = fi.baseName();
+
+    return true;
 }
 
 QString
@@ -99,7 +104,7 @@ CX2jConvCmdLineParser::getReportName() const
 {
     QString retVal = m_isOutput ? m_parser.value("output") : QLatin1String("%1.json").arg(m_baseName);
     if (!retVal.endsWith(QLatin1String(".json"), Qt::CaseInsensitive)) {
-        retVal = retVal + QLatin1String(".json");
+        retVal += QLatin1String(".json");
     }
     if ((retVal.indexOf('/') == -1) && (retVal.indexOf('\\') == -1)) {
         retVal = m_path.filePath(retVal);
@@ -113,10 +118,9 @@ CX2jConvCmdLineParser::getReportName() const
 OutputMode
 CX2jConvCmdLineParser::getOutputMode() const
 {
-    OutputMode retVal = OutputMode::OUTPUTMODE_COMPACT;
     QString buf = m_parser.value("mode");
     if (QString::compare(buf, QLatin1String("indented"), Qt::CaseInsensitive) == 0) {
-        retVal = OutputMode::OUTPUTMODE_INDENTED;
+        return OutputMode::OUTPUTMODE_INDENTED;
     }
-    return retVal;
+    return OutputMode::OUTPUTMODE_COMPACT;
 }
