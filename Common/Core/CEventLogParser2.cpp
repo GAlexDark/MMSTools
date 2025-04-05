@@ -23,12 +23,11 @@
 #include <QRegularExpression>
 
 #include "DBStrings.h"
-#include "elcUtils.h"
 
 namespace {
-    const QRegularExpression reEventLogHeader(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
+    const QRegularExpression reEventLog2Header(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
     const QRegularExpression reSuccessLogon(QLatin1String("^username:\\s(.*?),\\n\\s\\stype:\\s(.*?),\\n\\s\\sip\\saddress:\\s(.*?)$"));
-    const QRegularExpression reFailedLogon(QLatin1String("^type:\\s(.*?)\\n\\s\\sip\\saddress:\\s(.*?)$"));
+    const QRegularExpression reFailedLogon(QLatin1String("^username:\\s(.*?),\\n\\stype:\\s(.*?),\\n\\sip\\saddress:\\s(.*?)$"));
 
     const QString authSuccessUk("Вхід користувача - успішно");
     const QString authSuccessEn("User login - successful");
@@ -55,13 +54,18 @@ bool
 CEventLogParser2::parseUserFailedLogonDetails()
 {
     QRegularExpressionMatch match = reFailedLogon.match(m_details);
-    m_username1.clear();
+
     bool retVal = match.hasMatch();
     if (retVal) {
-        m_authType = match.captured(1).trimmed();
-        m_ipaddresses = match.captured(2).trimmed();
+        m_username1 = match.captured(1).trimmed();
+        if (m_username1 == "null") {
+            m_username1.clear();
+        }
+        m_authType = match.captured(2).trimmed();
+        m_ipaddresses = match.captured(3).trimmed();
         analizeIPAdresses();
     } else {
+        m_username1.clear();
         m_authType.clear();
         m_externalip.clear();
         m_internalip.clear();
@@ -139,7 +143,7 @@ CEventLogParser2::parse(const QString &line)
 {
     m_details = line;
     bool retVal = false;
-    QRegularExpressionMatch match = reEventLogHeader.match(m_details);
+    QRegularExpressionMatch match = reEventLog2Header.match(m_details);
     if (match.hasMatch()) {
         m_header = match.captured(1);
         m_username = match.captured(2);
