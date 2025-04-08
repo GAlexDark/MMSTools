@@ -190,54 +190,49 @@ read(const QXlsx::Document &dataSource, int &row, QJsonArray *array)
 bool
 convertSheet(const QXlsx::Document &dataSource, const QString &fileName, OutputMode mode, QString &msgString)
 {
-    bool retVal = checkHeader(dataSource);
-    if (retVal) {
-        int row = 2;
-        int numberOfRow = dataSource.dimension().lastRow();
-        if (numberOfRow >= row) {
-            QScopedPointer<QJsonArray> recordsArray(new QJsonArray);
-            try {
-                read(dataSource, row, recordsArray.data());
-            } catch (const jsonConvError &ex) {
-                msgString = ex.what();
-                retVal = false;
-            } catch (...) {
-                msgString = QLatin1String("The unknown exception occurred.");
-                retVal = false;
-            }
-            if (retVal) {
-                if (!recordsArray->isEmpty()) {
-                    QString path = QFileInfo(fileName).absolutePath();
-                    retVal = elcUtils::isFolderWritable(path);
-                    if (retVal) {
-                        QFile jsonFile(fileName);
-                        retVal = jsonFile.open(QIODevice::WriteOnly);
-                        if (retVal) {
-                            QJsonDocument jsonResult(*recordsArray);
-                            QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
-                            retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
-                            if (retVal) {
-                                msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 1)).arg(fileName);
-                            } else {
-                                msgString = QLatin1String("Error save result to the file '%1':").arg(fileName, jsonFile.errorString());
-                            }
-                            jsonFile.close();
-                        } else {
-                            msgString = QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString());
-                        }
-                    } else {
-                        msgString = QLatin1String("You don't have write permissions to this folder: %1").arg(path);
-                    }
-                } else {
-                    msgString = QLatin1String("Nothing to save.");
-                }
-            }
-        } else {
-            msgString = QLatin1String("The file '%1' is empty.").arg(fileName);
-        }
-    } else {
+    if (!checkHeader(dataSource)) {
         msgString = QLatin1String("The file '%1' header is wrong.").arg(fileName);
+        return false;
     }
+    int row = 2;
+    if (dataSource.dimension().lastRow() < row) {
+        msgString = QLatin1String("The file '%1' is empty.").arg(fileName);
+        return false;
+    }
+    QScopedPointer<QJsonArray> recordsArray(new QJsonArray);
+    try {
+        read(dataSource, row, recordsArray.data());
+    } catch (const jsonConvError &ex) {
+        msgString = ex.what();
+        return false;
+    } catch (...) {
+        msgString = QLatin1String("The unknown exception occurred.");
+        return false;
+    }
+    if (recordsArray->isEmpty()) {
+        msgString = QLatin1String("Nothing to save.");
+        return true;
+    }
+    QString path = QFileInfo(fileName).absolutePath();
+    if (!elcUtils::isFolderWritable(path)) {
+        msgString = QLatin1String("You don't have write permissions to this folder: %1").arg(path);
+        return false;
+    }
+    QFile jsonFile(fileName);
+    if (!jsonFile.open(QIODevice::WriteOnly)) {
+        msgString = QLatin1String("Error create file '%1': %2").arg(fileName, jsonFile.errorString());
+        return false;
+    }
+    QJsonDocument jsonResult(*recordsArray);
+    QJsonDocument::JsonFormat outputJsonFormat = mode == OutputMode::OUTPUTMODE_INDENTED ? QJsonDocument::Indented : QJsonDocument::Compact;
+    bool retVal = jsonFile.write(jsonResult.toJson(outputJsonFormat)) != -1;
+    jsonFile.close();
+    if (retVal) {
+        msgString = QLatin1String("\nTotal rows converted: %1.\nThe JSON was saved in the file: %2\n").arg(QString::number(row - 1)).arg(fileName);
+    } else {
+        msgString = QLatin1String("Error save result to the file '%1':").arg(fileName, jsonFile.errorString());
+    }
+
     return retVal;
 }
 

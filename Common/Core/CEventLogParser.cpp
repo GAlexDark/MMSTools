@@ -137,7 +137,7 @@ CEventLogParser::parse(const QString &line)
 {
     m_details = line;
     QRegularExpressionMatch match = reEventLogHeader.match(m_details);
-    if (match.hasMatch()) {
+    if (!match.hasMatch()) {
         setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(m_details));
         return false;
     }
