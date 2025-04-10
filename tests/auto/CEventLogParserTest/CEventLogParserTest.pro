@@ -12,11 +12,13 @@ INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core
 
 HEADERS += \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicParser.h \
-    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.h
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.h \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParserBase.h
 
 SOURCES +=  \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicParser.cpp \
     $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParser.cpp \
+    $${PROJECT_ROOT_DIRECTORY}/Common/Core/CEventLogParserBase.cpp \
     tst_ceventlogparsertest.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
