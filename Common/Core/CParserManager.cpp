@@ -30,6 +30,7 @@
 #include "CEventLogParser.h"
 #include "CEventLogParser2.h"
 #include "CAuditTrailParser.h"
+#include "CAuditTrailParser2.h"
 #include "CSystemLogParser.h"
 
 CParserManager& CParserManager::instance()
@@ -49,7 +50,8 @@ CParserManager::init()
     addClassListItem(QLatin1String("CSystemLogParser")); // ID=3
     qRegisterMetaType<pEventLogParser2>("CEventLogParser2");
     addClassListItem(QLatin1String("CEventLogParser2")); // ID=4
-
+    qRegisterMetaType<pAuditTrailParser2>("CAuditTrailParser2");
+    addClassListItem(QLatin1String("CAuditTrailParser2")); // ID=5
     struct parserData_t
     {
         QString visibleLogName;

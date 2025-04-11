@@ -70,9 +70,13 @@ namespace eventlog2 {
 }
 
 namespace audittrail {
-    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [audittraillog] (status TEXT NOT NULL, timestamp DATETIME NOT NULL, method TEXT NOT NULL, username TEXT NOT NULL, role TEXT NOT NULL, companyname TEXT NOT NULL, attributes TEXT, username1 TEXT, externalip TEXT, internalip TEXT, PRIMARY KEY (status, timestamp, method, username, role, companyname, attributes) ON CONFLICT IGNORE);"));
+    inline const QString createTable(QLatin1String("CREATE TABLE IF NOT EXISTS [audittraillog] (status TEXT NOT NULL, timestamp DATETIME NOT NULL, method TEXT NOT NULL, username TEXT NOT NULL, role TEXT NOT NULL, companyname TEXT NOT NULL, attributes TEXT, username1 TEXT, externalip TEXT, internalip TEXT, sessionid TEXT, PRIMARY KEY (status, timestamp, method, username, role, companyname, attributes) ON CONFLICT IGNORE);"));
     inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [audittraillog] (status, timestamp, method, username, role, companyname, attributes, username1, externalip, internalip) VALUES (:status, :timestamp, :method, :username, :role, :companyname, :attributes, :username1, :externalip, :internalip)"));
     inline const QString selectData(QLatin1String("SELECT a.timestamp, a.username, a.role, a.companyname, a.method, a.status, a.attributes, a.internalip FROM audittraillog a %1 ORDER BY a.timestamp DESC;"));
+}
+
+namespace audittrail2 {
+    inline const QString insertData(QLatin1String("INSERT OR IGNORE INTO [audittraillog] (status, timestamp, method, username, role, companyname, attributes, username1, externalip, internalip, sessionid) VALUES (:status, :timestamp, :method, :username, :role, :companyname, :attributes, :username1, :externalip, :internalip, :sessionid)"));
 }
 
 namespace other {
