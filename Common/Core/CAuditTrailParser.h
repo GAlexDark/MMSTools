@@ -27,9 +27,9 @@
 #include <QMap>
 #include <QVariant>
 
-#include "CBasicParser.h"
+#include "CAuditTrailParserBase.h"
 
-class CAuditTrailParser: public CBasicParser
+class CAuditTrailParser: public CAuditTrailParserBase
 {
     Q_OBJECT
     Q_CLASSINFO("tablename", "audittraillog")
@@ -44,6 +44,9 @@ public:
     bool parse(const QString& line) override;
     void convertData(QMap<QString, QVariant> &data) override;
     QString insertString() const override;
+    QString createTable() const override;
+    QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
+    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 #ifdef QT_DEBUG
     void getParsedData(QString &status,
                        QDateTime &timestamp,
@@ -56,28 +59,25 @@ public:
                        QString &internalip,
                        QString &externalip) const;
 #endif
-    QString createTable() const override;
-    QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
-    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 private:
-    bool parsePersonDataDetails();
-    bool parseLoadAuditTrail();
-    bool parseAttributesDetails();
+//    bool parsePersonDataDetails();
+//    bool parseLoadAuditTrail();
+//    bool parseAttributesDetails();
 
-    QDateTime   m_timestamp;
+//    QDateTime   m_timestamp;
 
-    QString     m_header;
-    QString     m_status;
-    QString     m_method;
-    QString     m_username;
-    QString     m_role;
-    QString     m_companyname;
-    QString     m_attributes;
-    QString     m_username1;
+//    QString     m_header;
+//    QString     m_status;
+//    QString     m_method;
+//    QString     m_username;
+//    QString     m_role;
+//    QString     m_companyname;
+//    QString     m_attributes;
+//    QString     m_username1;
 
-    char        m_delimiterChar;
-    char        m_quoteChar = 0;
+//    char        m_delimiterChar;
+//    char        m_quoteChar = 0;
 };
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);

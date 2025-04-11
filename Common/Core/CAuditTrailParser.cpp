@@ -23,59 +23,14 @@
 #include <QRegularExpression>
 
 #include "DBStrings.h"
-#include "elcUtils.h"
 
 namespace {
     const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
-    const QRegularExpression rePersonData(QLatin1String("Person\\s\\[pk=\\d+,\\salias=(.*)\\]"));
-    const QRegularExpression reLoadAuditTrail(QLatin1String("^.*;.*;(.*);.*;.*;.*;.*;.*;.*$"));
-
-    const QString person(QLatin1String("Person ["));
-    const QString nullValue(QLatin1String("null"));
-}
-
-bool
-CAuditTrailParser::parsePersonDataDetails()
-{
-    bool retVal = false;
-    qsizetype firstPos = m_attributes.indexOf(person);
-    if (firstPos != -1) {
-        qsizetype lastPos = m_attributes.indexOf(QLatin1Char(']'), firstPos);
-        QString alias = m_attributes.sliced(firstPos, lastPos - firstPos + 1).trimmed();
-        QRegularExpressionMatch match = rePersonData.match(alias);
-        if (match.hasMatch()) {
-            m_username1 = match.captured(1);
-            retVal = true;
-        }
-    }
-    return retVal;
-}
-
-bool
-CAuditTrailParser::parseLoadAuditTrail()
-{
-    bool retVal = false;
-    QRegularExpressionMatch match = reLoadAuditTrail.match(m_attributes);
-    if (match.hasMatch()) {
-        m_username1 = match.captured(1);
-        if (m_username1.compare(nullValue, Qt::CaseInsensitive) == 0) {
-            m_username1.clear();
-        }
-        retVal = true;
-    }
-    return retVal;
-}
-
-bool
-CAuditTrailParser::parseAttributesDetails()
-{
-    return parsePersonDataDetails();
 }
 
 CAuditTrailParser::CAuditTrailParser(QObject *parent)
-    : CBasicParser{parent}
+    : CAuditTrailParserBase{parent}
 {
-    clearErrorString();
     initFfs(m_eolChars, m_quoteChar, m_delimiterChar);
     setQuoteChar(m_quoteChar);
 }
@@ -83,43 +38,42 @@ CAuditTrailParser::CAuditTrailParser(QObject *parent)
 bool
 CAuditTrailParser::parse(const QString& line)
 {
-    bool retVal = false;
     QRegularExpressionMatch match = reAuditTrailHeader.match(line);
-    if (match.hasMatch()) {
-        m_header = match.captured(1);
-        m_status = match.captured(2);
-        QString timestamp = match.captured(3);
-        m_method = match.captured(4);
-        m_username = match.captured(5);
-        m_companyname = match.captured(6);
-
-        m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
-        if (!m_timestamp.isValid()) {
-            m_timestamp = QDateTime();
-            setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
-        } else {
-            retVal = true;
-        }
-
-        qsizetype posStart = m_username.indexOf(QLatin1Char('('));
-        qsizetype posEnd = m_username.indexOf(QLatin1Char(')'), posStart + 1) - posStart - 1;
-        m_role = m_username.sliced(posStart + 1, posEnd).trimmed();
-        m_username.resize(posStart - 1);
-
-        // Parsing Attributes & IpAddress
-        m_attributes = line.mid(m_header.length());
-        posStart = m_attributes.lastIndexOf(m_delimiterChar);
-        m_ipaddresses = m_attributes.mid(posStart + 1);
-        analizeIPAdresses();
-        m_attributes.resize(posStart);
-        removeQuote(m_attributes);
-
-        // Parse m_attributes
-        if (!parseAttributesDetails()) {
-            m_username1.clear();
-        }
-    } else {
+    if (!match.hasMatch()) {
         setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(line));
+        return false;
+    }
+    m_header = match.captured(1);
+    m_status = match.captured(2);
+    QString timestamp = match.captured(3);
+    m_method = match.captured(4);
+    m_username = match.captured(5);
+    m_companyname = match.captured(6);
+
+    bool retVal = true;
+    m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
+    if (!m_timestamp.isValid()) {
+        m_timestamp = QDateTime();
+        setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
+        return false;
+    }
+
+    qsizetype posStart = m_username.indexOf(QLatin1Char('('));
+    qsizetype posEnd = m_username.indexOf(QLatin1Char(')'), posStart + 1) - posStart - 1;
+    m_role = m_username.sliced(posStart + 1, posEnd).trimmed();
+    m_username.resize(posStart - 1);
+
+    // Parsing Attributes & IpAddress
+    m_attributes = line.mid(m_header.length());
+    posStart = m_attributes.lastIndexOf(m_delimiterChar);
+    m_ipaddresses = m_attributes.mid(posStart + 1);
+    analizeIPAdresses();
+    m_attributes.resize(posStart);
+    removeQuote(m_attributes);
+
+    // Parse m_attributes
+    if (!parseAttributesDetails()) {
+        m_username1.clear();
     }
     return retVal;
 }
