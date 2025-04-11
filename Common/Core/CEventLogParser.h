@@ -44,6 +44,9 @@ public:
     bool parse(const QString& line) override;
     void convertData(QMap<QString, QVariant> &data) override;
     QString insertString() const override;
+    QString createTable() const override;
+    QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
+    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 #ifdef QT_DEBUG
     void getParsedData(QString &username,
                        QString &timestampISO8601,
@@ -56,10 +59,6 @@ public:
                        QString &internalIP,
                        QDateTime &timestampTZ) const;
 #endif
-    QString createTable() const override;
-    QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
-    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
-
 private:
     bool parseUserFailedLogonDetails() override;
 };

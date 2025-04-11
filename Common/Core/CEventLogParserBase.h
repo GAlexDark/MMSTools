@@ -34,15 +34,17 @@ class CEventLogParserBase: public CBasicParser
     Q_OBJECT
 
 public:
-    explicit CEventLogParserBase(QObject *parent = nullptr);
+    using CBasicParser::CBasicParser;
     virtual bool parse(const QString& line) override = 0;
-    void convertData(QMap<QString, QVariant> &data) override = 0;
-    QString insertString() const override = 0;
-    QString createTable() const override = 0;
+    virtual void convertData(QMap<QString, QVariant> &data) override = 0;
+    virtual QString insertString() const override = 0;
+    virtual QString createTable() const override = 0;
+    virtual QString visibleLogName() override = 0;
+    virtual mms::ffs_t fileFieldsSeparationInfo() const override = 0;
 
 protected:
-    bool parseUserSuccessLogonDetails();
     virtual bool parseUserFailedLogonDetails() = 0;
+    bool parseUserSuccessLogonDetails();
     bool userSuccessLogonDetails();
     bool userFailedLogonDetails();
     bool parseUserLogonDetails();
@@ -54,8 +56,6 @@ protected:
     QString m_details;
     QString m_username1;
     QString m_authType;
-//    QString m_externalip;
-//    QString m_internalip;
     QDateTime m_timestamp;
     QDateTime m_timestamptz;
     QString m_header;
@@ -81,7 +81,6 @@ protected:
 
     char m_delimiterChar = 0;
     char m_quoteChar = 0;
-    //char m_eolChars;
 };
 
 #endif // CEVENTLOGPARSERBASE_H

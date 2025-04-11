@@ -32,12 +32,6 @@ namespace {
     const QString authFailedEn("User login - unsuccessful");
 }
 
-CEventLogParserBase::CEventLogParserBase(QObject *parent)
-        : CBasicParser{parent}
-{
-    clearErrorString();
-}
-
 bool
 CEventLogParserBase::parseUserSuccessLogonDetails()
 {

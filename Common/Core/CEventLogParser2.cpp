@@ -27,6 +27,7 @@
 namespace {
     const QRegularExpression reEventLog2Header(QLatin1String("^(\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\",\"(.*?)\")"));
     const QRegularExpression reFailedLogon(QLatin1String("^username:\\s(.*?),\\n\\stype:\\s(.*?),\\n\\sip\\saddress:\\s(.*?)$"));
+    const QString nullValue(QLatin1String("null"));
 }
 
 bool
@@ -37,7 +38,7 @@ CEventLogParser2::parseUserFailedLogonDetails()
     bool retVal = match.hasMatch();
     if (retVal) {
         m_username1 = match.captured(1).trimmed();
-        if (m_username1 == "null") {
+        if (m_username1.compare(nullValue, Qt::CaseInsensitive) == 0) {
             m_username1.clear();
         }
         m_authType = match.captured(2).trimmed();
