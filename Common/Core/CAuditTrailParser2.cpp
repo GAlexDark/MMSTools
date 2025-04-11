@@ -1,0 +1,139 @@
+/****************************************************************************
+*
+* Class for parsing the MMS Audit Trail logs.
+* Copyright (C) 2024  Oleksii Gaienko
+* Contact: galexsoftware@gmail.com
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+****************************************************************************/
+
+#include "CAuditTrailParser2.h"
+#include <QRegularExpression>
+
+#include "DBStrings.h"
+
+namespace {
+    const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
+}
+
+CAuditTrailParser2::CAuditTrailParser2(QObject *parent)
+    : CAuditTrailParserBase{parent}
+{
+    initFfs(m_eolChars, m_quoteChar, m_delimiterChar);
+    setQuoteChar(m_quoteChar);
+}
+
+bool
+CAuditTrailParser2::parse(const QString& line)
+{
+    QRegularExpressionMatch match = reAuditTrailHeader.match(line);
+    if (!match.hasMatch()) {
+        setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(line));
+        return false;
+    }
+
+    m_header = match.captured(1);
+    m_status = match.captured(2);
+    QString timestamp = match.captured(3);
+    m_method = match.captured(4);
+    m_username = match.captured(5);
+    m_companyname = match.captured(6);
+
+    bool retVal = true;
+    m_timestamp = QDateTime::fromString(timestamp, Qt::ISODateWithMs);
+    if (!m_timestamp.isValid()) {
+        m_timestamp = m_timestamp.toLocalTime();
+    } else {
+        m_timestamp = QDateTime();
+        setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
+        retVal = false;
+    }
+
+    qsizetype posStart = m_username.indexOf(QLatin1Char('('));
+    qsizetype posEnd = m_username.indexOf(QLatin1Char(')'), posStart + 1) - posStart - 1;
+    m_role = m_username.sliced(posStart + 1, posEnd).trimmed();
+    m_username.resize(posStart - 1);
+
+    // Parsing Attributes, IpAddress and SessionId
+    m_attributes = line.mid(m_header.length());
+    posEnd = posStart = m_attributes.lastIndexOf(m_delimiterChar);
+    m_sessionId = m_attributes.mid(posStart + 1);
+    posStart = m_attributes.lastIndexOf(m_delimiterChar, posStart - 1);
+    m_ipaddresses = m_attributes.sliced(posStart + 1, posEnd - posStart - 1);
+    analizeIPAdresses();
+    m_attributes.resize(posStart);
+    removeQuote(m_attributes);
+
+    // Parse m_attributes
+    if (!parseAttributesDetails()) {
+        m_username1.clear();
+    }
+
+    return retVal;
+}
+
+void
+CAuditTrailParser2::convertData(QMap<QString, QVariant> &data)
+{
+    data[phStatus] = m_status;
+    data[phTimestamp] = m_timestamp;
+    data[phMethod] = m_method;
+    data[phUsername] = m_username;
+    data[phRole] = m_role;
+    data[phCompanyname] = m_companyname;
+    data[phAttributes] = m_attributes;
+    data[phUsername1] = m_username1;
+    data[phInternalip] = m_internalip;
+    data[phExternalip] = m_externalip;
+    data[phSessionID] = m_sessionId;
+}
+
+QString
+CAuditTrailParser2::insertString() const
+{
+    return audittrail2::insertData;
+}
+#ifdef QT_DEBUG
+void
+CAuditTrailParser2::getParsedData(QString &status,
+                                QDateTime &timestamp,
+                                QString &method,
+                                QString &username,
+                                QString &role,
+                                QString &companyname,
+                                QString &attributes,
+                                QString &username1,
+                                QString &internalip,
+                                QString &externalip,
+                                QString &sessionId) const
+{
+    status = m_status;
+    timestamp = m_timestamp;
+    method = m_method;
+    username = m_username;
+    role = m_role;
+    companyname = m_companyname;
+    attributes = m_attributes;
+    username1 = m_username1;
+    internalip = m_internalip;
+    externalip = m_externalip;
+    sessionId = m_sessionId;
+}
+#endif
+QString
+CAuditTrailParser2::createTable() const
+{
+    return QString();
+}

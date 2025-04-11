@@ -9,7 +9,9 @@ HEADERS += \
     ../Common/Core/CEventLogParserBase.h \
     ../Common/Core/CEventLogParser.h \
     ../Common/Core/CEventLogParser2.h \
+    ../Common/Core/CAuditTrailParserBase.h \
     ../Common/Core/CAuditTrailParser.h \
+    ../Common/Core/CAuditTrailParser2.h \
     ../Common/Core/CSystemLogParser.h \
     ../Common/Core/CEventLogReport.h \
     ../Common/Core/CSVReader.h \
@@ -34,7 +36,9 @@ SOURCES += \
     ../Common/Core/CEventLogParserBase.cpp \
     ../Common/Core/CEventLogParser.cpp \
     ../Common/Core/CEventLogParser2.cpp \
+    ../Common/Core/CAuditTrailParserBase.cpp \
     ../Common/Core/CAuditTrailParser.cpp \
+    ../Common/Core/CAuditTrailParser2.cpp \
     ../Common/Core/CSystemLogParser.cpp \
     ../Common/Core/CEventLogReport.cpp \
     ../Common/Core/CSVReader.cpp \
