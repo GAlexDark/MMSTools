@@ -12,12 +12,12 @@ class CAuditTrailParserBase : public CBasicParser
     Q_OBJECT
 public:
     using CBasicParser::CBasicParser;
-    virtual bool parse(const QString& line) override = 0;
-    virtual void convertData(QMap<QString, QVariant> &data) override = 0;
-    virtual QString insertString() const override = 0;
-    virtual QString createTable() const override = 0;
-    virtual QString visibleLogName() override = 0;
-    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
+    bool parse(const QString& line) override = 0;
+    void convertData(QMap<QString, QVariant> &data) override = 0;
+    QString insertString() const override = 0;
+    QString createTable() const override = 0;
+    QString visibleLogName() override = 0;
+    mms::ffs_t fileFieldsSeparationInfo() const final { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 protected:
     bool parsePersonDataDetails();
