@@ -19,7 +19,7 @@
 *
 ****************************************************************************/
 
-#include "CAuditTrailParser.h"
+#include "CAuditTrailParser2.h"
 #include <QRegularExpression>
 
 #include "DBStrings.h"
@@ -28,7 +28,7 @@ namespace {
     const QRegularExpression reAuditTrailHeader(QLatin1String("(^(.*?);(.*?);(.*?);(.*?);(.*?);(.*?))"));
 }
 
-CAuditTrailParser::CAuditTrailParser(QObject *parent)
+CAuditTrailParser2::CAuditTrailParser2(QObject *parent)
     : CAuditTrailParserBase{parent}
 {
     initFfs(m_eolChars, m_quoteChar, m_delimiterChar);
@@ -36,13 +36,14 @@ CAuditTrailParser::CAuditTrailParser(QObject *parent)
 }
 
 bool
-CAuditTrailParser::parse(const QString& line)
+CAuditTrailParser2::parse(const QString& line)
 {
     QRegularExpressionMatch match = reAuditTrailHeader.match(line);
     if (!match.hasMatch()) {
         setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(line));
         return false;
     }
+
     m_header = match.captured(1);
     m_status = match.captured(2);
     QString timestamp = match.captured(3);
@@ -51,11 +52,13 @@ CAuditTrailParser::parse(const QString& line)
     m_companyname = match.captured(6);
 
     bool retVal = true;
-    m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
+    m_timestamp = QDateTime::fromString(timestamp, Qt::ISODateWithMs);
     if (!m_timestamp.isValid()) {
+        m_timestamp = m_timestamp.toLocalTime();
+    } else {
         m_timestamp = QDateTime();
         setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
-        return false;
+        retVal = false;
     }
 
     qsizetype posStart = m_username.indexOf(QLatin1Char('('));
@@ -63,10 +66,12 @@ CAuditTrailParser::parse(const QString& line)
     m_role = m_username.sliced(posStart + 1, posEnd).trimmed();
     m_username.resize(posStart - 1);
 
-    // Parsing Attributes & IpAddress
+    // Parsing Attributes, IpAddress and SessionId
     m_attributes = line.mid(m_header.length());
-    posStart = m_attributes.lastIndexOf(m_delimiterChar);
-    m_ipaddresses = m_attributes.mid(posStart + 1);
+    posEnd = posStart = m_attributes.lastIndexOf(m_delimiterChar);
+    m_sessionId = m_attributes.mid(posStart + 1);
+    posStart = m_attributes.lastIndexOf(m_delimiterChar, posStart - 1);
+    m_ipaddresses = m_attributes.sliced(posStart + 1, posEnd - posStart - 1);
     analizeIPAdresses();
     m_attributes.resize(posStart);
     removeQuote(m_attributes);
@@ -75,11 +80,12 @@ CAuditTrailParser::parse(const QString& line)
     if (!parseAttributesDetails()) {
         m_username1.clear();
     }
+
     return retVal;
 }
 
 void
-CAuditTrailParser::convertData(QMap<QString, QVariant> &data)
+CAuditTrailParser2::convertData(QMap<QString, QVariant> &data)
 {
     data[phStatus] = m_status;
     data[phTimestamp] = m_timestamp;
@@ -91,16 +97,17 @@ CAuditTrailParser::convertData(QMap<QString, QVariant> &data)
     data[phUsername1] = m_username1;
     data[phInternalip] = m_internalip;
     data[phExternalip] = m_externalip;
+    data[phSessionID] = m_sessionId;
 }
 
 QString
-CAuditTrailParser::insertString() const
+CAuditTrailParser2::insertString() const
 {
-    return audittrail::insertData;
+    return audittrail2::insertData;
 }
 #ifdef QT_DEBUG
 void
-CAuditTrailParser::getParsedData(QString &status,
+CAuditTrailParser2::getParsedData(QString &status,
                                 QDateTime &timestamp,
                                 QString &method,
                                 QString &username,
@@ -109,7 +116,8 @@ CAuditTrailParser::getParsedData(QString &status,
                                 QString &attributes,
                                 QString &username1,
                                 QString &internalip,
-                                QString &externalip) const
+                                QString &externalip,
+                                QString &sessionId) const
 {
     status = m_status;
     timestamp = m_timestamp;
@@ -121,10 +129,11 @@ CAuditTrailParser::getParsedData(QString &status,
     username1 = m_username1;
     internalip = m_internalip;
     externalip = m_externalip;
+    sessionId = m_sessionId;
 }
 #endif
 QString
-CAuditTrailParser::createTable() const
+CAuditTrailParser2::createTable() const
 {
-    return audittrail::createTable;
+    return QString();
 }

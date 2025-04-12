@@ -19,8 +19,8 @@
 *
 ****************************************************************************/
 
-#ifndef CAUDITTRAILPARSER_H
-#define CAUDITTRAILPARSER_H
+#ifndef CAUDITTRAILPARSER2_H
+#define CAUDITTRAILPARSER2_H
 
 #include <QString>
 #include <QDateTime>
@@ -29,23 +29,23 @@
 
 #include "CAuditTrailParserBase.h"
 
-class CAuditTrailParser: public CAuditTrailParserBase
+class CAuditTrailParser2: public CAuditTrailParserBase
 {
     Q_OBJECT
     Q_CLASSINFO("tablename", "audittraillog")
-    Q_CLASSINFO("columns", "Succeeded;Date;Method;Username;Companyname;Attributes;IpAddress")
-    Q_CLASSINFO("ID", "2")
+    Q_CLASSINFO("columns", "Succeeded;Date;Method;Username;Companyname;Attributes;IpAddress;SessionId")
+    Q_CLASSINFO("ID", "5")
     Q_CLASSINFO("quoteChar", "\"")
     Q_CLASSINFO("delimiterChar", ";")
     Q_CLASSINFO("eolChars", "\n")
 
 public:
-    Q_INVOKABLE explicit CAuditTrailParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CAuditTrailParser2(QObject *parent = nullptr);
     bool parse(const QString& line) final;
     void convertData(QMap<QString, QVariant> &data) final;
     QString insertString() const final;
     QString createTable() const final;
-    QString visibleLogName() final { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
+    QString visibleLogName() final { return QObject::tr("Audit Trail Log (CR-003)"); } // Don't use the 'const' because translation does not work.
 #ifdef QT_DEBUG
     void getParsedData(QString &status,
                        QDateTime &timestamp,
@@ -56,12 +56,16 @@ public:
                        QString &attributes,
                        QString &username1,
                        QString &internalip,
-                       QString &externalip) const;
+                       QString &externalip,
+                       QString &sessionId) const;
 #endif
+
+private:
+    QString     m_sessionId;
 };
 
-Q_DECLARE_METATYPE(CAuditTrailParser *);
+Q_DECLARE_METATYPE(CAuditTrailParser2 *);
 
-using pAuditTrailParser = CAuditTrailParser *;
+using pAuditTrailParser2 = CAuditTrailParser2 *;
 
-#endif // CAUDITTRAILPARSER_H
+#endif // CAUDITTRAILPARSER2_H

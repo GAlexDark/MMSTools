@@ -22,11 +22,14 @@
 #ifndef CEVENTLOGPARSER2_H
 #define CEVENTLOGPARSER2_H
 
+#include <QString>
 #include <QDateTime>
+#include <QMap>
+#include <QVariant>
 
-#include "CBasicParser.h"
+#include "CEventLogParserBase.h"
 
-class CEventLogParser2: public CBasicParser
+class CEventLogParser2: public CEventLogParserBase
 {
     Q_OBJECT
     Q_CLASSINFO("tablename", "eventlog")
@@ -38,9 +41,12 @@ class CEventLogParser2: public CBasicParser
 
 public:
     Q_INVOKABLE explicit CEventLogParser2(QObject *parent = nullptr);
-    bool parse(const QString& line) override;
-    void convertData(QMap<QString, QVariant> &data) override;
-    QString insertString() const override;
+    bool parse(const QString& line) final;
+    void convertData(QMap<QString, QVariant> &data) final;
+    QString insertString() const final;
+    QString createTable() const final;
+    QString visibleLogName() final { return QObject::tr("Event Log (CR-003)"); } // Don't use the 'const' because translation does not work.
+#ifdef QT_DEBUG
     void getParsedData(QString &username,
                        QString &timestampISO8601,
                        QString &sessionID,
@@ -52,52 +58,12 @@ public:
                        QString &externalIP,
                        QString &internalIP,
                        QDateTime &timestampTZ) const;
-
-    QString createTable() const override;
-    QString visibleLogName() override { return QObject::tr("Event Log (CR-003)"); } // Don't use the 'const' because translation does not work.
-    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
+#endif
 
 private:
-    bool parseUserSuccessLogonDetails();
-    bool parseUserFailedLogonDetails();
-    bool userSuccessLogonDetails();
-    bool userFailedLogonDetails();
-    bool parseUserLogonDetails();
+    bool parseUserFailedLogonDetails() final;
 
-    struct userSuccessLogonDetails_t
-    {
-        QString details;
-        QString username;
-        QString authType;
-        QString internalIp;
-        QString externalIp;
-    };
-    userSuccessLogonDetails_t m_prevValueUSLD;
-
-    struct userFailedLogonDetails_t
-    {
-        QString details;
-        QString authType;
-        QString internalIp;
-        QString externalIp;
-    };
-    userFailedLogonDetails_t m_prevValueUFLD;
-
-    QDateTime   m_timestamp;
-    QDateTime   m_timestamptz;
-    QString     m_header;
-    QString     m_details;
-    QString     m_timestampISO8601;
-    QString     m_format;
-    QString     m_username;
-    QString     m_username1;
-    QString     m_authType;
-    QString     m_requestID;
     QString     m_sessionID;
-    QString     m_type;
-
-    char        m_delimiterChar;
-    char        m_quoteChar = 0;
 };
 
 Q_DECLARE_METATYPE(CEventLogParser2 *);

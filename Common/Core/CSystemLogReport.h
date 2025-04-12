@@ -31,9 +31,9 @@ class CSystemLogReport : public CBasicReport
     Q_CLASSINFO("source", "systemlog")
 public:
     Q_INVOKABLE explicit CSystemLogReport(QObject *parent = nullptr);
-    bool generateReport() override;
-    QString visibleReportName() override { return QObject::tr("System Log"); }
-    QString selectString() const override;
+    bool generateReport() final;
+    QString visibleReportName() final { return QObject::tr("System Log"); }
+    QString selectString() const final;
 private:
     void addReportHeader(QXlsx::Document *xlsxReport, int row);
     void addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat);

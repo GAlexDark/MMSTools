@@ -39,10 +39,10 @@ public:
     virtual QString insertString() const = 0;
     virtual QString createTable() const = 0;
     virtual QString visibleLogName() = 0;
+    virtual mms::ffs_t fileFieldsSeparationInfo() const = 0;
 
     QString tableName() const;
     quint16 parserID() const;
-    virtual mms::ffs_t fileFieldsSeparationInfo() const = 0;
 
 protected:
     void removeQuote(QString &data) const;

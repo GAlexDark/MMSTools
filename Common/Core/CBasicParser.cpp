@@ -35,6 +35,7 @@ CBasicParser::CBasicParser(QObject *parent)
     : QObject{parent}
 {
     m_eolChars.clear();
+    clearErrorString();
 }
 
 void
