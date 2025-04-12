@@ -46,7 +46,6 @@ public:
     QString insertString() const override;
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Event Log (CR-003)"); } // Don't use the 'const' because translation does not work.
-    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 #ifdef QT_DEBUG
     void getParsedData(QString &username,
                        QString &timestampISO8601,

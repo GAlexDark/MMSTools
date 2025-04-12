@@ -46,7 +46,7 @@ public:
     QString insertString() const override;
     QString createTable() const override;
     QString visibleLogName() override { return QObject::tr("Audit Trail Log"); } // Don't use the 'const' because translation does not work.
-    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
+    //mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 #ifdef QT_DEBUG
     void getParsedData(QString &status,
                        QDateTime &timestamp,

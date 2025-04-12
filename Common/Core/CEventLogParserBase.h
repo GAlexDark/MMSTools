@@ -40,7 +40,7 @@ public:
     virtual QString insertString() const override = 0;
     virtual QString createTable() const override = 0;
     virtual QString visibleLogName() override = 0;
-    virtual mms::ffs_t fileFieldsSeparationInfo() const override = 0;
+    mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
 
 protected:
     virtual bool parseUserFailedLogonDetails() = 0;
