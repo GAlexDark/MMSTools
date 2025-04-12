@@ -23,7 +23,6 @@
 #include <QRegularExpression>
 
 #include "DBStrings.h"
-#include "elcUtils.h"
 
 namespace {
     const QRegularExpression reSystemLogHeader(QLatin1String("^(.*?);(.*?);(.*?);(.*?)"));
@@ -166,7 +165,6 @@ CSystemLogParser::parse(const QString& line)
 {
     QString buf(line);
     buf.replace(QLatin1String("&quot;"), QLatin1String("\""));
-
     QRegularExpressionMatch match = reSystemLogHeader.match(buf);
     if (!match.hasMatch()) {
         setErrorString(QStringLiteral("Wrong header.\nDetails: %1").arg(line));
@@ -175,7 +173,7 @@ CSystemLogParser::parse(const QString& line)
 
     m_severity = match.captured(1);
     QString timestamp = match.captured(2);
-    m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
+    m_timestamp = timestamp.contains('T') && timestamp.contains('-') ? QDateTime::fromString(timestamp, Qt::ISODateWithMs).toLocalTime() : QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
     if (!m_timestamp.isValid()) {
         m_timestamp = QDateTime();
         setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
