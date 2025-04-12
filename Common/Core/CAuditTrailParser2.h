@@ -41,12 +41,11 @@ class CAuditTrailParser2: public CAuditTrailParserBase
 
 public:
     Q_INVOKABLE explicit CAuditTrailParser2(QObject *parent = nullptr);
-    bool parse(const QString& line) override;
-    void convertData(QMap<QString, QVariant> &data) override;
-    QString insertString() const override;
-    QString createTable() const override;
-    QString visibleLogName() override { return QObject::tr("Audit Trail Log (CR-003)"); } // Don't use the 'const' because translation does not work.
-    //mms::ffs_t fileFieldsSeparationInfo() const override { return { m_delimiterChar, m_quoteChar, m_eolChars }; }
+    bool parse(const QString& line) final;
+    void convertData(QMap<QString, QVariant> &data) final;
+    QString insertString() const final;
+    QString createTable() const final;
+    QString visibleLogName() final { return QObject::tr("Audit Trail Log (CR-003)"); } // Don't use the 'const' because translation does not work.
 #ifdef QT_DEBUG
     void getParsedData(QString &status,
                        QDateTime &timestamp,

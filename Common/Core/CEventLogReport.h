@@ -31,9 +31,9 @@ class CEventLogReport : public CBasicReport
     Q_CLASSINFO("source", "eventlog")
 public:
     Q_INVOKABLE explicit CEventLogReport(QObject *parent = nullptr);
-    bool generateReport() override;
-    QString visibleReportName() override { return QObject::tr("Event Log"); }
-    QString selectString() const override;
+    bool generateReport() final;
+    QString visibleReportName() final { return QObject::tr("Event Log"); }
+    QString selectString() const final;
 private:
     void addReportHeader(QXlsx::Document *xlsxReport, int row);
     void addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat, bool &isDataTooLong);

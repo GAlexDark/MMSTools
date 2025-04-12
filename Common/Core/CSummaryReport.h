@@ -31,9 +31,9 @@ class CSummaryReport : public CBasicReport
     Q_CLASSINFO("source", "eventlog|audittraillog|systemlog")
 public:
     Q_INVOKABLE explicit CSummaryReport(QObject *parent = nullptr);
-    bool generateReport() override;
-    QString visibleReportName() override { return QObject::tr("(Experimental) Summary report"); }
-    QString selectString() const override;
+    bool generateReport() final;
+    QString visibleReportName() final { return QObject::tr("(Experimental) Summary report"); }
+    QString selectString() const final;
 private:
     void addReportHeader(QXlsx::Document *xlsxReport, int row);
     void addReportRow(QXlsx::Document *xlsxReport, int row, int multipartRowCount, const QXlsx::Format &dateFormat);

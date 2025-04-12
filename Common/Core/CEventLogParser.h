@@ -41,11 +41,11 @@ class CEventLogParser: public CEventLogParserBase
 
 public:
     Q_INVOKABLE explicit CEventLogParser(QObject *parent = nullptr);
-    bool parse(const QString& line) override;
-    void convertData(QMap<QString, QVariant> &data) override;
-    QString insertString() const override;
-    QString createTable() const override;
-    QString visibleLogName() override { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
+    bool parse(const QString& line) final;
+    void convertData(QMap<QString, QVariant> &data) final;
+    QString insertString() const final;
+    QString createTable() const final;
+    QString visibleLogName() final { return QObject::tr("Event Log"); } // Don't use the 'const' because translation does not work.
 #ifdef QT_DEBUG
     void getParsedData(QString &username,
                        QString &timestampISO8601,
@@ -59,7 +59,7 @@ public:
                        QDateTime &timestampTZ) const;
 #endif
 private:
-    bool parseUserFailedLogonDetails() override;
+    bool parseUserFailedLogonDetails() final;
 };
 
 Q_DECLARE_METATYPE(CEventLogParser *);
