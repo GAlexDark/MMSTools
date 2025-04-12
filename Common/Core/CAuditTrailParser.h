@@ -59,25 +59,6 @@ public:
                        QString &internalip,
                        QString &externalip) const;
 #endif
-
-private:
-//    bool parsePersonDataDetails();
-//    bool parseLoadAuditTrail();
-//    bool parseAttributesDetails();
-
-//    QDateTime   m_timestamp;
-
-//    QString     m_header;
-//    QString     m_status;
-//    QString     m_method;
-//    QString     m_username;
-//    QString     m_role;
-//    QString     m_companyname;
-//    QString     m_attributes;
-//    QString     m_username1;
-
-//    char        m_delimiterChar;
-//    char        m_quoteChar = 0;
 };
 
 Q_DECLARE_METATYPE(CAuditTrailParser *);
