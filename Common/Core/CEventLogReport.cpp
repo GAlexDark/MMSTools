@@ -71,20 +71,7 @@ CEventLogReport::generateReport()
         setErrorString(ex.what());
         retVal = false;
     }
-
-    if (row != 2) {
-        if (retVal) {
-            const QString fileName = createReportFilename(row);
-            retVal = xlsxReport->saveAs(fileName);
-            if (!retVal) {
-                setErrorString(QStringLiteral("Error save report file"));
-            }
-        }
-    } else {
-        retVal = false;
-        setErrorString(QStringLiteral("Nothing data to save"));
-    }
-
+    saveReport(retVal, xlsxReport, row);
     return retVal;
 }
 

@@ -52,14 +52,15 @@ protected:
     void setReportDataItem(QXlsx::Document *report, const int dbFieldIndex, const int reportFieldIndex, const int row);
     void setReportDataItem(QXlsx::Document *report, const QString &dbFieldName, const int reportFieldIndex, const int row);
     void setReportDataItem(QXlsx::Document *report, const int column, const int row, const QVariant &writeValue);
-    QString createReportFilename(const int row);
     int getMultipartRowCount() const { return m_multipartRowCount; }
     bool isShowMilliseconds() const { return m_showMilliseconds; }
+    void saveReport(bool &retVal, QScopedPointer<QXlsx::Document> &xlsxReport, const int row);
 
     pSqliteDatabase m_db = nullptr;
 
 private:
     QString createReportPartFilename();
+    QString createReportFilename(const int row);
 
     QString m_errorString;
     QString m_reportFileName;
