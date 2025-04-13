@@ -61,22 +61,24 @@
 <context>
     <name>CMmsLogsThreadReader</name>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="389"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="377"/>
         <source>Preparing to read the file(s).</source>
         <translation>Підготовка до читання файлу(ів).</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="403"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="390"/>
         <source>Reading of the file %1 has started.</source>
         <translation>Читання файлу %1 розпочалося.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="413"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="399"/>
         <source>The file %1 was read</source>
         <translation>Файл %1 прочитаний</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSVReader.cpp" line="413"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="388"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="393"/>
+        <location filename="../../Common/Core/CSVReader.cpp" line="397"/>
         <source>The file %1 was not read</source>
         <translation>Файл %1 не прочитаний</translation>
     </message>
@@ -210,9 +212,9 @@
         <translation>Про версію Qt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="163"/>
-        <location filename="../src/mainwindow.cpp" line="357"/>
-        <location filename="../src/mainwindow.cpp" line="434"/>
+        <location filename="../src/mainwindow.cpp" line="157"/>
+        <location filename="../src/mainwindow.cpp" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="409"/>
         <source>Ready</source>
         <translation>Готовий</translation>
     </message>
@@ -229,7 +231,7 @@ Copyright (C) 2023 Олексій Гаєнко
   https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="230"/>
+        <location filename="../src/mainwindow.cpp" line="223"/>
         <source>Open MMS Event Log file</source>
         <translation>Відкрити журнал подій MMS</translation>
     </message>
@@ -270,12 +272,12 @@ Copyright (C) 2023 Олексій Гаєнко
   https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="208"/>
+        <location filename="../src/mainwindow.cpp" line="202"/>
         <source>Contacts - MMS Event Log Conversion Utility</source>
         <translation>Контакти - Утиліта перетворення журналыв подій MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="209"/>
+        <location filename="../src/mainwindow.cpp" line="203"/>
         <source>&lt;p&gt;The MMS Event Log Conversion Utility developers can be reached at the mail:&lt;/p&gt;%1&lt;p&gt;Please use %2 for bigger chunks of text.&lt;/p&gt;</source>
         <translation>&lt;p&gt;З розробниками утиліти перетворення журналу подій MMS можна зв&apos;язатися електронною поштою:&lt;/p&gt;%1&lt;p&gt;Будь ласка, використовуйте %2 для великих фрагментів тексту.&lt;/p&gt;</translation>
     </message>
@@ -300,39 +302,38 @@ No - Otherwise.</source>
         <translation>Файл(и) даних не містить(-ять) заголовків</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="275"/>
+        <location filename="../src/mainwindow.cpp" line="274"/>
         <source>File selection canceled.</source>
         <translation>Вибір файлу(-ів) скасовано.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="282"/>
-        <location filename="../src/mainwindow.cpp" line="335"/>
+        <location filename="../src/mainwindow.cpp" line="230"/>
+        <location filename="../src/mainwindow.cpp" line="289"/>
         <source>No files selected</source>
         <translation>Файли не вибрані</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="309"/>
         <source>Read and converting</source>
-        <translation>Читання та конвертація</translation>
+        <translation type="vanished">Читання та конвертація</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="325"/>
+        <location filename="../src/mainwindow.cpp" line="326"/>
         <source>Reading file(s) completed</source>
         <translation>Читання файлів закінчено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="326"/>
+        <location filename="../src/mainwindow.cpp" line="327"/>
         <source>Reading complete</source>
         <translation>Читання закінчено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="328"/>
+        <location filename="../src/mainwindow.cpp" line="329"/>
         <source>Error reading file(s): %1</source>
         <translation>Помилка читання файлу(-ів): %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="267"/>
-        <location filename="../src/mainwindow.cpp" line="329"/>
+        <location filename="../src/mainwindow.cpp" line="330"/>
         <source>Error reading</source>
         <translation>Помилка читання</translation>
     </message>
@@ -351,30 +352,42 @@ Copyright (C) 2023 Олексій Гаєнко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
         <source>Error in internal IP address mask. Please check it in the config file.</source>
         <translation>Помилка в масці внутрішньої IP-адреси. Будь ласка, перевірте це у конфігураційному файлі.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="344"/>
         <source>Starting cleaning database...</source>
         <translation>Початок очищення БД...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="359"/>
+        <location filename="../src/mainwindow.cpp" line="355"/>
         <source>Cannot clean database: %1</source>
         <translation>Неможливо очистити БД: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="273"/>
-        <location filename="../src/mainwindow.cpp" line="360"/>
-        <location filename="../src/mainwindow.cpp" line="426"/>
-        <location filename="../src/mainwindow.cpp" line="440"/>
+        <location filename="../src/mainwindow.cpp" line="91"/>
+        <location filename="../src/mainwindow.cpp" line="106"/>
+        <location filename="../src/mainwindow.cpp" line="272"/>
+        <location filename="../src/mainwindow.cpp" line="356"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
+        <location filename="../src/mainwindow.cpp" line="442"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="195"/>
+        <location filename="../src/mainwindow.cpp" line="90"/>
+        <source>Unable to open advanced report filtering settings window.</source>
+        <translation>Неможливо відкрити вікно додаткових параметрів фільтрації звітів.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="105"/>
+        <source>Unable to open the advanced file reading settings window.</source>
+        <translation>Неможливо відкрити вікно додаткових налаштувань для читання файлів.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="189"/>
         <source>MMS Event Log Conversion Utility
 Version %1
 Copyright (C) 2023 Oleksii Gaienko
@@ -391,7 +404,18 @@ Copyright (C) 2023 Олексій Гаєнко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="270"/>
         <location filename="../src/mainwindow.cpp" line="380"/>
+        <source>Error opening options dialog.</source>
+        <translation>Помилка відкриття діалогового вікна параметрів.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="310"/>
+        <source>Reading and converting</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="390"/>
         <source>Additional report filtering settings:</source>
         <translation>Додаткові параметри фільтрації звітів:</translation>
     </message>
@@ -404,18 +428,18 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Список виключених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="394"/>
+        <location filename="../src/mainwindow.cpp" line="404"/>
         <source>Save MMS Event Log report</source>
         <translation>Зберегти звіт журналу MMS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="401"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>The report will be created here: %1</source>
         <translation>Звіт буде створено тут: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="317"/>
-        <location filename="../src/mainwindow.cpp" line="414"/>
+        <location filename="../src/mainwindow.cpp" line="318"/>
+        <location filename="../src/mainwindow.cpp" line="430"/>
         <source>wait...</source>
         <translation>Зачекайте...</translation>
     </message>
@@ -434,12 +458,12 @@ Copyright (C) 2023 Олексій Гаєнко
  https://github.com/QtExcel/QXlsx.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="232"/>
+        <location filename="../src/mainwindow.cpp" line="225"/>
         <source>MMS log files (*.csv)</source>
         <translation>Журнали подій MMS (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="243"/>
+        <location filename="../src/mainwindow.cpp" line="244"/>
         <source>%1 - this file have zero size and will be removed from the list.</source>
         <translation>%1 - цей файл має нульовий розмір і буде видалено зі списку.</translation>
     </message>
@@ -462,23 +486,21 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation>Невідомий тип журналу MMS.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="271"/>
-        <location filename="../src/mainwindow.cpp" line="438"/>
         <source>Error open options dialog.</source>
-        <translation>Помилка відкриття діалогового вікна параметрів.</translation>
+        <translation type="vanished">Помилка відкриття діалогового вікна параметрів.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="308"/>
+        <location filename="../src/mainwindow.cpp" line="309"/>
         <source>Start reading and converting file(s)...</source>
         <translation>Початок читання та конвертації файлу(-ів)...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="371"/>
+        <location filename="../src/mainwindow.cpp" line="367"/>
         <source>Start generating the report...</source>
         <translation>Початок створення звіту...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="372"/>
+        <location filename="../src/mainwindow.cpp" line="368"/>
         <source>Start generating the report</source>
         <translation>Початок створення звіту</translation>
     </message>
@@ -487,69 +509,73 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">(Експериментальний) Зведений звіт</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="382"/>
+        <location filename="../src/mainwindow.cpp" line="392"/>
         <source>	The included users list is empty.</source>
         <translation>	Перелік включених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="384"/>
+        <location filename="../src/mainwindow.cpp" line="394"/>
         <source>	The included users: %1</source>
         <translation>	Включені користувачі: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="387"/>
+        <location filename="../src/mainwindow.cpp" line="397"/>
         <source>	The excluded users list is empty.</source>
         <translation>	Перелік виключених користувачів порожній.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="389"/>
+        <location filename="../src/mainwindow.cpp" line="399"/>
         <source>	The excluded users: %1</source>
         <translation>	Виключені користувачі: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="391"/>
+        <location filename="../src/mainwindow.cpp" line="401"/>
         <source>Selected report type: %1</source>
         <translation>Вибраний тип звіту: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="403"/>
+        <location filename="../src/mainwindow.cpp" line="419"/>
         <source>Generating report...</source>
         <translation>Створення звіту...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="422"/>
+        <location filename="../src/mainwindow.cpp" line="438"/>
         <source>Report generating finished.
 The report was saved in the %1 file.</source>
         <translation>Формування звіту завершено.
 Звіт збережено у файлі %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="423"/>
+        <location filename="../src/mainwindow.cpp" line="439"/>
         <source>Report created</source>
         <translation>Звіт створено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="425"/>
-        <source>Error generate report: %1</source>
-        <translation>Помилка створення звіту: %1</translation>
+        <location filename="../src/mainwindow.cpp" line="441"/>
+        <source>Error generating report: %1</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="429"/>
+        <source>Error generate report: %1</source>
+        <translation type="vanished">Помилка створення звіту: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="445"/>
         <source>You don&apos;t have write permissions to this folder: %1</source>
         <translation>Ви не маєте дозволу на запис до цієї папки: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="430"/>
+        <location filename="../src/mainwindow.cpp" line="446"/>
         <source>Warning</source>
         <translation>Увага</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="433"/>
+        <location filename="../src/mainwindow.cpp" line="408"/>
         <source>Report name is empty</source>
         <translation>Відсутня назва звіту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="442"/>
+        <location filename="../src/mainwindow.cpp" line="384"/>
         <source>Report generation canceled.</source>
         <translation>Створення звіту скасовано.</translation>
     </message>
@@ -575,7 +601,7 @@ Version 1.0
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="179"/>
-        <location filename="../src/mainwindow.cpp" line="194"/>
+        <location filename="../src/mainwindow.cpp" line="188"/>
         <source>About MMS Event Log Conversion Utility</source>
         <translation>Про утиліту перетворення журналу подій MMS</translation>
     </message>
@@ -630,7 +656,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Зберегти звіт MMS EventLog</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="396"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
@@ -675,7 +701,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 розпарений</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="404"/>
+        <location filename="../src/mainwindow.cpp" line="420"/>
         <source>Generating report</source>
         <translation>Створення звіту</translation>
     </message>
@@ -688,7 +714,7 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Файл %1 збережено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="356"/>
+        <location filename="../src/mainwindow.cpp" line="352"/>
         <source>Database was cleared</source>
         <translation>БД очищена</translation>
     </message>
@@ -768,27 +794,29 @@ Copyright (C) 2023 Олексій Гаєнко
         <translation type="vanished">Неприпустимий символ у значенні %1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="114"/>
+        <location filename="../src/main.cpp" line="112"/>
         <source>Information</source>
         <translation>Інформація</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="115"/>
         <source>The another copy of the Utility is still running. Please close it.</source>
+        <translation type="vanished">Інша копія утиліти все ще працює. Будь ласка, закрийте її.</translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="113"/>
+        <source>Another copy of the Utility is still running. Please close it.</source>
         <translation>Інша копія утиліти все ще працює. Будь ласка, закрийте її.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="125"/>
-        <location filename="../src/main.cpp" line="129"/>
+        <location filename="../src/main.cpp" line="124"/>
+        <location filename="../src/main.cpp" line="128"/>
         <location filename="../src/main.cpp" line="144"/>
-        <location filename="../src/main.cpp" line="153"/>
-        <location filename="../src/mainwindow.cpp" line="94"/>
-        <location filename="../src/mainwindow.cpp" line="112"/>
+        <location filename="../src/main.cpp" line="152"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="125"/>
+        <location filename="../src/main.cpp" line="124"/>
         <location filename="../src/main.cpp" line="144"/>
         <source>Cannot create folder: %1
 Details: %2</source>
@@ -796,7 +824,7 @@ Details: %2</source>
 Деталі: %2</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="129"/>
+        <location filename="../src/main.cpp" line="128"/>
         <source>The settings Class cannot be initialized.</source>
         <translation>Клас налаштувань не може бути ініціалізований.</translation>
     </message>
@@ -814,7 +842,7 @@ The database file will be created on the default path.</source>
   Файл бази даних буде створено за типовим шляхом.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="153"/>
+        <location filename="../src/main.cpp" line="152"/>
         <source>Cannot open database: %1
 Details: %2</source>
         <translation>Неможливо відкрити базу даних: %1
@@ -833,13 +861,13 @@ Details: %2</source>
         <translation type="vanished">Критична помилка: %1</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CAuditTrailParser.h" line="58"/>
+        <location filename="../../Common/Core/CAuditTrailParser.h" line="48"/>
         <location filename="../../Common/Core/CAuditTrailReport.h" line="35"/>
         <source>Audit Trail Log</source>
         <translation>Журнал контролю</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CEventLogParser.h" line="57"/>
+        <location filename="../../Common/Core/CEventLogParser.h" line="48"/>
         <location filename="../../Common/Core/CEventLogReport.h" line="35"/>
         <source>Event Log</source>
         <translation>Журнал подій</translation>
@@ -850,20 +878,28 @@ Details: %2</source>
         <translation>(Експериментальний) Зведений звіт</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="93"/>
         <source>Unable to open advanced report filtering settings window.</source>
-        <translation>Неможливо відкрити вікно додаткових параметрів фільтрації звітів.</translation>
+        <translation type="vanished">Неможливо відкрити вікно додаткових параметрів фільтрації звітів.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="111"/>
         <source>Unable to open the advanced file reading settings window.</source>
-        <translation>Неможливо відкрити вікно додаткових налаштувань для читання файлів.</translation>
+        <translation type="vanished">Неможливо відкрити вікно додаткових налаштувань для читання файлів.</translation>
     </message>
     <message>
-        <location filename="../../Common/Core/CSystemLogParser.h" line="55"/>
+        <location filename="../../Common/Core/CSystemLogParser.h" line="48"/>
         <location filename="../../Common/Core/CSystemLogReport.h" line="35"/>
         <source>System Log</source>
         <translation>Журнал системи</translation>
+    </message>
+    <message>
+        <location filename="../../Common/Core/CAuditTrailParser2.h" line="48"/>
+        <source>Audit Trail Log (CR-003)</source>
+        <translation>Журнал контролю (CR-003)</translation>
+    </message>
+    <message>
+        <location filename="../../Common/Core/CEventLogParser2.h" line="48"/>
+        <source>Event Log (CR-003)</source>
+        <translation>Журнал подій (CR-003)</translation>
     </message>
 </context>
 </TS>

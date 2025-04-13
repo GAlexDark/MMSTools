@@ -174,3 +174,20 @@ CBasicReport::createReportFilename(const int row)
     }
     return retVal;
 }
+
+void
+CBasicReport::saveReport(bool &retVal, QScopedPointer<QXlsx::Document> &xlsxReport, const int row)
+{
+    if (row != 2) {
+        if (retVal) {
+            const QString fileName = createReportFilename(row);
+            retVal = xlsxReport->saveAs(fileName);
+            if (!retVal) {
+                setErrorString(QStringLiteral("Error save report file"));
+            }
+        }
+    } else {
+        retVal = false;
+        setErrorString(QStringLiteral("Nothing data to save"));
+    }
+}

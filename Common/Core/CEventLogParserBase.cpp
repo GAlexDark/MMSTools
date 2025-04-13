@@ -1,7 +1,7 @@
 /****************************************************************************
 *
 * Class for parsing the MMS Event logs.
-* Copyright (C) 2024  Oleksii Gaienko
+* Copyright (C) 2025  Oleksii Gaienko
 * Contact: galexsoftware@gmail.com
 *
 * This program is free software: you can redistribute it and/or modify
