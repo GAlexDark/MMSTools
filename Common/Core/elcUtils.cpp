@@ -110,7 +110,6 @@ elcUtils::waitForEndThread(QThread *obj, unsigned long time)
 }
 
 #ifdef Q_OS_WIN
-
 QString
 elcUtils::getWindowsApiErrorMessage(quint32 errorCode)
 {
@@ -184,8 +183,7 @@ expandEnvStrings_windows(QString &path)
         }
     }
 }
-#endif
-
+#else
 void
 expandEnvStrings_linux(QString &path)
 {
@@ -202,7 +200,7 @@ expandEnvStrings_linux(QString &path)
         value.clear();
     }
 }
-
+#endif
 void
 elcUtils::expandEnvironmentStrings(QString &path)
 {
