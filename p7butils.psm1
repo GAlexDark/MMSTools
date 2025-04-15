@@ -10,17 +10,23 @@ function Remove-File {
     )
 
     try {
-        [bool] $retVal = Test-Path -Path $Path -ErrorAction Stop
-        if ($retVal) {
-            Remove-Item -Path (Join-Path -Path $Path -ChildPath '*' -ErrorAction Stop) -Include $Extensions -Force -ErrorAction Stop
-        } else {
+        if (-not (Test-Path -Path $Path -ErrorAction Stop)) {
             Write-Host "The path '$Path' is not found" -ForegroundColor Red
+            return $false
         }
+
+        $itemsToRemove = Get-ChildItem -Path $Path -Include $Extensions -Recurse -Force -ErrorAction Stop
+        if ($itemsToRemove) {
+            $itemsToRemove | Remove-Item -Force -ErrorAction Stop
+            Write-Host "Files with specified extensions were successfully removed from '$Path'." -ForegroundColor Green
+        } else {
+            Write-Host "No files with the specified extensions were found in '$Path'." -ForegroundColor Yellow
+        }
+        return $true
     } catch {
-        $retVal = $false
-        Write-Host $PSItem.ErrorRecord -ForegroundColor Red
+        Write-Host "An error occurred: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
     }
-    return $retVal
 }
 
 function Get-DomainFromUrl {
@@ -52,17 +58,12 @@ function Test-CheckDnsName {
         [string] $Domain
     )
 
-    [bool] $retVal = $true;
     try {
         $dnsRecord = Resolve-DnsName -Name $Domain -DnsOnly -ErrorAction Stop
         Write-Host "OK - The domain name '$Domain' was resolved to the IP address: $($dnsRecord.IPAddress -join ',')" -ForegroundColor green
     } catch {
-        $errMessage = $PSItem.Exception.Message
-        Write-Host "Error resolve host $errMessage" -ForegroundColor Red
-        $retVal = $false
+        throw "Error resolve host: $($_.Exception.Message)"
     }
-
-    return $retVal
 }
 
 function Test-CheckQuery {
@@ -73,8 +74,7 @@ function Test-CheckQuery {
     )
 
     $url = [System.Uri]$BaseUrl
-    [bool] $retVal = if ($url.Query.Length -eq 0) { $false } else { $true }
-    return $retVal
+    return $url.Query.Length -eq 0
 }
 
 function Test-CheckURL {
@@ -83,12 +83,11 @@ function Test-CheckURL {
         [ValidateNotNullOrEmpty()]
         [string] $Url,
 
-		[Parameter(Mandatory = $false)]
-		[ValidateNotNullOrEmpty()]
-		[bool] $IsUsingProxy = $true
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [bool] $IsUsingProxy = $true
     )
 
-    [bool] $retVal = $true
     try {
         $params = @{
             Method = 'Head'
@@ -115,17 +114,14 @@ function Test-CheckURL {
             Write-Host $pattern -ForegroundColor Green
         } else {
             [string] $pattern = [string]::Format("Error connect to the '{0}'. Error code: {1}.", $Url, $result.StatusCode)
-            Write-Host $pattern -ForegroundColor Red
-            $retVal = $false
+            throw $pattern
         }
     } catch {
-        Write-Error $PSItem
-        $retVal = $false
+        [string] $pattern = [string]::Format("Error check URL '{0}': {1}", $Url, $_.Exception.Message)
+        throw $pattern
     } finally {
         Get-GarbageCollector
     }
-
-    return $retVal
 }
 
 function Get-GarbageCollector {
@@ -146,7 +142,6 @@ function Get-DownloadFile {
         [string] $SavePath
     )
 
-    [bool] $retVal = $true
     try {
         $fileName = Get-FileNameFromUrl -BaseUrl $DownloadUrl
         $fileName = Join-Path -Path $SavePath -ChildPath $fileName -ErrorAction Stop
@@ -171,15 +166,13 @@ function Get-DownloadFile {
             $params.Proxy = $proxy.Address
         }
         Invoke-WebRequest @params
-        Write-Host "OK - The file was successfully saved in the $SavePath folder." -ForegroundColor Green
+        Write-Host "OK - The file was successfully saved in the '$SavePath' folder." -ForegroundColor Green
     } catch {
-        Write-Error $PSItem
-        $retVal = $false
+        [string] $pattern = [string]::Format("Error download file from the '{0}': {1}", $DownloadUrl, $_.Exception.Message)
+        throw $pattern
     } finally {
         Get-GarbageCollector
     }
-
-    return $retVal
 }
 
 function Get-ShaHashFile {
@@ -189,18 +182,19 @@ function Get-ShaHashFile {
         [string] $FileName
     )
 
-    [bool] $retVal = $true
     try {
         [string] $hash = (Get-FileHash -Path $FileName -Algorithm SHA1 -ErrorAction Stop).Hash
-        [string] $hashFile = $FileName + ".sha"
-        [string] $name = (Split-Path -Path $FileName -Leaf -ErrorAction Stop)
-        $hash + " *" + $name | Out-File -FilePath $hashFile -Encoding utf8 -ErrorAction Stop
+        [string] $hashFile = "$FileName.sha"
+        $fileNameOnly = (Split-Path -Path $FileName -Leaf -ErrorAction Stop)
+        $hashContent = "$hash *$fileNameOnly"
+
+        $hashContent | Out-File -FilePath $hashFile -Encoding utf8 -ErrorAction Stop
         Write-Host "OK - The hash file '$hashFile' was successfully created." -ForegroundColor Green
+        return $true
     } catch {
-        Write-Host $PSItem -ForegroundColor Red
-        $retVal = $false
+        Write-Host "An error occurred: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
     }
-    return $retVal
 }
 
 Export-ModuleMember -Function Remove-File
