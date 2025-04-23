@@ -15,7 +15,7 @@
 
 .PROJECTURI https://github.com/GAlexDark/MMSTools
 
-.RELEASENOTES This script comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
+.RELEASENOTES This script comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. For more details, see the GNU General Public License.
 
 #>
 
@@ -38,101 +38,169 @@ Param (
     [ValidateNotNullOrEmpty()]
     [string] $EnvFileName,
 
-    [Parameter(Mandatory=$true,
-    HelpMessage = "Enter the path to the folder were will be saved data files.")]
-    [ValidateNotNullOrEmpty()]
-    [string] $OutputDir,
-
     [Parameter(Mandatory=$false,
     HelpMessage = "Select to change to the Slave mode.")]
     [switch] $Slave = $false
 )
 
+function ConvertFrom-Filename {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $FileName
+    )
+
+    [bool] $retVal = $true
+    [string] $fn = $FileName.Replace("/", "")
+    [string] $baseName = $fn.Substring(0, $fn.IndexOf('.'))
+    [string] $extension = $fn.Substring($fn.IndexOf('.') + 1)
+
+    try {
+        [string[]] $buffer = $baseName -split "_"
+        [bool] $isREJECTED = $false
+        [string] $defaultTimestamp = "1970-01-01"
+        [string] $mask = "yyyy-MM-dd"
+        [datetime] $dateFrom = [datetime]::ParseExact($defaultTimestamp, $mask, $null).AddHours(12).AddMinutes(0).AddSeconds(0)
+        [datetime] $dateTo = [datetime]::ParseExact($defaultTimestamp, $mask, $null).AddHours(12).AddMinutes(0).AddSeconds(0)
+        [string] $xCode = ""
+        [datetime] $issueDate = [datetime]::ParseExact($defaultTimestamp, $mask, $null).AddHours(0).AddMinutes(0).AddSeconds(0)
+
+        if ($buffer.Count -ge 4) {
+            $dateFrom = [datetime]::ParseExact($buffer[1], $mask, $null).AddHours(12).AddMinutes(0).AddSeconds(0)
+            $dateTo = [datetime]::ParseExact($buffer[2], $mask, $null).AddHours(12).AddMinutes(59).AddSeconds(59)
+            $xCode = $buffer[3].Trim()
+
+            switch ($buffer.Count) {
+                7 {
+                    $issueDate = [datetime]::ParseExact($buffer[5], $mask, $null).AddHours(($buffer[6] -split "-")[0]).AddMinutes(($buffer[6] -split "-")[1]).AddSeconds(0)
+                    break
+                }
+                8 {
+                    if ($buffer[5].Contains("-") -and $buffer[6].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[5], $mask, $null).AddHours(($buffer[6] -split "-")[0]).AddMinutes(($buffer[6] -split "-")[1]).AddSeconds(0)
+                    }
+                    if ($buffer[6].Contains("-") -and $buffer[7].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[6], $mask, $null).AddHours(($buffer[7] -split "-")[0]).AddMinutes(($buffer[7] -split "-")[1]).AddSeconds(0)
+                    }
+                    break
+                }
+                9 {
+                    if ($buffer[6].Contains("-") -and $buffer[7].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[6], $mask, $null).AddHours(($buffer[7] -split "-")[0]).AddMinutes(($buffer[7] -split "-")[1]).AddSeconds(0)
+                    }
+                    if ($buffer[7].Contains("-") -and $buffer[8].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[7], $mask, $null).AddHours(($buffer[8] -split "-")[0]).AddMinutes(($buffer[8] -split "-")[1]).AddSeconds(0)
+                    }
+                    break
+                }
+                10 {
+                    if ($buffer[7].Contains("-") -and $buffer[8].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[7], $mask, $null).AddHours(($buffer[8] -split "-")[0]).AddMinutes(($buffer[8] -split "-")[1]).AddSeconds(0)
+                    }
+                    if ($buffer[8].Contains("-") -and $buffer[9].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[8], $mask, $null).AddHours(($buffer[9] -split "-")[0]).AddMinutes(($buffer[9] -split "-")[1]).AddSeconds(0)
+                    }
+                    break
+                }
+                11 {
+                    if ($buffer[7].Contains("-") -and $buffer[8].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[7], $mask, $null).AddHours(($buffer[8] -split "-")[0]).AddMinutes(($buffer[8] -split "-")[1]).AddSeconds(0)
+                    }
+                    if ($buffer[8].Contains("-") -and $buffer[9].Contains("-")) {
+                        $issueDate = [datetime]::ParseExact($buffer[8], $mask, $null).AddHours(($buffer[9] -split "-")[0]).AddMinutes(($buffer[9] -split "-")[1]).AddSeconds(0)
+                    }
+                    break
+                }
+                12 {
+                    $issueDate = [datetime]::ParseExact($buffer[8], $mask, $null).AddHours(($buffer[9] -split "-")[0]).AddMinutes(($buffer[9] -split "-")[1]).AddSeconds(0)
+                    break
+                }
+            }
+            if ($FileName.Contains("REJECTED")) {
+                $isREJECTED = $true
+            }
+        } else {
+            $retVal = $false
+        }
+    } catch {
+        $retVal = $false
+    }
+
+    return @{Status = $retVal; Basename = $baseName; Extension = $extension; DateFrom = $dateFrom; DateTo = $dateTo; XCode = $xCode; IssueDate = $issueDate; isREJECTED = $isREJECTED}
+}
+
+function Validate-Path {
+    param (
+        [string] $Path,
+        [string] $ErrorMessage
+    )
+    if (-not (Test-Path -Path $Path -ErrorAction Stop)) {
+        throw $ErrorMessage
+    }
+}
+
+function Validate-Variable {
+    param (
+        [string] $VariableName,
+        [string] $ErrorMessage
+    )
+    if ([string]::IsNullOrEmpty($VariableName)) {
+        throw $ErrorMessage
+    }
+}
+
+function Log-Message {
+    param(
+        [string] $Message,
+        [string] $Color = "White"
+    )
+    Write-Host $Message -ForegroundColor $Color
+}
 #=========================================================================
 try {
     [int] $exitCode = 0
-
     $EnvFileName = $EnvFileName.Trim()
-    if ([string]::IsNullOrEmpty($EnvFileName)) {
-        throw "The 'EnvFileName' value is not set."
-    }
+    Validate-Variable -VariableName $EnvFileName -ErrorMessage "The 'EnvFileName' value is not set."
     $EnvFileName = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
-    [bool] $retVal = Test-Path -Path $EnvFileName -ErrorAction Stop
-    if (-not $retVal) {
-        throw "`nThe '$EnvFileName' file is not found.`n"
-    }
-
-    $retVal = Test-Path -Path $OutputDir -ErrorAction Stop
-    if (-not $retVal) {
-        throw "`nThe OutputDir '$OutputDir' is not exists.`n"
-    }
+    Validate-Path -Path $EnvFileName -ErrorMessage "`nThe '$EnvFileName' file not found.`n"
 
     #Mapping env variables
     . $EnvFileName
-    [string] $proxyName = $PROXY_NAME
-    [string] $proxyPort = $PROXY_PORT
-
-    [string] $remoteHost = $REMOTE_HOST
-    [int] $remotePort = $REMOTE_PORT
-    [string] $remotePath = $REMOTE_PATH
 
     [string] $userName = $($env:sshUserName)
     [string] $userPassword = $($env:sshPassword)
+    Validate-Variable -VariableName $userName -ErrorMessage "The 'userName' value is not set."
+    Validate-Variable -VariableName $userPassword -ErrorMessage "The 'userPassword' value is not set."
+    Validate-Variable -VariableName $REMOTE_HOST -ErrorMessage "The 'REMOTE_HOST' value is not set."
 
-    [string] $archiveStorage = $ARCHIVE_STORAGE
-    [string] $dateTimeFormat = $DATETIME_FORMAT
+    if ($REMOTE_PORT -eq 0) {
+        Log-Message "`nThe 'REMOTE_PORT' value is not set. Using the default value.`n" "Yellow"
+        $REMOTE_PORT = 22
+    } elseif (($REMOTE_PORT -lt 0) -and ($REMOTE_PORT -le 65535)) {
+        throw "The 'REMOTE_PORT' value is wrong: $REMOTE_PORT."
+    }
+    Validate-Variable -VariableName $REMOTE_PATH -ErrorMessage "The 'REMOTE_PATH' value not set."
+    Validate-Variable -VariableName $ARCHIVE_STORAGE -ErrorMessage "The 'ARCHIVE_STORAGE' value not set."
+    Validate-Path -Path $ARCHIVE_STORAGE -ErrorMessage "The '$ARCHIVE_STORAGE' directory not exists."
+    Validate-Variable -VariableName $DATETIME_FORMAT -ErrorMessage "The 'DATETIME_FORMAT' value not set."
+    Validate-Variable -VariableName $DB_NAME -ErrorMessage "The 'DB_NAME' value is not set."
+    Validate-Path -Path $DB_NAME -ErrorMessage "The '$DB_NAME' file not exists."
 
-    [string] $dbName = $DB_NAME
-
-    if ([string]::IsNullOrEmpty($remoteHost)) {
-        throw "The 'remoteHost' value is not set."
+    [UInt64] $freeSpace = (Get-PSDrive -PSProvider FileSystem $LOCAL_STORAGE_MOUNT_POINT).Free
+    if ($freeSpace -le $MIN_SPACE) {
+        throw "The disk space is low"
     }
-    if ($remotePort -eq 0) {
-        Write-Host `n
-        Write-Warning "The 'remotePort' value is not set. Using the default value.`n"
-    } elseif (($remotePort -lt 0) -and ($remotePort -le 65535)) {
-        throw "The 'remotePort' value is wrong: $remotePort."
-    }
-    if ([string]::IsNullOrEmpty($remotePath)) {
-        throw "The 'remotePath' value is not set."
-    }
-    if ([string]::IsNullOrEmpty($userName)) {
-        throw "The 'userName' value is not set."
-    }
-    if ([string]::IsNullOrEmpty($userPassword)) {
-        throw "The 'userPassword' value is not set."
-    }
-    if ([string]::IsNullOrEmpty($archiveStorage)) {
-        throw "The 'archiveStorage' value is not set."
-    } else {
-        $retVal = Test-Path -Path $archiveStorage -ErrorAction Stop
-        if (-not $retVal) {
-            throw "`nThe '$archiveStorage' directory is not exists.`n"
-        }
-    }
-    if ([string]::IsNullOrEmpty($dateTimeFormat)) {
-        throw "The 'dateTimeFormat' value is not set."
-    }
-    if ([string]::IsNullOrEmpty($dbName)) {
-        throw "The 'dbName' value is not set."
-    }
-
     #=========================================================================
-
     [string] $assemblyPath = if ($env:WINSCP_PATH) { $env:WINSCP_PATH } else { $PSScriptRoot }
     $assemblyPath = Join-Path -Path $assemblyPath -ChildPath "WinSCPnet.dll" -ErrorAction Stop
-    $retVal = Test-Path -Path $assemblyPath -ErrorAction Stop
-    if (-not $retVal) {
-        throw "The WinSCPnet.dll library is not found."
-    }
-    # Load WinSCP .NET assembly
+    Validate-Path -Path $assemblyPath -ErrorMessage "The 'WinSCPnet.dll' library not found."
     Add-Type -Path $assemblyPath -ErrorAction Stop
 
     # Setup session options
     $sessionOptions = New-Object WinSCP.SessionOptions -Property @{
         Protocol = [WinSCP.Protocol]::Sftp
-        HostName = $remoteHost
-        PortNumber = $remotePort
+        HostName = $REMOTE_HOST
+        PortNumber = $REMOTE_PORT
         UserName = $userName
         Password = $userPassword
     }
@@ -141,96 +209,105 @@ try {
     #$sessionOptions.AddRawSettings("SFTPListingQueue", "4")
     #$sessionOptions.AddRawSettings("SFTPDownloadQueue", "1500")
 
-    if (![string]::IsNullOrEmpty($proxyName) -and ![string]::IsNullOrEmpty($proxyPort) ) {
+    if (![string]::IsNullOrEmpty($PROXY_NAME) -and ![string]::IsNullOrEmpty($PROXY_PORT) ) {
         $sessionOptions.AddRawSettings("ProxyMethod", "3")
-        $sessionOptions.AddRawSettings("ProxyHost", $proxyName)
-        $sessionOptions.AddRawSettings("ProxyPort", $proxyPort)
+        $sessionOptions.AddRawSettings("ProxyHost", $PROXY_NAME)
+        $sessionOptions.AddRawSettings("ProxyPort", $PROXY_PORT)
     } else {
-        Write-Host "`nThe Proxy is not using (The settings is not present).`n" -ForegroundColor Yellow
+        Log-Message "`nThe Proxy is not using (The settings is not present).`n" "Yellow"
     }
 
+    [bool] $retVal = $true
     $session = New-Object WinSCP.Session
-    try {
-        $sessionOptions.SshHostKeyFingerprint = $session.ScanFingerprint($sessionOptions, "SHA-256")
-        # Connect
-        Write-Host "Connect to the $remoteHost."
-        $session.Open($sessionOptions)
-        Write-Host "Connection to the $remoteHost succeeded."
+    $sessionOptions.SshHostKeyFingerprint = $session.ScanFingerprint($sessionOptions, "SHA-256")
+    Log-Message "Connect to the $REMOTE_HOST..."
+    $session.Open($sessionOptions)
+    Log-Message "Connection to the $REMOTE_HOST succeeded."
 
-        [string] $buf = if ($Slave) { "remote host" } else { $remotePath }
-        Write-Host "`nStarting to get a list of the files and the directories in the $buf." -ForegroundColor Yellow
-        $filesInfo = $session.EnumerateRemoteFiles($remotePath, "*.*", [WinSCP.EnumerationOptions]::AllDirectories)
+    [string] $buf = if ($Slave) { "remote host" } else { $REMOTE_PATH }
+    Log-Message "`nStarting to get a list of the files and the directories in the $buf." "Yellow"
+    $filesInfo = $session.EnumerateRemoteFiles($REMOTE_PATH, "*.*", [WinSCP.EnumerationOptions]::AllDirectories)
 
-        [int] $count = 0
-        #------------------------------------
-        $assemblyPath = Join-Path -Path $PSScriptRoot -ChildPath "System.Data.SQLite.dll" -ErrorAction Stop
-        $retVal = Test-Path -Path $assemblyPath -ErrorAction Stop
-        if (-not $retVal) {
-            throw "The System.Data.SQLite.dll library is not found."
+    $assemblyPath = Join-Path -Path $PSScriptRoot -ChildPath "System.Data.SQLite.dll" -ErrorAction Stop
+    Validate-Path -Path $assemblyPath -ErrorMessage "The System.Data.SQLite.dll library not found"
+    Add-Type -Path $assemblyPath -ErrorAction Stop
+
+    $connectionString = [string]::Format("Data Source={0};Version=3;", $DB_NAME)
+    $oSQLiteDBConnection = New-Object System.Data.SQLite.SQLiteConnection($connectionString)
+
+    Log-Message "Open DB connection..."
+    $oSQLiteDBConnection.open()
+    Log-Message "DB connection opened.`n"
+
+    $prepareCommand = $oSQLiteDBConnection.CreateCommand()
+    $prepareCommand.Commandtext = "DROP TABLE IF EXISTS Fileinfo;"
+    $prepareCommand.CommandType = [System.Data.CommandType]::Text
+    $prepareCommand.ExecuteNonQuery() | Out-Null
+
+    $prepareCommand.Commandtext = "VACUUM;"
+    $prepareCommand.CommandType = [System.Data.CommandType]::Text
+    $prepareCommand.ExecuteNonQuery() | Out-Null
+
+    $prepareCommand.Commandtext = "CREATE TABLE Fileinfo (FileName TEXT NOT NULL, FullFileName TEXT NOT NULL, LastWriteTime TEXT NOT NULL, Owner TEXT NOT NULL, Permissions TEXT NOT NULL, DateFrom DATETIME NOT NULL, DateTo DATETIME NOT NULL, XCode TEXT, IssueDate DATETIME NOT NULL, IsREJECTED BOOLEAN NOT NULL, Extension TEXT);"
+    $prepareCommand.CommandType = [System.Data.CommandType]::Text
+    $prepareCommand.ExecuteNonQuery() | Out-Null
+
+    $transaction = $oSQLiteDBConnection.BeginTransaction()
+
+    $oSQLiteDBCommand = $oSQLiteDBConnection.CreateCommand()
+    $oSQLiteDBCommand.Commandtext = "INSERT INTO Fileinfo (FileName, FullFileName, LastWriteTime, Owner, Permissions, DateFrom, DateTo, XCode, IssueDate, IsREJECTED, Extension) VALUES (@FileName, @FullFileName, @LastWriteTime, @Owner, @Permissions, @DateFrom, @DateTo, @XCode, @IssueDate, @IsREJECTED, @Extension);"
+
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@FileName", [System.Data.DbType]::String))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@FullFileName", [System.Data.DbType]::String))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@LastWriteTime", [System.Data.DbType]::String))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@Owner", [System.Data.DbType]::String))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@Permissions", [System.Data.DbType]::String))) | Out-Null
+
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@DateFrom", [System.Data.DbType]::DateTime))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@DateTo", [System.Data.DbType]::DateTime))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@XCode", [System.Data.DbType]::String))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@IssueDate", [System.Data.DbType]::DateTime))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@IsREJECTED", [System.Data.DbType]::Boolean))) | Out-Null
+    $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@Extension", [System.Data.DbType]::String))) | Out-Null
+
+    [int] $count = 0
+    foreach ($fileInfo in $filesInfo) { # $fileInfo - RemoteFileInfo
+        [string] $buf = [WinSCP.RemotePath]::EscapeFileMask($fileInfo.FullName)
+        [string] $name = Split-Path -Path $buf -Leaf -ErrorAction Stop
+        $oSQLiteDBCommand.Parameters["@FileName"].Value = [string]::Format("/{0}", $name)
+        $oSQLiteDBCommand.Parameters["@FullFileName"].Value = $buf
+        $oSQLiteDBCommand.Parameters["@LastWriteTime"].Value = $fileInfo.LastWriteTime.ToString($DATETIME_FORMAT)
+        $oSQLiteDBCommand.Parameters["@Owner"].Value = "$($fileInfo.Owner):$($fileInfo.Group)"
+        $oSQLiteDBCommand.Parameters["@Permissions"].Value = $fileInfo.FilePermissions.Text
+
+        $data = ConvertFrom-Filename -FileName $name
+        if (-not $data.Status) {
+            Log-Message $name
         }
-        Add-Type -Path $assemblyPath -ErrorAction Stop
+        $oSQLiteDBCommand.Parameters["@DateFrom"].Value = $data.DateFrom
+        $oSQLiteDBCommand.Parameters["@DateTo"].Value = $data.DateTo
+        $oSQLiteDBCommand.Parameters["@XCode"].Value = $data.XCode
+        $oSQLiteDBCommand.Parameters["@IssueDate"].Value = $data.IssueDate
+        $oSQLiteDBCommand.Parameters["@IsREJECTED"].Value = $data.IsREJECTED
+        $oSQLiteDBCommand.Parameters["@Extension"].Value = $data.Extension
 
-        [string] $dbFile = Join-Path -Path $OutputDir -ChildPath $dbName -ErrorAction Stop
-
-        $connectionString = [string]::Format("Data Source={0};Version=3;",$dbFile)
-        $oSQLiteDBConnection = New-Object System.Data.SQLite.SQLiteConnection($connectionString)
-
-        try {
-            Write-Host "Open DB connection"
-            $oSQLiteDBConnection.open()
-            Write-Host "DB connection opened"
-
-            $prepareCommand = $oSQLiteDBConnection.CreateCommand()
-            $prepareCommand.Commandtext = "DROP TABLE IF EXISTS Fileinfo;"
-            $prepareCommand.CommandType = [System.Data.CommandType]::Text
-            $prepareCommand.ExecuteNonQuery() | Out-Null
-
-            $prepareCommand.Commandtext = "VACUUM;"
-            $prepareCommand.CommandType = [System.Data.CommandType]::Text
-            $prepareCommand.ExecuteNonQuery() | Out-Null
-
-            $prepareCommand.Commandtext = "CREATE TABLE Fileinfo (FileName TEXT NOT NULL PRIMARY KEY ASC UNIQUE ON CONFLICT FAIL, FullFileName TEXT NOT NULL, LastWriteTime TEXT NOT NULL, Owner TEXT NOT NULL, Permissions TEXT NOT NULL);"
-            $prepareCommand.CommandType = [System.Data.CommandType]::Text
-            $prepareCommand.ExecuteNonQuery() | Out-Null
-
-            $transaction = $oSQLiteDBConnection.BeginTransaction()
-
-            $oSQLiteDBCommand = $oSQLiteDBConnection.CreateCommand()
-            $oSQLiteDBCommand.Commandtext="INSERT INTO Fileinfo (FileName , FullFileName , LastWriteTime , Owner , Permissions) VALUES (@FileName, @FullFileName, @LastWriteTime, @Owner, @Permissions)";
-
-            $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@FileName", [System.Data.DbType]::String))) | Out-Null
-			$oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@FullFileName", [System.Data.DbType]::String))) | Out-Null
-            $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@LastWriteTime", [System.Data.DbType]::String))) | Out-Null
-            $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@Owner", [System.Data.DbType]::String))) | Out-Null
-            $oSQLiteDBCommand.Parameters.Add((New-Object System.Data.SQLite.SQLiteParameter("@Permissions", [System.Data.DbType]::String))) | Out-Null
-
-            foreach ($fileInfo in $filesInfo) { # $fileInfo - RemoteFileInfo
-                [string] $buf = [WinSCP.RemotePath]::EscapeFileMask($fileInfo.FullName)
-                $oSQLiteDBCommand.Parameters["@FileName"].Value = [string]::Format("/{0}", (Split-Path -Path $buf -Leaf))
-				$oSQLiteDBCommand.Parameters["@FullFileName"].Value = $buf
-                $oSQLiteDBCommand.Parameters["@LastWriteTime"].Value = $fileInfo.LastWriteTime.ToString($dateTimeFormat)
-                $oSQLiteDBCommand.Parameters["@Owner"].Value = ($fileInfo.Owner + ":" + $fileInfo.Group)
-                $oSQLiteDBCommand.Parameters["@Permissions"].Value = $fileInfo.FilePermissions.Text
-                $oSQLiteDBCommand.ExecuteNonQuery() | Out-Null
-
-                $count++
-            }
-            Write-Host "Total files: $count"
-            $transaction.Commit()
-        } finally {
-            $oSQLiteDBConnection.Close()
-            Write-Host "DB closed"
-            if ($oSQLiteDBConnection) {
-                $oSQLiteDBConnection.Dispose()
-            }
-        }
-    } finally {
-        # Disconnect, clean up
+        $oSQLiteDBCommand.ExecuteNonQuery() | Out-Null
+        $count++
+    }
+    Log-Message "`nTotal files: $count`n"
+    $transaction.Commit()
+} catch {
+    Log-Message "An error occurred: $($_.Exception.Message)" "Red"
+    $exitCode = 1
+} finally {
+    if ($oSQLiteDBConnection) {
+        Log-Message "DB closed"
+        $oSQLiteDBConnection.Close()
+        $oSQLiteDBConnection.Dispose()
+    }
+    if ($session) {
         $session.Dispose()
     }
-} catch {
-    $exitCode = 1
-    Write-Host $PSItem -ForegroundColor Red
+    Log-Message "`nDONE" "Green"
+    exit $exitCode
 }
-
-exit $exitCode
