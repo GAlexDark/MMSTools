@@ -247,6 +247,16 @@ function Validate-Path {
     }
 }
 
+function Validate-Variable {
+    param (
+        [string] $VariableName,
+        [string] $ErrorMessage
+    )
+    if ([string]::IsNullOrEmpty($VariableName)) {
+        throw $ErrorMessage
+    }
+}
+
 try {
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
@@ -393,21 +403,11 @@ try {
             [string] $userName = $($env:vaultUserName)
             [string] $userPassword = $($env:vaultPassword)
 
-            if ([string]::IsNullOrEmpty($userName)) {
-                throw "The 'userName' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($userPassword)) {
-                throw "The 'userPassword' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($VAULT_ADDRESS)) {
-                throw "The 'vaultAddress' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($SECRET_NAME)) {
-                throw "The 'secretName' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($DATETIME_FORMAT)) {
-                throw "The 'dateTimeFormat' value is not set"
-            }
+            Validate-Variable -VariableName $userName -ErrorMessage "The 'userName' value is not set"
+            Validate-Variable -VariableName $userPassword -ErrorMessage "The 'userPassword' value is not set"
+            Validate-Variable -VariableName $VAULT_ADDRESS -ErrorMessage "The 'VAULT_ADDRESS' value is not set"
+            Validate-Variable -VariableName $SECRET_NAME -ErrorMessage "The 'SECRET_NAME' value is not set"
+            Validate-Variable -VariableName $DATETIME_FORMAT -ErrorMessage "The 'DATETIME_FORMAT' value is not set"
 
             [string] $authPath = "v1/auth/userpass/login/"
             [string] $sealedPath = "v1/sys/seal-status"
@@ -437,9 +437,7 @@ try {
             $vaultUrl = [string]::Format("{0}/{1}{2}", $VAULT_ADDRESS, $authPath, $userName)
             $content = Invoke-RestMethod -Uri $vaultUrl -Method 'Post' -ContentType 'application/json' -Body $postParams -Headers @{ "Cache-Control" = "no-cache" } -SkipCertificateCheck -ErrorAction Stop
             [string] $clientToken = $content.auth.client_token
-            if ([string]::IsNullOrEmpty($clientToken)) {
-                throw "Wrong client token."
-            }
+            Validate-Variable -VariableName $clientToken -ErrorMessage "Wrong client token."
             Log-Message "Connected.`n"
 
             Log-Message "Upload data to the Vault..."
@@ -467,9 +465,9 @@ try {
             Log-Message "The metadata was uploaded successfully."
             Log-Message "The data was uploaded successfully." "Green"
         } catch {
-            $exitCode = 1
             Log-Message "Error upload data to the Vault: $($_.Exception.Message)" "Red"
             Log-Message "`nYou must upload data to the Vault manually or restart job." "Yellow"
+            $exitCode = 1
         } finally {
             Get-GarbageCollector
             $clientToken = ""
@@ -497,7 +495,7 @@ try {
     Log-Message $_.Exception.Message "Red"
     $exitCode = 1
 } finally {
-    Log-Message "`nDONE" -ForegroundColor "Green"
+    Log-Message "`nDONE" "Green"
     if (![string]::IsNullOrEmpty($timeStamp)) {
         Log-Message "`nID: $timeStamp"
     }
