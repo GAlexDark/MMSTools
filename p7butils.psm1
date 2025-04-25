@@ -15,7 +15,7 @@ function Remove-File {
             return $false
         }
 
-        $itemsToRemove = Get-ChildItem -Path $Path -Include $Extensions -Recurse -Force -ErrorAction Stop
+        $itemsToRemove = Get-ChildItem -Path (Join-Path -Path $Path -ChildPath '*' -ErrorAction Stop) -Include $Extensions -Force -ErrorAction Stop
         if ($itemsToRemove) {
             $itemsToRemove | Remove-Item -Force -ErrorAction Stop
             Write-Host "Files with specified extensions were successfully removed from '$Path'." -ForegroundColor Green

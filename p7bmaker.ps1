@@ -260,13 +260,13 @@ function Validate-Variable {
 try {
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
-	$ErrorView = "NormalView"
-	$PSStyle.OutputRendering = "PlainText"
+    $ErrorView = "NormalView"
+    $PSStyle.OutputRendering = "PlainText"
 
-	[string] $timeStamp = (Get-Date -ErrorAction Stop).ToString('yyyyMMddHHmmss')
-	if (![string]::IsNullOrEmpty($timeStamp)) {
-		Log-Message "`nID: $timeStamp"
-	}
+    [string] $timeStamp = (Get-Date -ErrorAction Stop).ToString('yyyyMMddHHmmss')
+    if (![string]::IsNullOrEmpty($timeStamp)) {
+        Log-Message "`nID: $timeStamp"
+    }
 
     [string] $copyright = "`nThe p7b file maker PoSH Script Version 2.0`n" +
                           "Copyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info`n" +
@@ -321,7 +321,7 @@ try {
 
     #Removing existing p7b, sha, base64, and zip files
     [string[]] $ext = ('*.p7b', '*.sha', '*.zip', '*.base64')
-    $retVal = Remove-File -Path $Workdir -Extensions $ext
+    [bool] $retVal = Remove-File -Path $Workdir -Extensions $ext
     if (-not $retVal) {
         throw "Error remove files in the $Workdir folder"
     }
@@ -476,7 +476,7 @@ try {
 
     Log-Message "`nCreating archive: $archiveName"
     [string[]] $sources = if ($Upload) { $newP7bBase64, "$newP7bBase64.sha" } else { $newP7b, $newSha }
-    Compress-Archive -Path $sources -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction stop
+    Compress-Archive -Path $sources -DestinationPath $archiveName -CompressionLevel Optimal -Force -ErrorAction stop
 
     #create the new folder and copy files to it
     [string] $newDir = Join-Path -Path $Workdir -ChildPath $timeStamp -ErrorAction Stop
