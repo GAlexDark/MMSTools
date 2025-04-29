@@ -344,7 +344,7 @@ CMmsLogsReader::convertData(const QString &line)
 {
     Q_CHECK_PTR(m_parser);
     if (!m_parser->parse(line)) {
-        setErrorString(QStringLiteral("Parsing error at line number %1: %2").arg(getLineNumber()).arg(line));
+        setErrorString(QStringLiteral("Parsing error at line number %1. Details: %2. Line: %3").arg(getLineNumber()).arg(m_parser->errorString(), line));
         return false;
     }
     QMap<QString, QVariant> data;
