@@ -67,7 +67,7 @@ function ConvertFrom-Filename {
 
         if ($buffer.Count -ge 4) {
             $dateFrom = [datetime]::ParseExact($buffer[1], $mask, $null).AddHours(12).AddMinutes(0).AddSeconds(0)
-            $dateTo = [datetime]::ParseExact($buffer[2], $mask, $null).AddHours(12).AddMinutes(59).AddSeconds(59)
+            $dateTo = [datetime]::ParseExact($buffer[2], $mask, $null).AddHours(12).AddMinutes(0).AddSeconds(0)
             $xCode = $buffer[3].Trim()
 
             switch ($buffer.Count) {
