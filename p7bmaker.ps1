@@ -20,29 +20,29 @@
 <#
 
 .SYNOPSIS
- Downloads the p7b file from the IIT site, adds certificates to it and upload BASE64 data to the HashiCorp Vault.
+ Downloads the p7b file from the IIT site, adds certificates to it and upload BASE64 data to the Vault.
 
 .DESCRIPTION
- The p7bmaker.ps1 script downloads the p7b file fron the IIT site, adds certificates to it and upload BASE64 data to the HashiCorp Vault.
- The p7bmaker.ps1 script must be located in the same folder where p7bmaker.exe is located.
+ This script downloads a p7b file, processes certificates, and optionally uploads BASE64 data to the Vault.
+ This script must be located in the same folder where p7bmaker.exe is located.
 
 .PARAMETER EnvFileName
- Specifies the path and name of the configuration file.
+ Specifies the configuration file.
 
 .PARAMETER Workdir
- Specifies the path to to the folder, contains *.cer and/or *.crt files and were will be saved p7b files.
+ Specifies the working directory for certificate and p7b file operations.
 
 .PARAMETER UseProxy
- Specifies the flag when the script must download the p7b file over the Corporate Firewall.
+ Flag to use a corporate network proxy.
 
 .PARAMETER Url
- Specifies the download URL. Attention! The URL value must not contains the '?d=' parameter!
+ Optional URL for downloading the p7b file. Attention! The URL value must not contains the '?d=' parameter!
 
 .PARAMETER Upload
- Specifies the flag when the script must upload the p7b data to the Vault.
+ Flag to upload p7b BASE data to the Vault.
 
 .PARAMETER DateStamp
- Specifies the datestamp from the IIT letter. If the '01011970' value was set, this parameter was ignored.
+ Optional datestamp from the IIT letter. If the '01011970' value was set, this parameter was ignored.
 
 .INPUTS
  None. You can't pipe objects to p7bmaker.ps1.
@@ -52,16 +52,18 @@
 
 .EXAMPLE
  PS> .\p7bmaker.ps1 -EnvFileName test.ps1 -Workdir B:\certdata -Upload
- p7b file maker PoSH Script Version 2.0
+ The p7b file maker PoSH Script Version 2.0
  Copyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info
- This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
+ This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. For more details, see the GNU General Public License.
 
- Attension! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
+ Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
+  Or use the 'Url' script parameter.
 
+ Files with specified extensions were successfully removed from 'B:\certdata'.
  OK - The domain name 'demosite.local' was resolved to the IP address: [hidden as minor]
  OK - The 'https://demosite.local/download/CACertificates.p7b' URL available.
 
- Starting download the P7B file from the 'https://demosite.local/download/CACertificates.p7b' Url.
+ Downloading from https 'https://demosite.local/download/CACertificates.p7b'.
 
  OK - The file was successfully saved in the B:\certdata folder.
 
@@ -78,6 +80,7 @@
 
  The number of certificates in the container after adding: 631.
 
+ Output format: PEM
  File 'B:/certdata/CACertificates20240917.p7b' saved successfully.
 
  Calculating result p7b file hash:
@@ -114,23 +117,26 @@
 
  Creating archive: CACertificates20240917.zip
  Creating the B:\certdata\20240917 folder and copy files to it
+ Files with specified extensions were successfully removed from 'B:\certdata'.
 
  DONE
 
 .EXAMPLE
  PS> .\p7bmaker.ps1 -EnvFileName test.ps1 -Workdir B:\certdata -Url "https://demosite.local/download_new/CACertificates.p7b" -Upload
- p7b file maker PoSH Script Version 2.0
+ The p7b file maker PoSH Script Version 2.0
  Copyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info
- This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.
+ This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. For more details, see the GNU General Public License.
 
  Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!
+  Or use the 'Url' script parameter.
 
  The value of the 'download_url' was changed with the value from the Url argument...
 
+ Files with specified extensions were successfully removed from 'B:\certdata'.
  OK - The domain name 'demosite.local' was resolved to the IP address: [hidden as minor]
  OK - The 'https://demosite.local/download_new/CACertificates.p7b' URL available.
 
- Starting download the P7B file from the 'https://demosite.local/download_new/CACertificates.p7b' Url.
+ Downloading from 'https://demosite.local/download_new/CACertificates.p7b'.
 
  OK - The file was successfully saved in the B:\certdata\ folder.
 
@@ -147,6 +153,7 @@
 
  The number of certificates in the container after adding: 631.
 
+ Output format: PEM
  File 'B:/certdata/CACertificates20240917.p7b' saved successfully.
 
  Calculating result p7b file hash:
@@ -157,10 +164,10 @@
 
  DONE
  OK - The hash file 'B:\certdata\CACertificates20240917.base64.sha' was successfully created.
- OK - The  URL available.
+ OK - The 'http://vault.local:8200' URL available.
 
  Checking the Vault status...
- OK - The 'http://vault.local:8200' URL available.
+ OK - The Vault available.
 
  Connect to the Vault...
  Connected.
@@ -183,6 +190,7 @@
 
  Creating archive: CACertificates20240917.zip
  Creating the B:\certdata\20240917 folder and copy files to it
+ Files with specified extensions were successfully removed from 'B:\certdata'.
 
  DONE
 
@@ -221,40 +229,68 @@ Param (
 )
 
 [int] $exitCode = 0
+function Log-Message {
+    param(
+        [string] $Message,
+        [string] $Color = "White"
+    )
+    Write-Host $Message -ForegroundColor $Color
+}
+
+function Validate-Path {
+    param(
+        [string] $Path,
+        [string] $ErrorMessage
+    )
+    if (-not (Test-Path -Path $Path -ErrorAction Stop)) {
+        throw $ErrorMessage
+    }
+}
+
+function Validate-Variable {
+    param (
+        [string] $VariableName,
+        [string] $ErrorMessage
+    )
+    if ([string]::IsNullOrEmpty($VariableName)) {
+        throw $ErrorMessage
+    }
+}
 
 try {
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
-	$ErrorView = "NormalView"
-	$PSStyle.OutputRendering = "PlainText"
+    $ErrorView = "NormalView"
+    $PSStyle.OutputRendering = "PlainText"
 
-	[string] $timeStamp = (Get-Date -ErrorAction Stop).ToString('yyyyMMddHHmmss')
-	if (![string]::IsNullOrEmpty($timeStamp)) {
-		Write-Host "`nID: $timeStamp"
-	}
+    [string] $timeStamp = (Get-Date -ErrorAction Stop).ToString('yyyyMMddHHmmss')
+    if (![string]::IsNullOrEmpty($timeStamp)) {
+        Log-Message "`nID: $timeStamp"
+    }
+
+    [string] $copyright = "`nThe p7b file maker PoSH Script Version 2.0`n" +
+                          "Copyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info`n" +
+                          "This program comes with ABSOLUTELY NO WARRANTY. " +
+                          "This is free software, and you are welcome to redistribute it under certain conditions. " +
+                          "For more details, see the GNU General Public License.`n"
+    Log-Message $copyright "Green"
+    $copyright = "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!!`n " +
+                 "Or use the 'Url' script parameter.`n"
+    Log-Message $copyright "Cyan"
 
     $assemblyPath = Join-Path -Path $PSScriptRoot -ChildPath "p7butils.psm1" -ErrorAction Stop
-    [bool] $retVal = Test-Path -Path $assemblyPath -ErrorAction Stop
-    if (-not $retVal) {
-        throw "The p7butils.psm1 is not found."
-    }
+    Validate-Path -Path $assemblyPath -ErrorMessage "The p7butils.psm1 not found."
     Import-Module -Name $assemblyPath -ErrorAction Stop
 
     $EnvFileName = $EnvFileName.Trim()
     $EnvFileNamePath = Join-Path -Path $PSScriptRoot -ChildPath $EnvFileName -ErrorAction Stop
-    $retVal = Test-Path -Path $EnvFileNamePath -ErrorAction Stop
-    if (-not $retVal) {
-        throw "The '$EnvFileName' file is not found."
-    }
+    Validate-Path -Path $EnvFileNamePath -ErrorMessage "The '$EnvFileName' file not found."
 
     $Workdir = $Workdir.Trim()
     if ($Path -eq "." -or $Path -eq ".\") {
         $Path = $PSScriptRoot
     }
-    $retVal = Test-Path -Path $Workdir -ErrorAction Stop
-    if (!$retVal) {
-        throw "The work dir $Workdir not found."
-    }
+    Validate-Path -Path $Workdir -ErrorMessage "The '$Workdir' folder not found."
 
     #Mapping env variables
     . $EnvFileNamePath
@@ -262,9 +298,6 @@ try {
     if ($freeSpace -le $MIN_SPACE) {
         throw "The disk space is low."
     }
-
-    Write-Host "The p7b file maker PoSH Script Version 2.0`nCopyright (C) 2025 Oleksii Gaienko, support@galexsoftware.info`nThis program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it according to the terms of the GPL version 3.`n" -ForegroundColor green
-    Write-Host "Attention! Check the CACertificates.p7b download URL periodically and save the new URL in the 'download_url' value!! Or use the 'Url' script parameter.`n" -ForegroundColor Cyan
 
     #**************************************************************************************
     # Задаем Url, откуда будет загружаться файл CACertificates.p7b:
@@ -274,10 +307,21 @@ try {
     [string] $userAgent = "p7bmaker PoSH module/2.0"
     # Nondefault Web Proxy:
     [string] $proxyName = ""
+    #
+    #**************************************************************************************
+
+    # Check domain name
+    if (-not [string]::IsNullOrEmpty($Url)) {
+        $download_url = $Url.Trim()
+        Log-Message "The value of the 'download_url' was changed with the value from the Url argument...`n" "Yellow"
+    }
+    if ($DateStamp -and $DateStamp -ne "01011970") {
+        $download_url += "?d=$DateStamp"
+    }
 
     #Removing existing p7b, sha, base64, and zip files
-    [string[]] $ext = ('*.p7b','*.sha','*.zip','*.base64')
-    $retVal = Remove-File -Path $Workdir -Extensions $ext
+    [string[]] $ext = ('*.p7b', '*.sha', '*.zip', '*.base64')
+    [bool] $retVal = Remove-File -Path $Workdir -Extensions $ext
     if (-not $retVal) {
         throw "Error remove files in the $Workdir folder"
     }
@@ -285,16 +329,14 @@ try {
     #Checking certs
     $certs = Get-ChildItem -Path $Workdir -Filter *.cer -ErrorAction Stop
     if ($certs) {
-        $currentDate = Get-Date
-        $certs | ForEach-Object {
+        $currentDate = Get-Date -ErrorAction Stop
+        foreach ($cert in $certs) {
             try {
-                $certItem = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $_.FullName
-                [string] $certSN = $certItem.SerialNumber
+                $certItem = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $cert.FullName
                 [datetime] $certValidTo = $certItem.NotAfter
                 if ($currentDate -gt $certValidTo) {
-                    Write-Warning "The certificate SN=$certSN expired!"
-                    $newName = $_.FullName + ".expired"
-                    Rename-Item -Path $_.FullName -NewName $newName -ErrorAction Stop
+                    Log-Message "The certificate SN=$($certItem.SerialNumber) expired!" "Yellow"
+                    Rename-Item -Path $cert.FullName -NewName "$($cert.FullName).expired" -ErrorAction Stop
                 }
             } finally {
                 if ($certItem) {
@@ -306,46 +348,23 @@ try {
         throw "The certificates is not found!"
     }
 
-    # Check domain name
-    if (-not [string]::IsNullOrEmpty($Url)) {
-        $download_url = $Url.Trim()
-        Write-Host "The value of the 'download_url' was changed with the value from the Url argument...`n" -ForegroundColor Yellow
-    }
-
-    if (-not [string]::IsNullOrEmpty($DateStamp) -and $DateStamp -ne "01011970") {
-        $download_url = $download_url + "?d=" + $DateStamp
-    }
-
     [string] $domain = Get-DomainFromUrl $download_url
-    $retVal = Test-CheckDnsName $domain
-    if (-not $retVal) {
-        throw "Error resolve host $domain"
-    }
-
-    $retVal = Test-CheckURL -Url $download_url
-    if (-not $retVal) {
-        throw "Error connect to the $download_url"
-    }
+    Test-CheckDnsName $domain
+    Test-CheckURL -Url $download_url
 
     #Download and save *.p7b file
-    Write-Output "`nStarting download the P7B file from the '$download_url' Url.`n"
-    $retVal = Get-DownloadFile -DownloadUrl $download_url -SavePath $WorkDir
-    if (-not $retVal) {
-        throw "Error download the file from the $download_url"
-    }
+    Log-Message "`nDownloading from $download_url.`n"
+    Get-DownloadFile -DownloadUrl $download_url -SavePath $WorkDir
 
     # Let's start creating a p7b container with the necessary certificates
-    $pathToExecute = Join-Path -Path $PSScriptRoot -ChildPath "p7bmaker.exe" -ErrorAction Stop
-    $retVal = Test-Path -Path $pathToExecute -ErrorAction Stop
-    if (-not $retVal) {
-        throw "The executable file p7bmaker.exe not found"
-    }
+    $p7bmakerPath = Join-Path -Path $PSScriptRoot -ChildPath "p7bmaker.exe" -ErrorAction Stop
+    Validate-Path -Path $p7bmakerPath -ErrorMessage "Executable p7bmaker.exe not found."
 
-    Write-Output "`nStarting $pathToExecute...`n"
+    Write-Output "`nStarting $p7bmakerPath...`n"
     $argsList = if ($Upload) { "-l $WorkDir --silent -o PEM" } else { "-l $WorkDir --silent" }
-    $processInfo = Start-Process -FilePath $pathToExecute -ArgumentList $argsList -Wait -NoNewWindow -PassThru
+    $processInfo = Start-Process -FilePath $p7bmakerPath -ArgumentList $argsList -Wait -NoNewWindow -PassThru
     if ($processInfo.ExitCode -ne 0) {
-        throw "The $pathToExecute returned an error."
+        throw "The $p7bmakerPath returned an error."
     }
 
     #create filenames
@@ -353,21 +372,15 @@ try {
     $baseName = $baseName.Substring(0, $baseName.LastIndexOf('.'))
     [string] $ts = (Get-Date -ErrorAction Stop).ToString('yyyyMMdd')
 
-    [string] $archiveName = $baseName + $ts + ".zip"
-    $archiveName = Join-Path -Path $Workdir -ChildPath $archiveName -ErrorAction Stop
-
-    [string] $newP7b = $baseName + $ts + ".p7b"
-    $newP7b = Join-Path -Path $Workdir -ChildPath $newP7b -ErrorAction Stop
-
-    [string] $newSha = $baseName + $ts + ".sha"
-    $newSha = Join-Path -Path $Workdir -ChildPath $newSha -ErrorAction Stop
+    [string] $archiveName = Join-Path -Path $Workdir -ChildPath "$baseName$ts.zip" -ErrorAction Stop
+    [string] $newP7b = Join-Path -Path $Workdir -ChildPath "$baseName$ts.p7b" -ErrorAction Stop
+    [string] $newSha = Join-Path -Path $Workdir -ChildPath "$baseName$ts.sha" -ErrorAction Stop
 
     #create .base64, if needed
     if ($Upload) {
         $content = Get-Content -Path $newP7b -Raw -ErrorAction Stop
         if ($content) {
-            [string] $newP7bBase64 = $baseName + $ts + ".base64"
-            $newP7bBase64 = Join-Path -Path $Workdir -ChildPath $newP7bBase64 -ErrorAction Stop
+            [string] $newP7bBase64 = Join-Path -Path $Workdir -ChildPath "$baseName$ts.base64" -ErrorAction Stop
             $pattern = "(?s)(?<=-----BEGIN PKCS7-----).*?(?=-----END PKCS7-----)"
             $matchesResult = [regex]::Matches($content, $pattern)
             if ($matchesResult.Count -gt 0) {
@@ -382,46 +395,29 @@ try {
                 throw "Error create the SHA1 hash file for the $newP7bBase64 file."
             }
         } else {
-            Write-Host "Error read the $newP7b file!" -ForegroundColor Red
+            Log-Message "Error read the $newP7b file!" "Red"
         }
 
         try {
             #Upload base64 to the Vault
             [string] $userName = $($env:vaultUserName)
             [string] $userPassword = $($env:vaultPassword)
-            [string] $vaultAddress = $VAULT_ADDRESS
-            [string] $secretName = $SECRET_NAME
-            [string] $dateTimeFormat = $DATETIME_FORMAT
 
-            if ([string]::IsNullOrEmpty($userName)) {
-                throw "The 'userName' value is not set"
-            }
-
-            if ([string]::IsNullOrEmpty($userPassword)) {
-                throw "The 'userPassword' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($vaultAddress)) {
-                throw "The 'vaultAddress' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($secretName)) {
-                throw "The 'secretName' value is not set"
-            }
-            if ([string]::IsNullOrEmpty($dateTimeFormat)) {
-                throw "The 'dateTimeFormat' value is not set"
-            }
+            Validate-Variable -VariableName $userName -ErrorMessage "The 'userName' value is not set"
+            Validate-Variable -VariableName $userPassword -ErrorMessage "The 'userPassword' value is not set"
+            Validate-Variable -VariableName $VAULT_ADDRESS -ErrorMessage "The 'VAULT_ADDRESS' value is not set"
+            Validate-Variable -VariableName $SECRET_NAME -ErrorMessage "The 'SECRET_NAME' value is not set"
+            Validate-Variable -VariableName $DATETIME_FORMAT -ErrorMessage "The 'DATETIME_FORMAT' value is not set"
 
             [string] $authPath = "v1/auth/userpass/login/"
             [string] $sealedPath = "v1/sys/seal-status"
-            [string] $apiPath = "v1/cryptography/data/certificate/$secretName"
-            [string] $metadataPath = "v1/cryptography/metadata/certificate/$secretName"
+            [string] $apiPath = "v1/cryptography/data/certificate/$SECRET_NAME"
+            [string] $metadataPath = "v1/cryptography/metadata/certificate/$SECRET_NAME"
 
-            $retVal = Test-CheckURL -Url $vaultAddress -IsUsingProxy $false
-            if (-not $retVal) {
-                throw "The Vault $vaultAddress checking error"
-            }
+            Test-CheckURL -Url $VAULT_ADDRESS -IsUsingProxy $false
 
-            Write-Host "`nChecking the Vault Endpoint status..."
-            [string] $vaultUrl = [string]::Format("{0}/{1}", $vaultAddress, $sealedPath)
+            Log-Message "`nChecking the Vault Endpoint status..."
+            [string] $vaultUrl = [string]::Format("{0}/{1}", $VAULT_ADDRESS, $sealedPath)
             $content = Invoke-WebRequest -Uri $vaultUrl -Method 'Get' -Headers @{ "Cache-Control" = "no-cache" } -SkipCertificateCheck -ErrorAction Stop
             [int] $statusCode = $content.StatusCode
             if ($statusCode -ne 200) {
@@ -432,62 +428,60 @@ try {
             [bool] $sealed = $sealedData.sealed
             [bool] $initialized = $sealedData.initialized
             if (-not $sealed -and -not $initialized) {
-                throw "Vault is not initialized."
+                throw "The Vault is not initialized."
             }
-            Write-Host "OK - The Vault is available.`n" -ForegroundColor Green
+            Log-Message "OK - The Vault is available.`n" "Green"
 
-            Write-Host "Connect to the Vault..."
+            Log-Message "Connect to the Vault..."
             $postParams = @{"password"="$userPassword"} | ConvertTo-Json -ErrorAction Stop
-            $vaultUrl = [string]::Format("{0}/{1}{2}", $vaultAddress, $authPath, $userName)
+            $vaultUrl = [string]::Format("{0}/{1}{2}", $VAULT_ADDRESS, $authPath, $userName)
             $content = Invoke-RestMethod -Uri $vaultUrl -Method 'Post' -ContentType 'application/json' -Body $postParams -Headers @{ "Cache-Control" = "no-cache" } -SkipCertificateCheck -ErrorAction Stop
             [string] $clientToken = $content.auth.client_token
-            if ([string]::IsNullOrEmpty($clientToken)) {
-                throw "Wrong client token."
-            }
-            write-host "Connected.`n"
+            Validate-Variable -VariableName $clientToken -ErrorMessage "Wrong client token."
+            Log-Message "Connected.`n"
 
-            Write-Host "Upload data to the Vault..."
+            Log-Message "Upload data to the Vault..."
             $p7bPayload = Get-Content -Path $newP7bBase64 -Encoding Ascii -ErrorAction Stop
             $postParams = @{"data"=@{"certificate"="$p7bPayload"}} | ConvertTo-Json -ErrorAction Stop
             $header = @{"X-Vault-Token"="$clientToken";"Cache-Control"="no-cache"}
-            $vaultUrl = [string]::Format("{0}/{1}", $vaultAddress, $apiPath)
+            $vaultUrl = [string]::Format("{0}/{1}", $VAULT_ADDRESS, $apiPath)
             $content = Invoke-RestMethod -Uri $vaultUrl -Method 'Patch' -ContentType 'application/merge-patch+json' -Headers $header -Body $postParams -SkipCertificateCheck -ErrorAction Stop
             $newVersion = $content.data.version
-            Write-Host "The secret version $newVersion was created successfully:"
+            Log-Message "The secret version $newVersion was created successfully:"
             $content
 
             # ToDo: what is --header "X-Vault-Namespace: $VAULT_NAMESPACE"
             $payload = Get-Content -Path $newSha -ErrorAction Stop
             $newShaHash = ($payload -split ' ')[0]
 
-            $payload = Get-Content -Path ($newP7bBase64 + ".sha") -ErrorAction Stop
+            $payload = Get-Content -Path "$newP7bBase64.sha" -ErrorAction Stop
             $newP7bBase64Hash = ($payload -split ' ')[0]
 
-            [string] $creationTime = (Get-Date -ErrorAction Stop).ToString($dateTimeFormat)
+            [string] $creationTime = (Get-Date -ErrorAction Stop).ToString($DATETIME_FORMAT)
             $postParams = @{"custom_metadata"=@{"Creator"="$userAgent";"Creation Time"="$creationTime";"P7B_BASE64_SHA1"="$newP7bBase64Hash";"P7B_PEM_SHA1"="$newShaHash";"P7B_BASE64_FILE"="$($baseName + $ts + ".base64")"}} | ConvertTo-Json -ErrorAction Stop
             $header = @{"X-Vault-Token"="$clientToken";"Accept"="application/json";"Cache-Control"="no-cache"}
-            $vaultUrl = [string]::Format("{0}/{1}", $vaultAddress, $metadataPath)
+            $vaultUrl = [string]::Format("{0}/{1}", $VAULT_ADDRESS, $metadataPath)
             $content = Invoke-RestMethod -Uri $vaultUrl -Method 'Patch' -ContentType 'application/merge-patch+json' -Headers $header -Body $postParams -SkipCertificateCheck -ErrorAction Stop
-            Write-Host "The metadata was uploaded successfully."
-            Write-Host "The data was uploaded successfully." -ForegroundColor Green
+            Log-Message "The metadata was uploaded successfully."
+            Log-Message "The data was uploaded successfully." "Green"
         } catch {
+            Log-Message "Error upload data to the Vault: $($_.Exception.Message)" "Red"
+            Log-Message "`nYou must upload data to the Vault manually or restart job." "Yellow"
             $exitCode = 1
-            Write-Host "Error upload data to the Vault: $PSItem" -ForegroundColor Red
-            Write-Host "`nYou must upload data to the Vault manually or restart job." -ForegroundColor Yellow
         } finally {
             Get-GarbageCollector
             $clientToken = ""
         }
     } # $Upload
 
-    Write-Host "`nCreating archive: $archiveName"
-    [string[]] $sources = if ($Upload) { $newP7bBase64, $($newP7bBase64 + ".sha") } else { $newP7b, $newSha }
-    Compress-Archive -Path $sources -DestinationPath $archiveName -CompressionLevel Optimal -ErrorAction stop
+    Log-Message "`nCreating archive: $archiveName"
+    [string[]] $sources = if ($Upload) { $newP7bBase64, "$newP7bBase64.sha" } else { $newP7b, $newSha }
+    Compress-Archive -Path $sources -DestinationPath $archiveName -CompressionLevel Optimal -Force -ErrorAction stop
 
     #create the new folder and copy files to it
     [string] $newDir = Join-Path -Path $Workdir -ChildPath $timeStamp -ErrorAction Stop
 
-    Write-Host "Creating the $newDir folder and copy files to it"
+    Log-Message "Creating the $newDir folder and copy files to it"
     New-Item -ItemType Directory -Path $newDir -ErrorAction Stop | Out-Null
     $ext = ('*.p7b','*.sha','*.cer','*.crt','*.der','*.base64')
     Copy-Item -Path (Join-Path -Path $Workdir -ChildPath '*' -ErrorAction Stop) -Destination $newDir -Include $ext -Force -ErrorAction Stop
@@ -498,14 +492,12 @@ try {
         throw "Error remove files in the $Workdir folder"
     }
 } catch {
-    Write-Error $PSItem
+    Log-Message $_.Exception.Message "Red"
     $exitCode = 1
+} finally {
+    Log-Message "`nDONE" "Green"
+    if (![string]::IsNullOrEmpty($timeStamp)) {
+        Log-Message "`nID: $timeStamp"
+    }
+    exit $exitCode
 }
-
-Write-Host "`nDONE" -ForegroundColor Green
-
-if (![string]::IsNullOrEmpty($timeStamp)) {
-	Write-Host "`nID: $timeStamp"
-}
-
-exit $exitCode

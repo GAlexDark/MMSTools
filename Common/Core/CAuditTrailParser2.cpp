@@ -53,7 +53,7 @@ CAuditTrailParser2::parse(const QString& line)
 
     bool retVal = true;
     m_timestamp = QDateTime::fromString(timestamp, Qt::ISODateWithMs);
-    if (!m_timestamp.isValid()) {
+    if (m_timestamp.isValid()) {
         m_timestamp = m_timestamp.toLocalTime();
     } else {
         m_timestamp = QDateTime();
