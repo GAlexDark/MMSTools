@@ -23,3 +23,7 @@
 [Security Rating]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 [Maintainability Rating]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 [Lines of Code]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
+
+## EventLogConverter Documentation
+
+See EventLogConverter/EventLogConverter.md User Manual for detailed information.
