@@ -24,9 +24,9 @@
 [Maintainability Rating]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 [Lines of Code]: https://sonarcloud.io/summary/new_code?id=GAlexDark_MMSTools
 
-**MMSTools** - набор утилит:  
-- для оффлайн-работы с логами Системы (EventLogConverter и EventLogConverterc)  
-- формирования p7b-контейнера с необходимыми для Системы сертификатами (p7bmaker) и загрузки его в Систему (p7bmaker.ps1) 
+**MMSTools** - набор утилит для:  
+- оффлайн-работы с логами Системы (EventLogConverter и EventLogConverterc)  
+- формирования p7b-контейнера с необходимыми для Системы сертификатами (p7bmaker) и загрузки его в Систему (p7bmaker.ps1 или certRenewer.ps1) 
 
 ## EventLogConverter Documentation
 
