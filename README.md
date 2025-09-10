@@ -35,3 +35,7 @@ See EventLogConverter/EventLogConverter.md User Manual for detailed information.
 ## EventLogConverterс Documentation
 
 See EventLogConverterс/EventLogConverterс.md User Manual for detailed information.
+
+## mmsxlsx2json Documentation
+
+See mmsxlsx2json/mmsxlsx2json.md User Manual for detailed information.
