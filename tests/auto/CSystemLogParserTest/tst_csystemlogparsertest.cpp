@@ -31,6 +31,8 @@ private slots:
     void test_userRoleCompany();
     void test_other1();
     void test_other2();
+    void test_CR003_timestamp1();
+    void test_CR003_timestamp2();
 };
 
 void
@@ -136,6 +138,62 @@ CSystemLogParserTest::test_other2()
 
     QCOMPARE(m_timestamp.toString(Qt::ISODate), QString("2024-07-14T16:43:17"));
     QCOMPARE(m_message, QString("file processing started ... (file: long_long_filename.xml)"));
+}
+
+void
+CSystemLogParserTest::test_CR003_timestamp1()
+{
+    QFile file(SRCDIR"data/testcase_userLoginSuccess1_CR003.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
+    QVERIFY(retVal);
+    QByteArray buf = file.readAll();
+    QVERIFY(!buf.isEmpty());
+    file.close();
+
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
+    m_parser.getParsedData(m_severity, m_timestamp, m_message, m_username, m_username1,
+                           m_role, m_companyname);
+
+    QCOMPARE(m_severity, QString("INFO"));
+    QCOMPARE(m_timestamp.toString(Qt::ISODateWithMs), QString("2025-04-12T18:39:33.474"));
+    QCOMPARE(m_message, QString("User \"mr_data\" has logged in successfully"));
+    QCOMPARE(m_username, QString());
+    QCOMPARE(m_username1, QString("mr_data"));
+    QCOMPARE(m_role, QString());
+    QCOMPARE(m_companyname, QString());
+}
+
+void
+CSystemLogParserTest::test_CR003_timestamp2()
+{
+    QFile file(SRCDIR"data/testcase_userLoginSuccess2_CR003.csv");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool retVal = file.open(QIODeviceBase::ReadOnly);
+#else
+    bool retVal = file.open(QIODevice::ReadOnly);
+#endif
+    QVERIFY(retVal);
+    QByteArray buf = file.readAll();
+    QVERIFY(!buf.isEmpty());
+    file.close();
+
+    retVal = m_parser.parse(buf);
+    QVERIFY(retVal);
+    m_parser.getParsedData(m_severity, m_timestamp, m_message, m_username, m_username1,
+                           m_role, m_companyname);
+
+    QCOMPARE(m_severity, QString("INFO"));
+    QCOMPARE(m_timestamp.toString(Qt::ISODateWithMs), QString("2025-10-31T23:57:20.557"));
+    QCOMPARE(m_message, QString("User \"mr_data\" has logged in successfully"));
+    QCOMPARE(m_username, QString());
+    QCOMPARE(m_username1, QString("mr_data"));
+    QCOMPARE(m_role, QString());
+    QCOMPARE(m_companyname, QString());
 }
 
 QTEST_APPLESS_MAIN(CSystemLogParserTest)
