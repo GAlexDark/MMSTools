@@ -173,7 +173,14 @@ CSystemLogParser::parse(const QString& line)
 
     m_severity = match.captured(1);
     QString timestamp = match.captured(2);
-    m_timestamp = timestamp.contains('T') && timestamp.contains('-') ? QDateTime::fromString(timestamp, Qt::ISODateWithMs).toLocalTime() : QDateTime::fromString(timestamp, "dd.MM.yyyy hh:mm:ss");
+    if (timestamp.contains('T') && timestamp.contains('-')) {
+        m_timestamp = QDateTime::fromString(timestamp, Qt::ISODateWithMs).toLocalTime();
+    } else {
+        m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy HH:mm:ss");
+        if (!m_timestamp.isValid()) {
+            m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy HH:mm:ss.zzz");
+        }
+    }
     if (!m_timestamp.isValid()) {
         m_timestamp = QDateTime();
         setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
