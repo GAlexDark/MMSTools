@@ -74,7 +74,7 @@ CAuditTrailParser2::parse(const QString& line)
     // Parsing Attributes, IpAddress and SessionId
     m_attributes = line.mid(m_header.length());
     posEnd = posStart = m_attributes.lastIndexOf(m_delimiterChar);
-    m_sessionId = m_attributes.mid(posStart + 1);
+    m_sessionId = m_attributes.mid(posStart + 1).trimmed();
     posStart = m_attributes.lastIndexOf(m_delimiterChar, posStart - 1);
     m_ipaddresses = m_attributes.sliced(posStart + 1, posEnd - posStart - 1);
     analizeIPAdresses();
