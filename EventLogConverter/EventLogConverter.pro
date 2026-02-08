@@ -6,6 +6,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION precompile_header
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    DEFINES += QT_NO_INFO_OUTPUT
+    DEFINES += QT_NO_WARNING_OUTPUT
+}
 
 DEFINES += QT_USE_QSTRINGBUILDER
 
@@ -61,7 +66,7 @@ RC_ICONS = img/elc.ico
 MAJOR_VER = 2
 MINOR_VER = 0
 PATCH_VER = 7
-BUILD_VER = 137
+BUILD_VER = 138
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

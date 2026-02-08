@@ -4,6 +4,11 @@ QT += core sql
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION cmdline precompile_header
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    DEFINES += QT_NO_INFO_OUTPUT
+    DEFINES += QT_NO_WARNING_OUTPUT
+}
 
 DEFINES += QT_USE_QSTRINGBUILDER
 
@@ -44,7 +49,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 3
-BUILD_VER = 136
+BUILD_VER = 137
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}

@@ -4,6 +4,11 @@ QT += core
 
 QT_CVERSION = c++17
 CONFIG += QT_CVERSION cmdline precompile_header
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+    DEFINES += QT_NO_INFO_OUTPUT
+    DEFINES += QT_NO_WARNING_OUTPUT
+}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -42,7 +47,7 @@ RC_ICONS = img/elcc.ico
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 1
-BUILD_VER = 7
+BUILD_VER = 8
 BUILD_DATE = $$_DATE_
 
 VER_PE = $${MAJOR_VER}.$${MINOR_VER}
