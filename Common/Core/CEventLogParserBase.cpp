@@ -73,7 +73,7 @@ CEventLogParserBase::userFailedLogonDetails()
 {
     bool retVal = true;
     if (QString::compare(m_prevValueUFLD.details, m_details, Qt::CaseInsensitive) == 0) {
-        m_username1.clear();
+        m_username1 = m_prevValueUFLD.username1;
         m_authType = m_prevValueUFLD.authType;
         m_internalip = m_prevValueUFLD.internalIp;
         m_externalip = m_prevValueUFLD.externalIp;
@@ -81,6 +81,7 @@ CEventLogParserBase::userFailedLogonDetails()
         retVal = parseUserFailedLogonDetails();
         if (retVal) {
             m_prevValueUFLD.details = m_details;
+            m_prevValueUFLD.username1 = m_username1;
             m_prevValueUFLD.authType = m_authType;
             m_prevValueUFLD.internalIp = m_internalip;
             m_prevValueUFLD.externalIp = m_externalip;

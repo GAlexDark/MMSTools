@@ -44,6 +44,7 @@ CEventLogParser::parseUserFailedLogonDetails()
         m_externalip.clear();
         m_internalip.clear();
     }
+    m_username1.clear();
     return retVal;
 }
 
@@ -70,7 +71,7 @@ CEventLogParser::parse(const QString &line)
     m_requestID = match.captured(4);
     m_type = match.captured(5);
 
-    m_details = m_details.mid(m_header.length() + 1);
+    m_details = m_details.mid(m_header.length() + 1).trimmed();
     removeQuote(m_details);
 
     bool retVal = true;

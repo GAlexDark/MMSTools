@@ -73,6 +73,7 @@ protected:
     struct userFailedLogonDetails_t
     {
         QString details;
+        QString username1;
         QString authType;
         QString internalIp;
         QString externalIp;
