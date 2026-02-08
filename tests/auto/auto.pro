@@ -6,6 +6,7 @@ SUBDIRS += \
     CPksc7Test \
     CSVLoaderTest \
     CEventLogParserTest \
+    CEventLogParser2Test \
     CSingleApplicationTest \
     CElcConsoleAppSettingsTest \
     CBasicDatabaseTest \
