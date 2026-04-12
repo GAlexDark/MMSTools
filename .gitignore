@@ -25,6 +25,7 @@
 *.cppcheck
 *.xls
 *.xlsx
+*.bak
 
 # Qt-es
 object_script.*.Release
