@@ -405,5 +405,7 @@ CMmsLogsThreadReader::run()
         ++i;
     }
     m_db.close();
+#ifdef QT_DEBUG
     qDebug() << QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
+#endif
 }

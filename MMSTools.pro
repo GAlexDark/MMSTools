@@ -5,5 +5,8 @@ SUBDIRS += \
     EventLogConverter \
     EventLogConverterc \
     mmsxlsx2json \
-	p7bmaker \
-    tests
+    p7bmaker
+
+CONFIG(debug, debug|release) {
+    SUBDIRS += tests
+}
