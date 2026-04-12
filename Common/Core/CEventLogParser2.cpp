@@ -77,7 +77,7 @@ CEventLogParser2::parse(const QString &line)
     m_requestID = match.captured(5);
     m_type = match.captured(6);
 
-    m_details = m_details.mid(m_header.length() + 1);
+    m_details = m_details.mid(m_header.length() + 1).trimmed();
     removeQuote(m_details);
 
     bool retVal = true;

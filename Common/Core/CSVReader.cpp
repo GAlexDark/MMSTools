@@ -22,8 +22,8 @@
 #include "CSVReader.h"
 #ifdef QT_DEBUG
   #include <QElapsedTimer>
-  #include "Debug.h"
 #endif
+#include "QDebug"
 #include "DBStrings.h"
 #include "elcUtils.h"
 #include "CParserManager.h"
@@ -278,23 +278,23 @@ CMmsLogsReader::initDB(const QString &dbFileName, const QMap<QString, QString> *
     if (retVal) {
         dataList_t res = m_db.findInDB(QLatin1String("PRAGMA journal_mode;"), false);
         QString value = "journal_mode: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
-        __DEBUG( value )
+        qDebug() << value;
         res.clear();
         res = m_db.findInDB(QLatin1String("PRAGMA page_size;"), false);
         value = "page_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
-        __DEBUG( value )
+        qDebug() << value;
         res.clear();
         res = m_db.findInDB(QLatin1String("PRAGMA cache_size;"), false);
         value = "cache_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
-        __DEBUG( value )
+        qDebug() << value;
         res.clear();
         res = m_db.findInDB(QLatin1String("pragma mmap_size;"), false);
         value = "mmap_size: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
-        __DEBUG( value )
+        qDebug() << value;
         res.clear();
         res = m_db.findInDB(QLatin1String("pragma threads;"), false);
         value = "threads: " + QString::fromStdWString(res.at(0).at(0).toStdWString());
-        __DEBUG( value )
+        qDebug() << value;
         res.clear();
     }
 #endif
@@ -406,7 +406,6 @@ CMmsLogsThreadReader::run()
     }
     m_db.close();
 #ifdef QT_DEBUG
-    msg = QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
-    __DEBUG( msg )
+    qDebug() << QStringLiteral("%1 milliseconds").arg(timer.elapsed() );
 #endif
 }

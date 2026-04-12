@@ -1,9 +1,19 @@
+include(../MMSTools.pri)
+include(../deployment.pri)
+
 TEMPLATE = app
+TARGET = p7bmaker
 
 QT = core
 
-QT_CVERSION = c++17
-CONFIG += QT_CVERSION cmdline
+CONFIG += cmdline
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT \
+               QT_NO_INFO_OUTPUT \
+               QT_NO_WARNING_OUTPUT
+    CONFIG -= debug
+    CONFIG += release
+}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -11,80 +21,81 @@ CONFIG += QT_CVERSION cmdline
 
 # The path to the OpenSSL folder
 HOST_DEPENDENT_PATH = D:/QtSDK/Tools/OpenSSLv3
-*-msvc* {
-  message(Microsoft VS)
-  LIBS += -L$${HOST_DEPENDENT_PATH}/Win_x64/lib -llibssl -llibcrypto
-  INCLUDEPATH += $${HOST_DEPENDENT_PATH}/Win_x64/include
+OPENSSL_PATH = $${OPENSSL_DIR}
+isEmpty(OPENSSL_PATH): OPENSSL_PATH = $${HOST_DEPENDENT_PATH}
 
-  # ref: https://stackoverflow.com/questions/16688079/how-to-change-the-c-runtime-library-setting-in-qtcreator
-  QMAKE_CXXFLAGS_DEBUG += /MTd
-  QMAKE_CFLAGS_DEBUG += /MTd
-  QMAKE_CXXFLAGS_RELEASE += /MT
-  QMAKE_CFLAGS_RELEASE += /MT
-  QMAKE_CXXFLAGS_RELEASE += /Zi
-  QMAKE_LFLAGS_RELEASE += /DEBUG
+win32-msvc* {
+  message("Building with MSVC")
+  INCLUDEPATH += $${OPENSSL_PATH}/Win_x64/include
+  LIBS += -L$${OPENSSL_PATH}/Win_x64/lib -llibssl -llibcrypto
 }
 
 #For the MinGW uses a custom build of the OpenSSL version 3.3.1
-*-g++* {
-  message(MinGW)
+win32-g++ {
+  message("Building with MinGW")
+  INCLUDEPATH += $${OPENSSL_PATH}/MinGW/lib/src/include
+
   CONFIG(debug, debug|release) {
-    message(config_debug)
-    LIBS += -L$${HOST_DEPENDENT_PATH}/MinGW/lib/debug/lib64 -llibssl -llibcrypto
+    LIBS += -L$${OPENSSL_PATH}/MinGW/lib/debug/lib64
+  } else {
+    LIBS += -L$${OPENSSL_PATH}/MinGW/lib/release/lib64
   }
-  CONFIG(release, debug|release) {
-    message(config_release)
-    LIBS += -L$${HOST_DEPENDENT_PATH}/MinGW/lib/release/lib64 -llibssl -llibcrypto
-  }
-  INCLUDEPATH += $${HOST_DEPENDENT_PATH}/MinGW/lib/src/include
-  LIBS += -lws2_32 -lGDI32 -lADVAPI32 -lCRYPT32 -lUSER32
+  LIBS += -llibssl -llibcrypto -lws2_32 -lGDI32 -lADVAPI32 -lCRYPT32 -lUSER32
 }
 
-INCLUDEPATH += ../Common/Core
-INCLUDEPATH += . src
+INCLUDEPATH += $${PROJECT_ROOT_DIRECTORY}/Common/Core \
+               $${PROJECT_ROOT_DIRECTORY}/src
 
 HEADERS += \
-  ../Common/Core/CConsoleOutput.h \
-  ../Common/Core/CBasicCmdLineParser.h \
-  ../Common/Core/elcUtils.h \
-  ../Common/Core/MMSTypes.h \
+  $${PROJECT_ROOT_DIRECTORY}/Common/Core/CConsoleOutput.h \
+  $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicCmdLineParser.h \
+  $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.h \
+  $${PROJECT_ROOT_DIRECTORY}/Common/Core/MMSTypes.h \
   src/CP7bMakerCmdLineParser.h \
   src/CPkcs7.h
 
 SOURCES += \
-  ../Common/Core/CBasicCmdLineParser.cpp \
-  ../Common/Core/elcUtils.cpp \
+  $${PROJECT_ROOT_DIRECTORY}/Common/Core/CBasicCmdLineParser.cpp \
+  $${PROJECT_ROOT_DIRECTORY}/Common/Core/elcUtils.cpp \
   src/CP7bMakerCmdLineParser.cpp \
   src/CPkcs7.cpp \
   src/main.cpp
-
-include(../deployment.pri)
-include(../MMSTools.pri)
 
 RC_ICONS = img/elcc.ico
 
 MAJOR_VER = 1
 MINOR_VER = 0
 PATCH_VER = 0
-BUILD_VER = 10
+BUILD_VER = 11
 BUILD_DATE = $$_DATE_
 
-VER_PE = $${MAJOR_VER}.$${MINOR_VER}
-win32:VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER}.$${BUILD_VER} # major.minor.patch.build
-else: VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
+# VERSION_PE_HEADER = $${MAJOR_VER}.$${MINOR_VER}
+win32 {
+    VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER}.$${BUILD_VER} # major.minor.patch.build
 
-VERSION_PE_HEADER = $${VER_PE}
+    CONFIG(release, debug|release) {
+        WINDEPLOYQT = $$system_path($$[QT_INSTALL_BINS]/windeployqt.exe)
+        TARGET_EXE  = $$system_path($$FINAL_DEST_DIR/$${TARGET}.exe)
+        # This postbuild process dont copy the OpenSSL dlls.
+        QMAKE_POST_LINK += \"$$WINDEPLOYQT\" --no-translations --no-opengl-sw --no-svg --compiler-runtime \"$$OUT_PWD/release/$$TARGET_EXE\"
+    }
+} else {
+    VERSTR = $${MAJOR_VER}.$${MINOR_VER}.$${PATCH_VER} # major.minor.patch
+}
+
 VERSION = $${VERSTR}
-QMAKE_TARGET_DESCRIPTION = p7b file maker Console Utility
-QMAKE_TARGET_COPYRIGHT = (C) 2024 Oleksii Gaienko
-QMAKE_TARGET_PRODUCT = p7b file maker Utility
-QMAKE_TARGET_INTERNALNAME = $${TARGET}
+
+QMAKE_TARGET_DESCRIPTION = "p7b file maker Console Utility"
+QMAKE_TARGET_COPYRIGHT = "(C) 2024 Oleksii Gaienko, support@galexsoftware.info"
+QMAKE_TARGET_PRODUCT = "p7b file maker Utility"
+QMAKE_TARGET_INTERNALNAME = "$${TARGET}"
 QMAKE_TARGET_COMMENTS = support@galexsoftware.info
 
-DEFINES += TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"
-DEFINES += BUILD_VER=\\\"$${VERSTR}\\\"
-DEFINES += BUILD_GIT=\\\"$${GIT_VERSION}\\\"
-DEFINES += "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\""
-DEFINES += QT_VER=\\\"$${QT_VERSION}\\\"
-DEFINES += CONTACT=\\\"support@galexsoftware.info\\\"
-DEFINES += CONSOLE
+DEFINES += \
+    CONSOLE \
+    CONTACT=\\\"support@galexsoftware.info\\\" \
+    BUILD_VER=\\\"$${VERSTR}\\\" \
+    BUILD_GIT=\\\"$${GIT_VERSION}\\\" \
+    "BUILD_DATE=\"\\\"$${BUILD_DATE}\\\"\"" \
+    QT_VER=\\\"$${QT_VERSION}\\\" \
+    TEST_SRCDIR=\\\"$${TEST_SRCDIR}\\\"

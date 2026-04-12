@@ -52,13 +52,18 @@ CAuditTrailParser2::parse(const QString& line)
     m_companyname = match.captured(6);
 
     bool retVal = true;
-    m_timestamp = QDateTime::fromString(timestamp, Qt::ISODateWithMs);
-    if (m_timestamp.isValid()) {
-        m_timestamp = m_timestamp.toLocalTime();
+    if (timestamp.contains('T') && timestamp.contains('-')) {
+        m_timestamp = QDateTime::fromString(timestamp, Qt::ISODateWithMs).toLocalTime();
     } else {
+        m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy HH:mm:ss");
+        if (!m_timestamp.isValid()) {
+            m_timestamp = QDateTime::fromString(timestamp, "dd.MM.yyyy HH:mm:ss.zzz");
+        }
+    }
+    if (!m_timestamp.isValid()) {
         m_timestamp = QDateTime();
         setErrorString(QStringLiteral("Error converting Timestamp value: %1").arg(timestamp));
-        retVal = false;
+        return false;
     }
 
     qsizetype posStart = m_username.indexOf(QLatin1Char('('));
@@ -69,7 +74,7 @@ CAuditTrailParser2::parse(const QString& line)
     // Parsing Attributes, IpAddress and SessionId
     m_attributes = line.mid(m_header.length());
     posEnd = posStart = m_attributes.lastIndexOf(m_delimiterChar);
-    m_sessionId = m_attributes.mid(posStart + 1);
+    m_sessionId = m_attributes.mid(posStart + 1).trimmed();
     posStart = m_attributes.lastIndexOf(m_delimiterChar, posStart - 1);
     m_ipaddresses = m_attributes.sliced(posStart + 1, posEnd - posStart - 1);
     analizeIPAdresses();
